@@ -5,11 +5,13 @@ import (
 	"fmt"
 	"io"
 	"sync"
+	"time"
 
 	ethcmn "github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/prque"
 	"github.com/ethereum/go-ethereum/core/rawdb"
 	ethstate "github.com/ethereum/go-ethereum/core/state"
+	"github.com/ethereum/go-ethereum/core/state/snapshot"
 	ethtypes "github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/trie"
@@ -64,6 +66,13 @@ type MptStore struct {
 	cmLock       sync.Mutex
 
 	retriever StateRootRetriever
+
+	snaps         *snapshot.Tree
+	snap          snapshot.Snapshot
+	snapDestructs map[ethcmn.Hash]struct{}
+	snapAccounts  map[ethcmn.Hash][]byte
+	snapStorage   map[ethcmn.Hash]map[ethcmn.Hash][]byte
+	snapRWLock    sync.RWMutex
 }
 
 func (ms *MptStore) CommitterCommitMap(deltaMap iavl.TreeDeltaMap) (_ types.CommitID, _ iavl.TreeDeltaMap) {
@@ -102,6 +111,17 @@ func generateMptStore(logger tmlog.Logger, id types.CommitID, db ethstate.Databa
 		exitSignal:          make(chan struct{}),
 	}
 	err := mptStore.openTrie(id)
+	if err != nil {
+		return mptStore, err
+	}
+	if err = mptStore.openSnapshot(); err != nil {
+		if mptStore.logger != nil {
+			mptStore.logger.Info("open snapshot fail", "warn", err)
+		}
+		err = nil
+	} else if mptStore.logger != nil {
+		mptStore.logger.Info("open snapshot successfully", "snapshot", "ok")
+	}
 
 	return mptStore, err
 }
@@ -171,13 +191,21 @@ func (ms *MptStore) Get(key []byte) []byte {
 	switch mptKeyType(key) {
 	case storageType:
 		addr, stateRoot, realKey := decodeAddressStorageInfo(key)
+		value, err := ms.getSnapStorage(addr, realKey)
+		if err == nil {
+			return value
+		}
 		t := ms.tryGetStorageTrie(addr, stateRoot, false)
-		value, err := t.TryGet(realKey)
+		value, err = t.TryGet(realKey)
 		if err != nil {
 			return nil
 		}
 		return value
 	case addressType:
+		v, err := ms.getSnapAccount(key)
+		if err == nil {
+			return v
+		}
 		value, err := ms.db.CopyTrie(ms.trie).TryGet(key)
 		if err != nil {
 			return nil
@@ -228,8 +256,10 @@ func (ms *MptStore) Set(key, value []byte) {
 		addr, stateRoot, realKey := decodeAddressStorageInfo(key)
 		t := ms.tryGetStorageTrie(addr, stateRoot, true)
 		t.TryUpdate(realKey, value)
+		ms.updateSnapStorages(addr, realKey, value)
 	case addressType:
 		ms.trie.TryUpdate(key, value)
+		ms.updateSnapAccounts(key, value)
 	default:
 		panic(fmt.Errorf("not support key %s for mpt set", hex.EncodeToString(key)))
 	}
@@ -246,8 +276,10 @@ func (ms *MptStore) Delete(key []byte) {
 		addr, stateRoot, realKey := decodeAddressStorageInfo(key)
 		t := ms.tryGetStorageTrie(addr, stateRoot, true)
 		t.TryDelete(realKey)
+		ms.updateSnapStorages(addr, realKey, nil)
 	case addressType:
 		ms.trie.TryDelete(key)
+		ms.updateDestructs(key)
 	default:
 		panic(fmt.Errorf("not support key %s for mpt delete", hex.EncodeToString(key)))
 
@@ -283,6 +315,7 @@ func (ms *MptStore) CommitterCommit(delta *iavl.TreeDelta) (types.CommitID, *iav
 			if err := ms.trie.TryUpdate(key, newValue); err != nil {
 				panic(fmt.Errorf("unexcepted err:%v while update acc %s ", err, addr.String()))
 			}
+			ms.updateSnapAccounts(key, newValue)
 		} else {
 			panic(fmt.Errorf("unexcepted err:%v while update get acc %s ", err, addr.String()))
 		}
@@ -389,6 +422,7 @@ func (ms *MptStore) fullNodePersist(curMptRoot ethcmn.Hash, curHeight int64) {
 		if err := ms.db.TrieDB().Commit(curMptRoot, false, nil); err != nil {
 			panic("fail to commit mpt data: " + err.Error())
 		}
+		ms.commitSnap(curMptRoot)
 	}
 	ms.SetLatestStoredBlockHeight(uint64(curHeight))
 	if ms.logger != nil {
@@ -427,6 +461,7 @@ func (ms *MptStore) otherNodePersist(curMptRoot ethcmn.Hash, curHeight int64) {
 			if err := triedb.Commit(chRoot, true, nil); err != nil {
 				panic("fail to commit mpt data: " + err.Error())
 			}
+			ms.commitSnap(chRoot)
 		}
 		ms.SetLatestStoredBlockHeight(uint64(curHeight))
 		if ms.logger != nil {
@@ -466,12 +501,12 @@ func (ms *MptStore) StopWithVersion(targetVersion int64) error {
 	// Ensure the state of a recent block is also stored to disk before exiting.
 	if !TrieDirtyDisabled {
 		triedb := ms.db.TrieDB()
-		oecStartHeight := uint64(tmtypes.GetStartBlockHeight()) // start height of oec
+		startHeight := uint64(tmtypes.GetStartBlockHeight()) // start height of okb
 
 		latestStoreVersion := ms.GetLatestStoredBlockHeight()
 
 		for version := latestStoreVersion; version <= curVersion; version++ {
-			if version <= oecStartHeight || version <= uint64(ms.startVersion) {
+			if version <= startHeight || version <= uint64(ms.startVersion) {
 				continue
 			}
 
@@ -495,6 +530,12 @@ func (ms *MptStore) StopWithVersion(targetVersion int64) error {
 		for !ms.triegc.Empty() {
 			ms.db.TrieDB().Dereference(ms.triegc.PopItem().(ethcmn.Hash))
 		}
+	}
+	ts := time.Now()
+	if err := ms.flattenPersistSnapshot(); err != nil && ms.logger != nil {
+		ms.logger.Error("Writing snapshot state to disk", "error", err)
+	} else if ms.logger != nil {
+		ms.logger.Info("Writing snapshot successfully", "cost", time.Since(ts))
 	}
 
 	return nil
