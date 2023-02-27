@@ -12,6 +12,7 @@ import (
 	"github.com/okx/okbchain/libs/cosmos-sdk/client/flags"
 	"github.com/okx/okbchain/libs/cosmos-sdk/store/mpt/types"
 	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
+	snap "github.com/okx/okbchain/libs/cosmos-sdk/store/mpt/snapshot"
 	"github.com/spf13/viper"
 )
 
@@ -43,6 +44,7 @@ func InstanceOfMptStore() ethstate.Database {
 		nkvstore := NewStatKeyValueStore(kvstore, gStatic)
 
 		db := rawdb.NewDatabase(nkvstore)
+		snap.SetDiskDB(db)
 		gMptDatabase = ethstate.NewDatabaseWithConfig(db, &trie.Config{
 			Cache:     int(TrieCacheSize),
 			Journal:   "",
