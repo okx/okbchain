@@ -5,11 +5,11 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/okex/exchain/x/common"
+	"github.com/okx/okbchain/x/common"
 
-	sdk "github.com/okex/exchain/libs/cosmos-sdk/types"
-	"github.com/okex/exchain/libs/tendermint/crypto"
-	govtypes "github.com/okex/exchain/x/gov/types"
+	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
+	"github.com/okx/okbchain/libs/tendermint/crypto"
+	govtypes "github.com/okx/okbchain/x/gov/types"
 )
 
 const (

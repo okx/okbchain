@@ -1,8 +1,8 @@
 package params
 
 import (
-	"github.com/okex/exchain/libs/cosmos-sdk/codec"
-	"github.com/okex/exchain/x/params/types"
+	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
+	"github.com/okx/okbchain/x/params/types"
 )
 
 // ModuleCdc is the codec of module
