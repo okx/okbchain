@@ -5,6 +5,7 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"errors"
+	"github.com/okx/okbchain/libs/system"
 	"math/big"
 	"strconv"
 	"strings"
@@ -118,7 +119,7 @@ func InitializeOKXApp(b testing.TB, db dbm.DB, numAccounts int) AppInfo {
 	// constants
 	minter := secp256k1.GenPrivKey()
 	addr := sdk.AccAddress(minter.PubKey().Address())
-	denom := "okt"
+	denom := system.Currency
 
 	// genesis setup (with a bunch of random accounts)
 	genAccs := make([]authexported.GenesisAccount, numAccounts+2)

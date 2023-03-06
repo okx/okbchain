@@ -2,6 +2,7 @@ package common
 
 import (
 	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
+	"github.com/okx/okbchain/libs/system"
 	"github.com/stretchr/testify/assert"
 	"testing"
 
@@ -14,7 +15,7 @@ import (
 
 var (
 	syscoinsTestDenom1 = "eos"
-	syscoinsTestDenom2 = "okt"
+	syscoinsTestDenom2 = system.Currency
 )
 
 func TestIsZeroCoins(t *testing.T) {
