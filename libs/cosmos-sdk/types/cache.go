@@ -6,22 +6,7 @@ import (
 	"time"
 
 	ethcmn "github.com/ethereum/go-ethereum/common"
-	"github.com/okex/exchain/libs/cosmos-sdk/store/types"
-	"github.com/okex/exchain/libs/tendermint/crypto"
-	"github.com/okex/exchain/libs/tendermint/libs/log"
-	"github.com/spf13/viper"
-)
-
-var (
-	maxAccInMap        = 100000
-	deleteAccCount     = 10000
-	maxStorageInMap    = 10000000
-	deleteStorageCount = 1000000
-
-	FlagMultiCache         = "multi-cache"
-	MaxAccInMultiCache     = "multi-cache-acc"
-	MaxStorageInMultiCache = "multi-cache-storage"
-	UseCache               bool
+	"github.com/okx/okbchain/libs/tendermint/crypto"
 )
 
 type Account interface {
