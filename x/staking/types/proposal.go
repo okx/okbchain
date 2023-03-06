@@ -14,7 +14,7 @@ import (
 
 const (
 	proposalTypeProposeValidator = "ProposeValidator"
-	ProposeValidatorProposalName = "okexchain/staking/ProposeValidatorProposal"
+	ProposeValidatorProposalName = system.Chain+"/staking/ProposeValidatorProposal"
 )
 
 var _ govtypes.Content = (*ProposeValidatorProposal)(nil)

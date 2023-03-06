@@ -19,9 +19,9 @@ func init() {
 }
 
 func RegisterConvert() {
-	baseapp.RegisterCmHandle("okexchain/MsgRegisterFeeSplit", baseapp.NewCMHandle(ConvertRegisterFeeSplitMsg, 0))
-	baseapp.RegisterCmHandle("okexchain/MsgUpdateFeeSplit", baseapp.NewCMHandle(ConvertUpdateFeeSplitMsg, 0))
-	baseapp.RegisterCmHandle("okexchain/MsgCancelFeeSplit", baseapp.NewCMHandle(ConvertCancelFeeSplitMsg, 0))
+	baseapp.RegisterCmHandle(system.Chain+"/MsgRegisterFeeSplit", baseapp.NewCMHandle(ConvertRegisterFeeSplitMsg, 0))
+	baseapp.RegisterCmHandle(system.Chain+"/MsgUpdateFeeSplit", baseapp.NewCMHandle(ConvertUpdateFeeSplitMsg, 0))
+	baseapp.RegisterCmHandle(system.Chain+"/MsgCancelFeeSplit", baseapp.NewCMHandle(ConvertCancelFeeSplitMsg, 0))
 }
 
 func ConvertRegisterFeeSplitMsg(data []byte, signers []sdk.AccAddress) (sdk.Msg, error) {

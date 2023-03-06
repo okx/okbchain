@@ -34,7 +34,7 @@ func (suite *UpgradeKeeperSuite) SetupTest() {
 	suite.NoError(err)
 
 	suite.cdc = codec.New()
-	suite.cdc.RegisterConcrete(UpgradeInfo{}, "okexchain/params/types/UpgradeInfo", nil)
+	suite.cdc.RegisterConcrete(UpgradeInfo{}, system.Chain+"/params/types/UpgradeInfo", nil)
 	suite.cdc.Seal()
 
 	suite.logger = log.TestingLogger()

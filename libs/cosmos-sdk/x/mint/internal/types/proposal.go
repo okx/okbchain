@@ -17,7 +17,7 @@ const (
 
 func init() {
 	govtypes.RegisterProposalType(proposalTypeManageTreasures)
-	govtypes.RegisterProposalTypeCodec(ManageTreasuresProposal{}, "okexchain/mint/ManageTreasuresProposal")
+	govtypes.RegisterProposalTypeCodec(ManageTreasuresProposal{}, system.Chain+"/mint/ManageTreasuresProposal")
 }
 
 var (
