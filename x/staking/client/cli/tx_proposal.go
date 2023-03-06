@@ -65,7 +65,7 @@ Where proposal.json contains:
   "is_add": true,
   "deposit": [
     {
-      "denom": "okt",
+      "denom": "okb",
       "amount": "100.000000000000000000"
     }
   ],

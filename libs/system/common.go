@@ -10,4 +10,5 @@ const (
 	ServerLog = Server+".log"
 	EnvPrefix = "OKBCHAIN"
 	CoinType uint32 = 60
+	Currency = "okb"
 )
