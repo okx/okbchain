@@ -5,15 +5,15 @@ import (
 	"testing"
 	"time"
 
-	"github.com/okex/exchain/x/common"
+	"github.com/okx/okbchain/x/common"
 
-	"github.com/okex/exchain/libs/cosmos-sdk/x/supply"
+	"github.com/okx/okbchain/libs/cosmos-sdk/x/supply"
 
-	sdk "github.com/okex/exchain/libs/cosmos-sdk/types"
-	abci "github.com/okex/exchain/libs/tendermint/abci/types"
-	"github.com/okex/exchain/libs/tendermint/crypto/ed25519"
-	"github.com/okex/exchain/x/staking/exported"
-	"github.com/okex/exchain/x/staking/types"
+	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
+	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
+	"github.com/okx/okbchain/libs/tendermint/crypto/ed25519"
+	"github.com/okx/okbchain/x/staking/exported"
+	"github.com/okx/okbchain/x/staking/types"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
