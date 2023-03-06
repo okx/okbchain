@@ -61,15 +61,15 @@ endif
 build_tags += $(BUILD_TAGS)
 build_tags := $(strip $(build_tags))
 
-ldflags = -X $(GithubTop)/okb/okbchain/libs/cosmos-sdk/version.Version=$(Version) \
-	-X $(GithubTop)/okb/okbchain/libs/cosmos-sdk/version.Name=$(Name) \
-  -X $(GithubTop)/okb/okbchain/libs/cosmos-sdk/version.ServerName=$(ServerName) \
-  -X $(GithubTop)/okb/okbchain/libs/cosmos-sdk/version.ClientName=$(ClientName) \
-  -X $(GithubTop)/okb/okbchain/libs/cosmos-sdk/version.Commit=$(COMMIT) \
-  -X $(GithubTop)/okb/okbchain/libs/cosmos-sdk/version.CosmosSDK=$(CosmosSDK) \
-  -X $(GithubTop)/okb/okbchain/libs/cosmos-sdk/version.Tendermint=$(Tendermint) \
-  -X "$(GithubTop)/okb/okbchain/libs/cosmos-sdk/version.BuildTags=$(build_tags)" \
-  -X $(GithubTop)/okb/okbchain/libs/tendermint/types.MILESTONE_MARS_HEIGHT=$(MarsHeight)
+ldflags = -X $(GithubTop)/okx/okbchain/libs/cosmos-sdk/version.Version=$(Version) \
+	-X $(GithubTop)/okx/okbchain/libs/cosmos-sdk/version.Name=$(Name) \
+  -X $(GithubTop)/okx/okbchain/libs/cosmos-sdk/version.ServerName=$(ServerName) \
+  -X $(GithubTop)/okx/okbchain/libs/cosmos-sdk/version.ClientName=$(ClientName) \
+  -X $(GithubTop)/okx/okbchain/libs/cosmos-sdk/version.Commit=$(COMMIT) \
+  -X $(GithubTop)/okx/okbchain/libs/cosmos-sdk/version.CosmosSDK=$(CosmosSDK) \
+  -X $(GithubTop)/okx/okbchain/libs/cosmos-sdk/version.Tendermint=$(Tendermint) \
+  -X "$(GithubTop)/okx/okbchain/libs/cosmos-sdk/version.BuildTags=$(build_tags)" \
+  -X $(GithubTop)/okx/okbchain/libs/tendermint/types.MILESTONE_MARS_HEIGHT=$(MarsHeight)
 
 
 ifeq ($(WITH_ROCKSDB),true)
@@ -116,13 +116,10 @@ testnet: okbchain
 
 test-unit:
 	@VERSION=$(VERSION) go test -mod=readonly -tags='ledger test_ledger_mock' ./app/...
-	@VERSION=$(VERSION) go test -mod=readonly -tags='ledger test_ledger_mock' ./x/backend/...
 	@VERSION=$(VERSION) go test -mod=readonly -tags='ledger test_ledger_mock' ./x/common/...
-	@VERSION=$(VERSION) go test -mod=readonly -tags='ledger test_ledger_mock' ./x/dex/...
 	@VERSION=$(VERSION) go test -mod=readonly -tags='ledger test_ledger_mock' ./x/distribution/...
 	@VERSION=$(VERSION) go test -mod=readonly -tags='ledger test_ledger_mock' ./x/genutil/...
 	@VERSION=$(VERSION) go test -mod=readonly -tags='ledger test_ledger_mock' ./x/gov/...
-#	@VERSION=$(VERSION) go test -mod=readonly -tags='ledger test_ledger_mock' ./x/order/...
 	@VERSION=$(VERSION) go test -mod=readonly -tags='ledger test_ledger_mock' ./x/params/...
 	@VERSION=$(VERSION) go test -mod=readonly -tags='ledger test_ledger_mock' ./x/staking/...
 	@VERSION=$(VERSION) go test -mod=readonly -tags='ledger test_ledger_mock' ./x/token/...
