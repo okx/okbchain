@@ -2,6 +2,7 @@ package types
 
 import (
 	"fmt"
+	"github.com/okx/okbchain/libs/system"
 	"strings"
 
 	"github.com/okx/okbchain/libs/cosmos-sdk/x/params/types"
@@ -17,7 +18,7 @@ var _ govtypes.Content = ParameterChangeProposal{}
 
 func init() {
 	govtypes.RegisterProposalType(sdkparams.ProposalTypeChange)
-	govtypes.RegisterProposalTypeCodec(ParameterChangeProposal{}, "okexchain/params/ParameterChangeProposal")
+	govtypes.RegisterProposalTypeCodec(ParameterChangeProposal{}, system.Chain+"/params/ParameterChangeProposal")
 }
 
 // ParameterChangeProposal is the struct of param change proposal

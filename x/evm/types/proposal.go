@@ -2,6 +2,7 @@ package types
 
 import (
 	"fmt"
+	"github.com/okx/okbchain/libs/system"
 	"strings"
 
 	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
@@ -27,11 +28,11 @@ func init() {
 	govtypes.RegisterProposalType(proposalTypeManageContractMethodBlockedList)
 	govtypes.RegisterProposalType(proposalTypeManageSysContractAddress)
 	govtypes.RegisterProposalType(proposalTypeManageContractByteCode)
-	govtypes.RegisterProposalTypeCodec(ManageContractDeploymentWhitelistProposal{}, "okexchain/evm/ManageContractDeploymentWhitelistProposal")
-	govtypes.RegisterProposalTypeCodec(ManageContractBlockedListProposal{}, "okexchain/evm/ManageContractBlockedListProposal")
-	govtypes.RegisterProposalTypeCodec(ManageContractMethodBlockedListProposal{}, "okexchain/evm/ManageContractMethodBlockedListProposal")
-	govtypes.RegisterProposalTypeCodec(ManageSysContractAddressProposal{}, "okexchain/evm/ManageSysContractAddressProposal")
-	govtypes.RegisterProposalTypeCodec(ManageContractByteCodeProposal{}, "okexchain/evm/ManageContractBytecode")
+	govtypes.RegisterProposalTypeCodec(ManageContractDeploymentWhitelistProposal{}, system.Chain+"/evm/ManageContractDeploymentWhitelistProposal")
+	govtypes.RegisterProposalTypeCodec(ManageContractBlockedListProposal{}, system.Chain+"/evm/ManageContractBlockedListProposal")
+	govtypes.RegisterProposalTypeCodec(ManageContractMethodBlockedListProposal{}, system.Chain+"/evm/ManageContractMethodBlockedListProposal")
+	govtypes.RegisterProposalTypeCodec(ManageSysContractAddressProposal{}, system.Chain+"/evm/ManageSysContractAddressProposal")
+	govtypes.RegisterProposalTypeCodec(ManageContractByteCodeProposal{}, system.Chain+"/evm/ManageContractBytecode")
 }
 
 var (

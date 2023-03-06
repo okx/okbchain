@@ -2,6 +2,7 @@ package types
 
 import (
 	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
+	"github.com/okx/okbchain/libs/system"
 )
 
 // ModuleCdc defines the feesplit module's codec
@@ -9,10 +10,10 @@ var ModuleCdc = codec.New()
 
 const (
 	// Amino names
-	registerFeeSplitName = "okexchain/MsgRegisterFeeSplit"
-	updateFeeSplitName   = "okexchain/MsgUpdateFeeSplit"
-	cancelFeeSplitName   = "okexchain/MsgCancelFeeSplit"
-	sharesProposalName   = "okexchain/feesplit/SharesProposal"
+	registerFeeSplitName = system.Chain+"/MsgRegisterFeeSplit"
+	updateFeeSplitName   = system.Chain+"/MsgUpdateFeeSplit"
+	cancelFeeSplitName   = system.Chain+"/MsgCancelFeeSplit"
+	sharesProposalName   = system.Chain+"/feesplit/SharesProposal"
 )
 
 // NOTE: This is required for the GetSignBytes function

@@ -2,6 +2,7 @@ package types
 
 import (
 	"fmt"
+	"github.com/okx/okbchain/libs/system"
 	"strings"
 
 	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
@@ -15,7 +16,7 @@ const (
 
 func init() {
 	govtypes.RegisterProposalType(proposalTypeFeeSplitShares)
-	govtypes.RegisterProposalTypeCodec(FeeSplitSharesProposal{}, "okexchain/feesplit/SharesProposal")
+	govtypes.RegisterProposalTypeCodec(FeeSplitSharesProposal{}, system.Chain+"/feesplit/SharesProposal")
 }
 
 var (

@@ -3,6 +3,7 @@ package types
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/okx/okbchain/libs/system"
 	"strings"
 
 	"github.com/okx/okbchain/x/common"
@@ -14,7 +15,7 @@ import (
 
 const (
 	proposalTypeProposeValidator = "ProposeValidator"
-	ProposeValidatorProposalName = "okexchain/staking/ProposeValidatorProposal"
+	ProposeValidatorProposalName = system.Chain+"/staking/ProposeValidatorProposal"
 )
 
 var _ govtypes.Content = (*ProposeValidatorProposal)(nil)
