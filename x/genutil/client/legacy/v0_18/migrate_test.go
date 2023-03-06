@@ -18,8 +18,8 @@ func TestMigrate(t *testing.T) {
 	codec.RegisterCrypto(v018Codec)
 
 	appState := genutil.AppMap{
-		"staking": []byte(`{"params":{"bond_denom":"okt","epoch":252,"max_bonded_validators":21,"max_validators_to_add_shares":30,"min_delegation":"0.000100000000000000","min_self_delegation":"10000.000000000000000000","unbonding_time":"1209600000000000"}}`),
-		"evm":     []byte(`{"params":{"enable_call":true,"enable_create":true,"evm_denom":"okt","extra_eips":null}}`),
+		"staking": []byte(`{"params":{"bond_denom":"okb","epoch":252,"max_bonded_validators":21,"max_validators_to_add_shares":30,"min_delegation":"0.000100000000000000","min_self_delegation":"10000.000000000000000000","unbonding_time":"1209600000000000"}}`),
+		"evm":     []byte(`{"params":{"enable_call":true,"enable_create":true,"evm_denom":"okb","extra_eips":null}}`),
 	}
 	statsMigrate := Migrate(appState)
 

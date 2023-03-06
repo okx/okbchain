@@ -21,7 +21,7 @@ const (
   "is_added": true,
   "deposit": [
     {
-      "denom": "okt",
+      "denom": "okb",
       "amount": "100.000000000000000000"
     }
   ]
@@ -36,7 +36,7 @@ const (
   "is_added": true,
   "deposit": [
     {
-      "denom": "okt",
+      "denom": "okb",
       "amount": "100.000000000000000000"
     }
   ]
@@ -75,7 +75,7 @@ const (
   "is_added": true,
   "deposit": [
     {
-      "denom": "okt",
+      "denom": "okb",
       "amount": "100.000000000000000000"
     }
   ]
@@ -192,7 +192,7 @@ func TestParseManageSysContractAddressProposalJSON(t *testing.T) {
   "is_added":true,
   "deposit": [
     {
-      "denom": "okt",
+      "denom": "okb",
       "amount": "100.000000000000000000"
     }
   ]
