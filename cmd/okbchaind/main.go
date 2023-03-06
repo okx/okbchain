@@ -71,7 +71,7 @@ func main() {
 	ctx := server.NewDefaultContext()
 
 	rootCmd := &cobra.Command{
-		Use:               "exchaind",
+		Use:               system.Server,
 		Short:             "ExChain App Daemon (server)",
 		PersistentPreRunE: preRun(ctx),
 	}
