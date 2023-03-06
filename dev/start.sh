@@ -94,11 +94,11 @@ okbchaincli keys add --recover admin18 -m "lazy cause kite fence gravity regret 
 # Set moniker and chain-id for Ethermint (Moniker can be anything, chain-id must be an integer)
 okbchaind init $MONIKER --chain-id $CHAINID --home $HOME_SERVER
 
-# Change parameter token denominations to okt
-cat $HOME_SERVER/config/genesis.json | jq '.app_state["staking"]["params"]["bond_denom"]="okt"' > $HOME_SERVER/config/tmp_genesis.json && mv $HOME_SERVER/config/tmp_genesis.json $HOME_SERVER/config/genesis.json
-cat $HOME_SERVER/config/genesis.json | jq '.app_state["crisis"]["constant_fee"]["denom"]="okt"' > $HOME_SERVER/config/tmp_genesis.json && mv $HOME_SERVER/config/tmp_genesis.json $HOME_SERVER/config/genesis.json
-cat $HOME_SERVER/config/genesis.json | jq '.app_state["gov"]["deposit_params"]["min_deposit"][0]["denom"]="okt"' > $HOME_SERVER/config/tmp_genesis.json && mv $HOME_SERVER/config/tmp_genesis.json $HOME_SERVER/config/genesis.json
-cat $HOME_SERVER/config/genesis.json | jq '.app_state["mint"]["params"]["mint_denom"]="okt"' > $HOME_SERVER/config/tmp_genesis.json && mv $HOME_SERVER/config/tmp_genesis.json $HOME_SERVER/config/genesis.json
+# Change parameter token denominations to okb
+cat $HOME_SERVER/config/genesis.json | jq '.app_state["staking"]["params"]["bond_denom"]="okb"' > $HOME_SERVER/config/tmp_genesis.json && mv $HOME_SERVER/config/tmp_genesis.json $HOME_SERVER/config/genesis.json
+cat $HOME_SERVER/config/genesis.json | jq '.app_state["crisis"]["constant_fee"]["denom"]="okb"' > $HOME_SERVER/config/tmp_genesis.json && mv $HOME_SERVER/config/tmp_genesis.json $HOME_SERVER/config/genesis.json
+cat $HOME_SERVER/config/genesis.json | jq '.app_state["gov"]["deposit_params"]["min_deposit"][0]["denom"]="okb"' > $HOME_SERVER/config/tmp_genesis.json && mv $HOME_SERVER/config/tmp_genesis.json $HOME_SERVER/config/genesis.json
+cat $HOME_SERVER/config/genesis.json | jq '.app_state["mint"]["params"]["mint_denom"]="okb"' > $HOME_SERVER/config/tmp_genesis.json && mv $HOME_SERVER/config/tmp_genesis.json $HOME_SERVER/config/genesis.json
 
 # Enable EVM
 
@@ -113,10 +113,10 @@ else
 fi
 
 # Allocate genesis accounts (cosmos formatted addresses)
-okbchaind add-genesis-account $(okbchaincli keys show $KEY    -a) 100000000okt --home $HOME_SERVER
-okbchaind add-genesis-account $(okbchaincli keys show admin16 -a) 900000000okt --home $HOME_SERVER
-okbchaind add-genesis-account $(okbchaincli keys show admin17 -a) 900000000okt --home $HOME_SERVER
-okbchaind add-genesis-account $(okbchaincli keys show admin18 -a) 900000000okt --home $HOME_SERVER
+okbchaind add-genesis-account $(okbchaincli keys show $KEY    -a) 100000000okb --home $HOME_SERVER
+okbchaind add-genesis-account $(okbchaincli keys show admin16 -a) 900000000okb --home $HOME_SERVER
+okbchaind add-genesis-account $(okbchaincli keys show admin17 -a) 900000000okb --home $HOME_SERVER
+okbchaind add-genesis-account $(okbchaincli keys show admin18 -a) 900000000okb --home $HOME_SERVER
 
 # Sign genesis transaction
 okbchaind gentx --name $KEY --keyring-backend test --home $HOME_SERVER
@@ -130,4 +130,4 @@ okbchaincli config keyring-backend test
 
 run
 
-# okbchaincli tx send captain 0x83D83497431C2D3FEab296a9fba4e5FaDD2f7eD0 1okt --fees 1okt -b block -y
+# okbchaincli tx send captain 0x83D83497431C2D3FEab296a9fba4e5FaDD2f7eD0 1okb --fees 1okb -b block -y
