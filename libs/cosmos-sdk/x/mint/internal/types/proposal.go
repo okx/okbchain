@@ -3,6 +3,7 @@ package types
 import (
 	"fmt"
 	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
+	"github.com/okx/okbchain/libs/system"
 	govtypes "github.com/okx/okbchain/x/gov/types"
 	"strings"
 )

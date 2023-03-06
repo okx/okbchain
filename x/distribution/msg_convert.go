@@ -3,6 +3,7 @@ package distribution
 import (
 	"encoding/json"
 	"errors"
+	"github.com/okx/okbchain/libs/system"
 
 	"github.com/okx/okbchain/libs/cosmos-sdk/baseapp"
 	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"

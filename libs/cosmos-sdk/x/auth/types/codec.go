@@ -3,6 +3,7 @@ package types
 import (
 	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
 	"github.com/okx/okbchain/libs/cosmos-sdk/x/auth/exported"
+	"github.com/okx/okbchain/libs/system"
 	"github.com/tendermint/go-amino"
 )
 

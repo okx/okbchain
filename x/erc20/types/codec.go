@@ -2,6 +2,7 @@ package types
 
 import (
 	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
+	"github.com/okx/okbchain/libs/system"
 )
 
 // ModuleCdc defines the erc20 module's codec

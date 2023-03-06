@@ -2,6 +2,7 @@ package types
 
 import (
 	"fmt"
+	"github.com/okx/okbchain/libs/system"
 	"strings"
 
 	"github.com/ethereum/go-ethereum/common"
