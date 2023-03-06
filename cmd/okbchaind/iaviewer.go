@@ -18,7 +18,7 @@ import (
 	"github.com/gogo/protobuf/proto"
 
 	"github.com/okx/okbchain/app"
-	"github.com/okx/okbchain/cmd/exchaind/base"
+	"github.com/okx/okbchain/cmd/okbchaind/base"
 	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
 	"github.com/okx/okbchain/libs/cosmos-sdk/server"
 	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"

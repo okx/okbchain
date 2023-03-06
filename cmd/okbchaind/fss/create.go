@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 
 	"github.com/okx/okbchain/app/utils/appstatus"
-	"github.com/okx/okbchain/cmd/exchaind/base"
+	"github.com/okx/okbchain/cmd/okbchaind/base"
 	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
 	"github.com/okx/okbchain/libs/iavl"
 	dbm "github.com/okx/okbchain/libs/tm-db"

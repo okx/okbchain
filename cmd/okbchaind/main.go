@@ -9,8 +9,8 @@ import (
 	"strings"
 
 	"github.com/okx/okbchain/app/logevents"
-	"github.com/okx/okbchain/cmd/exchaind/fss"
-	"github.com/okx/okbchain/cmd/exchaind/mpt"
+	"github.com/okx/okbchain/cmd/okbchaind/fss"
+	"github.com/okx/okbchain/cmd/okbchaind/mpt"
 
 	"github.com/okx/okbchain/app/rpc"
 	evmtypes "github.com/okx/okbchain/x/evm/types"
