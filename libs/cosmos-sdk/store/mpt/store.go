@@ -3,6 +3,7 @@ package mpt
 import (
 	"encoding/hex"
 	"fmt"
+	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
 	"io"
 	"sync"
 
@@ -162,8 +163,8 @@ func (ms *MptStore) CacheWrapWithTrace(w io.Writer, tc types.TraceContext) types
 }
 
 func (ms *MptStore) Get(key []byte) []byte {
-	switch key[0] {
-	case keyPrefixStorageMpt[0]:
+	switch mptKeyType(len(key)) {
+	case storageType:
 		addr, stateRoot, realKey := decodeAddressStorageInfo(key)
 		t := ms.tryGetStorageTrie(addr, stateRoot, false)
 		value, err := t.TryGet(realKey)
@@ -171,7 +172,7 @@ func (ms *MptStore) Get(key []byte) []byte {
 			return nil
 		}
 		return value
-	case byte(1): // TODO auth.AddressStoreKeyPrefix need move
+	case addressType:
 		value, err := ms.db.CopyTrie(ms.trie).TryGet(key)
 		if err != nil {
 			return nil
@@ -217,12 +218,12 @@ func (ms *MptStore) Set(key, value []byte) {
 	if ms.prefetcher != nil {
 		ms.prefetcher.Used(ms.originalRoot, [][]byte{key})
 	}
-	switch key[0] {
-	case keyPrefixStorageMpt[0]:
+	switch mptKeyType(len(key)) {
+	case storageType:
 		addr, stateRoot, realKey := decodeAddressStorageInfo(key)
 		t := ms.tryGetStorageTrie(addr, stateRoot, true)
 		t.TryUpdate(realKey, value)
-	case byte(1): // TODO auth.AddressStoreKeyPrefix need move
+	case addressType:
 		var stateR ethcmn.Hash
 		var err error
 		if trie, ok := ms.storageTrieForWrite[ethcmn.BytesToAddress(key[1:])]; ok {
@@ -247,12 +248,12 @@ func (ms *MptStore) Delete(key []byte) {
 	if ms.prefetcher != nil {
 		ms.prefetcher.Used(ms.originalRoot, [][]byte{key})
 	}
-	switch key[0] {
-	case keyPrefixStorageMpt[0]:
+	switch mptKeyType(len(key)) {
+	case storageType:
 		addr, stateRoot, realKey := decodeAddressStorageInfo(key)
 		t := ms.tryGetStorageTrie(addr, stateRoot, true)
 		t.TryDelete(realKey)
-	case byte(1): //TODO auth.AddressStoreKeyPrefix need move
+	case addressType:
 		err := ms.trie.TryDelete(key)
 		if err != nil {
 			return
@@ -643,4 +644,20 @@ func decodeAddressStorageInfo(key []byte) (ethcmn.Address, ethcmn.Hash, []byte) 
 	storageRoot := ethcmn.BytesToHash(key[sizePreFixKey+20 : sizePreFixKey+20+32])
 	updateKey := key[sizePreFixKey+20+32:]
 	return addr, storageRoot, updateKey
+}
+
+var (
+	storageType = 0
+	addressType = 1
+)
+
+func mptKeyType(size int) int {
+	if size == 1+sdk.AddrLen { //prefix=auth.
+		return addressType
+	} else if size == len(keyPrefixStorageMpt)+len(ethcmn.Address{})+len(ethcmn.Hash{})+len(ethcmn.Hash{}) {
+		return storageType
+	} else {
+		return -1
+	}
+
 }

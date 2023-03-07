@@ -62,7 +62,6 @@ type Keeper struct {
 	// add inner block data
 	innerBlockData BlockInnerData
 
-	EvmStateDb     *types.CommitStateDB
 	UpdatedAccount []ethcmn.Address
 
 	db ethstate.Database
@@ -143,7 +142,6 @@ func NewKeeper(
 	ak.SetObserverKeeper(k)
 
 	//k.OpenTrie()
-	k.EvmStateDb = types.NewCommitStateDB(k.GenerateCSDBParams())
 	return k
 }
 
@@ -179,7 +177,6 @@ func NewSimulateKeeper(
 	}
 
 	//k.OpenTrie()
-	k.EvmStateDb = types.NewCommitStateDB(k.GenerateCSDBParams())
 
 	return k
 }

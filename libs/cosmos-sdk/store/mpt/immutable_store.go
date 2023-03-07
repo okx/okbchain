@@ -46,8 +46,8 @@ func (ms *ImmutableMptStore) Get(key []byte) []byte {
 	ms.mtx.Lock()
 	defer ms.mtx.Unlock()
 
-	switch key[0] {
-	case keyPrefixStorageMpt[0]:
+	switch mptKeyType(len(key)) {
+	case storageType:
 		_, stateRoot, realKey := decodeAddressStorageInfo(key)
 
 		var t ethstate.Trie
@@ -65,7 +65,7 @@ func (ms *ImmutableMptStore) Get(key []byte) []byte {
 			return nil
 		}
 		return value
-	case byte(1): // TODO auth.AddressStoreKeyPrefix need move
+	case addressType:
 		value, err := ms.trie.TryGet(key)
 		if err != nil {
 			return nil
