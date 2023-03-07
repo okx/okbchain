@@ -42,11 +42,11 @@ import (
 	"google.golang.org/grpc/encoding/proto"
 
 	"github.com/okx/okbchain/app/ante"
-	okexchaincodec "github.com/okx/okbchain/app/codec"
+	chaincodec "github.com/okx/okbchain/app/codec"
 	appconfig "github.com/okx/okbchain/app/config"
 	"github.com/okx/okbchain/app/refund"
+	chain "github.com/okx/okbchain/app/types"
 	ethermint "github.com/okx/okbchain/app/types"
-	okexchain "github.com/okx/okbchain/app/types"
 	"github.com/okx/okbchain/app/utils/sanity"
 	bam "github.com/okx/okbchain/libs/cosmos-sdk/baseapp"
 	"github.com/okx/okbchain/libs/cosmos-sdk/client"
@@ -111,8 +111,8 @@ func init() {
 	// set the address prefixes
 	config := sdk.GetConfig()
 	config.SetCoinType(system.CoinType)
-	okexchain.SetBech32Prefixes(config)
-	okexchain.SetBip44CoinType(config)
+	chain.SetBech32Prefixes(config)
+	chain.SetBip44CoinType(config)
 }
 
 const (
@@ -296,9 +296,9 @@ func NewSimApp(
 	//	logStartingFlags(logger)
 	//})
 
-	codecProxy, interfaceReg := okexchaincodec.MakeCodecSuit(ModuleBasics)
+	codecProxy, interfaceReg := chaincodec.MakeCodecSuit(ModuleBasics)
 
-	// NOTE we use custom OKExChain transaction decoder that supports the sdk.Tx interface instead of sdk.StdTx
+	// NOTE we use custom OKBChain transaction decoder that supports the sdk.Tx interface instead of sdk.StdTx
 	bApp := bam.NewBaseApp(appName, logger, db, evm.TxDecoder(codecProxy), baseAppOptions...)
 
 	bApp.SetCommitMultiStoreTracer(traceStore)
@@ -359,9 +359,9 @@ func NewSimApp(
 
 	//proxy := codec.NewMarshalProxy(cc, cdc)
 	app.marshal = codecProxy
-	// use custom OKExChain account for contracts
+	// use custom OKBChain account for contracts
 	app.AccountKeeper = auth.NewAccountKeeper(
-		codecProxy.GetCdc(), keys[auth.StoreKey], keys[mpt.StoreKey], app.subspaces[auth.ModuleName], okexchain.ProtoAccount,
+		codecProxy.GetCdc(), keys[mpt.StoreKey], app.subspaces[auth.ModuleName], chain.ProtoAccount,
 	)
 
 	bankKeeper := bank.NewBaseKeeperWithMarshal(
@@ -778,11 +778,11 @@ func getTxFeeHandler() sdk.GetTxFeeHandler {
 
 func (app *SimApp) SetOption(req abci.RequestSetOption) (res abci.ResponseSetOption) {
 	if req.Key == "CheckChainID" {
-		if err := okexchain.IsValidateChainIdWithGenesisHeight(req.Value); err != nil {
+		if err := chain.IsValidateChainIdWithGenesisHeight(req.Value); err != nil {
 			app.Logger().Error(err.Error())
 			panic(err)
 		}
-		err := okexchain.SetChainId(req.Value)
+		err := chain.SetChainId(req.Value)
 		if err != nil {
 			app.Logger().Error(err.Error())
 			panic(err)
