@@ -152,7 +152,7 @@ func (suite *StoreTestSuite) TestGetImmutable() {
 	suite.Require().Equal(curStore.Get(key), newValue)
 
 	suite.Require().Panics(func() { curStore.Set(nil, nil) })
-	suite.Require().NotPanics(func() { curStore.Delete(nil) })
+	suite.Require().Panics(func() { curStore.Delete(nil) })
 }
 
 func (suite *StoreTestSuite) TestTestIterator() {

@@ -69,6 +69,8 @@ func (p *TestParams) ParamSetPairs() params.ParamSetPairs {
 		{Key: types.KeyMinDelegation, Value: &p.MinDelegation, ValidatorFn: common.ValidateDecPositive("min delegation")},
 		{Key: types.KeyMinSelfDelegation, Value: &p.MinSelfDelegation, ValidatorFn: common.ValidateDecPositive("min self delegation")},
 		{Key: types.KeyHistoricalEntries, Value: &p.HistoricalEntries, ValidatorFn: validateHistoricalEntries},
+		{Key: types.KeyConsensusType, Value: &p.ConsensusType, ValidatorFn: common.ValidateConsensusType("consensus type")},
+		{Key: types.KeyEnableDposOp, Value: &p.EnableDposOp, ValidatorFn: common.ValidateBool("enable operation")},
 	}
 }
 
