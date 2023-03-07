@@ -130,7 +130,7 @@ func (ak AccountKeeper) ModifyAccStateRoot(before []byte, rootHash ethcmn.Hash) 
 	if eAcc, ok := acc.(interface{ SetStateRoot(hash ethcmn.Hash) }); ok {
 		eAcc.SetStateRoot(rootHash)
 	} else {
-		panic("unExcepted behavior: acc should implement SetStateRoot ")
+		panic("unExcepted behavior: mpt store acc should implement SetStateRoot ")
 	}
 	return ak.encodeAccount(acc)
 }

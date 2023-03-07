@@ -279,11 +279,11 @@ func (ms *MptStore) CommitterCommit(delta *iavl.TreeDelta) (types.CommitID, *iav
 		}
 		key := AddressStoreKey(addr.Bytes())
 		preValue, err := ms.trie.TryGet(key)
-		if err != nil {
-			panic(err)
+		if err == nil { // maybe acc already been deleted
+			newValue := ms.retriever.ModifyAccStateRoot(preValue, stateR)
+			ms.trie.TryUpdate(key, newValue)
 		}
-		newValue := ms.retriever.ModifyAccStateRoot(preValue, stateR)
-		ms.trie.TryUpdate(key, newValue)
+
 		delete(ms.storageTrieForWrite, addr)
 	}
 
