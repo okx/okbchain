@@ -1,4 +1,4 @@
-module github.com/okx/exchain/dev/client
+module github.com/okx/okbchain/dev/client
 
 go 1.17
 
