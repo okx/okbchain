@@ -5,7 +5,6 @@ import (
 	ethcrypto "github.com/ethereum/go-ethereum/crypto"
 	ethermint "github.com/okx/okbchain/app/types"
 	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	"github.com/okx/okbchain/libs/tendermint/types"
 	"github.com/stretchr/testify/suite"
 	"testing"
 )
@@ -15,8 +14,6 @@ type StateDBMptTestSuite struct {
 }
 
 func (suite *StateDBMptTestSuite) SetupTest() {
-	types.UnittestOnlySetMilestoneMarsHeight(1)
-
 	suite.StateDBTestSuite.SetupTest()
 }
 
