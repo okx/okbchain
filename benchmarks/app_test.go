@@ -95,7 +95,7 @@ func TestCw20TxSending(t *testing.T) {
 type AppInfo struct {
 	height int64
 
-	App              *app.OKExChainApp
+	App              *app.OKBChainApp
 	evmMintKey       *ecdsa.PrivateKey
 	evmMintAddr      sdk.AccAddress
 	MinterKey        crypto.PrivKey
@@ -161,7 +161,7 @@ func InitializeOKXApp(b testing.TB, db dbm.DB, numAccounts int) AppInfo {
 	return info
 }
 
-func setup(db dbm.DB, withGenesis bool, invCheckPeriod uint) (*app.OKExChainApp, simapp.GenesisState) {
+func setup(db dbm.DB, withGenesis bool, invCheckPeriod uint) (*app.OKBChainApp, simapp.GenesisState) {
 	okxApp := app.NewOKExChainApp(log.NewNopLogger(), db, nil, true, map[int64]bool{}, invCheckPeriod)
 	if withGenesis {
 		return okxApp, app.NewDefaultGenesisState()
@@ -169,9 +169,9 @@ func setup(db dbm.DB, withGenesis bool, invCheckPeriod uint) (*app.OKExChainApp,
 	return okxApp, simapp.GenesisState{}
 }
 
-// SetupWithGenesisAccounts initializes a new OKExChainApp with the provided genesis
+// SetupWithGenesisAccounts initializes a new OKBChainApp with the provided genesis
 // accounts and possible balances.
-func SetupWithGenesisAccounts(b testing.TB, db dbm.DB, genAccs []authexported.GenesisAccount) *app.OKExChainApp {
+func SetupWithGenesisAccounts(b testing.TB, db dbm.DB, genAccs []authexported.GenesisAccount) *app.OKBChainApp {
 	okxApp, genesisState := setup(db, true, 0)
 	authGenesis := authtypes.NewGenesisState(authtypes.DefaultParams(), genAccs)
 	appCodec := okxApp.Codec()

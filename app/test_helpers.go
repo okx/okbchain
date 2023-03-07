@@ -23,8 +23,8 @@ func WithChainId(chainId string) Option {
 	}
 }
 
-// Setup initializes a new OKExChainApp. A Nop logger is set in OKExChainApp.
-func Setup(isCheckTx bool, options ...Option) *OKExChainApp {
+// Setup initializes a new OKBChainApp. A Nop logger is set in OKBChainApp.
+func Setup(isCheckTx bool, options ...Option) *OKBChainApp {
 	viper.Set(sdk.FlagDBBackend, string(dbm.MemDBBackend))
 	types.DBBackend = string(dbm.MemDBBackend)
 	db := dbm.NewMemDB()

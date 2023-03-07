@@ -72,8 +72,8 @@ func TestHandlerBlockedContractAddrSend(t *testing.T) {
 	}
 }
 
-// Setup initializes a new OKExChainApp. A Nop logger is set in OKExChainApp.
-func initApp(isCheckTx bool) *chain.OKExChainApp {
+// Setup initializes a new OKBChainApp. A Nop logger is set in OKBChainApp.
+func initApp(isCheckTx bool) *chain.OKBChainApp {
 	db := dbm.NewMemDB()
 	app := chain.NewOKExChainApp(log.NewNopLogger(), db, nil, true, map[int64]bool{}, 0)
 

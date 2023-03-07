@@ -50,7 +50,7 @@ const (
 
 type repairApp struct {
 	db dbm.DB
-	*OKExChainApp
+	*OKBChainApp
 }
 
 func (app *repairApp) getLatestVersion() int64 {

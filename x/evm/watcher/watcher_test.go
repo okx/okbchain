@@ -55,7 +55,7 @@ func calcHash(kvs []KV) []byte {
 
 type WatcherTestSt struct {
 	ctx     sdk.Context
-	app     *app.OKExChainApp
+	app     *app.OKBChainApp
 	handler sdk.Handler
 }
 

@@ -58,10 +58,10 @@ type KeeperTestSuite struct {
 	ctx     sdk.Context
 	querier sdk.Querier
 	keeper  keeper.Keeper
-	app     *app.OKExChainApp
+	app     *app.OKBChainApp
 }
 
-func MakeOKEXApp() *app.OKExChainApp {
+func MakeOKEXApp() *app.OKBChainApp {
 	genesisState := app.NewDefaultGenesisState()
 	db := dbm.NewMemDB()
 	okexapp := app.NewOKExChainApp(log.NewTMLogger(log.NewSyncWriter(os.Stdout)), db, nil, true, map[int64]bool{}, 0)

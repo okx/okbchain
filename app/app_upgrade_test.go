@@ -252,7 +252,7 @@ func setupModuleBasics(bs ...module.AppModule) *module.Manager {
 }
 
 type testSimApp struct {
-	*OKExChainApp
+	*OKBChainApp
 	// the module manager
 }
 
@@ -293,7 +293,7 @@ func newTestOkcChainApp(
 	memKeys := sdk.NewMemoryStoreKeys(capabilitytypes.MemStoreKey)
 
 	ret := &testSimApp{}
-	app := &OKExChainApp{
+	app := &OKBChainApp{
 		BaseApp:        bApp,
 		invCheckPeriod: invCheckPeriod,
 		keys:           keys,
@@ -301,7 +301,7 @@ func newTestOkcChainApp(
 		subspaces:      make(map[string]params.Subspace),
 		heightTasks:    make(map[int64]*upgradetypes.HeightTasks),
 	}
-	ret.OKExChainApp = app
+	ret.OKBChainApp = app
 	bApp.SetInterceptors(makeInterceptors())
 
 	// init params keeper and subspaces

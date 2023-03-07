@@ -117,7 +117,7 @@ func TestFakeBlockTxSuite(t *testing.T) {
 
 type FakeBlockTxTestSuite struct {
 	suite.Suite
-	app   *OKExChainApp
+	app   *OKBChainApp
 	codec *codec.Codec
 
 	evmSenderPrivKey   ethsecp256k1.PrivKey
