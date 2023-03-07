@@ -119,7 +119,7 @@ func newDisplayApp(ctx *server.Context) *app.OKBChainApp {
 		panic("fail to open application db: " + err.Error())
 	}
 
-	return app.NewOKExChainApp(
+	return app.NewOKBChainApp(
 		ctx.Logger,
 		db,
 		nil,

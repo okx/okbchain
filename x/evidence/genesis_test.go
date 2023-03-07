@@ -30,7 +30,7 @@ type GenesisTestSuite struct {
 func MakeOKEXApp() *app.OKBChainApp {
 	genesisState := app.NewDefaultGenesisState()
 	db := dbm.NewMemDB()
-	okexapp := app.NewOKExChainApp(log.NewTMLogger(log.NewSyncWriter(os.Stdout)), db, nil, true, map[int64]bool{}, 0)
+	okexapp := app.NewOKBChainApp(log.NewTMLogger(log.NewSyncWriter(os.Stdout)), db, nil, true, map[int64]bool{}, 0)
 
 	stateBytes, err := codec.MarshalJSONIndent(okexapp.Codec(), genesisState)
 	if err != nil {

@@ -265,8 +265,8 @@ type OKBChainApp struct {
 	WasmHandler wasmkeeper.HandlerOption
 }
 
-// NewOKExChainApp returns a reference to a new initialized OKExChain application.
-func NewOKExChainApp(
+// NewOKBChainApp returns a reference to a new initialized OKExChain application.
+func NewOKBChainApp(
 	logger log.Logger,
 	db dbm.DB,
 	traceStore io.Writer,
@@ -283,7 +283,7 @@ func NewOKExChainApp(
 
 	codecProxy, interfaceReg := chaincodec.MakeCodecSuit(ModuleBasics)
 	vmbridge.RegisterInterface(interfaceReg)
-	// NOTE we use custom OKExChain transaction decoder that supports the sdk.Tx interface instead of sdk.StdTx
+	// NOTE we use custom OKBChain transaction decoder that supports the sdk.Tx interface instead of sdk.StdTx
 	bApp := bam.NewBaseApp(appName, logger, db, evm.TxDecoder(codecProxy), baseAppOptions...)
 
 	bApp.SetCommitMultiStoreTracer(traceStore)
@@ -344,7 +344,7 @@ func NewOKExChainApp(
 
 	//proxy := codec.NewMarshalProxy(cc, cdc)
 	app.marshal = codecProxy
-	// use custom OKExChain account for contracts
+	// use custom OKBChain account for contracts
 	app.AccountKeeper = auth.NewAccountKeeper(
 		codecProxy.GetCdc(), keys[mpt.StoreKey], app.subspaces[auth.ModuleName], chain.ProtoAccount,
 	)
@@ -794,7 +794,7 @@ func (app *OKBChainApp) GetKey(storeKey string) *sdk.KVStoreKey {
 	return app.keys[storeKey]
 }
 
-// Codec returns OKExChain's codec.
+// Codec returns OKBChain's codec.
 //
 // NOTE: This is solely to be used for testing purposes as it may be desirable
 // for modules to register their own custom testing types.

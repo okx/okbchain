@@ -290,7 +290,7 @@ func (suite *EvmTestSuite) TestInit() {
 			suite.SetupTest() // reset values
 
 			db := dbm.NewMemDB()
-			chain := app.NewOKExChainApp(log.NewNopLogger(), db, nil, true, map[int64]bool{}, 0)
+			chain := app.NewOKBChainApp(log.NewNopLogger(), db, nil, true, map[int64]bool{}, 0)
 			genesisState := app.NewDefaultGenesisState()
 
 			tc.malleate(&genesisState)

@@ -54,7 +54,7 @@ func checkValidKey(key string) error {
 // newMigrationApp generates a new app with the given key and application.db
 func newMigrationApp(ctx *server.Context) *app.OKBChainApp {
 	appDb := openApplicationDb(ctx.Config.RootDir)
-	return app.NewOKExChainApp(
+	return app.NewOKBChainApp(
 		ctx.Logger,
 		appDb,
 		nil,

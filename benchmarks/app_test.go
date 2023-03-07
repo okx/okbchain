@@ -162,7 +162,7 @@ func InitializeOKXApp(b testing.TB, db dbm.DB, numAccounts int) AppInfo {
 }
 
 func setup(db dbm.DB, withGenesis bool, invCheckPeriod uint) (*app.OKBChainApp, simapp.GenesisState) {
-	okxApp := app.NewOKExChainApp(log.NewNopLogger(), db, nil, true, map[int64]bool{}, invCheckPeriod)
+	okxApp := app.NewOKBChainApp(log.NewNopLogger(), db, nil, true, map[int64]bool{}, invCheckPeriod)
 	if withGenesis {
 		return okxApp, app.NewDefaultGenesisState()
 	}
