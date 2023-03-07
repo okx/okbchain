@@ -47,11 +47,11 @@ var (
 // MptStore Implements types.KVStore and CommitKVStore.
 // Its main purpose is to own the same interface as iavl store in libs/cosmos-sdk/store/iavl/iavl_store.go
 type MptStore struct {
-	trie              ethstate.Trie
-	storageTrieForSet map[ethcmn.Address]ethstate.Trie
-	db                ethstate.Database
-	triegc            *prque.Prque
-	logger            tmlog.Logger
+	trie                ethstate.Trie
+	storageTrieForWrite map[ethcmn.Address]ethstate.Trie
+	db                  ethstate.Database
+	triegc              *prque.Prque
+	logger              tmlog.Logger
 
 	prefetcher   *TriePrefetcher
 	originalRoot ethcmn.Hash
@@ -92,12 +92,12 @@ func NewMptStore(logger tmlog.Logger, id types.CommitID) (*MptStore, error) {
 func generateMptStore(logger tmlog.Logger, id types.CommitID, db ethstate.Database, retriever StateRootRetriever) (*MptStore, error) {
 	triegc := prque.New(nil)
 	mptStore := &MptStore{
-		storageTrieForSet: make(map[ethcmn.Address]ethstate.Trie, 0),
-		db:                db,
-		triegc:            triegc,
-		logger:            logger,
-		retriever:         retriever,
-		exitSignal:        make(chan struct{}),
+		storageTrieForWrite: make(map[ethcmn.Address]ethstate.Trie, 0),
+		db:                  db,
+		triegc:              triegc,
+		logger:              logger,
+		retriever:           retriever,
+		exitSignal:          make(chan struct{}),
 	}
 	err := mptStore.openTrie(id)
 
@@ -186,7 +186,7 @@ func (ms *MptStore) Get(key []byte) []byte {
 
 func (ms *MptStore) tryGetStorageTrie(addr ethcmn.Address, stateRoot ethcmn.Hash, useCache bool) ethstate.Trie {
 	if useCache {
-		if t, ok := ms.storageTrieForSet[addr]; ok {
+		if t, ok := ms.storageTrieForWrite[addr]; ok {
 			return t
 		}
 	}
@@ -202,7 +202,7 @@ func (ms *MptStore) tryGetStorageTrie(addr ethcmn.Address, stateRoot ethcmn.Hash
 	}
 
 	if useCache {
-		ms.storageTrieForSet[addr] = t
+		ms.storageTrieForWrite[addr] = t
 	}
 	return t
 }
@@ -225,7 +225,7 @@ func (ms *MptStore) Set(key, value []byte) {
 	case byte(1): // TODO auth.AddressStoreKeyPrefix need move
 		var stateR ethcmn.Hash
 		var err error
-		if trie, ok := ms.storageTrieForSet[ethcmn.BytesToAddress(key[1:])]; ok {
+		if trie, ok := ms.storageTrieForWrite[ethcmn.BytesToAddress(key[1:])]; ok {
 			stateR, err = trie.Commit(nil)
 			if err != nil {
 				panic(err)
@@ -295,8 +295,8 @@ func (ms *MptStore) CommitterCommit(delta *iavl.TreeDelta) (types.CommitID, *iav
 	ms.originalRoot = root
 
 	// delete storage trie map
-	for addr := range ms.storageTrieForSet {
-		delete(ms.storageTrieForSet, addr)
+	for addr := range ms.storageTrieForWrite {
+		delete(ms.storageTrieForWrite, addr)
 	}
 
 	// TODO: use a thread to push data to database
