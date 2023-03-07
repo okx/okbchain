@@ -83,7 +83,7 @@ func main() {
 		flags.NewCompletionCmd(rootCmd, true),
 	)
 
-	// Add flags and prefix all env exposed with OKEXCHAIN
+	// Add flags and prefix all env exposed with OKBCHAIN
 	executor := cli.PrepareMainCmd(rootCmd, system.EnvPrefix, app.DefaultCLIHome)
 
 	err := executor.Execute()

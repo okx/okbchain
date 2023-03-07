@@ -265,7 +265,7 @@ type OKBChainApp struct {
 	WasmHandler wasmkeeper.HandlerOption
 }
 
-// NewOKBChainApp returns a reference to a new initialized OKExChain application.
+// NewOKBChainApp returns a reference to a new initialized OKBChain application.
 func NewOKBChainApp(
 	logger log.Logger,
 	db dbm.DB,

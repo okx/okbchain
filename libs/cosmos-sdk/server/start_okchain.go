@@ -28,7 +28,7 @@ import (
 	tmtypes "github.com/okx/okbchain/libs/tendermint/types"
 )
 
-// exchain full-node start flags
+// okbchain full-node start flags
 const (
 	FlagListenAddr         = "rest.laddr"
 	FlagUlockKey           = "rest.unlock_key"
