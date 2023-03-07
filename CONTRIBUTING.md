@@ -21,8 +21,8 @@ Contributing to this repo can mean many things such as participated in
 discussion or proposing code changes. To ensure a smooth workflow for all
 contributors, the general procedure for contributing has been established:
 
-1. Either [open](https://github.com/okx/okexchain/issues/new/choose) or
-   [find](https://github.com/okx/okexchain/issues) an issue you'd like to help with
+1. Either [open](https://github.com/okx/okbchain/issues/new/choose) or
+   [find](https://github.com/okx/okbchain/issues) an issue you'd like to help with
 2. Participate in thoughtful discussion on that issue
 3. If you would like to contribute:
    1. If a the issue is a proposal, ensure that the proposal has been accepted
@@ -54,7 +54,7 @@ tools` for installing the linting tools.
 
 Other notes:
   - Looking for a good place to start contributing? How about checking out some
-    [good first issues](https://github.com/okx/okexchain/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22)
+    [good first issues](https://github.com/okx/okbchain/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22)
   - Please make sure to use `gofmt` before every commit - the easiest way to do
     this is have your editor run it for you upon saving a file. Additionally
     please ensure that your code is lint compliant by running `make lint`
