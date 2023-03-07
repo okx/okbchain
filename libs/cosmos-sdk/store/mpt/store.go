@@ -224,16 +224,7 @@ func (ms *MptStore) Set(key, value []byte) {
 		t := ms.tryGetStorageTrie(addr, stateRoot, true)
 		t.TryUpdate(realKey, value)
 	case addressType:
-		var stateR ethcmn.Hash
-		var err error
-		if trie, ok := ms.storageTrieForWrite[ethcmn.BytesToAddress(key[1:])]; ok {
-			stateR, err = trie.Commit(nil)
-			if err != nil {
-				panic(err)
-			}
-			value = ms.retriever.ModifyAccStateRoot(value, stateR)
-		}
-		err = ms.trie.TryUpdate(key, value)
+		err := ms.trie.TryUpdate(key, value)
 		if err != nil {
 			return
 		}
@@ -281,6 +272,21 @@ func (ms *MptStore) CommitterCommit(delta *iavl.TreeDelta) (types.CommitID, *iav
 	// stop pre round prefetch
 	ms.StopPrefetcher()
 
+	for addr, v := range ms.storageTrieForWrite {
+		stateR, err := v.Commit(nil)
+		if err != nil {
+			panic(err)
+		}
+		key := AddressStoreKey(addr.Bytes())
+		preValue, err := ms.trie.TryGet(key)
+		if err != nil {
+			panic(err)
+		}
+		newValue := ms.retriever.ModifyAccStateRoot(preValue, stateR)
+		ms.trie.TryUpdate(key, newValue)
+		delete(ms.storageTrieForWrite, addr)
+	}
+
 	root, err := ms.trie.Commit(func(_ [][]byte, _ []byte, leaf []byte, parent ethcmn.Hash) error {
 		storageRoot := ms.retriever.RetrieveStateRoot(leaf)
 		if storageRoot != ethtypes.EmptyRootHash && storageRoot != (ethcmn.Hash{}) {
@@ -294,11 +300,6 @@ func (ms *MptStore) CommitterCommit(delta *iavl.TreeDelta) (types.CommitID, *iav
 	}
 	ms.SetMptRootHash(uint64(ms.version), root)
 	ms.originalRoot = root
-
-	// delete storage trie map
-	for addr := range ms.storageTrieForWrite {
-		delete(ms.storageTrieForWrite, addr)
-	}
 
 	// TODO: use a thread to push data to database
 	// push data to database
@@ -631,6 +632,7 @@ func (ms *MptStore) SetUpgradeVersion(i int64) {}
 
 var (
 	keyPrefixStorageMpt = []byte{0x0}
+	keyPrefixAddrMpt    = []byte{0x01} // TODO auth.AddressStoreKeyPrefix
 	sizePreFixKey       = len(keyPrefixStorageMpt)
 )
 
@@ -646,13 +648,21 @@ func decodeAddressStorageInfo(key []byte) (ethcmn.Address, ethcmn.Hash, []byte) 
 	return addr, storageRoot, updateKey
 }
 
+func AddressStoreKey(addr []byte) []byte {
+	return append(keyPrefixAddrMpt, addr...)
+}
+
 var (
 	storageType = 0
 	addressType = 1
 )
 
+/*
+	storageType : 0x0 + addr + stateRoot + key
+	addressType : 0x1 + addr
+*/
 func mptKeyType(size int) int {
-	if size == 1+sdk.AddrLen { //prefix=auth.
+	if size == 1+sdk.AddrLen {
 		return addressType
 	} else if size == len(keyPrefixStorageMpt)+len(ethcmn.Address{})+len(ethcmn.Hash{})+len(ethcmn.Hash{}) {
 		return storageType
