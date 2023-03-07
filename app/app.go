@@ -38,10 +38,10 @@ import (
 	"github.com/okx/okbchain/app/utils/appstatus"
 
 	"github.com/okx/okbchain/app/ante"
-	okexchaincodec "github.com/okx/okbchain/app/codec"
+	chaincodec "github.com/okx/okbchain/app/codec"
 	appconfig "github.com/okx/okbchain/app/config"
 	"github.com/okx/okbchain/app/refund"
-	okexchain "github.com/okx/okbchain/app/types"
+	chain "github.com/okx/okbchain/app/types"
 	"github.com/okx/okbchain/app/utils/sanity"
 	bam "github.com/okx/okbchain/libs/cosmos-sdk/baseapp"
 	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
@@ -109,8 +109,8 @@ import (
 func init() {
 	// set the address prefixes
 	config := sdk.GetConfig()
-	okexchain.SetBech32Prefixes(config)
-	okexchain.SetBip44CoinType(config)
+	chain.SetBech32Prefixes(config)
+	chain.SetBip44CoinType(config)
 }
 
 const (
@@ -281,7 +281,7 @@ func NewOKExChainApp(
 		logStartingFlags(logger)
 	})
 
-	codecProxy, interfaceReg := okexchaincodec.MakeCodecSuit(ModuleBasics)
+	codecProxy, interfaceReg := chaincodec.MakeCodecSuit(ModuleBasics)
 	vmbridge.RegisterInterface(interfaceReg)
 	// NOTE we use custom OKExChain transaction decoder that supports the sdk.Tx interface instead of sdk.StdTx
 	bApp := bam.NewBaseApp(appName, logger, db, evm.TxDecoder(codecProxy), baseAppOptions...)
@@ -346,7 +346,7 @@ func NewOKExChainApp(
 	app.marshal = codecProxy
 	// use custom OKExChain account for contracts
 	app.AccountKeeper = auth.NewAccountKeeper(
-		codecProxy.GetCdc(), keys[mpt.StoreKey], app.subspaces[auth.ModuleName], okexchain.ProtoAccount,
+		codecProxy.GetCdc(), keys[mpt.StoreKey], app.subspaces[auth.ModuleName], chain.ProtoAccount,
 	)
 
 	bankKeeper := bank.NewBaseKeeperWithMarshal(
@@ -729,11 +729,11 @@ func NewOKExChainApp(
 
 func (app *OKExChainApp) SetOption(req abci.RequestSetOption) (res abci.ResponseSetOption) {
 	if req.Key == "CheckChainID" {
-		if err := okexchain.IsValidateChainIdWithGenesisHeight(req.Value); err != nil {
+		if err := chain.IsValidateChainIdWithGenesisHeight(req.Value); err != nil {
 			app.Logger().Error(err.Error())
 			panic(err)
 		}
-		err := okexchain.SetChainId(req.Value)
+		err := chain.SetChainId(req.Value)
 		if err != nil {
 			app.Logger().Error(err.Error())
 			panic(err)

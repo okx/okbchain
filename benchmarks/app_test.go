@@ -41,7 +41,7 @@ func TestTxSending(t *testing.T) {
 	appInfo := InitializeOKXApp(t, db, 50)
 	height := int64(2)
 	global.SetGlobalHeight(height - 1)
-	appInfo.App.BeginBlock(abci.RequestBeginBlock{Header: abci.Header{ChainID: "exchain-67", Height: height, Time: time.Now()}})
+	appInfo.App.BeginBlock(abci.RequestBeginBlock{Header: abci.Header{ChainID: system.Chain + "-67", Height: height, Time: time.Now()}})
 	txs := GenSequenceOfTxs(&appInfo, bankSendMsg, 100)
 	for _, tx := range txs {
 		res := appInfo.App.DeliverTx(abci.RequestDeliverTx{Tx: tx})
@@ -60,7 +60,7 @@ func TestOip20TxSending(t *testing.T) {
 	require.NoError(t, err)
 	global.SetGlobalHeight(appInfo.height)
 	height := appInfo.height + 1
-	appInfo.App.BeginBlock(abci.RequestBeginBlock{Header: abci.Header{ChainID: "exchain-67", Height: height, Time: time.Now()}})
+	appInfo.App.BeginBlock(abci.RequestBeginBlock{Header: abci.Header{ChainID: system.Chain + "-67", Height: height, Time: time.Now()}})
 	txs := buildOip20Transfer(100, &appInfo)
 	for _, tx := range txs {
 		res := appInfo.App.DeliverTx(abci.RequestDeliverTx{Tx: tx})
@@ -81,7 +81,7 @@ func TestCw20TxSending(t *testing.T) {
 	require.NoError(t, err)
 
 	height := appInfo.height + 1
-	appInfo.App.BeginBlock(abci.RequestBeginBlock{Header: abci.Header{ChainID: "exchain-67", Height: height, Time: time.Now()}})
+	appInfo.App.BeginBlock(abci.RequestBeginBlock{Header: abci.Header{ChainID: system.Chain + "-67", Height: height, Time: time.Now()}})
 	txs := buildTxFromMsg(cw20TransferMsg)(100, &appInfo)
 	for _, tx := range txs {
 		res := appInfo.App.DeliverTx(abci.RequestDeliverTx{Tx: tx})
@@ -214,7 +214,7 @@ func deployOip20(info *AppInfo) error {
 	// add oip20 contract
 	global.SetGlobalHeight(info.height)
 	height := info.height + 1
-	info.App.BeginBlock(abci.RequestBeginBlock{Header: abci.Header{ChainID: "exchain-67", Height: height, Time: time.Now()}})
+	info.App.BeginBlock(abci.RequestBeginBlock{Header: abci.Header{ChainID: system.Chain + "-67", Height: height, Time: time.Now()}})
 
 	// deploy oip20
 	OipBytes, err := hex.DecodeString(Oip20Bin)
@@ -247,7 +247,7 @@ func deployCw20(info *AppInfo) error {
 	// add cw20 contract
 	global.SetGlobalHeight(info.height)
 	height := info.height + 1
-	info.App.BeginBlock(abci.RequestBeginBlock{Header: abci.Header{ChainID: "exchain-67", Height: height, Time: time.Now()}})
+	info.App.BeginBlock(abci.RequestBeginBlock{Header: abci.Header{ChainID: system.Chain + "-67", Height: height, Time: time.Now()}})
 
 	// upload cw20
 	txs := buildTxFromMsg(cw20StoreMsg)(1, info)
@@ -279,7 +279,7 @@ func deployCw20(info *AppInfo) error {
 func emptyBlock(info *AppInfo) {
 	global.SetGlobalHeight(info.height)
 	height := info.height + 1
-	info.App.BeginBlock(abci.RequestBeginBlock{Header: abci.Header{ChainID: "exchain-67", Height: height, Time: time.Now()}})
+	info.App.BeginBlock(abci.RequestBeginBlock{Header: abci.Header{ChainID: system.Chain + "-67", Height: height, Time: time.Now()}})
 	info.App.EndBlock(abci.RequestEndBlock{Height: height})
 	info.App.Commit(abci.RequestCommit{})
 
@@ -295,11 +295,12 @@ func GenSequenceOfTxs(info *AppInfo, msgGen func(*AppInfo) ([]sdk.Msg, error), n
 		if err != nil {
 			panic(err)
 		}
+		chainID := system.Chain + "-67"
 		tx := helpers.GenTx(
 			msgs,
 			fees,
 			1e8,
-			"exchain-67",
+			chainID,
 			[]uint64{info.AccNum},
 			[]uint64{info.SeqNum},
 			info.MinterKey,

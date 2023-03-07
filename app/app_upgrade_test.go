@@ -29,9 +29,9 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/okx/okbchain/app/ante"
-	okexchaincodec "github.com/okx/okbchain/app/codec"
+	chaincodec "github.com/okx/okbchain/app/codec"
 	"github.com/okx/okbchain/app/refund"
-	okexchain "github.com/okx/okbchain/app/types"
+	chain "github.com/okx/okbchain/app/types"
 	bam "github.com/okx/okbchain/libs/cosmos-sdk/baseapp"
 	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
 	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
@@ -277,9 +277,9 @@ func newTestOkcChainApp(
 		logStartingFlags(logger)
 	})
 
-	codecProxy, interfaceReg := okexchaincodec.MakeCodecSuit(ModuleBasics)
+	codecProxy, interfaceReg := chaincodec.MakeCodecSuit(ModuleBasics)
 
-	// NOTE we use custom OKExChain transaction decoder that supports the sdk.Tx interface instead of sdk.StdTx
+	// NOTE we use custom OKBChain transaction decoder that supports the sdk.Tx interface instead of sdk.StdTx
 	bApp := bam.NewBaseApp(appName, logger, db, evm.TxDecoder(codecProxy))
 
 	bApp.SetCommitMultiStoreTracer(traceStore)
@@ -324,9 +324,9 @@ func newTestOkcChainApp(
 
 	//proxy := codec.NewMarshalProxy(cc, cdc)
 	app.marshal = codecProxy
-	// use custom OKExChain account for contracts
+	// use custom chakin account for contracts
 	app.AccountKeeper = auth.NewAccountKeeper(
-		codecProxy.GetCdc(), keys[auth.StoreKey], keys[mpt.StoreKey], app.subspaces[auth.ModuleName], okexchain.ProtoAccount,
+		codecProxy.GetCdc(), keys[mpt.StoreKey], app.subspaces[auth.ModuleName], chain.ProtoAccount,
 	)
 
 	bankKeeper := bank.NewBaseKeeperWithMarshal(

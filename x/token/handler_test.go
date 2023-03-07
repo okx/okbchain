@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	ethcrypto "github.com/ethereum/go-ethereum/crypto"
-	okexchain "github.com/okx/okbchain/app"
+	chain "github.com/okx/okbchain/app"
 	app "github.com/okx/okbchain/app/types"
 	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
 	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
@@ -73,13 +73,13 @@ func TestHandlerBlockedContractAddrSend(t *testing.T) {
 }
 
 // Setup initializes a new OKExChainApp. A Nop logger is set in OKExChainApp.
-func initApp(isCheckTx bool) *okexchain.OKExChainApp {
+func initApp(isCheckTx bool) *chain.OKExChainApp {
 	db := dbm.NewMemDB()
-	app := okexchain.NewOKExChainApp(log.NewNopLogger(), db, nil, true, map[int64]bool{}, 0)
+	app := chain.NewOKExChainApp(log.NewNopLogger(), db, nil, true, map[int64]bool{}, 0)
 
 	if !isCheckTx {
 		// init chain must be called to stop deliverState from being nil
-		genesisState := okexchain.NewDefaultGenesisState()
+		genesisState := chain.NewDefaultGenesisState()
 		stateBytes, err := codec.MarshalJSONIndent(app.Codec(), genesisState)
 		if err != nil {
 			panic(err)
