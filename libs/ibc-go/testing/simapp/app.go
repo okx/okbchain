@@ -376,7 +376,7 @@ func NewSimApp(
 	app.marshal = codecProxy
 	// use custom OKBChain account for contracts
 	app.AccountKeeper = auth.NewAccountKeeper(
-		codecProxy.GetCdc(), keys[auth.StoreKey], app.subspaces[auth.ModuleName], okexchain.ProtoAccount,
+		codecProxy.GetCdc(), keys[auth.StoreKey], app.subspaces[auth.ModuleName], chain.ProtoAccount,
 	)
 
 	bankKeeper := bank.NewBaseKeeperWithMarshal(
