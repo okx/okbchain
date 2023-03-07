@@ -25,8 +25,7 @@ func (app *OKBChainApp) grpcSimulate(txBytes []byte) (sdk.GasInfo, *sdk.Result, 
 	return app.Simulate(txBytes, tx, 0, nil)
 }
 
-
-func (app *OKBChainApp) setupUpgradeModules() {
+func (app *OKBChainApp) setupUpgradeModules(onlyTask bool) {
 	heightTasks, paramMap, cf, pf, vf := app.CollectUpgradeModules(app.mm)
 
 	app.heightTasks = heightTasks
