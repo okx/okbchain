@@ -1,6 +1,7 @@
 package types
 
 import (
+	"github.com/okx/okbchain/libs/system"
 	"strconv"
 	"sync"
 )
@@ -25,8 +26,8 @@ var (
 )
 
 const (
-	MainNet = "exchain-66"
-	TestNet = "exchain-65"
+	MainNet = system.Chain + "-66"
+	TestNet = system.Chain + "-65"
 
 	MILESTONE_EARTH  = "earth"
 	MILESTONE_Venus4 = "venus4"
@@ -34,7 +35,7 @@ const (
 
 const (
 	TestNetChangeChainId = 2270901
-	TestNetChainName1    = "okexchain-65"
+	TestNetChainName1    = system.Chain + "-65"
 )
 
 func init() {
