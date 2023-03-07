@@ -1,6 +1,8 @@
 package mpt
 
 import (
+	"encoding/hex"
+	"fmt"
 	"io"
 	"sync"
 
@@ -44,11 +46,34 @@ func (ms *ImmutableMptStore) Get(key []byte) []byte {
 	ms.mtx.Lock()
 	defer ms.mtx.Unlock()
 
-	value, err := ms.trie.TryGet(key)
-	if err != nil {
-		return nil
+	switch key[0] {
+	case keyPrefixStorageMpt[0]:
+		_, stateRoot, realKey := decodeAddressStorageInfo(key)
+
+		var t ethstate.Trie
+		var err error
+		t, err = ms.db.OpenStorageTrie(ethcmn.Hash{}, stateRoot)
+		if err != nil {
+			t, err = ms.db.OpenStorageTrie(ethcmn.Hash{}, ethcmn.Hash{})
+			if err != nil {
+				panic("unexcepted err")
+			}
+		}
+
+		value, err := t.TryGet(realKey)
+		if err != nil {
+			return nil
+		}
+		return value
+	case byte(1): // TODO auth.AddressStoreKeyPrefix need move
+		value, err := ms.trie.TryGet(key)
+		if err != nil {
+			return nil
+		}
+		return value
+	default:
+		panic(fmt.Errorf("not support key %s for immutable mpt get", hex.EncodeToString(key)))
 	}
-	return value
 }
 
 func (ms *ImmutableMptStore) Has(key []byte) bool {
