@@ -95,12 +95,12 @@ Please note that Go requires code to live under absolute paths, which complicate
 While my fork lives at `https://github.com/rigeyrigerige/okexchain`,
 the code should never exist at  `$GOPATH/src/github.com/rigeyrigerige/okexchain`.
 Instead, we use `git remote` to add the fork as a new remote for the original repo,
-`$GOPATH/src/github.com/okx/okexchain `, and do all the work there.
+`$GOPATH/src/github.com/okx/okbchain `, and do all the work there.
 
 For instance, to create a fork and work on a branch of it, I would:
 
   - Create the fork on github, using the fork button.
-  - Go to the original repo checked out locally (i.e. `$GOPATH/src/github.com/okx/okexchain`)
+  - Go to the original repo checked out locally (i.e. `$GOPATH/src/github.com/okx/okbchain`)
   - `git remote rename origin upstream`
   - `git remote add origin git@github.com:rigeyrigerige/okexchain.git`
 
@@ -180,7 +180,7 @@ only pull requests targeted directly against master.
   - `master` must never fail `make test` or `make test_cli`
   - `master` should not fail `make lint`
   - no `--force` onto `master` (except when reverting a broken commit, which should seldom happen)
-  - create a development branch either on github.com/okx/okexchain, or your fork (using `git remote add origin`)
+  - create a development branch either on github.com/okx/okbchain, or your fork (using `git remote add origin`)
   - before submitting a pull request, begin `git rebase` on top of `master`
 
 ### Pull Merge Procedure
