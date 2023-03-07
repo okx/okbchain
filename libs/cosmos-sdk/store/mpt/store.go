@@ -1,6 +1,7 @@
 package mpt
 
 import (
+	"encoding/hex"
 	"fmt"
 	"io"
 	"sync"
@@ -46,10 +47,11 @@ var (
 // MptStore Implements types.KVStore and CommitKVStore.
 // Its main purpose is to own the same interface as iavl store in libs/cosmos-sdk/store/iavl/iavl_store.go
 type MptStore struct {
-	trie   ethstate.Trie
-	db     ethstate.Database
-	triegc *prque.Prque
-	logger tmlog.Logger
+	trie              ethstate.Trie
+	storageTrieForSet map[ethcmn.Address]ethstate.Trie
+	db                ethstate.Database
+	triegc            *prque.Prque
+	logger            tmlog.Logger
 
 	prefetcher   *TriePrefetcher
 	originalRoot ethcmn.Hash
@@ -90,11 +92,12 @@ func NewMptStore(logger tmlog.Logger, id types.CommitID) (*MptStore, error) {
 func generateMptStore(logger tmlog.Logger, id types.CommitID, db ethstate.Database, retriever StateRootRetriever) (*MptStore, error) {
 	triegc := prque.New(nil)
 	mptStore := &MptStore{
-		db:         db,
-		triegc:     triegc,
-		logger:     logger,
-		retriever:  retriever,
-		exitSignal: make(chan struct{}),
+		storageTrieForSet: make(map[ethcmn.Address]ethstate.Trie, 0),
+		db:                db,
+		triegc:            triegc,
+		logger:            logger,
+		retriever:         retriever,
+		exitSignal:        make(chan struct{}),
 	}
 	err := mptStore.openTrie(id)
 
@@ -159,12 +162,49 @@ func (ms *MptStore) CacheWrapWithTrace(w io.Writer, tc types.TraceContext) types
 }
 
 func (ms *MptStore) Get(key []byte) []byte {
-	value, err := ms.db.CopyTrie(ms.trie).TryGet(key)
-	if err != nil {
-		return nil
+	switch key[0] {
+	case keyPrefixStorageMpt[0]:
+		addr, stateRoot, realKey := decodeAddressStorageInfo(key)
+		t := ms.tryGetStorageTrie(addr, stateRoot, false)
+		value, err := t.TryGet(realKey)
+		if err != nil {
+			return nil
+		}
+		return value
+	case byte(1): // TODO auth.AddressStoreKeyPrefix need move
+		value, err := ms.db.CopyTrie(ms.trie).TryGet(key)
+		if err != nil {
+			return nil
+		}
+
+		return value
+	default:
+		panic(fmt.Errorf("not support key %s for mpt get", hex.EncodeToString(key)))
 	}
 
-	return value
+}
+
+func (ms *MptStore) tryGetStorageTrie(addr ethcmn.Address, stateRoot ethcmn.Hash, useCache bool) ethstate.Trie {
+	if useCache {
+		if t, ok := ms.storageTrieForSet[addr]; ok {
+			return t
+		}
+	}
+
+	var t ethstate.Trie
+	var err error
+	t, err = ms.db.OpenStorageTrie(ethcmn.Hash{}, stateRoot)
+	if err != nil {
+		t, err = ms.db.OpenStorageTrie(ethcmn.Hash{}, ethcmn.Hash{})
+		if err != nil {
+			panic("unexcepted err")
+		}
+	}
+
+	if useCache {
+		ms.storageTrieForSet[addr] = t
+	}
+	return t
 }
 
 func (ms *MptStore) Has(key []byte) bool {
@@ -177,9 +217,27 @@ func (ms *MptStore) Set(key, value []byte) {
 	if ms.prefetcher != nil {
 		ms.prefetcher.Used(ms.originalRoot, [][]byte{key})
 	}
-	err := ms.trie.TryUpdate(key, value)
-	if err != nil {
-		return
+	switch key[0] {
+	case keyPrefixStorageMpt[0]:
+		addr, stateRoot, realKey := decodeAddressStorageInfo(key)
+		t := ms.tryGetStorageTrie(addr, stateRoot, true)
+		t.TryUpdate(realKey, value)
+	case byte(1): // TODO auth.AddressStoreKeyPrefix need move
+		var stateR ethcmn.Hash
+		var err error
+		if trie, ok := ms.storageTrieForSet[ethcmn.BytesToAddress(key[1:])]; ok {
+			stateR, err = trie.Commit(nil)
+			if err != nil {
+				panic(err)
+			}
+			value = ms.retriever.ModifyAccStateRoot(value, stateR)
+		}
+		err = ms.trie.TryUpdate(key, value)
+		if err != nil {
+			return
+		}
+	default:
+		panic(fmt.Errorf("not support key %s for mpt set", hex.EncodeToString(key)))
 	}
 
 	return
@@ -189,10 +247,19 @@ func (ms *MptStore) Delete(key []byte) {
 	if ms.prefetcher != nil {
 		ms.prefetcher.Used(ms.originalRoot, [][]byte{key})
 	}
+	switch key[0] {
+	case keyPrefixStorageMpt[0]:
+		addr, stateRoot, realKey := decodeAddressStorageInfo(key)
+		t := ms.tryGetStorageTrie(addr, stateRoot, true)
+		t.TryDelete(realKey)
+	case byte(1): //TODO auth.AddressStoreKeyPrefix need move
+		err := ms.trie.TryDelete(key)
+		if err != nil {
+			return
+		}
+	default:
+		panic(fmt.Errorf("not support key %s for mpt delete", hex.EncodeToString(key)))
 
-	err := ms.trie.TryDelete(key)
-	if err != nil {
-		return
 	}
 }
 
@@ -226,6 +293,11 @@ func (ms *MptStore) CommitterCommit(delta *iavl.TreeDelta) (types.CommitID, *iav
 	}
 	ms.SetMptRootHash(uint64(ms.version), root)
 	ms.originalRoot = root
+
+	// delete storage trie map
+	for addr := range ms.storageTrieForSet {
+		delete(ms.storageTrieForSet, addr)
+	}
 
 	// TODO: use a thread to push data to database
 	// push data to database
@@ -555,3 +627,20 @@ func (ms *MptStore) prefetchData() {
 }
 
 func (ms *MptStore) SetUpgradeVersion(i int64) {}
+
+var (
+	keyPrefixStorageMpt = []byte{0x0}
+	sizePreFixKey       = len(keyPrefixStorageMpt)
+)
+
+func AddressStoragePrefixMpt(address ethcmn.Address, stateRoot ethcmn.Hash) []byte {
+	t1 := append(keyPrefixStorageMpt, address.Bytes()...)
+	return append(t1, stateRoot.Bytes()...)
+}
+
+func decodeAddressStorageInfo(key []byte) (ethcmn.Address, ethcmn.Hash, []byte) {
+	addr := ethcmn.BytesToAddress(key[sizePreFixKey : sizePreFixKey+20])
+	storageRoot := ethcmn.BytesToHash(key[sizePreFixKey+20 : sizePreFixKey+20+32])
+	updateKey := key[sizePreFixKey+20+32:]
+	return addr, storageRoot, updateKey
+}
