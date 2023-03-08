@@ -16,7 +16,7 @@ func TestValidatorSMCreateValidator(t *testing.T) {
 	params := DefaultDposParams()
 	params.MaxValidators = 1
 
-	startUpValidator := NewValidator(addrVals[0], PKs[0], Description{}, types.DefaultMinSelfDelegation)
+	startUpValidator := NewValidator(addrVals[0], PKs[0], Description{}, types.DefaultDPoSMinSelfDelegation)
 	expectDelegatorShares := SharesFromDefaultMSD
 
 	startUpStatus := baseValidatorStatus{startUpValidator}
@@ -58,7 +58,7 @@ func TestValidatorSMCreateValidatorWithValidatorSet(t *testing.T) {
 	params.Epoch = 3
 	params.UnbondingTime = time.Millisecond * 300
 
-	startUpValidator := NewValidator(StartUpValidatorAddr, StartUpValidatorPubkey, Description{}, types.DefaultMinSelfDelegation)
+	startUpValidator := NewValidator(StartUpValidatorAddr, StartUpValidatorPubkey, Description{}, types.DefaultDPoSMinSelfDelegation)
 
 	startUpStatus := baseValidatorStatus{startUpValidator}
 
@@ -93,7 +93,7 @@ func TestValidatorSMNormalFullLifeCircle(t *testing.T) {
 	params.Epoch = 2
 	params.UnbondingTime = time.Millisecond * 300
 
-	startUpValidator := NewValidator(StartUpValidatorAddr, StartUpValidatorPubkey, Description{}, types.DefaultMinSelfDelegation)
+	startUpValidator := NewValidator(StartUpValidatorAddr, StartUpValidatorPubkey, Description{}, types.DefaultDPoSMinSelfDelegation)
 
 	startUpStatus := baseValidatorStatus{startUpValidator}
 
@@ -153,7 +153,7 @@ func TestValidatorSMEvilFullLifeCircle(t *testing.T) {
 	params.Epoch = 2
 	params.UnbondingTime = time.Millisecond * 300
 
-	startUpValidator := NewValidator(StartUpValidatorAddr, StartUpValidatorPubkey, Description{}, types.DefaultMinSelfDelegation)
+	startUpValidator := NewValidator(StartUpValidatorAddr, StartUpValidatorPubkey, Description{}, types.DefaultDPoSMinSelfDelegation)
 
 	startUpStatus := baseValidatorStatus{startUpValidator}
 
@@ -205,7 +205,7 @@ func TestValidatorSMEvilFullLifeCircleWithUnjail(t *testing.T) {
 	params.Epoch = 2
 	params.UnbondingTime = time.Millisecond * 300
 
-	startUpValidator := NewValidator(StartUpValidatorAddr, StartUpValidatorPubkey, Description{}, types.DefaultMinSelfDelegation)
+	startUpValidator := NewValidator(StartUpValidatorAddr, StartUpValidatorPubkey, Description{}, types.DefaultDPoSMinSelfDelegation)
 
 	startUpStatus := baseValidatorStatus{startUpValidator}
 
@@ -272,7 +272,7 @@ func TestValidatorSMEvilFullLifeCircleWithUnjail2(t *testing.T) {
 	params.Epoch = 2
 	params.UnbondingTime = time.Millisecond * 300
 
-	startUpValidator := NewValidator(StartUpValidatorAddr, StartUpValidatorPubkey, Description{}, types.DefaultMinSelfDelegation)
+	startUpValidator := NewValidator(StartUpValidatorAddr, StartUpValidatorPubkey, Description{}, types.DefaultDPoSMinSelfDelegation)
 
 	startUpStatus := baseValidatorStatus{startUpValidator}
 
@@ -327,7 +327,7 @@ func TestValidatorSMEpochRotate(t *testing.T) {
 	params.Epoch = 2
 	params.UnbondingTime = time.Millisecond * 300
 
-	startUpValidator := NewValidator(StartUpValidatorAddr, StartUpValidatorPubkey, Description{}, types.DefaultMinSelfDelegation)
+	startUpValidator := NewValidator(StartUpValidatorAddr, StartUpValidatorPubkey, Description{}, types.DefaultDPoSMinSelfDelegation)
 
 	startUpStatus := baseValidatorStatus{startUpValidator}
 
@@ -373,7 +373,7 @@ func TestValidatorSMReRankPowerIndex(t *testing.T) {
 	params.Epoch = 2
 	params.UnbondingTime = time.Millisecond * 300
 
-	startUpValidator := NewValidator(StartUpValidatorAddr, StartUpValidatorPubkey, Description{}, types.DefaultMinSelfDelegation)
+	startUpValidator := NewValidator(StartUpValidatorAddr, StartUpValidatorPubkey, Description{}, types.DefaultDPoSMinSelfDelegation)
 
 	startUpStatus := baseValidatorStatus{startUpValidator}
 
@@ -454,7 +454,7 @@ func TestValidatorSMMultiVoting(t *testing.T) {
 	params.Epoch = 2
 	params.UnbondingTime = time.Millisecond * 300
 
-	startUpValidator := NewValidator(StartUpValidatorAddr, StartUpValidatorPubkey, Description{}, types.DefaultMinSelfDelegation)
+	startUpValidator := NewValidator(StartUpValidatorAddr, StartUpValidatorPubkey, Description{}, types.DefaultDPoSMinSelfDelegation)
 
 	startUpStatus := baseValidatorStatus{startUpValidator}
 
@@ -569,7 +569,7 @@ func TestValidatorSMDestroyValidatorUnbonding2UnBonded2Removed(t *testing.T) {
 	params.Epoch = 1
 	params.UnbondingTime = time.Millisecond * 300
 
-	startUpValidator := NewValidator(StartUpValidatorAddr, StartUpValidatorPubkey, Description{}, types.DefaultMinSelfDelegation)
+	startUpValidator := NewValidator(StartUpValidatorAddr, StartUpValidatorPubkey, Description{}, types.DefaultDPoSMinSelfDelegation)
 
 	startUpStatus := baseValidatorStatus{startUpValidator}
 
@@ -647,7 +647,7 @@ func TestValidatorSMDestroyValidatorUnbonding2Removed(t *testing.T) {
 	params.Epoch = 1
 	params.UnbondingTime = time.Millisecond * 300
 
-	startUpValidator := NewValidator(StartUpValidatorAddr, StartUpValidatorPubkey, Description{}, types.DefaultMinSelfDelegation)
+	startUpValidator := NewValidator(StartUpValidatorAddr, StartUpValidatorPubkey, Description{}, types.DefaultDPoSMinSelfDelegation)
 
 	startUpStatus := baseValidatorStatus{startUpValidator}
 

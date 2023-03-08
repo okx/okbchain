@@ -22,7 +22,7 @@ func Deprecated_TestValidatorSMProxyDelegationSmoke(t *testing.T) {
 	params.Epoch = 2
 	params.UnbondingTime = time.Millisecond * 300
 
-	startUpValidator := NewValidator(StartUpValidatorAddr, StartUpValidatorPubkey, Description{}, types.DefaultMinSelfDelegation)
+	startUpValidator := NewValidator(StartUpValidatorAddr, StartUpValidatorPubkey, Description{}, types.DefaultDPoSMinSelfDelegation)
 
 	startUpStatus := baseValidatorStatus{startUpValidator}
 
@@ -111,7 +111,7 @@ func TestDelegator(t *testing.T) {
 	params.Epoch = 2
 	params.UnbondingTime = time.Millisecond * 300
 
-	startUpValidator := NewValidator(StartUpValidatorAddr, StartUpValidatorPubkey, Description{}, types.DefaultMinSelfDelegation)
+	startUpValidator := NewValidator(StartUpValidatorAddr, StartUpValidatorPubkey, Description{}, types.DefaultDPoSMinSelfDelegation)
 
 	startUpStatus := baseValidatorStatus{startUpValidator}
 
@@ -207,7 +207,7 @@ func Deprecated_TestProxy(t *testing.T) {
 	params.Epoch = 2
 	params.UnbondingTime = time.Millisecond * 300
 
-	startUpValidator := NewValidator(StartUpValidatorAddr, StartUpValidatorPubkey, Description{}, types.DefaultMinSelfDelegation)
+	startUpValidator := NewValidator(StartUpValidatorAddr, StartUpValidatorPubkey, Description{}, types.DefaultDPoSMinSelfDelegation)
 
 	startUpStatus := baseValidatorStatus{startUpValidator}
 
@@ -339,7 +339,7 @@ func Deprecated_TestRebindProxy(t *testing.T) {
 	params.Epoch = 2
 	params.UnbondingTime = time.Millisecond * 300
 
-	startUpValidator := NewValidator(StartUpValidatorAddr, StartUpValidatorPubkey, Description{}, types.DefaultMinSelfDelegation)
+	startUpValidator := NewValidator(StartUpValidatorAddr, StartUpValidatorPubkey, Description{}, types.DefaultDPoSMinSelfDelegation)
 
 	startUpStatus := baseValidatorStatus{startUpValidator}
 
@@ -451,7 +451,7 @@ func Deprecated_TestLimitedProxy(t *testing.T) {
 	params.Epoch = 2
 	params.UnbondingTime = time.Millisecond * 300
 
-	startUpValidator := NewValidator(StartUpValidatorAddr, StartUpValidatorPubkey, Description{}, types.DefaultMinSelfDelegation)
+	startUpValidator := NewValidator(StartUpValidatorAddr, StartUpValidatorPubkey, Description{}, types.DefaultDPoSMinSelfDelegation)
 
 	startUpStatus := baseValidatorStatus{startUpValidator}
 
@@ -516,7 +516,7 @@ func TestDelegatorProxyValidatorConstraints4Steps(t *testing.T) {
 	params.MaxValidators = uint16(len(originVaSet))
 	params.Epoch = 2
 	params.UnbondingTime = time.Millisecond * 300
-	startUpValidator := NewValidator(StartUpValidatorAddr, StartUpValidatorPubkey, Description{}, types.DefaultMinSelfDelegation)
+	startUpValidator := NewValidator(StartUpValidatorAddr, StartUpValidatorPubkey, Description{}, types.DefaultDPoSMinSelfDelegation)
 	startUpStatus := baseValidatorStatus{startUpValidator}
 	orgValsLen := len(originVaSet)
 	fullVaSet := make([]sdk.ValAddress, orgValsLen+1)
