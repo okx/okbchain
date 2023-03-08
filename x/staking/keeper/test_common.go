@@ -121,7 +121,6 @@ func CreateTestInput(t *testing.T, isCheckTx bool, initBalance int64) (sdk.Conte
 	ms := store.NewCommitMultiStore(db)
 	ms.MountStoreWithDB(tkeyStaking, sdk.StoreTypeTransient, nil)
 	ms.MountStoreWithDB(keyStaking, sdk.StoreTypeIAVL, db)
-	ms.MountStoreWithDB(keyAcc, sdk.StoreTypeIAVL, db)
 	ms.MountStoreWithDB(keyMpt, sdk.StoreTypeMPT, db)
 	ms.MountStoreWithDB(keyParams, sdk.StoreTypeIAVL, db)
 	ms.MountStoreWithDB(tkeyParams, sdk.StoreTypeTransient, db)
