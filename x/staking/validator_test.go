@@ -13,7 +13,7 @@ func TestValidatorMultiCreates(t *testing.T) {
 
 	_, _, mk := CreateTestInput(t, false, SufficientInitPower)
 
-	params := DefaultParams()
+	params := DefaultDposParams()
 	params.MaxValidators = 1
 	params.Epoch = 1
 
@@ -47,7 +47,7 @@ func TestValidatorSM1Create2Destroy3Create(t *testing.T) {
 
 	_, _, mk := CreateTestInput(t, false, SufficientInitPower)
 
-	params := DefaultParams()
+	params := DefaultDposParams()
 	params.MaxValidators = 1
 	params.Epoch = 1
 	params.UnbondingTime = time.Millisecond * 300

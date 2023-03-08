@@ -15,7 +15,7 @@ import (
 func Deprecated_TestValidatorSMProxyDelegationSmoke(t *testing.T) {
 	common.InitConfig()
 	_, _, mk := CreateTestInput(t, false, SufficientInitPower)
-	params := DefaultParams()
+	params := DefaultDposParams()
 
 	originVaSet := addrVals[1:]
 	params.MaxValidators = uint16(len(originVaSet))
@@ -106,7 +106,7 @@ func TestDelegator(t *testing.T) {
 	common.InitConfig()
 	_, _, mk := CreateTestInput(t, false, SufficientInitPower)
 
-	params := DefaultParams()
+	params := DefaultDposParams()
 	params.MaxValidators = uint16(len(addrVals)) - 1
 	params.Epoch = 2
 	params.UnbondingTime = time.Millisecond * 300
@@ -200,7 +200,7 @@ func TestDelegator(t *testing.T) {
 func Deprecated_TestProxy(t *testing.T) {
 	common.InitConfig()
 	_, _, mk := CreateTestInput(t, false, SufficientInitPower)
-	params := DefaultParams()
+	params := DefaultDposParams()
 
 	originVaSet := addrVals[1:]
 	params.MaxValidators = uint16(len(originVaSet))
@@ -332,7 +332,7 @@ func Deprecated_TestProxy(t *testing.T) {
 func Deprecated_TestRebindProxy(t *testing.T) {
 	common.InitConfig()
 	_, _, mk := CreateTestInput(t, false, SufficientInitPower)
-	params := DefaultParams()
+	params := DefaultDposParams()
 
 	originVaSet := addrVals[1:]
 	params.MaxValidators = uint16(len(originVaSet))
@@ -444,7 +444,7 @@ func Deprecated_TestRebindProxy(t *testing.T) {
 func Deprecated_TestLimitedProxy(t *testing.T) {
 	common.InitConfig()
 	_, _, mk := CreateTestInput(t, false, SufficientInitPower)
-	params := DefaultParams()
+	params := DefaultDposParams()
 
 	originVaSet := addrVals[1:]
 	params.MaxValidators = uint16(len(originVaSet))
@@ -510,7 +510,7 @@ func Deprecated_TestLimitedProxy(t *testing.T) {
 //
 func TestDelegatorProxyValidatorConstraints4Steps(t *testing.T) {
 	common.InitConfig()
-	params := DefaultParams()
+	params := DefaultDposParams()
 
 	originVaSet := addrVals[1:]
 	params.MaxValidators = uint16(len(originVaSet))
