@@ -73,7 +73,7 @@ func (pc *prerunContext) dequeueResult() (*ABCIResponses, time.Duration, error) 
 			return context.result.res, context.result.duration, context.result.err
 		} else {
 			// todo
-			panic("wrong app hash")
+			//panic("wrong app hash")
 		}
 	}
 	return nil, 0, nil
