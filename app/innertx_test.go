@@ -54,6 +54,7 @@ type InnerTxTestSuite struct {
 	handler sdk.Handler
 }
 
+// Note: DefaultMinSelfDelegation was changed to 0 from 10000
 func (suite *InnerTxTestSuite) SetupTest() {
 	checkTx := false
 	chain_id := "ethermint-3"
@@ -213,13 +214,13 @@ func (suite *InnerTxTestSuite) TestMsgSend() {
 			true,
 			func() {
 				fromBalance := suite.app.AccountKeeper.GetAccount(suite.ctx, valcmaddress).GetCoins()
-				suite.Require().True(fromBalance.IsEqual(sdk.NewDecCoins(sdk.NewDecCoinFromCoin(sdk.NewInt64Coin(sdk.DefaultBondDenom, 10000)))))
+				suite.Require().True(fromBalance.IsEqual(sdk.NewDecCoins(sdk.NewDecCoinFromCoin(sdk.NewInt64Coin(sdk.DefaultBondDenom, 20000)))))
 
 				suite.app.StakingKeeper.ApplyAndReturnValidatorSetUpdates(suite.ctx)
 				val, ok := suite.app.StakingKeeper.GetValidator(suite.ctx, valopaddress)
 				suite.Require().True(ok)
 				suite.Require().Equal(valopaddress, val.OperatorAddress)
-				suite.Require().True(val.MinSelfDelegation.Equal(sdk.NewDec(10000)))
+				suite.Require().True(val.MinSelfDelegation.Equal(sdk.NewDec(0)))
 			},
 		},
 		{
