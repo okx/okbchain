@@ -156,7 +156,7 @@ func DefaultDposParams() Params {
 		DefaultEpoch,
 		DefaultMaxValsToAddShares,
 		DefaultMinDelegation,
-		DefaultMinSelfDelegation,
+		sdk.NewDec(10000),
 		DefaultHistoricalEntries,
 		common.DPoS,
 		true,
