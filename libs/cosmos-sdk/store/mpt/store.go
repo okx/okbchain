@@ -224,10 +224,7 @@ func (ms *MptStore) Set(key, value []byte) {
 		t := ms.tryGetStorageTrie(addr, stateRoot, true)
 		t.TryUpdate(realKey, value)
 	case addressType:
-		err := ms.trie.TryUpdate(key, value)
-		if err != nil {
-			return
-		}
+		ms.trie.TryUpdate(key, value)
 	default:
 		panic(fmt.Errorf("not support key %s for mpt set", hex.EncodeToString(key)))
 	}
@@ -245,10 +242,7 @@ func (ms *MptStore) Delete(key []byte) {
 		t := ms.tryGetStorageTrie(addr, stateRoot, true)
 		t.TryDelete(realKey)
 	case addressType:
-		err := ms.trie.TryDelete(key)
-		if err != nil {
-			return
-		}
+		ms.trie.TryDelete(key)
 	default:
 		panic(fmt.Errorf("not support key %s for mpt delete", hex.EncodeToString(key)))
 
@@ -275,7 +269,7 @@ func (ms *MptStore) CommitterCommit(delta *iavl.TreeDelta) (types.CommitID, *iav
 	for addr, v := range ms.storageTrieForWrite {
 		stateR, err := v.Commit(nil)
 		if err != nil {
-			panic(err)
+			panic(fmt.Errorf("unexcepted err:%v while commit storage tire ", err))
 		}
 		key := AddressStoreKey(addr.Bytes())
 		preValue, err := ms.trie.TryGet(key)
@@ -658,8 +652,8 @@ var (
 )
 
 /*
-	storageType : 0x0 + addr + stateRoot + key
-	addressType : 0x1 + addr
+storageType : 0x0 + addr + stateRoot + key
+addressType : 0x1 + addr
 */
 func mptKeyType(size int) int {
 	if size == 1+sdk.AddrLen {
