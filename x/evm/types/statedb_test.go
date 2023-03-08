@@ -60,6 +60,12 @@ func (suite *StateDBTestSuite) SetupTest() {
 	params.EnableCreate = true
 	params.EnableCall = true
 	suite.stateDB.SetParams(params)
+
+	// clear database
+	for i := uint64(0); i <= 100; i++ {
+		key := types.AppendHeightHashKey(i)
+		suite.stateDB.Database().TrieDB().DiskDB().Delete(key)
+	}
 }
 
 func (suite *StateDBTestSuite) TestParams() {
