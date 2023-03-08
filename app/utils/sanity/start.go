@@ -1,6 +1,7 @@
 package sanity
 
 import (
+	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
 	"github.com/spf13/viper"
 
 	"github.com/okx/okbchain/app/config"

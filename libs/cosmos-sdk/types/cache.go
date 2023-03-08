@@ -2,11 +2,26 @@ package types
 
 import (
 	"fmt"
+	"github.com/okx/okbchain/libs/cosmos-sdk/store/types"
+	"github.com/okx/okbchain/libs/tendermint/libs/log"
+	"github.com/spf13/viper"
 	"sync"
 	"time"
 
 	ethcmn "github.com/ethereum/go-ethereum/common"
 	"github.com/okx/okbchain/libs/tendermint/crypto"
+)
+
+var (
+	maxAccInMap        = 100000
+	deleteAccCount     = 10000
+	maxStorageInMap    = 10000000
+	deleteStorageCount = 1000000
+
+	FlagMultiCache         = "multi-cache"
+	MaxAccInMultiCache     = "multi-cache-acc"
+	MaxStorageInMultiCache = "multi-cache-storage"
+	UseCache               bool
 )
 
 type Account interface {
@@ -52,7 +67,7 @@ type codeWithCache struct {
 type Cache struct {
 	useCache  bool
 	parent    *Cache
-	gasConfig types.GasConfig
+	gasConfig GasConfig
 
 	storageMap map[ethcmn.Address]map[ethcmn.Hash]*storageWithCache
 	accMap     map[ethcmn.Address]*accountWithCache

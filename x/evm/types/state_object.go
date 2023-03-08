@@ -3,6 +3,8 @@ package types
 import (
 	"bytes"
 	"fmt"
+	"github.com/okx/okbchain/libs/cosmos-sdk/store/mpt"
+	tmtypes "github.com/okx/okbchain/libs/tendermint/types"
 	"io"
 	"math/big"
 	"sync"

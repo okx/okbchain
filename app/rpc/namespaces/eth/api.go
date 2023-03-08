@@ -8,6 +8,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/okx/okbchain/libs/cosmos-sdk/store/mpt"
+	"github.com/okx/okbchain/libs/tendermint/crypto/merkle"
 	"math/big"
 	"strconv"
 	"sync"

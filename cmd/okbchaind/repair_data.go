@@ -15,6 +15,7 @@ import (
 	"github.com/okx/okbchain/libs/system/trace"
 	sm "github.com/okx/okbchain/libs/tendermint/state"
 	tmtypes "github.com/okx/okbchain/libs/tendermint/types"
+	types2 "github.com/okx/okbchain/x/evm/types"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )

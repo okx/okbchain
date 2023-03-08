@@ -21,7 +21,7 @@ Name=okbchain
 ServerName=okbchaind
 ClientName=okbchaincli
 
-MarsHeight=1
+MarsHeight=0
 
 LINK_STATICALLY = false
 cgo_flags=

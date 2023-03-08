@@ -3,6 +3,7 @@ package types
 import (
 	"bytes"
 	"fmt"
+	tmtypes "github.com/okx/okbchain/libs/tendermint/types"
 
 	ethcmn "github.com/ethereum/go-ethereum/common"
 	ethstate "github.com/ethereum/go-ethereum/core/state"

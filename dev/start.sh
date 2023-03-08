@@ -29,7 +29,7 @@ run() {
       --log_level $LOG_LEVEL \
       --log_file json \
       --dynamic-gp-mode=2 \
-      --consensus.timeout_commit 200ms \
+      --consensus.timeout_commit 2000ms \
       --enable-preruntx=1 \
       --iavl-enable-async-commit=false \
       --enable-gid \

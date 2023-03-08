@@ -2,12 +2,6 @@ package mpt
 
 import (
 	"fmt"
-	"strconv"
-
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/auth"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/auth/exported"
-	"github.com/status-im/keycard-go/hexutils"
 	"log"
 
 	ethcmn "github.com/ethereum/go-ethereum/common"

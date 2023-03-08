@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	ethermint "github.com/okx/okbchain/app/types"
+	tmtypes "github.com/okx/okbchain/libs/tendermint/types"
 
 	ethcmn "github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/rawdb"
