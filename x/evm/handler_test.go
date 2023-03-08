@@ -917,7 +917,6 @@ func (suite *EvmContractBlockedListTestSuite) TestEvmParamsAndContractBlockedLis
 
 	for _, tc := range testCases {
 		suite.Run(tc.msg, func() {
-			suite.SetupTest()
 			// update params
 			params := suite.app.EvmKeeper.GetParams(suite.ctx)
 			params.EnableContractBlockedList = tc.enableContractBlockedList
@@ -926,6 +925,8 @@ func (suite *EvmContractBlockedListTestSuite) TestEvmParamsAndContractBlockedLis
 			// reset contract blocked list
 			suite.stateDB.DeleteContractBlockedList(suite.stateDB.GetContractBlockedList())
 			suite.stateDB.SetContractBlockedList(tc.contractBlockedList)
+
+			suite.stateDB.Commit(true)
 
 			// nonce here could be any value
 			err = suite.deployOrInvokeContract(callerPrivKey, invokeContract1HexPayload, 1024, &suite.contract1Addr)
@@ -1039,6 +1040,7 @@ func (suite *EvmContractBlockedListTestSuite) TestEvmParamsAndContractMethodBloc
 
 	for _, tc := range testCases {
 		suite.Run(tc.msg, func() {
+			suite.SetupTest()
 			suite.ctx.SetIsDeliverTx(true).SetIsCheckTx(false)
 
 			// set contract code
