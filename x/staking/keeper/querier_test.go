@@ -197,7 +197,7 @@ func TestQueriorQueryProxy(t *testing.T) {
 
 func TestParams(t *testing.T) {
 	ctx, _, keeper := CreateTestInput(t, false, 0)
-	expParams := types.DefaultParams()
+	expParams := types.DefaultDposParams()
 
 	//check that the empty keeper loads the default
 	resParams := keeper.GetParams(ctx)

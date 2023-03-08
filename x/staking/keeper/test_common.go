@@ -179,7 +179,7 @@ func CreateTestInput(t *testing.T, isCheckTx bool, initBalance int64) (sdk.Conte
 	supplyKeeper.SetSupply(ctx, supply.NewSupply(totalSupply))
 
 	keeper := NewKeeper(pro, keyStaking, supplyKeeper, pk.Subspace(DefaultParamspace))
-	keeper.SetParams(ctx, types.DefaultParams())
+	keeper.SetParams(ctx, types.DefaultDposParams())
 
 	// set module accounts
 	supplyKeeper.SetModuleAccount(ctx, feeCollectorAcc)
