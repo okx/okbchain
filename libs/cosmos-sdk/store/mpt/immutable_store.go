@@ -50,14 +50,9 @@ func (ms *ImmutableMptStore) Get(key []byte) []byte {
 	case storageType:
 		_, stateRoot, realKey := decodeAddressStorageInfo(key)
 
-		var t ethstate.Trie
-		var err error
-		t, err = ms.db.OpenStorageTrie(ethcmn.Hash{}, stateRoot)
+		t, err := ms.db.OpenStorageTrie(ethcmn.Hash{}, stateRoot)
 		if err != nil {
-			t, err = ms.db.OpenStorageTrie(ethcmn.Hash{}, ethcmn.Hash{})
-			if err != nil {
-				panic("unexcepted err")
-			}
+			return nil
 		}
 
 		value, err := t.TryGet(realKey)
