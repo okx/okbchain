@@ -109,10 +109,6 @@ func (k Keeper) PoAAllocateTokens(ctx sdk.Context, previousVotes []abci.VoteInfo
 }
 
 func (k Keeper) allocateByEqual(ctx sdk.Context, rewards sdk.SysCoins, previousVotes []abci.VoteInfo) sdk.SysCoins {
-	if len(previousVotes) == 0 {
-		// This should never happen except in unit test
-		return rewards
-	}
 	logger := k.Logger(ctx)
 
 	//count the total sum of the unJailed val
