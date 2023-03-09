@@ -36,6 +36,7 @@ run() {
       --append-pid=true \
       --iavl-output-modules evm=0,acc=0 \
       --commit-gap-height 3 \
+      --pruning nothing \
       --trie.dirty-disabled=true \
       --trace --home $HOME_SERVER --chain-id $CHAINID \
       --elapsed Round=1,CommitRound=1,Produce=1 \
