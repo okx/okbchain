@@ -5,6 +5,7 @@ package mint
 import (
 	"github.com/okx/okbchain/libs/cosmos-sdk/x/mint/internal/keeper"
 	"github.com/okx/okbchain/libs/cosmos-sdk/x/mint/internal/types"
+	govtypes "github.com/okx/okbchain/x/gov/types"
 )
 
 const (
@@ -20,18 +21,19 @@ const (
 
 var (
 	// functions aliases
-	NewKeeper            = keeper.NewKeeper
-	NewQuerier           = keeper.NewQuerier
-	NewGenesisState      = types.NewGenesisState
-	DefaultGenesisState  = types.DefaultGenesisState
-	ValidateGenesis      = types.ValidateGenesis
-	NewMinter            = types.NewMinter
-	InitialMinter        = types.InitialMinter
-	DefaultInitialMinter = types.DefaultInitialMinter
-	ValidateMinter       = types.ValidateMinter
-	ParamKeyTable        = types.ParamKeyTable
-	NewParams            = types.NewParams
-	DefaultParams        = types.DefaultParams
+	NewKeeper                  = keeper.NewKeeper
+	NewQuerier                 = keeper.NewQuerier
+	NewGenesisState            = types.NewGenesisState
+	DefaultGenesisState        = types.DefaultGenesisState
+	ValidateGenesis            = types.ValidateGenesis
+	NewMinter                  = types.NewMinter
+	InitialMinter              = types.InitialMinter
+	DefaultInitialMinter       = types.DefaultInitialMinter
+	ValidateMinter             = types.ValidateMinter
+	ParamKeyTable              = types.ParamKeyTable
+	NewParams                  = types.NewParams
+	DefaultParams              = types.DefaultParams
+	ErrProposerMustBeValidator = types.ErrProposerMustBeValidator
 
 	// variable aliases
 	ModuleCdc    = types.ModuleCdc
@@ -49,4 +51,10 @@ type (
 	GenesisState = types.GenesisState
 	Minter       = types.Minter
 	Params       = types.Params
+)
+
+type DistrExtendProposal = types.ExtraProposal
+
+var (
+	_ govtypes.Content = (*DistrExtendProposal)(nil)
 )

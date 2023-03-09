@@ -18,6 +18,8 @@ var (
 	ErrDuplicatedTreasure      = sdkerrors.Register(ModuleName, 3, "treasures can not be duplicate")
 	ErrUnexpectedProposalType  = sdkerrors.Register(ModuleName, 4, "unsupported proposal type of mint module")
 	ErrProposerMustBeValidator = sdkerrors.Register(ModuleName, 5, "the proposal of proposer must be validator")
+	ErrNextBlockUpdateTooLate  = sdkerrors.Register(ModuleName, 7, "the next block to update is too late")
+	ErrCodeInvalidHeight       = sdkerrors.Register(ModuleName, 8, "height must be greater than current block")
 )
 
 // ErrTreasuresInternal returns an error when the length of address list in the proposal is larger than the max limitation
@@ -27,4 +29,8 @@ func ErrTreasuresInternal(err error) sdk.EnvelopedErr {
 			DefaultParamspace,
 			11,
 			fmt.Sprintf("treasures error:%s", err.Error()))}
+}
+
+func ErrExtendProposalParams(desc string) sdk.Error {
+	return sdkerrors.New(DefaultCodespace, 6, desc)
 }
