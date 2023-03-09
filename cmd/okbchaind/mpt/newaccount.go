@@ -17,6 +17,7 @@ import (
 	"github.com/spf13/cobra"
 	"io/ioutil"
 	"os"
+	"strconv"
 )
 
 type TempNewAccountPretty struct {
@@ -43,12 +44,14 @@ type TempModuleAccountPretty struct {
 
 func AccountGetCmd(ctx *server.Context) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "account [data]",
-		Args:  cobra.ExactArgs(1),
+		Use:   "account [data] [height]",
+		Args:  cobra.ExactArgs(2),
 		Short: "get account",
 		Run: func(cmd *cobra.Command, args []string) {
 			fmt.Printf("--------- iterate %s data start ---------\n", args[0])
-			iavlAccount := GetAccount(args[0])
+			height, err := strconv.Atoi(args[1])
+			panicError(err)
+			iavlAccount := GetAccount(args[0], int64(height))
 			buff, err := json.Marshal(iavlAccount)
 			if err != nil {
 				fmt.Printf("Error:%s", err)
@@ -65,7 +68,7 @@ func AccountGetCmd(ctx *server.Context) *cobra.Command {
 }
 
 // migrateAccFromIavlToMpt migrate acc data from iavl to mpt
-func GetAccount(datadir string) map[string]interface{} {
+func GetAccount(datadir string, height int64) map[string]interface{} {
 	result := make(map[string]interface{}, 0)
 	// 0.1 initialize App and context
 	appDb := openApplicationDb(datadir)
@@ -73,11 +76,13 @@ func GetAccount(datadir string) map[string]interface{} {
 		log.NewTMLogger(log.NewSyncWriter(os.Stdout)),
 		appDb,
 		nil,
-		true,
+		false,
 		map[int64]bool{},
 		0,
 	)
 
+	err := migrationApp.LoadStartVersion(height)
+	panicError(err)
 	cmCtx := migrationApp.MockContext()
 
 	// 1.2 update every account to mpt
