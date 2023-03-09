@@ -641,7 +641,7 @@ func NewSimApp(
 		wasm.ModuleName,
 	)
 	app.mm.SetOrderEndBlockers(
-		crisis.ModuleName,
+		//crisis.ModuleName,
 		gov.ModuleName,
 		staking.ModuleName,
 		evm.ModuleName,
