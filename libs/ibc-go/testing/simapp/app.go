@@ -580,6 +580,7 @@ func NewSimApp(
 		app.subspaces[wasm.ModuleName],
 		&app.AccountKeeper,
 		bank.NewBankKeeperAdapter(app.BankKeeper),
+		&app.ParamsKeeper,
 		v2keeper.ChannelKeeper,
 		&v2keeper.PortKeeper,
 		nil,
