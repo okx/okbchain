@@ -90,11 +90,7 @@ func (k Keeper) withdrawDelegationRewards(ctx sdk.Context, val stakingexported.V
 
 	// check existence of delegator starting info
 	if !k.HasDelegatorStartingInfo(ctx, val.GetOperator(), delAddress) {
-		del := k.stakingKeeper.Delegator(ctx, delAddress)
-		if del.GetLastAddedShares().IsZero() {
-			return nil, types.ErrCodeZeroDelegationShares()
-		}
-		k.initExistedDelegationStartInfo(ctx, val, del)
+		return nil, types.ErrCodeZeroDelegationShares()
 	}
 
 	// end current period and calculate rewards
@@ -144,20 +140,4 @@ func (k Keeper) withdrawDelegationRewards(ctx sdk.Context, val stakingexported.V
 		"Stake", startingInfo.Stake, "StartingPeriod", startingPeriod, "EndingPeriod", endingPeriod,
 		"RewardsRaw", rewardsRaw, "Rewards", rewards, "Coins", coins, "Remainder", remainder)
 	return coins, nil
-}
-
-//initExistedDelegationStartInfo If the delegator existed but no start info, it add shares before distribution proposal, and need to set a new start info
-func (k Keeper) initExistedDelegationStartInfo(ctx sdk.Context, val stakingexported.ValidatorI, del stakingexported.DelegatorI) {
-	logger := k.Logger(ctx)
-	//set previous validator period 0
-	previousPeriod := uint64(0)
-	// increment reference count for the period we're going to track
-	k.incrementReferenceCount(ctx, val.GetOperator(), previousPeriod)
-
-	k.SetDelegatorStartingInfo(ctx, val.GetOperator(), del.GetDelegatorAddress(),
-		types.NewDelegatorStartingInfo(previousPeriod, del.GetLastAddedShares(), 0))
-
-	logger.Debug("initExistedDelegationStartInfo", "Validator", val.GetOperator(),
-		"Delegator", del.GetDelegatorAddress(), "Shares", del.GetLastAddedShares())
-	return
 }

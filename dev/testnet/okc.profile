@@ -1,5 +1,5 @@
 BIN_NAME=okbchaind
-OKCHAIN_TOP=${GOPATH}/src/github.com/okx/okbchain
+OKCHAIN_TOP=/Users/oker/workspace/okbchain
 OKCHAIN_BIN=${OKCHAIN_TOP}/build
 OKCHAIN_BIN=${GOPATH}/bin
 OKCHAIN_NET_TOP=`pwd`

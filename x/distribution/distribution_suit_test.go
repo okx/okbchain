@@ -42,12 +42,9 @@ func allocateTokens(t *testing.T) {
 	ctx.SetBlockHeight(ctx.BlockHeight() + 1)
 }
 
-func initEnv(t *testing.T, validatorCount int64, newVersion bool) {
+func initEnv(t *testing.T, validatorCount int64) {
 	communityTax := sdk.NewDecWithPrec(2, 2)
 	ctx, ak, _, dk, sk, _, supplyKeeper = keeper.CreateTestInputAdvanced(t, false, 1000, communityTax)
-	if newVersion {
-		dk.SetInitExistedValidatorFlag(ctx, true)
-	}
 
 	h := staking.NewHandler(sk)
 	valOpAddrs, valConsPks, _ := keeper.GetTestAddrs()
@@ -58,13 +55,7 @@ func initEnv(t *testing.T, validatorCount int64, newVersion bool) {
 			staking.Description{}, keeper.NewTestSysCoin(i+1, 0))
 		_, e := h(ctx, msg)
 		require.Nil(t, e)
-		if newVersion {
-			require.True(t, dk.GetValidatorAccumulatedCommission(ctx, valOpAddrs[i]).IsZero())
-		} else {
-			require.Panics(t, func() {
-				dk.GetValidatorOutstandingRewards(ctx, valOpAddrs[i])
-			})
-		}
+		require.True(t, dk.GetValidatorAccumulatedCommission(ctx, valOpAddrs[i]).IsZero())
 	}
 	staking.EndBlocker(ctx, sk)
 	ctx.SetBlockHeight(ctx.BlockHeight() + 1)
@@ -213,7 +204,7 @@ func (suite *DistributionSuite) TestNormal() {
 
 	for _, tc := range testCases {
 		suite.Run(tc.title, func() {
-			initEnv(suite.T(), tc.valCount, true)
+			initEnv(suite.T(), tc.valCount)
 			dk.SetDistributionType(ctx, tc.distrType)
 			allocateTokens(suite.T())
 
@@ -378,7 +369,7 @@ func (suite *DistributionSuite) TestDelegator() {
 
 	for _, tc := range testCases {
 		suite.Run(tc.title, func() {
-			initEnv(suite.T(), tc.valCount, true)
+			initEnv(suite.T(), tc.valCount)
 			dk.SetDistributionType(ctx, tc.distrType)
 
 			newRate, _ := sdk.NewDecFromStr(tc.rate)
@@ -602,7 +593,7 @@ func (suite *DistributionSuite) TestProxy() {
 
 		for _, tc := range testCases {
 			suite.Run(tc.title, func() {
-				initEnv(suite.T(), tc.valCount, true)
+				initEnv(suite.T(), tc.valCount)
 				dk.SetDistributionType(ctx, tc.distrType)
 
 				newRate, _ := sdk.NewDecFromStr(tc.rate)
@@ -936,7 +927,7 @@ func (suite *DistributionSuite) TestWithdraw() {
 
 	for _, tc := range testCases {
 		suite.Run(tc.title, func() {
-			initEnv(suite.T(), tc.valCount, true)
+			initEnv(suite.T(), tc.valCount)
 			dk.SetDistributionType(ctx, tc.distrType)
 
 			newRate, _ := sdk.NewDecFromStr(tc.rate)
@@ -1174,7 +1165,7 @@ func (suite *DistributionSuite) TestWithdrawAllRewards() {
 
 	for _, tc := range testCases {
 		suite.Run(tc.title, func() {
-			initEnv(suite.T(), tc.valCount, true)
+			initEnv(suite.T(), tc.valCount)
 			dk.SetDistributionType(ctx, tc.distrType)
 
 			newRate, _ := sdk.NewDecFromStr(tc.rate)
@@ -1324,7 +1315,7 @@ func (suite *DistributionSuite) TestDestroyValidator() {
 
 	for _, tc := range testCases {
 		suite.Run(tc.title, func() {
-			initEnv(suite.T(), tc.valCount, true)
+			initEnv(suite.T(), tc.valCount)
 			dk.SetDistributionType(ctx, tc.distrType)
 
 			newRate, _ := sdk.NewDecFromStr(tc.rate)
@@ -1445,7 +1436,7 @@ func (suite *DistributionSuite) TestUpgrade() {
 			[4][4]string{{"0"}},
 			[4][4]string{{"48"}},
 			"0.5",
-			2,
+			1,
 		},
 		{
 			"1 delegator，2 validator",
@@ -1454,7 +1445,7 @@ func (suite *DistributionSuite) TestUpgrade() {
 			[4][4]string{{"0", "0"}},
 			[4][4]string{{"24", "24"}},
 			"0.5",
-			4,
+			2,
 		},
 		{
 			"2 delegator，1 validator",
@@ -1463,7 +1454,7 @@ func (suite *DistributionSuite) TestUpgrade() {
 			[4][4]string{{"0"}, {"0"}},
 			[4][4]string{{"24"}, {"24"}},
 			"0.5",
-			2,
+			1,
 		},
 		{
 			"2 delegator，2 validator",
@@ -1472,7 +1463,7 @@ func (suite *DistributionSuite) TestUpgrade() {
 			[4][4]string{{"0", "0"}, {"0", "0"}},
 			[4][4]string{{"12", "12"}, {"12", "12"}},
 			"0.5",
-			4,
+			2,
 		},
 		{
 			"2 delegator，4 validator",
@@ -1481,7 +1472,7 @@ func (suite *DistributionSuite) TestUpgrade() {
 			[4][4]string{{"0", "0", "0", "0"}, {"0", "0", "0", "0"}},
 			[4][4]string{{"6", "6", "6", "6"}, {"6", "6", "6", "6"}},
 			"0.5",
-			8,
+			4,
 		},
 		{
 			"4 delegator，4 validator",
@@ -1490,13 +1481,13 @@ func (suite *DistributionSuite) TestUpgrade() {
 			[4][4]string{{"0", "0", "0", "0"}, {"0", "0", "0", "0"}, {"0", "0", "0", "0"}, {"0", "0", "0", "0"}},
 			[4][4]string{{"3", "3", "3", "3"}, {"3", "3", "3", "3"}, {"3", "3", "3", "3"}, {"3", "3", "3", "3"}},
 			"0.5",
-			8,
+			4,
 		},
 	}
 
 	for _, tc := range testCases {
 		suite.Run(tc.title, func() {
-			initEnv(suite.T(), tc.valCount, false)
+			initEnv(suite.T(), tc.valCount)
 			ctx.SetBlockTime(time.Now())
 			for i := int64(0); i < tc.delCount; i++ {
 				keeper.DoDeposit(suite.T(), ctx, sk, keeper.TestDelAddrs[i], depositCoin)
@@ -1524,9 +1515,7 @@ func (suite *DistributionSuite) TestUpgrade() {
 			afterValCommission := [4]types.ValidatorAccumulatedCommission{}
 			for i := int64(0); i < tc.valCount; i++ {
 				afterValCommission[i] = dk.GetValidatorAccumulatedCommission(ctx, keeper.TestValAddrs[i])
-				require.Panics(suite.T(), func() {
-					require.True(suite.T(), dk.GetValidatorOutstandingRewards(ctx, keeper.TestValAddrs[i]).IsZero())
-				})
+				require.Equal(suite.T(), dk.GetValidatorOutstandingRewards(ctx, keeper.TestValAddrs[i]), afterValCommission[i])
 			}
 
 			//withdraw again
@@ -1759,7 +1748,7 @@ func (suite *DistributionSuite) TestTruncateWithPrecWithdraw() {
 
 	for _, tc := range testCases {
 		suite.Run(tc.title, func() {
-			initEnv(suite.T(), 1, true)
+			initEnv(suite.T(), 1)
 			dk.SetDistributionType(ctx, types.DistributionTypeOnChain)
 			dk.SetRewardTruncatePrecision(ctx, tc.precision)
 			ctx.SetBlockTime(time.Now().UTC().Add(48 * time.Hour))
