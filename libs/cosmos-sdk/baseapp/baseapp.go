@@ -566,7 +566,7 @@ func (app *BaseApp) setCheckState(header abci.Header) {
 // (i.e. a CacheMultiStore) and a new Context with the cache-wrapped multi-store,
 // and provided header. It is set on InitChain and BeginBlock and set to nil on
 // Commit.
-func (app *BaseApp) setDeliverState(header abci.Header) {
+func (app *BaseApp) SetDeliverState(header abci.Header) {
 	ms := app.cms.CacheMultiStore()
 	app.deliverState = &state{
 		ms:  ms,
