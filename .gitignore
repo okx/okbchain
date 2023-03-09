@@ -58,6 +58,10 @@ libs/ibc-go/modules/apps/transfer/keeper/data/*
 libs/ibc-go/modules/core/02-client/keeper/data/*
 libs/ibc-go/modules/core/02-client/types/data/*
 libs/ibc-go/modules/core/03-connection/keeper/data/*
+libs/ibc-go/modules/core/04-channel/keeper/data/*
+libs/ibc-go/modules/core/ante/data/*
+libs/ibc-go/modules/core/keeper/data/*
+libs/ibc-go/modules/light-clients/07-tendermint/types/data/*
 
 
 
