@@ -29,14 +29,13 @@ func (k *Keeper) BeginBlock(ctx sdk.Context, req abci.RequestBeginBlock) {
 	ctx.SetGasMeter(sdk.NewInfiniteGasMeter())
 
 	// Set the hash -> height and height -> hash mapping.
-	lastHash := req.Header.LastBlockId.GetHash()
-	lastHeight := req.Header.GetHeight() - 1
-	k.SetHeightHash(ctx, uint64(lastHeight), common.BytesToHash(lastHash))
-	k.SetBlockHeight(ctx, lastHash, lastHeight)
+	currentHash := req.Hash
+	height := req.Header.GetHeight()
+	blockHash := common.BytesToHash(currentHash)
+	k.SetHeightHash(ctx, uint64(height), blockHash)
+	k.SetBlockHeight(ctx, currentHash, height)
 	// Add latest block height and hash to cache
-	blockHash := common.BytesToHash(req.GetHash())
 	k.AddHeightHashToCache(req.Header.GetHeight(), blockHash.Hex())
-
 	// reset counters that are used on CommitStateDB.Prepare
 	if !ctx.IsTraceTx() {
 		k.Bloom = big.NewInt(0)
