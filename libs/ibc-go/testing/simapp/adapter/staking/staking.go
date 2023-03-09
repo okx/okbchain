@@ -9,16 +9,15 @@ import (
 	"github.com/okx/okbchain/x/common"
 	"github.com/okx/okbchain/x/staking/keeper"
 	"github.com/okx/okbchain/x/staking/types"
-	"time"
 )
 
 type StakingKeeper struct {
 	keeper.Keeper
 }
 
-func (k StakingKeeper) UnbondingTime(ctx sdk.Context) (res time.Duration) {
-	return types2.DefaultUnbondingTime
-}
+//func (k StakingKeeper) UnbondingTime(ctx sdk.Context) (res time.Duration) {
+//	return types2.DefaultUnbondingTime
+//}
 
 // NewKeeper creates a new staking Keeper instance
 func NewStakingKeeper(cdcMarshl *codec.CodecProxy, key sdk.StoreKey, supplyKeeper types.SupplyKeeper,
