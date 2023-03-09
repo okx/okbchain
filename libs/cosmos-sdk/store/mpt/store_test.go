@@ -256,52 +256,6 @@ func (suite *StoreTestSuite) TestMPTStoreQuery() {
 	suite.Require().Equal(v3, qres.Value)
 }
 
-func TestTrieReadBad(t *testing.T) {
-	db := memorydb.New()
-
-	trie, err := state.NewDatabase(rawdb.NewDatabase(db)).OpenTrie(common.Hash{})
-	require.NoError(t, err)
-	require.NotNilf(t, trie, "trie is nil")
-
-	err = trie.TryUpdate([]byte("key1"), []byte("value1"))
-	require.NoError(t, err)
-
-	wg := sync.WaitGroup{}
-	wg.Add(2)
-
-	go func() {
-		defer wg.Done()
-		var res = map[string]struct{}{}
-		for i := 0; i < 10000; i++ {
-			value, err := trie.TryGet([]byte("key1"))
-			require.NoError(t, err)
-			res[string(value)] = struct{}{}
-			//require.Equal(t, []byte("value1"), value)
-		}
-		for v := range res {
-			t.Logf("bad read key1 value:\"%s\"", v)
-		}
-		delete(res, "value1")
-		require.NotEqual(t, 0, len(res))
-	}()
-
-	go func() {
-		defer wg.Done()
-		var res = map[string]struct{}{}
-		for i := 0; i < 10000; i++ {
-			value, _ := trie.TryGet([]byte("key2"))
-			res[string(value)] = struct{}{}
-			//require.Len(t, value, 0)
-		}
-		for v := range res {
-			t.Logf("bad read key2 value:\"%s\"", v)
-		}
-		require.NotEqual(t, 0, len(res))
-		require.NotEqual(t, 1, len(res))
-	}()
-	wg.Wait()
-}
-
 func TestTrieReadGood(t *testing.T) {
 	db := memorydb.New()
 
