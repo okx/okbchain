@@ -62,7 +62,7 @@ func DefaultParams() Params {
 		//InflationMin:        sdk.NewDecWithPrec(7, 2),
 		//GoalBonded:          sdk.NewDecWithPrec(67, 2),
 		BlocksPerYear:  uint64(60 * 60 * 8766 / 3), // assuming 3 second block times
-		DeflationRate:  sdk.NewDecWithPrec(5, 1),
+		DeflationRate:  sdk.ZeroDec(),
 		DeflationEpoch: 3,                        // 3 years
 	}
 }
