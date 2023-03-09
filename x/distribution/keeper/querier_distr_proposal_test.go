@@ -125,6 +125,8 @@ func TestRewards(t *testing.T) {
 	delegator.Shares = shares
 	sk.SetDelegator(ctx, delegator)
 
+	sk.AfterDelegationModified(ctx, dAddr1, delegator.ValidatorAddresses)
+
 	//types.NewDelegationDelegatorReward(TestValAddrs[0], nil)
 	expect := types.NewQueryDelegatorTotalRewardsResponse(
 		[]types.DelegationDelegatorReward{
