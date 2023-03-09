@@ -90,7 +90,7 @@ func (k Keeper) withdrawDelegationRewards(ctx sdk.Context, val stakingexported.V
 
 	// check existence of delegator starting info
 	if !k.HasDelegatorStartingInfo(ctx, val.GetOperator(), delAddress) {
-		return nil, types.ErrCodeZeroDelegationShares()
+		return nil, types.ErrCodeEmptyDelegationDistInfo()
 	}
 
 	// end current period and calculate rewards

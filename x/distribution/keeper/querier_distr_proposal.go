@@ -42,10 +42,6 @@ func queryDelegationRewards(ctx sdk.Context, _ []string, req abci.RequestQuery, 
 	}
 
 	logger := k.Logger(ctx)
-	if !k.HasDelegatorStartingInfo(ctx, val.GetOperator(), params.DelegatorAddress) {
-		return nil, sdkerrors.Wrap(types.ErrCodeZeroDelegationShares(), params.DelegatorAddress.String())
-	}
-
 	endingPeriod := k.incrementValidatorPeriod(ctx, val)
 	rewards := k.calculateDelegationRewards(ctx, val, params.DelegatorAddress, endingPeriod)
 	if rewards == nil {
@@ -88,9 +84,6 @@ func queryDelegatorTotalRewards(ctx sdk.Context, _ []string, req abci.RequestQue
 		}
 
 		logger := k.Logger(ctx)
-		if !k.HasDelegatorStartingInfo(ctx, val.GetOperator(), params.DelegatorAddress) {
-			return nil, sdkerrors.Wrap(types.ErrCodeZeroDelegationShares(), params.DelegatorAddress.String())
-		}
 
 		endingPeriod := k.incrementValidatorPeriod(ctx, val)
 		delReward := k.calculateDelegationRewards(ctx, val, params.DelegatorAddress, endingPeriod)
