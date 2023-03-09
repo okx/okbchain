@@ -105,6 +105,7 @@ func (coord *Coordinator) SetupClients(path *Path) {
 	err := path.EndpointA.CreateClient()
 	require.NoError(coord.t, err)
 
+	fmt.Println("\n\n\n\n\n\n\n 结束endPointA 创建client")
 	err = path.EndpointB.CreateClient()
 	require.NoError(coord.t, err)
 }

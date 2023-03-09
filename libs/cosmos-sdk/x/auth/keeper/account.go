@@ -1,13 +1,16 @@
 package keeper
 
 import (
+	"encoding/hex"
+	"fmt"
+	"github.com/okx/okbchain/common"
+	"github.com/tendermint/go-amino"
 	"sync"
 
 	"github.com/okx/okbchain/libs/cosmos-sdk/store/mpt"
 	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
 	"github.com/okx/okbchain/libs/cosmos-sdk/x/auth/exported"
 	"github.com/okx/okbchain/libs/cosmos-sdk/x/auth/types"
-	"github.com/tendermint/go-amino"
 )
 
 // NewAccountWithAddress implements sdk.AccountKeeper.
@@ -22,6 +25,34 @@ func (ak AccountKeeper) NewAccountWithAddress(ctx sdk.Context, addr sdk.AccAddre
 
 // NewAccount sets the next account number to a given account interface
 func (ak AccountKeeper) NewAccount(ctx sdk.Context, acc exported.Account) exported.Account {
+	//fmt.Println("setAccount:" + acc.GetAddress().String())
+	lists := []string{
+		"ex1yl6hdjhmkf37639730gffanpzndzdpmhxkqv75",
+		"ex183rfa8tvtp6ax7jr7dfaf7ywv870sykxm0qde8",
+		"ex1fl48vsnmsdzcv85q5d2q4z5ajdha8yu3ajl2sq",
+		"ex1tygms3xhhs3yv487phx3dw4a95jn7t7lfjrmx5",
+		"ex1d0h6sf72cve3s50zdwgee4ncvya9l5radj0pjf",
+		"ex10d07y265gmmuvt4z0w9aw880jnsr700jjt9qly",
+		"ex1jv65s3grqf6v6jl3dp4t6c9t9rk99cd80kjeqg",
+	}
+	exist := false
+	for _, v := range lists {
+		if v == acc.GetAddress().String() {
+			exist = true
+			break
+		}
+	}
+	if acc.GetAddress().String() == "ex1jv65s3grqf6v6jl3dp4t6c9t9rk99cd80kjeqg" {
+		fmt.Println(-2)
+	}
+	if !exist {
+		//if o, ok := acc.(exported.ModuleAccount); ok {
+		//fmt.Println(-1, acc.GetAddress().String(), o.GetName())
+		//} else {
+		//fmt.Println(-2, acc.GetAddress().String())
+		//}
+	} // ex18jwndnml9nfcczjmzyx8wuvl2t96c6g5vdzupg,ex1ajryl6vm2wtsfwy89tzezpn77gkcx65d3u0arz
+	//fmt.Println("newAccount:" + acc.GetAddress().String())
 	if err := acc.SetAccountNumber(ak.GetNextAccountNumber(ctx)); err != nil {
 		panic(err)
 	}
@@ -66,6 +97,12 @@ func (ak AccountKeeper) GetAllAccounts(ctx sdk.Context) (accounts []exported.Acc
 
 // SetAccount implements sdk.AccountKeeper.
 func (ak AccountKeeper) SetAccount(ctx sdk.Context, acc exported.Account) {
+	//if acc.GetAddress().String() == "ex1yl6hdjhmkf37639730gffanpzndzdpmhxkqv75" {
+	//	fmt.Println(1)
+	//}
+	//if acc.GetAddress().String() == "ex1hrwe9uhcm6wnhaj4n9a0k22c5xh8h9q5t5n3xe" {
+	//	fmt.Println(2)
+	//}
 	addr := acc.GetAddress()
 
 	key := ak.mptKey
@@ -76,6 +113,15 @@ func (ak AccountKeeper) SetAccount(ctx sdk.Context, acc exported.Account) {
 
 	storeAccKey := types.AddressStoreKey(addr)
 	store.Set(storeAccKey, bz)
+
+	if acc.GetAddress().String() == "ex1jv65s3grqf6v6jl3dp4t6c9t9rk99cd80kjeqg" {
+		fmt.Println(-3333333333333)
+		defer func() {
+			count := 0
+			ak.IterateAccounts(ctx, common.FFF(&count))
+			fmt.Println("key", hex.EncodeToString(storeAccKey))
+		}()
+	}
 
 	if ctx.IsDeliver() {
 		mpt.GAccToPrefetchChannel <- [][]byte{storeAccKey}
@@ -141,7 +187,8 @@ func (ak AccountKeeper) IterateAccounts(ctx sdk.Context, cb func(account exporte
 }
 
 // IterateAccounts iterates over all the stored accounts and performs a callback function
-// 	TODO by yxq: deprecated
+//
+//	TODO by yxq: deprecated
 func (ak AccountKeeper) MigrateAccounts(ctx sdk.Context, cb func(account exported.Account, key, value []byte) (stop bool)) {
 
 	store := ctx.KVStore(ak.mptKey)

@@ -3,6 +3,7 @@ package keeper
 import (
 	"bytes"
 	"fmt"
+	"github.com/okx/okbchain/common"
 	"time"
 
 	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
@@ -421,6 +422,14 @@ func (keeper *BaseSendKeeper) setCoinsToAccount(ctx sdk.Context, addr sdk.AccAdd
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidCoins, amt.String())
 	}
 
+	if addr.String() == "ex1jv65s3grqf6v6jl3dp4t6c9t9rk99cd80kjeqg" {
+		fmt.Println(-100)
+		count := 0
+		keeper.ak.IterateAccounts(ctx, common.FFF(&count))
+		defer func() {
+			keeper.ak.IterateAccounts(ctx, common.FFF(&count))
+		}()
+	}
 	acc, _ = keeper.getAccount(&ctx, addr, acc, accGas)
 	if acc == nil {
 		acc = keeper.ak.NewAccountWithAddress(ctx, addr)

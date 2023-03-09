@@ -25,11 +25,18 @@ func TotalSupply(k Keeper) sdk.Invariant {
 	return func(ctx sdk.Context) (string, bool) {
 		var expectedTotal sdk.Coins
 		supply := k.GetSupply(ctx)
-
+		count := 0
 		k.ak.IterateAccounts(ctx, func(acc exported.Account) bool {
+			if aaaa, ok := acc.(exported.ModuleAccount); ok {
+				fmt.Println(aaaa.GetAddress().String(), "xxxx余额:"+aaaa.GetCoins().String(), aaaa.GetName())
+			} else {
+				fmt.Println(acc.GetAddress().String(), "xxxx余额:"+acc.GetCoins().String())
+			}
+			count++
 			expectedTotal = expectedTotal.Add(acc.GetCoins()...)
 			return false
 		})
+		fmt.Println(count, expectedTotal.String(), "\n\n")
 
 		var supplyCoins sdk.DecCoins
 		for _, coin := range supply.GetTotal() {

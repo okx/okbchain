@@ -1,6 +1,8 @@
 package keeper
 
 import (
+	"fmt"
+	"github.com/okx/okbchain/common"
 	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
 	authtypes "github.com/okx/okbchain/libs/cosmos-sdk/x/auth"
 	"github.com/okx/okbchain/libs/cosmos-sdk/x/supply/exported"
@@ -44,8 +46,14 @@ func (k Keeper) GetModuleAccountAndPermissions(ctx sdk.Context, moduleName strin
 
 	// create a new module account
 	macc := types.NewEmptyModuleAccount(moduleName, perms...)
+	if moduleName == "distribution" {
+		fmt.Println(-1)
+	}
 	maccI := (k.ak.NewAccount(ctx, macc)).(exported.ModuleAccountI) // set the account number
 	k.SetModuleAccount(ctx, maccI)
+	count := 0
+	k.ak.IterateAccounts(ctx, common.FFF(&count))
+	fmt.Println("打印结束", count, "\n")
 
 	return maccI, perms
 }

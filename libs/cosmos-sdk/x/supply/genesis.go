@@ -1,6 +1,7 @@
 package supply
 
 import (
+	"fmt"
 	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
 	authexported "github.com/okx/okbchain/libs/cosmos-sdk/x/auth/exported"
 	"github.com/okx/okbchain/libs/cosmos-sdk/x/supply/internal/types"
@@ -13,16 +14,22 @@ func InitGenesis(ctx sdk.Context, keeper Keeper, ak types.AccountKeeper, data Ge
 	// manually set the total supply based on accounts if not provided
 	if data.Supply.Empty() {
 		var totalSupply sdk.Coins
+		count := 0
 		ak.IterateAccounts(ctx,
 			func(acc authexported.Account) (stop bool) {
+				if aaaa, ok := acc.(authexported.ModuleAccount); ok {
+					fmt.Println(aaaa.GetAddress().String(), "xxxx余额:"+aaaa.GetCoins().String(), aaaa.GetName())
+				} else {
+					fmt.Println(acc.GetAddress().String(), "xxxx余额:"+acc.GetCoins().String())
+				}
+				count++
 				totalSupply = totalSupply.Add(acc.GetCoins()...)
 				return false
 			},
 		)
-
+		fmt.Println(count, totalSupply.String(), "\n\n")
 		data.Supply = totalSupply
 	}
-
 	keeper.SetSupply(ctx, types.NewSupply(data.Supply))
 }
 

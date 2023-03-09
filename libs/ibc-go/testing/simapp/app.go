@@ -3,9 +3,9 @@ package simapp
 import (
 	"encoding/hex"
 	"fmt"
-	"github.com/okx/okbchain/libs/system"
-
 	evm2 "github.com/okx/okbchain/libs/ibc-go/testing/simapp/adapter/evm"
+	"github.com/okx/okbchain/libs/system"
+	"github.com/okx/okbchain/x/feesplit"
 
 	"io"
 	"math/big"
@@ -212,6 +212,8 @@ var (
 		ibcfeetypes.ModuleName:      nil,
 		icatypes.ModuleName:         nil,
 		mock.ModuleName:             nil,
+		wasm.ModuleName:             nil,
+		feesplit.ModuleName:         nil,
 	}
 
 	GlobalGpIndex = GasPriceIndex{}
@@ -625,6 +627,7 @@ func NewSimApp(
 	// During begin block slashing happens after distr.BeginBlocker so that
 	// there is nothing left over in the validator fee pool, so as to keep the
 	// CanWithdrawInvariant invariant.
+
 	app.mm.SetOrderBeginBlockers(
 		bank.ModuleName,
 		capabilitytypes.ModuleName,
@@ -654,15 +657,17 @@ func NewSimApp(
 	app.mm.SetOrderInitGenesis(
 		capabilitytypes.ModuleName,
 		auth.ModuleName, distr.ModuleName, staking.ModuleName, bank.ModuleName,
-		slashing.ModuleName, gov.ModuleName, mint.ModuleName, supply.ModuleName,
+		slashing.ModuleName, gov.ModuleName, mint.ModuleName,
 		token.ModuleName,
 		ibctransfertypes.ModuleName,
 		ibchost.ModuleName,
-		evm.ModuleName, crisis.ModuleName, genutil.ModuleName, params.ModuleName, evidence.ModuleName,
+		evm.ModuleName, genutil.ModuleName, params.ModuleName, evidence.ModuleName,
 		erc20.ModuleName,
 		mock.ModuleName,
 		wasm.ModuleName,
 		icatypes.ModuleName, ibcfeetypes.ModuleName,
+		supply.ModuleName,
+		crisis.ModuleName,
 	)
 
 	app.mm.RegisterInvariants(&app.CrisisKeeper)
