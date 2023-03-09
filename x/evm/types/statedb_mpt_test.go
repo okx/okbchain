@@ -5,7 +5,8 @@ import (
 	ethcrypto "github.com/ethereum/go-ethereum/crypto"
 	ethermint "github.com/okx/okbchain/app/types"
 	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	"github.com/okx/okbchain/libs/tendermint/types"
+	dbm "github.com/okx/okbchain/libs/tm-db"
+	"github.com/spf13/viper"
 	"github.com/stretchr/testify/suite"
 	"testing"
 )
@@ -22,6 +23,7 @@ func (suite *StateDBMptTestSuite) SetupTest() {
 }
 
 func TestStateDBMptTestSuite(t *testing.T) {
+	viper.Set(sdk.FlagDBBackend, string(dbm.MemDBBackend))
 	suite.Run(t, new(StateDBMptTestSuite))
 }
 

@@ -8,8 +8,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/store/mpt"
-
 	"github.com/stretchr/testify/require"
 
 	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
@@ -59,7 +57,6 @@ func createTestCodec() *codec.Codec {
 
 func CreateTestInput(t *testing.T, defaults types.Params) (sdk.Context, bank.Keeper, staking.Keeper, params.Subspace, Keeper) {
 	keyAcc := sdk.NewKVStoreKey(auth.StoreKey)
-	keyMpt := sdk.NewKVStoreKey(mpt.StoreKey)
 	keyStaking := sdk.NewKVStoreKey(staking.StoreKey)
 	keySlashing := sdk.NewKVStoreKey(types.StoreKey)
 	keySupply := sdk.NewKVStoreKey(supply.StoreKey)
@@ -69,8 +66,7 @@ func CreateTestInput(t *testing.T, defaults types.Params) (sdk.Context, bank.Kee
 	db := dbm.NewMemDB()
 
 	ms := store.NewCommitMultiStore(db)
-	ms.MountStoreWithDB(keyAcc, sdk.StoreTypeIAVL, db)
-	ms.MountStoreWithDB(keyMpt, sdk.StoreTypeMPT, db)
+	ms.MountStoreWithDB(keyAcc, sdk.StoreTypeMPT, db)
 	ms.MountStoreWithDB(keyStaking, sdk.StoreTypeIAVL, db)
 	ms.MountStoreWithDB(keySupply, sdk.StoreTypeIAVL, db)
 	ms.MountStoreWithDB(keySlashing, sdk.StoreTypeIAVL, db)
