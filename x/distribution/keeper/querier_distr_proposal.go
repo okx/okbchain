@@ -12,10 +12,6 @@ import (
 )
 
 func queryDelegationRewards(ctx sdk.Context, _ []string, req abci.RequestQuery, k Keeper) ([]byte, error) {
-	if !k.CheckDistributionProposalValid(ctx) {
-		return nil, types.ErrCodeNotSupportDistributionProposal()
-	}
-
 	var params types.QueryDelegationRewardsParams
 	err := k.cdc.UnmarshalJSON(req.Data, &params)
 	if err != nil {
@@ -71,10 +67,6 @@ func queryDelegationRewards(ctx sdk.Context, _ []string, req abci.RequestQuery, 
 }
 
 func queryDelegatorTotalRewards(ctx sdk.Context, _ []string, req abci.RequestQuery, k Keeper) ([]byte, error) {
-	if !k.CheckDistributionProposalValid(ctx) {
-		return nil, types.ErrCodeNotSupportDistributionProposal()
-	}
-
 	var params types.QueryDelegatorParams
 	err := k.cdc.UnmarshalJSON(req.Data, &params)
 	if err != nil {
@@ -128,10 +120,6 @@ func queryDelegatorTotalRewards(ctx sdk.Context, _ []string, req abci.RequestQue
 }
 
 func queryValidatorOutstandingRewards(ctx sdk.Context, path []string, req abci.RequestQuery, k Keeper) ([]byte, error) {
-	if !k.CheckDistributionProposalValid(ctx) {
-		return nil, types.ErrCodeNotSupportDistributionProposal()
-	}
-
 	var params types.QueryValidatorOutstandingRewardsParams
 	err := k.cdc.UnmarshalJSON(req.Data, &params)
 	if err != nil {
