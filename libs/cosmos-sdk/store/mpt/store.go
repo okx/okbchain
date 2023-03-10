@@ -107,7 +107,11 @@ func generateMptStore(logger tmlog.Logger, id types.CommitID, db ethstate.Databa
 }
 
 func mockMptStore(logger tmlog.Logger, id types.CommitID) (*MptStore, error) {
-	db := ethstate.NewDatabase(rawdb.NewMemoryDatabase())
+	db := ethstate.NewDatabaseWithConfig(rawdb.NewMemoryDatabase(), &trie.Config{
+		Cache:     int(TrieCacheSize),
+		Journal:   "",
+		Preimages: true,
+	})
 	return generateMptStore(logger, id, db, EmptyStateRootRetriever{})
 }
 
