@@ -23,7 +23,7 @@ type Store struct {
 	dbadapter.Store
 }
 
-func (s *Store) CommitterCommit(interface{}) (types.CommitID, interface{}) {
+func (s *Store) CommitterCommit(interface{}) (_ types.CommitID, _ interface{}) {
 	return
 }
 
