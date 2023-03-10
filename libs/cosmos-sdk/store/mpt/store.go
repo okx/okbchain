@@ -13,6 +13,7 @@ import (
 	ethtypes "github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethdb"
+	"github.com/ethereum/go-ethereum/trie"
 	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
 	"github.com/okx/okbchain/libs/cosmos-sdk/store/cachekv"
 	"github.com/okx/okbchain/libs/cosmos-sdk/store/tracekv"
@@ -264,9 +265,9 @@ func (ms *MptStore) CommitterCommit(delta *iavl.TreeDelta) (types.CommitID, *iav
 
 	// stop pre round prefetch
 	ms.StopPrefetcher()
-
+	nodeSets := trie.NewMergedNodeSet()
 	for addr, v := range ms.storageTrieForWrite {
-		stateR, err := v.Commit(nil)
+		stateR, set, err := v.Commit(false)
 		if err != nil {
 			panic(fmt.Errorf("unexcepted err:%v while commit storage tire ", err))
 		}
@@ -274,22 +275,34 @@ func (ms *MptStore) CommitterCommit(delta *iavl.TreeDelta) (types.CommitID, *iav
 		preValue, err := ms.trie.TryGet(key)
 		if err == nil { // maybe acc already been deleted
 			newValue := ms.retriever.ModifyAccStateRoot(preValue, stateR)
-			ms.trie.TryUpdate(key, newValue)
+			if err := ms.trie.TryUpdate(key, newValue); err != nil {
+				panic(fmt.Errorf("unexcepted err:%v while update acc %s ", err, addr.String()))
+			}
+		} else {
+			panic(fmt.Errorf("unexcepted err:%v while update get acc %s ", err, addr.String()))
 		}
 
+		if set != nil {
+			if err := nodeSets.Merge(set); err != nil {
+				panic("fail to commit trie data(storage nodeSets merge): " + err.Error())
+			}
+		}
 		delete(ms.storageTrieForWrite, addr)
 	}
 
-	root, err := ms.trie.Commit(func(_ [][]byte, _ []byte, leaf []byte, parent ethcmn.Hash) error {
-		storageRoot := ms.retriever.RetrieveStateRoot(leaf)
-		if storageRoot != ethtypes.EmptyRootHash && storageRoot != (ethcmn.Hash{}) {
-			ms.db.TrieDB().Reference(storageRoot, parent)
-		}
-		return nil
-	})
-
+	root, set, err := ms.trie.Commit(true)
 	if err != nil {
-		panic("fail to commit trie data: " + err.Error())
+		panic("fail to commit trie data(acc_trie.Commit): " + err.Error())
+	}
+
+	if set != nil {
+		if err := nodeSets.Merge(set); err != nil {
+			panic("fail to commit trie data(acc nodeSets merge): " + err.Error())
+		}
+	}
+
+	if err := ms.db.TrieDB().UpdateForOK(nodeSets, AccountStateRootRetriever.RetrieveStateRoot); err != nil {
+		panic("fail to commit trie data (UpdateForOK): " + err.Error())
 	}
 	ms.SetMptRootHash(uint64(ms.version), root)
 	ms.originalRoot = root
