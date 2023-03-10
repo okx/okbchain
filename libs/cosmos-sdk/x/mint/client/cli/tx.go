@@ -116,7 +116,7 @@ Where proposal.json contains like these:
     "title":"modify minted per block",
     "description":"modify minted per block",
     "action":"MintedPerBlock",
-    "extra": "{\"coins\":[{\"denom\":\"%s\",\"amount\":\"1.000000000000000000\"}]}",
+    "extra": "{\"coin\":{\"denom\":\"%s\",\"amount\":\"1.000000000000000000\"}}",
     "deposit":[
         {
             "denom":"%s",
