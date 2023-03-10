@@ -16,6 +16,7 @@ import (
 	"github.com/ethereum/go-ethereum/trie"
 	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
 	"github.com/okx/okbchain/libs/cosmos-sdk/store/cachekv"
+	mpttype "github.com/okx/okbchain/libs/cosmos-sdk/store/mpt/types"
 	"github.com/okx/okbchain/libs/cosmos-sdk/store/tracekv"
 	"github.com/okx/okbchain/libs/cosmos-sdk/store/types"
 	sdkerrors "github.com/okx/okbchain/libs/cosmos-sdk/types/errors"
@@ -191,12 +192,12 @@ func (ms *MptStore) tryGetStorageTrie(addr ethcmn.Address, stateRoot ethcmn.Hash
 			return t
 		}
 	}
-
+	addrHash := mpttype.Keccak256HashWithSyncPool(addr[:])
 	var t ethstate.Trie
 	var err error
-	t, err = ms.db.OpenStorageTrie(ethcmn.Hash{}, stateRoot)
+	t, err = ms.db.OpenStorageTrie(addrHash, stateRoot)
 	if err != nil {
-		t, err = ms.db.OpenStorageTrie(ethcmn.Hash{}, ethcmn.Hash{})
+		t, err = ms.db.OpenStorageTrie(addrHash, ethcmn.Hash{})
 		if err != nil {
 			panic("unexcepted err")
 		}
