@@ -223,7 +223,7 @@ func NewNextBlockUpdate(data string) (NextBlockUpdateParams, error) {
 }
 
 type MintedPerBlockParams struct {
-	Coins sdk.SysCoins `json:"coins" yaml:"coins"` // minted per block on this proposal.
+	Coin sdk.SysCoin `json:"coin" yaml:"coin"` // minted per block on this proposal.
 }
 
 func NewMintedPerBlockParams(jsonData string) (MintedPerBlockParams, error) {
@@ -233,21 +233,11 @@ func NewMintedPerBlockParams(jsonData string) (MintedPerBlockParams, error) {
 		return param, ErrExtendProposalParams("parse json error, mint per block")
 	}
 
-	if param.Coins == nil || param.Coins.Empty() {
-		return param, ErrExtendProposalParams("coin is nil")
-	}
-	noDeaultBondDenom := true
-	for _, v := range param.Coins {
-		if v.Denom == sdk.DefaultBondDenom {
-			noDeaultBondDenom = false
-		}
-	}
-
-	if noDeaultBondDenom || param.Coins.AmountOf(sdk.DefaultBondDenom).IsNil() {
+	if param.Coin.Amount.IsNil() || param.Coin.Denom != sdk.DefaultBondDenom {
 		return param, ErrExtendProposalParams("coin is nil")
 	}
 
-	if param.Coins.AmountOf(sdk.DefaultBondDenom).IsNegative() {
+	if param.Coin.IsNegative() {
 		return param, ErrExtendProposalParams("coin is negative")
 	}
 

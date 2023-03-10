@@ -103,10 +103,10 @@ func (suite *MintTestSuite) TestModifyMintedPerBlockProposal() {
 		expectDec   sdktypes.Dec
 		expectError error
 	}{
-		{"amount -1", "{\"coins\":[{\"denom\":\"okb\",\"amount\":\"-1.000000000000000000\"}]}", sdktypes.NewDec(0), types.ErrExtendProposalParams("coin is negative")},
-		{"not okb", "{\"coins\":[{\"denom\":\"okx\",\"amount\":\"1.000000000000000000\"}]}", sdktypes.NewDec(0), types.ErrExtendProposalParams("coin is zero")},
-		{"amount 1 ok", "{\"coins\":[{\"denom\":\"okb\",\"amount\":\"1.000000000000000000\"}]}", sdktypes.NewDec(1), nil},
-		{"amount 0.5 ok", "{\"coins\":[{\"denom\":\"okb\",\"amount\":\"0.500000000000000000\"}]}", sdktypes.NewDecWithPrec(5, 1), nil},
+		{"amount -1", "{\"coin\":{\"denom\":\"okb\",\"amount\":\"-1.000000000000000000\"}}", sdktypes.NewDec(0), types.ErrExtendProposalParams("coin is negative")},
+		{"not okb", "{\"coin\":{\"denom\":\"okx\",\"amount\":\"1.000000000000000000\"}}", sdktypes.NewDec(0), types.ErrExtendProposalParams("coin is nil")},
+		{"amount 1 ok", "{\"coin\":{\"denom\":\"okb\",\"amount\":\"1.000000000000000000\"}}", sdktypes.NewDec(1), nil},
+		{"amount 0.5 ok", "{\"coin\":{\"denom\":\"okb\",\"amount\":\"0.500000000000000000\"}}", sdktypes.NewDecWithPrec(5, 1), nil},
 	}
 
 	for _, tc := range testCases {

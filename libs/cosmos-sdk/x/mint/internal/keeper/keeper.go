@@ -158,16 +158,16 @@ func (k *Keeper) invokeMintedPerBlock(ctx sdk.Context, extra string) error {
 		return err
 	}
 
-	if param.Coins.AmountOf(sdk.DefaultBondDenom).IsZero() {
-		return types.ErrExtendProposalParams("coin is zero")
+	if param.Coin.Amount.IsNil() || param.Coin.Denom != sdk.DefaultBondDenom {
+		return types.ErrExtendProposalParams("coin is nil")
 	}
 
-	if param.Coins.AmountOf(sdk.DefaultBondDenom).IsNegative() {
+	if param.Coin.IsNegative() {
 		return types.ErrExtendProposalParams("coin is negative")
 	}
 
 	minter := k.GetMinterCustom(ctx)
-	minter.MintedPerBlock = param.Coins
+	minter.MintedPerBlock = sdk.DecCoins{param.Coin}
 	k.SetMinterCustom(ctx, minter)
 	return nil
 }
