@@ -158,7 +158,7 @@ func (suite *ProposalSuite) TestNewChangeDistributionTypeProposal() {
 			RandStr(types.MaxDescriptionLength),
 			ActionMintedPerBlock,
 			"{\"coidns\":[{\"denom\":\"okb\",\"amount\":\"1.000000000000000000\"}]}",
-			ErrExtendProposalParams("coin is zero"),
+			ErrExtendProposalParams("coin is nil"),
 		},
 		{
 			"ActionMintedPerBlock, error json",
@@ -166,7 +166,7 @@ func (suite *ProposalSuite) TestNewChangeDistributionTypeProposal() {
 			RandStr(types.MaxDescriptionLength),
 			ActionMintedPerBlock,
 			"{\"coins\":[{\"denom\":\"okb\",\"amounst\":\"1.000000000000000000\"}]}",
-			ErrExtendProposalParams("coin is zero"),
+			ErrExtendProposalParams("coin is nil"),
 		},
 		{
 			"ActionMintedPerBlock, error json",
@@ -174,7 +174,7 @@ func (suite *ProposalSuite) TestNewChangeDistributionTypeProposal() {
 			RandStr(types.MaxDescriptionLength),
 			ActionMintedPerBlock,
 			"{\"coins\":[{\"denodm\":\"okb\",\"amount\":\"1.000000000000000000\"}]}",
-			ErrExtendProposalParams("coin is zero"),
+			ErrExtendProposalParams("coin is nil"),
 		},
 		{
 			"ActionMintedPerBlock, error json",
@@ -182,7 +182,7 @@ func (suite *ProposalSuite) TestNewChangeDistributionTypeProposal() {
 			RandStr(types.MaxDescriptionLength),
 			ActionMintedPerBlock,
 			"{\"coins\":[{}]}",
-			ErrExtendProposalParams("coin is zero"),
+			ErrExtendProposalParams("coin is nil"),
 		},
 		{
 			"ActionMintedPerBlock, error json",
@@ -190,7 +190,7 @@ func (suite *ProposalSuite) TestNewChangeDistributionTypeProposal() {
 			RandStr(types.MaxDescriptionLength),
 			ActionMintedPerBlock,
 			"{\"coins\":[]}",
-			ErrExtendProposalParams("coin is zero"),
+			ErrExtendProposalParams("coin is nil"),
 		},
 		{
 			"ActionMintedPerBlock, error json",
@@ -206,7 +206,15 @@ func (suite *ProposalSuite) TestNewChangeDistributionTypeProposal() {
 			RandStr(types.MaxDescriptionLength),
 			ActionMintedPerBlock,
 			"{\"coins\":[{\"denom\":\"okbb\",\"amount\":\"1.000000000000000000\"}]}",
-			ErrExtendProposalParams("coin is zero"),
+			ErrExtendProposalParams("coin is nil"),
+		},
+		{
+			"ActionMintedPerBlock, ok",
+			RandStr(types.MaxTitleLength),
+			RandStr(types.MaxDescriptionLength),
+			ActionMintedPerBlock,
+			"{\"coins\":[{\"denom\":\"okb\",\"amount\":\"0.000000000000000000\"}]}",
+			nil,
 		},
 		{
 			"ActionMintedPerBlock, ok",

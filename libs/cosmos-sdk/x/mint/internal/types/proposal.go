@@ -233,12 +233,18 @@ func NewMintedPerBlockParams(jsonData string) (MintedPerBlockParams, error) {
 		return param, ErrExtendProposalParams("parse json error, mint per block")
 	}
 
-	if param.Coins.AmountOf(sdk.DefaultBondDenom).IsNil() {
-		return param, ErrExtendProposalParams("coin is zero")
+	if param.Coins == nil || param.Coins.Empty() {
+		return param, ErrExtendProposalParams("coin is nil")
+	}
+	noDeaultBondDenom := true
+	for _, v := range param.Coins {
+		if v.Denom == sdk.DefaultBondDenom {
+			noDeaultBondDenom = false
+		}
 	}
 
-	if param.Coins.AmountOf(sdk.DefaultBondDenom).IsZero() {
-		return param, ErrExtendProposalParams("coin is zero")
+	if noDeaultBondDenom || param.Coins.AmountOf(sdk.DefaultBondDenom).IsNil() {
+		return param, ErrExtendProposalParams("coin is nil")
 	}
 
 	if param.Coins.AmountOf(sdk.DefaultBondDenom).IsNegative() {
