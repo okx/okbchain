@@ -2,21 +2,19 @@ package mpt
 
 import (
 	"bytes"
+	"encoding/binary"
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	ethcmn "github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/rlp"
-	"github.com/okx/okbchain/app"
+	ethcrypto "github.com/ethereum/go-ethereum/crypto"
+	"github.com/ethereum/go-ethereum/trie"
 	apptypes "github.com/okx/okbchain/app/types"
 	"github.com/okx/okbchain/libs/cosmos-sdk/server"
 	"github.com/okx/okbchain/libs/cosmos-sdk/store/mpt"
 	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	authexported "github.com/okx/okbchain/libs/cosmos-sdk/x/auth/exported"
-	"github.com/okx/okbchain/libs/tendermint/libs/log"
 	"github.com/spf13/cobra"
 	"io/ioutil"
-	"os"
 	"strconv"
 )
 
@@ -46,12 +44,12 @@ func AccountGetCmd(ctx *server.Context) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "account [data] [height]",
 		Args:  cobra.ExactArgs(2),
-		Short: "get account",
+		Short: "get account all storage",
 		Run: func(cmd *cobra.Command, args []string) {
 			fmt.Printf("--------- iterate %s data start ---------\n", args[0])
 			height, err := strconv.Atoi(args[1])
 			panicError(err)
-			iavlAccount := GetAccount(args[0], int64(height))
+			iavlAccount := getAccountFromMpt(uint64(height))
 			buff, err := json.Marshal(iavlAccount)
 			if err != nil {
 				fmt.Printf("Error:%s", err)
@@ -67,58 +65,76 @@ func AccountGetCmd(ctx *server.Context) *cobra.Command {
 	return cmd
 }
 
-// migrateAccFromIavlToMpt migrate acc data from iavl to mpt
-func GetAccount(datadir string, height int64) map[string]interface{} {
+func getAccountFromMpt(height uint64) map[string]interface{} {
 	result := make(map[string]interface{}, 0)
-	// 0.1 initialize App and context
-	appDb := openApplicationDb(datadir)
-	migrationApp := app.NewOKBChainApp(
-		log.NewTMLogger(log.NewSyncWriter(os.Stdout)),
-		appDb,
-		nil,
-		false,
-		map[int64]bool{},
-		0,
-	)
-
-	err := migrationApp.LoadStartVersion(height)
+	accMptDb := mpt.InstanceOfMptStore()
+	heightBytes, err := accMptDb.TrieDB().DiskDB().Get(mpt.KeyPrefixAccLatestStoredHeight)
 	panicError(err)
-	cmCtx := migrationApp.MockContext()
+	lastestHeight := binary.BigEndian.Uint64(heightBytes)
+	if lastestHeight < height {
+		panic(fmt.Errorf("height(%d) > lastestHeight(%d)", height, lastestHeight))
+	}
+	if height == 0 {
+		height = lastestHeight
+	}
 
-	// 1.2 update every account to mpt
-	count, contractCount := 0, 0
-	migrationApp.AccountKeeper.MigrateAccounts(cmCtx, func(account authexported.Account, key, value []byte) (stop bool) {
-		count++
-		if len(value) == 0 {
-			fmt.Printf("[warning] %s has nil value\n", account.GetAddress().String())
-		}
-		buff, err := json.Marshal(account)
+	hhash := sdk.Uint64ToBigEndian(height)
+	rootHash, err := accMptDb.TrieDB().DiskDB().Get(append(mpt.KeyPrefixAccRootMptHash, hhash...))
+	panicError(err)
+	accTrie, err := accMptDb.OpenTrie(ethcmn.BytesToHash(rootHash))
+	panicError(err)
+
+	var stateRoot ethcmn.Hash
+	itr := trie.NewIterator(accTrie.NodeIterator(nil))
+	for itr.Next() {
+		addr := ethcmn.BytesToAddress(accTrie.GetKey(itr.Key))
+		addrHash := ethcrypto.Keccak256Hash(addr[:])
+		acc := DecodeAccount(addr.String(), itr.Value)
+		buff, err := json.Marshal(acc)
 		panicError(err)
-
 		// check if the account is a contract account
-		if ethAcc, ok := account.(*apptypes.EthAccount); ok {
+		if ethAcc, ok := acc.(*apptypes.EthAccount); ok {
 			var okbAcc = TempNewAccountPretty{Storage: make(map[string]string)}
 			err = json.Unmarshal(buff, &okbAcc)
 			panicError(err)
 
 			if !bytes.Equal(ethAcc.CodeHash, mpt.EmptyCodeHashBytes) {
-				contractCount++
+				stateRoot.SetBytes(acc.GetStateRoot().Bytes())
 
-				_ = migrationApp.EvmKeeper.ForEachStorage(cmCtx, ethAcc.EthAddress(), func(key, value ethcmn.Hash) bool {
-					// Encoding []byte cannot fail, ok to ignore the error.
-					v, _ := rlp.EncodeToBytes(ethcmn.TrimLeftZeroes(value[:]))
-					okbAcc.Storage[key.String()] = hex.EncodeToString(v)
-					return false
-				})
+				contractTrie := getStorageTrie(accMptDb, addrHash, stateRoot)
+
+				cItr := trie.NewIterator(contractTrie.NodeIterator(nil))
+				for cItr.Next() {
+					key := ethcmn.BytesToHash(contractTrie.GetKey(cItr.Key))
+					prefixKey := GetStorageByAddressKey(ethAcc.EthAddress().Bytes(), key.Bytes())
+					okbAcc.Storage[prefixKey.String()] = hex.EncodeToString(cItr.Value)
+				}
 			}
 
-			result[account.GetAddress().String()] = &okbAcc
+			result[acc.GetAddress().String()] = &okbAcc
 		} else {
-			result[account.GetAddress().String()] = account
+			result[acc.GetAddress().String()] = acc
 		}
-
-		return false
-	})
-
+	}
 	return result
+}
+
+// GetStorageByAddressKey returns a hash of the composite key for a state
+// object's storage prefixed with it's address.
+func GetStorageByAddressKey(prefix, key []byte) ethcmn.Hash {
+	compositeKey := make([]byte, len(prefix)+len(key))
+
+	copy(compositeKey, prefix)
+	copy(compositeKey[len(prefix):], key)
+	return keccak256HashWithSyncPool(compositeKey)
+}
+
+func keccak256HashWithSyncPool(data ...[]byte) (h ethcmn.Hash) {
+	d := ethcrypto.NewKeccakState()
+	d.Reset()
+	for _, b := range data {
+		d.Write(b)
+	}
+	d.Read(h[:])
+	return h
 }

@@ -157,6 +157,7 @@ run() {
     --log_level ${LOG_LEVEL} \
     --chain-id ${CHAIN_ID} \
     --upload-delta=false \
+    --pruning nothing \
     --enable-gid \
     --consensus.timeout_commit 3800ms \
     --enable-blockpart-ack=false \
