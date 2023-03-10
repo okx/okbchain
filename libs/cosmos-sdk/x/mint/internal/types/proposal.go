@@ -18,6 +18,7 @@ const (
 	ProposalTypeExtra = "MintExtra"
 
 	ActionNextBlockUpdate = "NextBlockUpdate"
+	ActionMintedPerBlock  = "MintedPerBlock"
 
 	// RouterKey uses module name for routing
 	RouterKey = ModuleName
@@ -165,25 +166,27 @@ func (p ExtraProposal) ValidateBasic() error {
 	if err != nil {
 		return err
 	}
-
 	if len(strings.TrimSpace(p.Action)) == 0 {
-		return govtypes.ErrInvalidProposalContent("method is required")
+		return govtypes.ErrInvalidProposalContent("extra proposal's action is required")
 	}
 	if len(p.Action) > govtypes.MaxExtraActionLength {
-		return govtypes.ErrInvalidProposalContent("extra action length is bigger than max length")
+		return govtypes.ErrInvalidProposalContent("extra proposal's action length is bigger than max length")
 	}
-
 	if len(strings.TrimSpace(p.Extra)) == 0 {
-		return govtypes.ErrInvalidProposalContent("method is required")
+		return govtypes.ErrInvalidProposalContent("extra proposal's extra is required")
 	}
 	if len(p.Extra) > govtypes.MaxExtraBodyLength {
-		return govtypes.ErrInvalidProposalContent("extra body length is bigger than max length")
+		return govtypes.ErrInvalidProposalContent("extra proposal's extra body length is bigger than max length")
 	}
-
 	switch p.Action {
 	case ActionNextBlockUpdate:
-		_, err = NewNextBlockUpdate(err.Error())
+		_, err = NewNextBlockUpdate(p.Extra)
 		return err
+	case ActionMintedPerBlock:
+		_, err = NewMintedPerBlockParams(p.Extra)
+		return err
+	default:
+		return ErrUnknownExtraProposalAction
 	}
 
 	return nil
@@ -205,15 +208,37 @@ type NextBlockUpdateParams struct {
 	BlockNum uint64 `json:"block_num" yaml:"block_num"`
 }
 
-func NewNextBlockUpdate(jsonData string) (NextBlockUpdateParams, error) {
+func NewNextBlockUpdate(data string) (NextBlockUpdateParams, error) {
 	var param NextBlockUpdateParams
-	err := json.Unmarshal([]byte(jsonData), &param)
+	err := json.Unmarshal([]byte(data), &param)
 	if err != nil {
-		return param, ErrExtendProposalParams(err.Error())
+		return param, ErrExtendProposalParams("parse json error, next block update")
 	}
 
 	if global.GetGlobalHeight() > 0 && param.BlockNum <= uint64(global.GetGlobalHeight()) {
 		return param, ErrCodeInvalidHeight
+	}
+
+	return param, nil
+}
+
+type MintedPerBlockParams struct {
+	Coins sdk.SysCoins `json:"coins" yaml:"coins"` // minted per block on this proposal.
+}
+
+func NewMintedPerBlockParams(jsonData string) (MintedPerBlockParams, error) {
+	var param MintedPerBlockParams
+	err := json.Unmarshal([]byte(jsonData), &param)
+	if err != nil {
+		return param, ErrExtendProposalParams("parse json error, mint per block")
+	}
+
+	if param.Coins.AmountOf(sdk.DefaultBondDenom).IsZero() {
+		return param, ErrExtendProposalParams("coin is zero")
+	}
+
+	if param.Coins.AmountOf(sdk.DefaultBondDenom).IsNegative() {
+		return param, ErrExtendProposalParams("coin is negative")
 	}
 
 	return param, nil
