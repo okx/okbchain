@@ -39,7 +39,7 @@ func (app *BaseApp) InitChain(req abci.RequestInitChain) (res abci.ResponseInitC
 	initHeader := abci.Header{ChainID: req.ChainId, Time: req.Time}
 
 	// initialize the deliver state and check state with a correct header
-	app.setDeliverState(initHeader)
+	app.SetDeliverState(initHeader)
 	app.setCheckState(initHeader)
 
 	if app.initChainer == nil {
@@ -140,7 +140,7 @@ func (app *BaseApp) BeginBlock(req abci.RequestBeginBlock) (res abci.ResponseBeg
 				"deliverState was not reset by BaseApp.Commit due to the previous prerun task being stopped",
 				"height", req.Header.Height)
 		}
-		app.setDeliverState(req.Header)
+		app.SetDeliverState(req.Header)
 	} else {
 		// In the first block, app.deliverState.ctx will already be initialized
 		// by InitChain. Context is now updated with Header information.

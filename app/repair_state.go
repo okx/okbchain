@@ -34,6 +34,7 @@ import (
 	"github.com/okx/okbchain/libs/tendermint/types"
 	dbm "github.com/okx/okbchain/libs/tm-db"
 	evmtypes "github.com/okx/okbchain/x/evm/types"
+	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
 	"github.com/spf13/viper"
 )
 
@@ -134,14 +135,23 @@ func RepairState(ctx *server.Context, onStart bool) {
 	}
 	log.Println(fmt.Sprintf("repair state at version = %d", startVersion))
 
-	err = repairApp.LoadStartVersion(startVersion)
+	err = repairApp.LoadStartVersion(startVersion - 1)
 	panicError(err)
 
 	rawTrieDirtyDisabledFlag := viper.GetBool(mpttypes.FlagTrieDirtyDisabled)
 	mpttypes.TrieDirtyDisabled = true
 
+	// init deliver state for 1st block
+	if startVersion == 1 {
+		repairBlock, _ := loadBlock(startVersion, dataDir)
+		initHeader := abci.Header{ChainID: repairBlock.Header.ChainID, Time: repairBlock.Header.Time}
+
+		// initialize the deliver state and check state with a correct header
+		repairApp.SetDeliverState(initHeader)
+	}
+
 	// repair data by apply the latest two blocks
-	doRepair(ctx, state, stateStoreDB, proxyApp, startVersion, latestBlockHeight, dataDir)
+	doRepair(ctx, state, stateStoreDB, proxyApp, startVersion-1, latestBlockHeight, dataDir)
 
 	mpttypes.TrieDirtyDisabled = rawTrieDirtyDisabledFlag
 }
@@ -175,7 +185,9 @@ func doRepair(ctx *server.Context, state sm.State, stateStoreDB dbm.DB,
 
 	ctx.Logger.Debug("stateCopy", "state", fmt.Sprintf("%+v", stateCopy))
 	// construct state for repair
-	state = constructStartState(state, stateStoreDB, startHeight)
+	state, err := constructStartState(state, stateStoreDB, startHeight)
+	panicError(err)
+
 	ctx.Logger.Debug("constructStartState", "state", fmt.Sprintf("%+v", state))
 	// repair state
 	eventBus := types.NewEventBus()
@@ -291,20 +303,20 @@ func splitAndTrimEmpty(s, sep, cutset string) []string {
 	return nonEmptyStrings
 }
 
-func constructStartState(state sm.State, stateStoreDB dbm.DB, startHeight int64) sm.State {
+func constructStartState(state sm.State, stateStoreDB dbm.DB, startHeight int64) (sm.State, error) {
 	stateCopy := state.Copy()
 	validators, lastStoredHeight, err := sm.LoadValidatorsWithStoredHeight(stateStoreDB, startHeight+1)
 	lastValidators, err := sm.LoadValidators(stateStoreDB, startHeight)
-	if err != nil {
-		return stateCopy
+	if err != nil && startHeight != 0 {
+		return stateCopy, err
 	}
 	nextValidators, err := sm.LoadValidators(stateStoreDB, startHeight+2)
 	if err != nil {
-		return stateCopy
+		return stateCopy, err
 	}
 	consensusParams, err := sm.LoadConsensusParams(stateStoreDB, startHeight+1)
 	if err != nil {
-		return stateCopy
+		return stateCopy, err
 	}
 	stateCopy.Validators = validators
 	stateCopy.LastValidators = lastValidators
@@ -312,7 +324,7 @@ func constructStartState(state sm.State, stateStoreDB dbm.DB, startHeight int64)
 	stateCopy.ConsensusParams = consensusParams
 	stateCopy.LastBlockHeight = startHeight
 	stateCopy.LastHeightValidatorsChanged = lastStoredHeight
-	return stateCopy
+	return stateCopy, nil
 }
 
 func loadBlock(height int64, dataDir string) (*types.Block, *types.BlockMeta) {
