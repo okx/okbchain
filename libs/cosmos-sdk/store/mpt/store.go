@@ -656,7 +656,7 @@ storageType : 0x0 + addr + stateRoot + key
 addressType : 0x1 + addr
 */
 func mptKeyType(size int) int {
-	if size == 1+sdk.AddrLen {
+	if size == 1+sdk.AddrLen || size == 1+sdk.WasmContractAddrLen {
 		return addressType
 	} else if size == len(keyPrefixStorageMpt)+len(ethcmn.Address{})+len(ethcmn.Hash{})+len(ethcmn.Hash{}) {
 		return storageType

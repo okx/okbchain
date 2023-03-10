@@ -119,9 +119,10 @@ func (so *stateObject) updateRoot(db ethstate.Database) {
 
 // updateTrie writes cached storage modifications into the object's storage trie.
 // It will return nil if the trie has not been loaded and no changes have been made
-func (so *stateObject) updateTrie(db ethstate.Database) {
+func (so *stateObject) updateTrie(db ethstate.Database) (updated bool) {
 	// Make sure all dirty slots are finalized into the pending storage area
 	so.finalise(false) // Don't prefetch any more, pull directly if need be
+	updated = false
 	if len(so.pendingStorage) == 0 {
 		return
 	}
@@ -135,6 +136,7 @@ func (so *stateObject) updateTrie(db ethstate.Database) {
 		if value == so.originStorage[key] {
 			continue
 		}
+		updated = true
 		so.originStorage[key] = value
 
 		usedStorage = append(usedStorage, ethcmn.CopyBytes(key[:])) // Copy needed for closure
@@ -153,18 +155,21 @@ func (so *stateObject) updateTrie(db ethstate.Database) {
 	if len(so.pendingStorage) > 0 {
 		so.pendingStorage = make(ethstate.Storage)
 	}
+	return
 }
 
 // CommitTrie the storage trie of the object to db.
 // This updates the trie root.
 func (so *stateObject) CommitTrie(db ethstate.Database) error {
 	// If nothing changed, don't bother with hashing anything
-	so.updateTrie(db)
+	if updated := so.updateTrie(db); !updated {
+		return nil
+	}
 
 	if so.dbErr != nil {
 		return so.dbErr
 	}
-	
+
 	return nil
 }
 
