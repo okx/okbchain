@@ -17,6 +17,7 @@ import (
 	"github.com/okx/okbchain/libs/cosmos-sdk/store/cachekv"
 	"github.com/okx/okbchain/libs/cosmos-sdk/store/tracekv"
 	"github.com/okx/okbchain/libs/cosmos-sdk/store/types"
+	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
 	sdkerrors "github.com/okx/okbchain/libs/cosmos-sdk/types/errors"
 	"github.com/okx/okbchain/libs/iavl"
 	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
@@ -628,6 +629,8 @@ var (
 	keyPrefixAddrMpt    = []byte{0x01} // TODO auth.AddressStoreKeyPrefix
 	sizePreFixKey       = len(keyPrefixStorageMpt)
 	storageKeySize      = sizePreFixKey + len(ethcmn.Address{}) + len(ethcmn.Hash{}) + len(ethcmn.Hash{})
+	addrKeySize         = len(keyPrefixAddrMpt) + sdk.AddrLen
+	wasmContractKeySize = len(keyPrefixAddrMpt) + sdk.WasmContractAddrLen
 )
 
 func AddressStoragePrefixMpt(address ethcmn.Address, stateRoot ethcmn.Hash) []byte {
@@ -658,8 +661,14 @@ addressType : 0x1 + addr
 
 // TODO need strict check type later by scf !!!
 func mptKeyType(key []byte) int {
-	if key[0] == 0 && len(key) == storageKeySize {
+	switch len(key) {
+	case wasmContractKeySize:
+		return addressType
+	case addrKeySize:
+		return addressType
+	case storageKeySize:
 		return storageType
+	default:
+		return -1
 	}
-	return addressType
 }
