@@ -34,5 +34,5 @@ func ErrTreasuresInternal(err error) sdk.EnvelopedErr {
 }
 
 func ErrExtraProposalParams(desc string) sdk.Error {
-	return sdkerrors.New(DefaultCodespace, 6, desc)
+	return sdkerrors.New(DefaultCodespace, 6, fmt.Sprintf("mint extra proposal error:%s", desc))
 }
