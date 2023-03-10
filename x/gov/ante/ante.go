@@ -57,7 +57,7 @@ func (ad AnteDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, ne
 				if err := ad.pk.CheckMsgSubmitProposal(ctx, msg); err != nil {
 					return ctx, err
 				}
-			case mint.DistrExtendProposal:
+			case mint.ExtraProposal:
 				if !ad.sk.IsValidator(ctx, msg.Proposer) {
 					return ctx, mint.ErrProposerMustBeValidator
 				}

@@ -128,15 +128,15 @@ func (k *Keeper) SetGovKeeper(gk types.GovKeeper) {
 func (k *Keeper) InvokeExtraProposal(ctx sdk.Context, action string, extra string) error {
 	switch action {
 	case types.ActionNextBlockUpdate:
-		return k.handleNextBlockUpdate(ctx, extra)
+		return k.invokeNextBlockUpdate(ctx, extra)
 	case types.ActionMintedPerBlock:
-		return k.handleMintedPerBlock(ctx, extra)
+		return k.invokeMintedPerBlock(ctx, extra)
 	}
 
 	return nil
 }
 
-func (k *Keeper) handleNextBlockUpdate(ctx sdk.Context, extra string) error {
+func (k *Keeper) invokeNextBlockUpdate(ctx sdk.Context, extra string) error {
 	param, err := types.NewNextBlockUpdate(extra)
 	if err != nil {
 		return err
@@ -152,7 +152,7 @@ func (k *Keeper) handleNextBlockUpdate(ctx sdk.Context, extra string) error {
 	return nil
 }
 
-func (k *Keeper) handleMintedPerBlock(ctx sdk.Context, extra string) error {
+func (k *Keeper) invokeMintedPerBlock(ctx sdk.Context, extra string) error {
 	param, err := types.NewMintedPerBlockParams(extra)
 	if err != nil {
 		return err

@@ -143,7 +143,7 @@ type ExtraProposal struct {
 	Extra       string `json:"extra" yaml:"extra"`
 }
 
-// NewExtraProposal creates a new distr extend proposal.
+// NewExtraProposal creates a new extra proposal.
 func NewExtraProposal(title, description, action, extra string) ExtraProposal {
 	return ExtraProposal{title, description, action, extra}
 }

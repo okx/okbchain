@@ -44,17 +44,14 @@ var (
 	//KeyInflationMin        = types.KeyInflationMin
 	//KeyGoalBonded          = types.KeyGoalBonded
 	KeyBlocksPerYear = types.KeyBlocksPerYear
+	
+	_ govtypes.Content = (*ExtraProposal)(nil)
 )
 
 type (
-	Keeper       = keeper.Keeper
-	GenesisState = types.GenesisState
-	Minter       = types.Minter
-	Params       = types.Params
-)
-
-type DistrExtendProposal = types.ExtraProposal
-
-var (
-	_ govtypes.Content = (*DistrExtendProposal)(nil)
+	Keeper        = keeper.Keeper
+	GenesisState  = types.GenesisState
+	Minter        = types.Minter
+	Params        = types.Params
+	ExtraProposal = types.ExtraProposal
 )
