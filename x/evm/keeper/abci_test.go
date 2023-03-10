@@ -1,6 +1,10 @@
 package keeper_test
 
 import (
+	"math/big"
+	"os"
+	"time"
+
 	ethcmn "github.com/ethereum/go-ethereum/common"
 	ethtypes "github.com/ethereum/go-ethereum/core/types"
 	ethcrypto "github.com/ethereum/go-ethereum/crypto"
@@ -9,9 +13,6 @@ import (
 	"github.com/okx/okbchain/x/evm/types"
 	"github.com/okx/okbchain/x/evm/watcher"
 	"github.com/spf13/viper"
-	"math/big"
-	"os"
-	"time"
 )
 
 func (suite *KeeperTestSuite) TestBeginBlock() {
