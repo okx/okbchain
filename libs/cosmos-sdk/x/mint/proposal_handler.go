@@ -9,7 +9,7 @@ import (
 	govTypes "github.com/okx/okbchain/x/gov/types"
 )
 
-const InvokeExtendProposalName = "InvokeExtraProposal"
+const InvokeExtraProposalName = "InvokeExtraProposal"
 
 // NewManageTreasuresProposalHandler handles "gov" type message in "mint"
 func NewManageTreasuresProposalHandler(k *Keeper) govTypes.Handler {
@@ -54,7 +54,7 @@ func handleExtraProposal(ctx sdk.Context, k *Keeper, p types.ExtraProposal) (err
 		}
 	}()
 
-	f := reflect.ValueOf(k).MethodByName(InvokeExtendProposalName)
+	f := reflect.ValueOf(k).MethodByName(InvokeExtraProposalName)
 	result := f.Call([]reflect.Value{reflect.ValueOf(ctx), reflect.ValueOf(p.Action), reflect.ValueOf(p.Extra)})
 	rErr := result[0].Interface()
 	err, _ = rErr.(error)

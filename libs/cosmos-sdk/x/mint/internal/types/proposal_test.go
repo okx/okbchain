@@ -118,7 +118,7 @@ func (suite *ProposalSuite) TestNewChangeDistributionTypeProposal() {
 			RandStr(types.MaxDescriptionLength),
 			ActionNextBlockUpdate,
 			"{dfafdasf}",
-			ErrExtendProposalParams("parse json error, next block update"),
+			ErrExtraProposalParams("parse json error, next block update"),
 		},
 		{
 			"ActionNextBlockUpdate, error json",
@@ -150,7 +150,7 @@ func (suite *ProposalSuite) TestNewChangeDistributionTypeProposal() {
 			RandStr(types.MaxDescriptionLength),
 			ActionMintedPerBlock,
 			"{dfafdasf}",
-			ErrExtendProposalParams("parse json error, mint per block"),
+			ErrExtraProposalParams("parse json error, mint per block"),
 		},
 		{
 			"ActionMintedPerBlock, error json",
@@ -158,7 +158,7 @@ func (suite *ProposalSuite) TestNewChangeDistributionTypeProposal() {
 			RandStr(types.MaxDescriptionLength),
 			ActionMintedPerBlock,
 			"{\"coins\":{\"denom\":\"okb\",\"amount\":\"1.000000000000000000\"}}",
-			ErrExtendProposalParams("coin is nil"),
+			ErrExtraProposalParams("coin is nil"),
 		},
 		{
 			"ActionMintedPerBlock, error json",
@@ -166,7 +166,7 @@ func (suite *ProposalSuite) TestNewChangeDistributionTypeProposal() {
 			RandStr(types.MaxDescriptionLength),
 			ActionMintedPerBlock,
 			"{\"coin\":{\"denom\":\"okb\",\"aamount\":\"1.000000000000000000\"}}",
-			ErrExtendProposalParams("coin is nil"),
+			ErrExtraProposalParams("coin is nil"),
 		},
 		{
 			"ActionMintedPerBlock, error json",
@@ -174,7 +174,7 @@ func (suite *ProposalSuite) TestNewChangeDistributionTypeProposal() {
 			RandStr(types.MaxDescriptionLength),
 			ActionMintedPerBlock,
 			"{\"coin\":{\"ddenom\":\"okb\",\"amount\":\"1.000000000000000000\"}}",
-			ErrExtendProposalParams("coin is nil"),
+			ErrExtraProposalParams("coin is nil"),
 		},
 		{
 			"ActionMintedPerBlock, error json",
@@ -182,7 +182,7 @@ func (suite *ProposalSuite) TestNewChangeDistributionTypeProposal() {
 			RandStr(types.MaxDescriptionLength),
 			ActionMintedPerBlock,
 			"{\"coin\":[{}]}",
-			ErrExtendProposalParams("parse json error, mint per block"),
+			ErrExtraProposalParams("parse json error, mint per block"),
 		},
 		{
 			"ActionMintedPerBlock, error json",
@@ -190,7 +190,7 @@ func (suite *ProposalSuite) TestNewChangeDistributionTypeProposal() {
 			RandStr(types.MaxDescriptionLength),
 			ActionMintedPerBlock,
 			"{\"coins\":[]}",
-			ErrExtendProposalParams("coin is nil"),
+			ErrExtraProposalParams("coin is nil"),
 		},
 		{
 			"ActionMintedPerBlock, error json",
@@ -198,7 +198,7 @@ func (suite *ProposalSuite) TestNewChangeDistributionTypeProposal() {
 			RandStr(types.MaxDescriptionLength),
 			ActionMintedPerBlock,
 			"{\"coin\":[]}",
-			ErrExtendProposalParams("parse json error, mint per block"),
+			ErrExtraProposalParams("parse json error, mint per block"),
 		},
 		{
 			"ActionMintedPerBlock, error json",
@@ -206,7 +206,7 @@ func (suite *ProposalSuite) TestNewChangeDistributionTypeProposal() {
 			RandStr(types.MaxDescriptionLength),
 			ActionMintedPerBlock,
 			"{\"coin\":{\"denom\":\"okb\",\"amount\":\"-1.000000000000000000\"}}",
-			ErrExtendProposalParams("coin is negative"),
+			ErrExtraProposalParams("coin is negative"),
 		},
 		{
 			"ActionMintedPerBlock, error json",
@@ -214,7 +214,7 @@ func (suite *ProposalSuite) TestNewChangeDistributionTypeProposal() {
 			RandStr(types.MaxDescriptionLength),
 			ActionMintedPerBlock,
 			"{\"coin\":{\"denom\":\"okbb\",\"amount\":\"-1.000000000000000000\"}}",
-			ErrExtendProposalParams("coin is nil"),
+			ErrExtraProposalParams("coin is nil"),
 		},
 		{
 			"ActionMintedPerBlock, ok",

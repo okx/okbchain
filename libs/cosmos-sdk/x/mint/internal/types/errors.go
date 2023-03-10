@@ -33,6 +33,6 @@ func ErrTreasuresInternal(err error) sdk.EnvelopedErr {
 			fmt.Sprintf("treasures error:%s", err.Error()))}
 }
 
-func ErrExtendProposalParams(desc string) sdk.Error {
+func ErrExtraProposalParams(desc string) sdk.Error {
 	return sdkerrors.New(DefaultCodespace, 6, desc)
 }

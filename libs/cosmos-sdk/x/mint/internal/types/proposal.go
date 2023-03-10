@@ -212,7 +212,7 @@ func NewNextBlockUpdate(data string) (NextBlockUpdateParams, error) {
 	var param NextBlockUpdateParams
 	err := json.Unmarshal([]byte(data), &param)
 	if err != nil {
-		return param, ErrExtendProposalParams("parse json error, next block update")
+		return param, ErrExtraProposalParams("parse json error, next block update")
 	}
 
 	if global.GetGlobalHeight() > 0 && param.BlockNum <= uint64(global.GetGlobalHeight()) {
@@ -230,15 +230,15 @@ func NewMintedPerBlockParams(jsonData string) (MintedPerBlockParams, error) {
 	var param MintedPerBlockParams
 	err := json.Unmarshal([]byte(jsonData), &param)
 	if err != nil {
-		return param, ErrExtendProposalParams("parse json error, mint per block")
+		return param, ErrExtraProposalParams("parse json error, mint per block")
 	}
 
 	if param.Coin.Amount.IsNil() || param.Coin.Denom != sdk.DefaultBondDenom {
-		return param, ErrExtendProposalParams("coin is nil")
+		return param, ErrExtraProposalParams("coin is nil")
 	}
 
 	if param.Coin.IsNegative() {
-		return param, ErrExtendProposalParams("coin is negative")
+		return param, ErrExtraProposalParams("coin is negative")
 	}
 
 	return param, nil

@@ -159,11 +159,11 @@ func (k *Keeper) invokeMintedPerBlock(ctx sdk.Context, extra string) error {
 	}
 
 	if param.Coin.Amount.IsNil() || param.Coin.Denom != sdk.DefaultBondDenom {
-		return types.ErrExtendProposalParams("coin is nil")
+		return types.ErrExtraProposalParams("coin is nil")
 	}
 
 	if param.Coin.IsNegative() {
-		return types.ErrExtendProposalParams("coin is negative")
+		return types.ErrExtraProposalParams("coin is negative")
 	}
 
 	minter := k.GetMinterCustom(ctx)
