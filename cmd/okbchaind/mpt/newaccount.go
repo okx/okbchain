@@ -44,7 +44,7 @@ func AccountGetCmd(ctx *server.Context) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "account [data] [height]",
 		Args:  cobra.ExactArgs(2),
-		Short: "get account all storage",
+		Short: "get account all storage for diff iavl account",
 		Run: func(cmd *cobra.Command, args []string) {
 			fmt.Printf("--------- iterate %s data start ---------\n", args[0])
 			height, err := strconv.Atoi(args[1])
