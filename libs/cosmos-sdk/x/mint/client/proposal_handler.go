@@ -12,7 +12,7 @@ var (
 		rest.ManageTreasuresProposalRESTHandler,
 	)
 
-	ExtendProposalHandler = govcli.NewProposalHandler(
+	ExtraProposalHandler = govcli.NewProposalHandler(
 		cli.GetCmdExtraProposal,
 		rest.ExtraProposalRESTHandler,
 	)
