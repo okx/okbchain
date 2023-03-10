@@ -2,6 +2,8 @@ package types
 
 import (
 	"bytes"
+	"github.com/ethereum/go-ethereum/trie"
+	"github.com/okx/okbchain/libs/iavl"
 	"math"
 	"testing"
 	"time"
@@ -241,5 +243,34 @@ func TestDeltasMessageAmino(t *testing.T) {
 		require.NoError(t, err)
 
 		require.Equal(t, expectValue, actualValue)
+	}
+}
+
+func TestTreeDeltaMarshalAndUnmarshal(t *testing.T) {
+	nodeDelta := make([]*trie.NodeDelta, 1)
+	nodeDelta[0] = &trie.NodeDelta{Key: "test-key", Val: []byte("test-val")}
+	mptDelta := trie.MptDeltaMap{"test1": &trie.MptDelta{NodeDelta: nodeDelta}}
+	type fields struct {
+		IavlTreeDelta iavl.TreeDeltaMap
+		MptTreeDelta  trie.MptDeltaMap
+	}
+	tests := []struct {
+		name   string
+		fields fields
+	}{
+		// TODO: Add test cases.
+		{"normal", fields{MptTreeDelta: mptDelta}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			td := &TreeDelta{
+				IavlTreeDelta: tt.fields.IavlTreeDelta,
+				MptTreeDelta:  tt.fields.MptTreeDelta,
+			}
+			outBytes := td.Marshal()
+			outDelta := TreeDelta{}
+			outDelta.Unmarshal(outBytes)
+			assert.Equal(t, tt.fields, outDelta)
+		})
 	}
 }

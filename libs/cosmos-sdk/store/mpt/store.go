@@ -12,6 +12,7 @@ import (
 	ethtypes "github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethdb"
+	"github.com/ethereum/go-ethereum/trie"
 	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
 	"github.com/okx/okbchain/libs/cosmos-sdk/store/cachekv"
 	"github.com/okx/okbchain/libs/cosmos-sdk/store/tracekv"
@@ -32,7 +33,18 @@ var (
 	TrieAccStoreCache uint = 32 // MB
 
 	AccountStateRootRetriever StateRootRetriever = EmptyStateRootRetriever{}
+
+	applyDelta   = false
+	produceDelta = false
 )
+
+func SetApplyDelta(val bool) {
+	applyDelta = val
+}
+
+func SetProduceDelta(val bool) {
+	produceDelta = val
+}
 
 var cdc = codec.New()
 
@@ -207,19 +219,34 @@ func (ms *MptStore) ReverseIterator(start, end []byte) types.Iterator {
 /*
 *  implement CommitStore, CommitKVStore
  */
-func (ms *MptStore) CommitterCommit(delta *iavl.TreeDelta) (types.CommitID, *iavl.TreeDelta) {
+func (ms *MptStore) CommitterCommit(inputDelta interface{}) (rootHash types.CommitID, outputDelta interface{}) {
 	ms.version++
+
+	fmt.Println("fsc:test================CommitterCommit:", ms.version, "c:", applyDelta, "p", produceDelta)
 
 	// stop pre round prefetch
 	ms.StopPrefetcher()
 
-	root, err := ms.trie.Commit(func(_ [][]byte, _ []byte, leaf []byte, parent ethcmn.Hash) error {
+	onleaf := func(_ [][]byte, _ []byte, leaf []byte, parent ethcmn.Hash) error {
 		storageRoot := ms.retriever.RetrieveStateRoot(leaf)
 		if storageRoot != ethtypes.EmptyRootHash && storageRoot != (ethcmn.Hash{}) {
 			ms.db.TrieDB().Reference(storageRoot, parent)
 		}
 		return nil
-	})
+	}
+	var root ethcmn.Hash
+	var err error
+	if applyDelta && inputDelta != nil {
+		delta, ok := inputDelta.(*trie.MptDelta)
+		if !ok {
+			panic(fmt.Sprintf("wrong input delta of mpt. delta: %v", inputDelta))
+		}
+		root, err = ms.trie.CommitWithDelta(delta, onleaf)
+	} else if produceDelta {
+		root, outputDelta, err = ms.trie.CommitForDelta(onleaf)
+	} else {
+		root, err = ms.trie.Commit(onleaf)
+	}
 
 	if err != nil {
 		panic("fail to commit trie data: " + err.Error())
@@ -239,7 +266,7 @@ func (ms *MptStore) CommitterCommit(delta *iavl.TreeDelta) (types.CommitID, *iav
 	return types.CommitID{
 		Version: ms.version,
 		Hash:    root.Bytes(),
-	}, nil
+	}, outputDelta
 }
 
 func (ms *MptStore) LastCommitID() types.CommitID {

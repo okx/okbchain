@@ -3,6 +3,7 @@ package rootmulti
 import (
 	"encoding/binary"
 	"fmt"
+	"github.com/ethereum/go-ethereum/trie"
 	"io"
 	"log"
 	"path/filepath"
@@ -19,7 +20,6 @@ import (
 	cfg "github.com/okx/okbchain/libs/tendermint/config"
 	"github.com/okx/okbchain/libs/tendermint/crypto/merkle"
 
-	jsoniter "github.com/json-iterator/go"
 	"github.com/okx/okbchain/libs/cosmos-sdk/store/cachemulti"
 	"github.com/okx/okbchain/libs/cosmos-sdk/store/dbadapter"
 	"github.com/okx/okbchain/libs/cosmos-sdk/store/flatkv"
@@ -41,8 +41,6 @@ import (
 	"github.com/pkg/errors"
 	"github.com/spf13/viper"
 )
-
-var itjs = jsoniter.ConfigCompatibleWithStandardLibrary
 
 const (
 	latestVersionKey      = "s/latest"
@@ -578,19 +576,19 @@ func (rs *Store) LastCommitVersion() int64 {
 	return rs.lastCommitInfo.Version
 }
 
-func (rs *Store) CommitterCommit(*iavltree.TreeDelta) (_ types.CommitID, _ *iavltree.TreeDelta) {
+func (rs *Store) CommitterCommit(interface{}) (_ types.CommitID, _ interface{}) {
 	return
 }
 
 // Implements Committer/CommitStore.
-func (rs *Store) CommitterCommitMap(inputDeltaMap iavltree.TreeDeltaMap) (types.CommitID, iavltree.TreeDeltaMap) {
+func (rs *Store) CommitterCommitMap(inputDeltaMap *tmtypes.TreeDelta) (types.CommitID, *tmtypes.TreeDelta) {
 	iavltree.IavlCommitAsyncNoBatch = cfg.DynamicConfig.GetIavlAcNoBatch()
 
 	previousHeight := rs.lastCommitInfo.Version
 	version := previousHeight + 1
 
 	tsCommitStores := time.Now()
-	var outputDeltaMap iavltree.TreeDeltaMap
+	var outputDeltaMap *tmtypes.TreeDelta
 	rs.lastCommitInfo, outputDeltaMap = commitStores(version, rs.stores, inputDeltaMap, rs.commitFilters)
 
 	if !iavltree.EnableAsyncCommit {
@@ -1156,9 +1154,9 @@ type StoreSort struct {
 
 // Commits each store and returns a new commitInfo.
 func commitStores(version int64, storeMap map[types.StoreKey]types.CommitKVStore,
-	inputDeltaMap iavltree.TreeDeltaMap, filters []types.StoreFilter) (commitInfo, iavltree.TreeDeltaMap) {
+	inputDelta *tmtypes.TreeDelta, filters []types.StoreFilter) (commitInfo, *tmtypes.TreeDelta) {
 	var storeInfos []storeInfo
-	outputDeltaMap := iavltree.TreeDeltaMap{}
+	outputDeltaMap := tmtypes.NewTreeDelta()
 
 	// updata commit gap height
 	if iavltree.EnableAsyncCommit {
@@ -1169,7 +1167,39 @@ func commitStores(version int64, storeMap map[types.StoreKey]types.CommitKVStore
 			continue
 		}
 
-		commitID, outputDelta := store.CommitterCommit(inputDeltaMap[key.Name()]) // CommitterCommit
+		var commitID types.CommitID
+		var outputDelta interface{}
+		if tmtypes.DownloadDelta && inputDelta != nil {
+			if store.GetStoreType() == types.StoreTypeMPT {
+				inputMptMap := inputDelta.MptTreeDelta
+				commitID, outputDelta = store.CommitterCommit(inputMptMap[key.Name()]) // CommitterCommit
+			} else if store.GetStoreType() == types.StoreTypeIAVL {
+				inputIavlMap := inputDelta.IavlTreeDelta
+				commitID, _ = store.CommitterCommit(inputIavlMap[key.Name()]) // CommitterCommit
+			} else {
+				commitID, _ = store.CommitterCommit(nil) // CommitterCommit
+			}
+		} else if tmtypes.UploadDelta {
+			if store.GetStoreType() == types.StoreTypeMPT {
+				commitID, outputDelta = store.CommitterCommit(nil) // CommitterCommit
+				outputMpt, ok := outputDelta.(*trie.MptDelta)
+				if !ok {
+					panic("produce mpt delta failed. key:" + key.Name())
+				}
+				outputDeltaMap.MptTreeDelta[key.Name()] = outputMpt
+			} else if store.GetStoreType() == types.StoreTypeIAVL {
+				commitID, outputDelta = store.CommitterCommit(nil) // CommitterCommit
+				outputIavl, ok := outputDelta.(*iavltree.TreeDelta)
+				if !ok {
+					panic("produce iavl delta failed. key:" + key.Name())
+				}
+				outputDeltaMap.IavlTreeDelta[key.Name()] = outputIavl
+			} else {
+				commitID, _ = store.CommitterCommit(nil) // CommitterCommit
+			}
+		} else {
+			commitID, _ = store.CommitterCommit(nil) // CommitterCommit
+		}
 
 		if store.GetStoreType() == types.StoreTypeTransient {
 			continue
@@ -1179,7 +1209,6 @@ func commitStores(version int64, storeMap map[types.StoreKey]types.CommitKVStore
 		si.Name = key.Name()
 		si.Core.CommitID = commitID
 		storeInfos = append(storeInfos, si)
-		outputDeltaMap[key.Name()] = outputDelta
 	}
 	return commitInfo{
 		Version:    version,
