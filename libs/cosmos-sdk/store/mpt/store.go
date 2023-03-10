@@ -3,7 +3,6 @@ package mpt
 import (
 	"encoding/hex"
 	"fmt"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
 	"io"
 	"sync"
 
@@ -163,7 +162,7 @@ func (ms *MptStore) CacheWrapWithTrace(w io.Writer, tc types.TraceContext) types
 }
 
 func (ms *MptStore) Get(key []byte) []byte {
-	switch mptKeyType(len(key)) {
+	switch mptKeyType(key) {
 	case storageType:
 		addr, stateRoot, realKey := decodeAddressStorageInfo(key)
 		t := ms.tryGetStorageTrie(addr, stateRoot, false)
@@ -218,7 +217,7 @@ func (ms *MptStore) Set(key, value []byte) {
 	if ms.prefetcher != nil {
 		ms.prefetcher.Used(ms.originalRoot, [][]byte{key})
 	}
-	switch mptKeyType(len(key)) {
+	switch mptKeyType(key) {
 	case storageType:
 		addr, stateRoot, realKey := decodeAddressStorageInfo(key)
 		t := ms.tryGetStorageTrie(addr, stateRoot, true)
@@ -236,7 +235,7 @@ func (ms *MptStore) Delete(key []byte) {
 	if ms.prefetcher != nil {
 		ms.prefetcher.Used(ms.originalRoot, [][]byte{key})
 	}
-	switch mptKeyType(len(key)) {
+	switch mptKeyType(key) {
 	case storageType:
 		addr, stateRoot, realKey := decodeAddressStorageInfo(key)
 		t := ms.tryGetStorageTrie(addr, stateRoot, true)
@@ -628,6 +627,7 @@ var (
 	keyPrefixStorageMpt = []byte{0x0}
 	keyPrefixAddrMpt    = []byte{0x01} // TODO auth.AddressStoreKeyPrefix
 	sizePreFixKey       = len(keyPrefixStorageMpt)
+	storageKeySize      = sizePreFixKey + len(ethcmn.Address{}) + len(ethcmn.Hash{}) + len(ethcmn.Hash{})
 )
 
 func AddressStoragePrefixMpt(address ethcmn.Address, stateRoot ethcmn.Hash) []byte {
@@ -655,13 +655,11 @@ var (
 storageType : 0x0 + addr + stateRoot + key
 addressType : 0x1 + addr
 */
-func mptKeyType(size int) int {
-	if size == 1+sdk.AddrLen || size == 1+sdk.WasmContractAddrLen {
-		return addressType
-	} else if size == len(keyPrefixStorageMpt)+len(ethcmn.Address{})+len(ethcmn.Hash{})+len(ethcmn.Hash{}) {
-		return storageType
-	} else {
-		return -1
-	}
 
+// TODO need strict check type later by scf !!!
+func mptKeyType(key []byte) int {
+	if key[0] == 0 && len(key) == storageKeySize {
+		return storageType
+	}
+	return addressType
 }

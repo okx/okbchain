@@ -46,7 +46,7 @@ func (ms *ImmutableMptStore) Get(key []byte) []byte {
 	ms.mtx.Lock()
 	defer ms.mtx.Unlock()
 
-	switch mptKeyType(len(key)) {
+	switch mptKeyType(key) {
 	case storageType:
 		_, stateRoot, realKey := decodeAddressStorageInfo(key)
 
