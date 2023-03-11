@@ -4,12 +4,8 @@ import (
 	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
 	"github.com/okx/okbchain/libs/cosmos-sdk/x/mint/internal/types"
 	"github.com/okx/okbchain/x/common"
-	"reflect"
-
 	govTypes "github.com/okx/okbchain/x/gov/types"
 )
-
-const InvokeExtraProposalName = "InvokeExtraProposal"
 
 // NewManageTreasuresProposalHandler handles "gov" type message in "mint"
 func NewManageTreasuresProposalHandler(k *Keeper) govTypes.Handler {
@@ -48,15 +44,5 @@ func handleManageTreasuresProposal(ctx sdk.Context, k *Keeper, proposal *govType
 }
 
 func handleExtraProposal(ctx sdk.Context, k *Keeper, p types.ExtraProposal) (err error) {
-	defer func() {
-		if r := recover(); r != nil {
-			err = types.ErrHandleExtraProposal
-		}
-	}()
-
-	f := reflect.ValueOf(k).MethodByName(InvokeExtraProposalName)
-	result := f.Call([]reflect.Value{reflect.ValueOf(ctx), reflect.ValueOf(p.Action), reflect.ValueOf(p.Extra)})
-	rErr := result[0].Interface()
-	err, _ = rErr.(error)
-	return err
+	return k.InvokeExtraProposal(ctx, p.Action, p.Extra)
 }
