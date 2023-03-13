@@ -12,14 +12,24 @@ import (
 type wrapIterator struct {
 	*mptIterator
 
-	cacheKeys [][]byte
+	start, end []byte
+	cacheKeys  [][]byte
 }
 
 func newWrapIterator(t ethstate.Trie, start, end []byte) *wrapIterator {
 	var keys [][]byte
-	mptIter := newOriginIterator(t, start, end)
+	mptIter := newOriginIterator(t, nil, nil)
 	for ; mptIter.Valid(); mptIter.Next() {
-		keys = append(keys, mptIter.Key())
+		key := mptIter.Key()
+		if start != nil && bytes.Compare(key, start) < 0 {
+			//start is included
+			continue
+		}
+		if end != nil && bytes.Compare(key, end) >= 0 {
+			//end is not included
+			continue
+		}
+		keys = append(keys, key)
 	}
 	sort.Slice(keys, func(i, j int) bool {
 		return bytes.Compare(keys[i], keys[j]) < 0
@@ -27,8 +37,14 @@ func newWrapIterator(t ethstate.Trie, start, end []byte) *wrapIterator {
 
 	return &wrapIterator{
 		mptIterator: mptIter,
+		start:       start,
+		end:         end,
 		cacheKeys:   keys,
 	}
+}
+
+func (it *wrapIterator) Domain() ([]byte, []byte) {
+	return it.start, it.end
 }
 
 func (it *wrapIterator) Valid() bool {
