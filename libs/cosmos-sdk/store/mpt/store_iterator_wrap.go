@@ -8,7 +8,7 @@ import (
 )
 
 // wrapIterator is a wrap of mpt iterator which can be iterated by the origin key.
-// It is compatible with cachekv.
+// It is compatible with cachekv iterator.
 type wrapIterator struct {
 	*mptIterator
 
