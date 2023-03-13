@@ -89,6 +89,7 @@ func CreateTestInputAdvanced(t *testing.T, isCheckTx bool, initPower int64,
 	initTokens := sdk.TokensFromConsensusPower(initPower)
 
 	keyDistr := sdk.NewKVStoreKey(types.StoreKey)
+	keyMpt := sdk.NewKVStoreKey(auth.StoreKey)
 	keyStaking := sdk.NewKVStoreKey(staking.StoreKey)
 	keyAcc := sdk.NewKVStoreKey(auth.StoreKey)
 	keySupply := sdk.NewKVStoreKey(supply.StoreKey)

@@ -3,6 +3,7 @@ package keeper // noalias
 import (
 	"bytes"
 	"encoding/hex"
+	"github.com/okx/okbchain/libs/cosmos-sdk/store/mpt"
 	"math/rand"
 	"strconv"
 	"testing"
@@ -82,6 +83,7 @@ func MakeTestCodec() *codec.Codec {
 func CreateTestInput(t *testing.T, isCheckTx bool, initPower int64) (sdk.Context, auth.AccountKeeper, Keeper, types.SupplyKeeper) {
 	keyStaking := sdk.NewKVStoreKey(types.StoreKey)
 	keyAcc := sdk.NewKVStoreKey(auth.StoreKey)
+	keyMpt := sdk.NewKVStoreKey(mpt.StoreKey)
 	keyParams := sdk.NewKVStoreKey(params.StoreKey)
 	tkeyParams := sdk.NewTransientStoreKey(params.TStoreKey)
 	keySupply := sdk.NewKVStoreKey(supply.StoreKey)
