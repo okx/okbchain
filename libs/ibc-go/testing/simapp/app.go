@@ -152,6 +152,7 @@ var (
 			evmclient.ManageSysContractAddressProposalHandler,
 			evmclient.ManageContractByteCodeProposalHandler,
 			govclient.ManageTreasuresProposalHandler,
+			govclient.ExtraProposalHandler,
 			erc20client.TokenMappingProposalHandler,
 			erc20client.ProxyContractRedirectHandler,
 			wasmclient.MigrateContractProposalHandler,
