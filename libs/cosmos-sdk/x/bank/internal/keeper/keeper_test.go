@@ -236,10 +236,10 @@ func TestMsgMultiSendEvents(t *testing.T) {
 
 	app.BankKeeper.SetSendEnabled(ctx, true)
 
-	addr := sdk.AccAddress([]byte("addr1"))
-	addr2 := sdk.AccAddress([]byte("addr2"))
-	addr3 := sdk.AccAddress([]byte("addr3"))
-	addr4 := sdk.AccAddress([]byte("addr4"))
+	addr := sdk.AccAddress(ethcmn.BytesToAddress([]byte("addr1")).Bytes())
+	addr2 := sdk.AccAddress(ethcmn.BytesToAddress([]byte("addr2")).Bytes())
+	addr3 := sdk.AccAddress(ethcmn.BytesToAddress([]byte("addr3")).Bytes())
+	addr4 := sdk.AccAddress(ethcmn.BytesToAddress([]byte("addr4")).Bytes())
 	acc := app.AccountKeeper.NewAccountWithAddress(ctx, addr)
 	acc2 := app.AccountKeeper.NewAccountWithAddress(ctx, addr2)
 
