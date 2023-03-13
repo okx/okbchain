@@ -659,7 +659,6 @@ storageType : 0x0 + addr + stateRoot + key
 addressType : 0x1 + addr
 */
 
-// TODO need strict check type later by scf !!!
 func mptKeyType(key []byte) int {
 	switch len(key) {
 	case wasmContractKeySize:

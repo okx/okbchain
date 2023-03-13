@@ -351,8 +351,8 @@ func TestVestingAccountSend(t *testing.T) {
 	origCoins := sdk.NewCoins(sdk.NewInt64Coin("stake", 100))
 	sendCoins := sdk.NewCoins(sdk.NewInt64Coin("stake", 50))
 
-	addr1 := sdk.AccAddress([]byte("addr1"))
-	addr2 := sdk.AccAddress([]byte("addr2"))
+	addr1 := sdk.AccAddress(ethcmn.BytesToAddress([]byte("addr1")).Bytes())
+	addr2 := sdk.AccAddress(ethcmn.BytesToAddress([]byte("addr2")).Bytes())
 	bacc := auth.NewBaseAccountWithAddress(addr1)
 	bacc.SetCoins(origCoins)
 	vacc := vesting.NewContinuousVestingAccount(&bacc, ctx.BlockHeader().Time.Unix(), endTime.Unix())
