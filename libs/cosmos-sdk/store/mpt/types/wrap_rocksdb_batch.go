@@ -25,30 +25,30 @@ func NewWrapRocksDBBatch(db *tmdb.RocksDB) *WrapRocksDBBatch {
 	return &WrapRocksDBBatch{db: db}
 }
 
-func (wrsdbb *WrapRocksDBBatch) Put(key []byte, value []byte) error {
-	wrsdbb.records = append(wrsdbb.records, record{
+func (wrb *WrapRocksDBBatch) Put(key []byte, value []byte) error {
+	wrb.records = append(wrb.records, record{
 		key:   key,
-		value: value,
+		value: nonNilBytes(value),
 	})
-	wrsdbb.size += len(value)
+	wrb.size += len(value)
 	return nil
 }
 
-func (wrsdbb *WrapRocksDBBatch) Delete(key []byte) error {
-	wrsdbb.records = append(wrsdbb.records, record{
+func (wrb *WrapRocksDBBatch) Delete(key []byte) error {
+	wrb.records = append(wrb.records, record{
 		key: key,
 	})
-	wrsdbb.size += len(key)
+	wrb.size += len(key)
 	return nil
 }
 
-func (wrsdbb *WrapRocksDBBatch) ValueSize() int {
-	return wrsdbb.size
+func (wrb *WrapRocksDBBatch) ValueSize() int {
+	return wrb.size
 }
 
-func (wrsdbb *WrapRocksDBBatch) Write() error {
-	batch := tmdb.NewRocksDBBatch(wrsdbb.db)
-	for _, rcd := range wrsdbb.records {
+func (wrb *WrapRocksDBBatch) Write() error {
+	batch := tmdb.NewRocksDBBatch(wrb.db)
+	for _, rcd := range wrb.records {
 		if rcd.value != nil {
 			batch.Set(rcd.key, rcd.value)
 		} else {
@@ -60,9 +60,9 @@ func (wrsdbb *WrapRocksDBBatch) Write() error {
 }
 
 // Replay replays the batch contents.
-func (wrsdbb *WrapRocksDBBatch) Replay(w ethdb.KeyValueWriter) error {
+func (wrb *WrapRocksDBBatch) Replay(w ethdb.KeyValueWriter) error {
 	var err error
-	for _, rcd := range wrsdbb.records {
+	for _, rcd := range wrb.records {
 		if rcd.value != nil {
 			err = w.Put(rcd.key, rcd.value)
 		} else {
@@ -75,6 +75,13 @@ func (wrsdbb *WrapRocksDBBatch) Replay(w ethdb.KeyValueWriter) error {
 	return nil
 }
 
-func (wrsdbb *WrapRocksDBBatch) Reset() {
-	wrsdbb.records = wrsdbb.records[:0]
+func (wrb *WrapRocksDBBatch) Reset() {
+	wrb.records = wrb.records[:0]
+}
+
+func nonNilBytes(bz []byte) []byte {
+	if bz == nil {
+		return []byte{}
+	}
+	return bz
 }
