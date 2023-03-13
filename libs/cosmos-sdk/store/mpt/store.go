@@ -643,28 +643,28 @@ func (ms *MptStore) prefetchData() {
 func (ms *MptStore) SetUpgradeVersion(i int64) {}
 
 var (
-	keyPrefixStorageMpt = []byte{0x0}
-	keyPrefixAddrMpt    = []byte{0x01} // TODO auth.AddressStoreKeyPrefix
-	sizePreFixKey       = len(keyPrefixStorageMpt)
-	storageKeySize      = sizePreFixKey + len(ethcmn.Address{}) + len(ethcmn.Hash{}) + len(ethcmn.Hash{})
-	addrKeySize         = len(keyPrefixAddrMpt) + sdk.AddrLen
-	wasmContractKeySize = len(keyPrefixAddrMpt) + sdk.WasmContractAddrLen
+	keyPrefixStorageMpt = byte(0)
+	keyPrefixAddrMpt    = byte(1) // TODO auth.AddressStoreKeyPrefix
+	prefixSizeInMpt     = 1
+	storageKeySize      = prefixSizeInMpt + len(ethcmn.Address{}) + len(ethcmn.Hash{}) + len(ethcmn.Hash{})
+	addrKeySize         = prefixSizeInMpt + sdk.AddrLen
+	wasmContractKeySize = prefixSizeInMpt + sdk.WasmContractAddrLen
 )
 
 func AddressStoragePrefixMpt(address ethcmn.Address, stateRoot ethcmn.Hash) []byte {
-	t1 := append(keyPrefixStorageMpt, address.Bytes()...)
+	t1 := append([]byte{keyPrefixStorageMpt}, address.Bytes()...)
 	return append(t1, stateRoot.Bytes()...)
 }
 
 func decodeAddressStorageInfo(key []byte) (ethcmn.Address, ethcmn.Hash, []byte) {
-	addr := ethcmn.BytesToAddress(key[sizePreFixKey : sizePreFixKey+20])
-	storageRoot := ethcmn.BytesToHash(key[sizePreFixKey+20 : sizePreFixKey+20+32])
-	updateKey := key[sizePreFixKey+20+32:]
+	addr := ethcmn.BytesToAddress(key[prefixSizeInMpt : prefixSizeInMpt+20])
+	storageRoot := ethcmn.BytesToHash(key[prefixSizeInMpt+20 : prefixSizeInMpt+20+32])
+	updateKey := key[prefixSizeInMpt+20+32:]
 	return addr, storageRoot, updateKey
 }
 
 func AddressStoreKey(addr []byte) []byte {
-	return append(keyPrefixAddrMpt, addr...)
+	return append([]byte{keyPrefixAddrMpt}, addr...)
 }
 
 var (
@@ -679,13 +679,13 @@ addressType : 0x1 + addr
 
 func mptKeyType(key []byte) int {
 	switch key[0] {
-	case keyPrefixAddrMpt[0]:
+	case keyPrefixAddrMpt:
 		size := len(key)
 		if size == wasmContractKeySize || size == addrKeySize {
 			return addressType
 		}
 		return -1
-	case keyPrefixStorageMpt[0]:
+	case keyPrefixStorageMpt:
 		if len(key) == storageKeySize {
 			return storageType
 		}
