@@ -116,7 +116,10 @@ func (so *stateObject) getTrie(db ethstate.Database) ethstate.Trie {
 func (so *stateObject) updateRoot(db ethstate.Database) {
 	// If nothing changed, don't bother with hashing anything
 	if trie := so.updateTrie(db); trie != nil {
-		so.account.StateRoot = trie.Hash()
+		if IsEndBlock {
+
+			so.account.StateRoot = trie.Hash()
+		}
 	}
 }
 
@@ -171,7 +174,10 @@ func (so *stateObject) CommitTrie(db ethstate.Database) error {
 
 	root, err := so.trie.Commit(nil)
 	if err == nil {
-		so.account.StateRoot = root
+		if IsEndBlock {
+			so.account.StateRoot = root
+		}
+
 	}
 	return err
 }

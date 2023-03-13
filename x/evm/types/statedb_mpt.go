@@ -15,6 +15,10 @@ import (
 	"github.com/okx/okbchain/libs/tendermint/libs/log"
 )
 
+var (
+	IsEndBlock = false
+)
+
 func (csdb *CommitStateDB) CommitMpt(prefetcher *mpt.TriePrefetcher) (ethcmn.Hash, error) {
 	// Commit objects to the trie, measuring the elapsed time
 	codeWriter := csdb.db.TrieDB().DiskDB().NewBatch()
@@ -168,7 +172,7 @@ func (csdb *CommitStateDB) MarkUpdatedAcc(addList []ethcmn.Address) {
 	}
 }
 
-//TODO this line code only get contract_storage_merkle_proof, have not acc_merkle_proof
+// TODO this line code only get contract_storage_merkle_proof, have not acc_merkle_proof
 // GetStorageProof returns the Merkle proof for given storage slot.
 func (csdb *CommitStateDB) GetStorageProof(a ethcmn.Address, key ethcmn.Hash) ([][]byte, error) {
 	var proof mpt.ProofList
