@@ -192,8 +192,8 @@ func TestMsgSendEvents(t *testing.T) {
 
 	app.BankKeeper.SetSendEnabled(ctx, true)
 
-	addr := ethcmn.BytesToAddress(sdk.AccAddress([]byte("addr1")))
-	addr2 := ethcmn.BytesToAddress(sdk.AccAddress([]byte("addr2")))
+	addr := sdk.AccAddress(ethcmn.BytesToAddress([]byte("addr1")).Bytes())
+	addr2 := sdk.AccAddress(ethcmn.BytesToAddress([]byte("addr2")).Bytes())
 	acc := app.AccountKeeper.NewAccountWithAddress(ctx, addr.Bytes())
 
 	app.AccountKeeper.SetAccount(ctx, acc)
