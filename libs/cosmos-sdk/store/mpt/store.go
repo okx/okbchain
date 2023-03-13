@@ -660,14 +660,20 @@ addressType : 0x1 + addr
 */
 
 func mptKeyType(key []byte) int {
-	switch len(key) {
-	case wasmContractKeySize:
-		return addressType
-	case addrKeySize:
-		return addressType
-	case storageKeySize:
-		return storageType
+	switch key[0] {
+	case keyPrefixAddrMpt[0]:
+		size := len(key)
+		if size == wasmContractKeySize || size == addrKeySize {
+			return addressType
+		}
+		return -1
+	case keyPrefixStorageMpt[0]:
+		if len(key) == storageKeySize {
+			return storageType
+		}
+		return -1
 	default:
 		return -1
+
 	}
 }
