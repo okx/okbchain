@@ -52,10 +52,10 @@ func registerQueryRoutes(cliCtx context.CLIContext, r *mux.Router) {
 	).Methods("GET")
 
 	// query the proxy relationship on a proxy delegator
-	r.HandleFunc(
-		"/staking/delegators/{delegatorAddr}/proxy",
-		delegatorProxyHandlerFn(cliCtx),
-	).Methods("GET")
+	//r.HandleFunc(
+	//	"/staking/delegators/{delegatorAddr}/proxy",
+	//	delegatorProxyHandlerFn(cliCtx),
+	//).Methods("GET")
 
 	// query the all shares on a validator
 	r.HandleFunc(
