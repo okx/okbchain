@@ -7,8 +7,11 @@ import (
 	ethstate "github.com/ethereum/go-ethereum/core/state"
 )
 
+// wrapIterator is a wrap of mpt iterator which can be iterated by the origin key.
+// It is compatible with cachekv.
 type wrapIterator struct {
 	*mptIterator
+
 	cacheKeys [][]byte
 }
 
@@ -54,6 +57,9 @@ func (it *wrapIterator) Value() []byte {
 	if err != nil {
 		return nil
 	}
-
 	return value
+}
+
+func (it *wrapIterator) Error() error {
+	return nil
 }
