@@ -4,6 +4,7 @@
 package types
 
 import (
+	"fmt"
 	"github.com/cosmos/gorocksdb"
 	"github.com/ethereum/go-ethereum/ethdb"
 	tmdb "github.com/okx/okbchain/libs/tm-db"

@@ -2,6 +2,7 @@ package mpt
 
 import (
 	"encoding/binary"
+	"fmt"
 	"path/filepath"
 	"sync"
 
@@ -42,10 +43,12 @@ func InstanceOfMptStore() ethstate.Database {
 		}
 		nkvstore := NewStatKeyValueStore(kvstore, gStatic)
 		db := rawdb.NewDatabase(nkvstore)
+		fmt.Println("TrieDirtyDisabled", TrieDirtyDisabled)
 		gMptDatabase = ethstate.NewDatabaseWithConfig(db, &trie.Config{
 			Cache:     int(TrieCacheSize),
 			Journal:   "",
 			Preimages: true,
+			EnableAC:  !TrieDirtyDisabled,
 		})
 	})
 

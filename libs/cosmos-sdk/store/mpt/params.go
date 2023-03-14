@@ -9,7 +9,7 @@ import (
 const (
 	StoreTypeMPT = types.StoreTypeMPT
 
-	TriesInMemory = 100
+	TriesInMemory = 8
 
 	// StoreKey is string representation of the store key for mpt
 	StoreKey = "mpt"
