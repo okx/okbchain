@@ -141,8 +141,6 @@ func NewKeeper(
 	k.Watcher.SetWatchDataManager()
 	ak.SetObserverKeeper(k)
 
-	//k.OpenTrie()
-	k.EvmStateDb = types.NewCommitStateDB(k.GenerateCSDBParams())
 	return k
 }
 
@@ -176,9 +174,6 @@ func NewSimulateKeeper(
 		heightCache: heightCache,
 		hashCache:   hashCache,
 	}
-
-	//k.OpenTrie()
-	k.EvmStateDb = types.NewCommitStateDB(k.GenerateCSDBParams())
 
 	return k
 }

@@ -55,14 +55,10 @@ func msg2st(ctx *sdk.Context, k *Keeper, msg *types.MsgEthereumTx, st *types.Sta
 	st.TraceTx = ctx.IsTraceTx()
 	st.TraceTxLog = ctx.IsTraceTxLog()
 
-	if ctx.IsDeliver() {
-		st.Csdb = k.EvmStateDb.WithContext(*ctx)
-	} else {
-		csdb := getCommitStateDB()
-		types.ResetCommitStateDB(csdb, k.GenerateCSDBParams(), ctx)
-		st.Csdb = csdb
-		reuseCsdb = true
-	}
+	csdb := getCommitStateDB()
+	types.ResetCommitStateDB(csdb, k.GenerateCSDBParams(), ctx)
+	st.Csdb = csdb
+	reuseCsdb = true
 
 	return
 }
