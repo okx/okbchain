@@ -6,6 +6,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/okx/okbchain/libs/cosmos-sdk/store"
+	"github.com/okx/okbchain/libs/cosmos-sdk/store/mpt"
 	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
 	"github.com/okx/okbchain/libs/cosmos-sdk/x/auth"
 	"github.com/okx/okbchain/libs/cosmos-sdk/x/params"
@@ -28,7 +29,7 @@ type EvmFactory struct {
 }
 
 func NewEvmFactory(chainId string, q *watcher.Querier) EvmFactory {
-	ef := EvmFactory{ChainId: chainId, WrappedQuerier: q, storeKey: sdk.NewKVStoreKey(evm.StoreKey)}
+	ef := EvmFactory{ChainId: chainId, WrappedQuerier: q, storeKey: sdk.NewKVStoreKey(mpt.StoreKey)}
 	ef.cms, ef.paramsKey, ef.paramsTKey = initCommitMultiStore(ef.storeKey)
 	ef.storePool = sync.Pool{
 		New: func() interface{} {
