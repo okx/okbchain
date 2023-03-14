@@ -5,11 +5,8 @@ import (
 	"fmt"
 	"io"
 	"sync"
-<<<<<<< Updated upstream
-	"time"
-=======
 	"sync/atomic"
->>>>>>> Stashed changes
+	"time"
 
 	ethcmn "github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/prque"
