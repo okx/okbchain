@@ -19,7 +19,6 @@ import (
 	ethtypes "github.com/ethereum/go-ethereum/core/types"
 	ethvm "github.com/ethereum/go-ethereum/core/vm"
 	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
-	"github.com/okx/okbchain/libs/cosmos-sdk/store/mpt"
 	"github.com/okx/okbchain/libs/cosmos-sdk/store/prefix"
 	"github.com/okx/okbchain/libs/cosmos-sdk/store/types"
 	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
@@ -77,8 +76,7 @@ type CacheCode struct {
 // manner. In otherwords, how this relates to the keeper in this module.
 // Warning!!! If you change CommitStateDB.member you must be careful ResetCommitStateDB contract BananaLF.
 type CommitStateDB struct {
-	db         ethstate.Database
-	prefetcher *mpt.TriePrefetcher
+	db ethstate.Database
 
 	// TODO: We need to store the context as part of the structure itself opposed
 	// to being passed as a parameter (as it should be) in order to implement the
@@ -294,7 +292,6 @@ func ResetCommitStateDB(csdb *CommitStateDB, csdbParams CommitStateDBParams, ctx
 		csdb.updatedAccount = make(map[ethcmn.Address]struct{})
 	}
 
-	csdb.prefetcher = nil
 	csdb.ctx = *ctx
 	csdb.refund = 0
 	csdb.thash = ethcmn.Hash{}
@@ -852,22 +849,7 @@ func (csdb *CommitStateDB) Commit(deleteEmptyObjects bool) (ethcmn.Hash, error) 
 	// Finalize any pending changes and merge everything into the tries
 	csdb.IntermediateRoot(deleteEmptyObjects)
 
-	// If there was a trie prefetcher operating, it gets aborted and irrevocably
-	// modified after we start retrieving tries. Remove it from the statedb after
-	// this round of use.
-	//
-	// This is weird pre-byzantium since the first tx runs with a prefetcher and
-	// the remainder without, but pre-byzantium even the initial prefetcher is
-	// useless, so no sleep lost.
-	prefetcher := csdb.prefetcher
-	if csdb.prefetcher != nil {
-		defer func() {
-			csdb.prefetcher.Close()
-			csdb.prefetcher = nil
-		}()
-	}
-
-	return csdb.CommitMpt(prefetcher)
+	return csdb.CommitMpt()
 }
 
 // Finalise finalizes the state objects (accounts) state by setting their state,
