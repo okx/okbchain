@@ -55,7 +55,11 @@ func (so *stateObject) GetCommittedStateMpt(db ethstate.Database, key ethcmn.Has
 	)
 
 	ctx := &so.stateDB.ctx
-	store := so.stateDB.dbAdapter.NewStore(ctx.KVStore(so.stateDB.storeKey), mpt.AddressStoragePrefixMpt(so.address, so.account.StateRoot))
+	reUse := ctx.KVStore(so.stateDB.storeKey)
+	store := so.stateDB.dbAdapter.NewStore(reUse, mpt.AddressStoragePrefixMpt(so.address, so.account.StateRoot))
+	defer func() {
+		ctx.ReturnKVStore(reUse)
+	}()
 	enc = store.Get(key.Bytes())
 
 	if len(enc) > 0 {
@@ -129,7 +133,11 @@ func (so *stateObject) updateTrie(db ethstate.Database) (updated bool) {
 
 	// Insert all the pending updates into the trie
 	ctx := &so.stateDB.ctx
-	store := so.stateDB.dbAdapter.NewStore(ctx.KVStore(so.stateDB.storeKey), mpt.AddressStoragePrefixMpt(so.address, so.account.StateRoot))
+	reUse := ctx.GetReusableKVStore(so.stateDB.storeKey)
+	store := so.stateDB.dbAdapter.NewStore(reUse, mpt.AddressStoragePrefixMpt(so.address, so.account.StateRoot))
+	defer func() {
+		ctx.ReturnKVStore(reUse)
+	}()
 	usedStorage := make([][]byte, 0, len(so.pendingStorage))
 	for key, value := range so.pendingStorage {
 		// Skip noop changes, persist actual changes
