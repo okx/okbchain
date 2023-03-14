@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"sync"
+	"time"
 
 	ethcmn "github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/prque"
@@ -532,8 +533,11 @@ func (ms *MptStore) StopWithVersion(targetVersion int64) error {
 			ms.db.TrieDB().Dereference(ms.triegc.PopItem().(ethcmn.Hash))
 		}
 	}
+	ts := time.Now()
 	if err := ms.flattenPersistSnapshot(); err != nil && ms.logger != nil {
 		ms.logger.Error("Writing snapshot state to disk", "error", err)
+	} else if ms.logger != nil {
+		ms.logger.Info("Writing snapshot successfully", "cost", time.Since(ts))
 	}
 
 	return nil
