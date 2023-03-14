@@ -8,6 +8,7 @@ import (
 	ethcrypto "github.com/ethereum/go-ethereum/crypto"
 	snap "github.com/okx/okbchain/libs/cosmos-sdk/store/mpt/snapshot"
 	mpttypes "github.com/okx/okbchain/libs/cosmos-sdk/store/mpt/types"
+	"sync/atomic"
 )
 
 var (
@@ -87,6 +88,13 @@ func (ms *MptStore) commitSnap(root common.Hash) {
 	ms.snap, ms.snapDestructs, ms.snapAccounts, ms.snapStorage = nil, nil, nil, nil
 
 	ms.prepareSnap(root)
+	if ms.logger != nil {
+		storageSnap := atomic.LoadUint64(&storageSnapGet)
+		storageTrie := atomic.LoadUint64(&storageTrieGet)
+		accSnap := atomic.LoadUint64(&accSnapGet)
+		accTrie := atomic.LoadUint64(&accTrieGet)
+		ms.logger.Error("giskook snapshot stat", "storageSnap", storageSnap, "storageTrie", storageTrie, "accSnap", accSnap, "accTrie", accTrie)
+	}
 }
 
 func (ms *MptStore) updateSnapAccounts(addr, bz []byte) {

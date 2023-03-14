@@ -5,7 +5,11 @@ import (
 	"fmt"
 	"io"
 	"sync"
+<<<<<<< Updated upstream
 	"time"
+=======
+	"sync/atomic"
+>>>>>>> Stashed changes
 
 	ethcmn "github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/prque"
@@ -181,14 +185,21 @@ func (ms *MptStore) CacheWrapWithTrace(w io.Writer, tc types.TraceContext) types
 	return cachekv.NewStore(tracekv.NewStore(ms, w, tc))
 }
 
+var storageSnapGet uint64
+var storageTrieGet uint64
+var accSnapGet uint64
+var accTrieGet uint64
+
 func (ms *MptStore) Get(key []byte) []byte {
 	switch mptKeyType(key) {
 	case storageType:
 		addr, stateRoot, realKey := decodeAddressStorageInfo(key)
 		value, err := ms.getSnapStorage(addr, realKey)
 		if err == nil {
+			atomic.AddUint64(&storageSnapGet, 1)
 			return value
 		}
+		atomic.AddUint64(&storageTrieGet, 1)
 		t := ms.tryGetStorageTrie(addr, stateRoot, false)
 		value, err = t.TryGet(realKey)
 		if err != nil {
@@ -198,8 +209,10 @@ func (ms *MptStore) Get(key []byte) []byte {
 	case addressType:
 		v, err := ms.getSnapAccount(key)
 		if err == nil {
+			atomic.AddUint64(&accSnapGet, 1)
 			return v
 		}
+		atomic.AddUint64(&accTrieGet, 1)
 		value, err := ms.db.CopyTrie(ms.trie).TryGet(key)
 		if err != nil {
 			return nil
