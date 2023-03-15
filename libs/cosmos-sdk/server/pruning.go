@@ -2,6 +2,9 @@ package server
 
 import (
 	"fmt"
+	tmiavl "github.com/okx/okbchain/libs/iavl"
+	iavlcfg "github.com/okx/okbchain/libs/iavl/config"
+	"github.com/okx/okbchain/libs/system"
 	"strings"
 
 	"github.com/okx/okbchain/libs/cosmos-sdk/store/mpt"
@@ -10,8 +13,6 @@ import (
 
 	"github.com/okx/okbchain/libs/cosmos-sdk/store"
 	"github.com/okx/okbchain/libs/cosmos-sdk/store/types"
-	tmiavl "github.com/okx/okbchain/libs/iavl"
-	iavlcfg "github.com/okx/okbchain/libs/iavl/config"
 )
 
 // GetPruningOptionsFromFlags parses command flags and returns the correct
@@ -22,10 +23,7 @@ func GetPruningOptionsFromFlags() (types.PruningOptions, error) {
 
 	switch strategy {
 	case types.PruningOptionNothing:
-		tmiavl.EnablePruningHistoryState = false
-		tmiavl.CommitIntervalHeight = 1
-		mpt.TrieCommitGap = 1
-		iavlcfg.DynamicConfig.SetCommitGapHeight(1)
+		pruningNothingModify()
 		return types.NewPruningOptionsFromString(strategy), nil
 
 	case types.PruningOptionDefault, types.PruningOptionEverything:
@@ -49,4 +47,16 @@ func GetPruningOptionsFromFlags() (types.PruningOptions, error) {
 	default:
 		return store.PruningOptions{}, fmt.Errorf("unknown pruning strategy %s", strategy)
 	}
+}
+
+func pruningNothingModify() {
+	tmiavl.EnablePruningHistoryState = false
+	tmiavl.CommitIntervalHeight = 1
+	viper.Set(tmiavl.FlagIavlCommitIntervalHeight, 1)
+	mpt.TrieCommitGap = 1
+	viper.Set(system.FlagTreeEnableAsyncCommit, false)
+	tmiavl.EnableAsyncCommit = false
+	mpt.EnableAsyncCommit = false
+	viper.Set(system.FlagTreeEnableAsyncCommit, false)
+	iavlcfg.DynamicConfig.SetCommitGapHeight(1)
 }
