@@ -44,18 +44,18 @@ func AccountGetCmd(ctx *server.Context) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "account [data] [height]",
 		Args:  cobra.ExactArgs(2),
-		Short: "get account all storage for diff iavl account",
+		Short: "get account all storage for diff mpt account",
 		Run: func(cmd *cobra.Command, args []string) {
 			fmt.Printf("--------- iterate %s data start ---------\n", args[0])
 			height, err := strconv.Atoi(args[1])
 			panicError(err)
-			iavlAccount := getAccountFromMpt(uint64(height))
-			buff, err := json.Marshal(iavlAccount)
+			mptAccount := getAccountFromMpt(uint64(height))
+			buff, err := json.Marshal(mptAccount)
 			if err != nil {
 				fmt.Printf("Error:%s", err)
 				return
 			}
-			if err := ioutil.WriteFile(args[0]+"iavlaccount", buff, 0555); err != nil {
+			if err := ioutil.WriteFile(args[0]+"mptaccount", buff, 0555); err != nil {
 				fmt.Printf("Error:%s", err)
 				return
 			}

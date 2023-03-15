@@ -150,7 +150,6 @@ start() {
     --p2p.seeds ${seednode} \
     --rest.laddr tcp://${IP}:${restport} \
     --log_level ${LOG_LEVEL} \
-    --pruning nothing \
     --enable-gid \
     --append-pid \
     ${UPLOAD_DELTA} \
