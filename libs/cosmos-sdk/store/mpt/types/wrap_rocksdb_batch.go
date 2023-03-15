@@ -1,6 +1,3 @@
-//go:build rocksdb
-// +build rocksdb
-
 package types
 
 import (
@@ -17,7 +14,8 @@ import (
 type BatchCache struct {
 	batchList  *list.List
 	batchCache map[int64]*list.Element
-	maxSize    int
+	//batchInUse map[int64]bool
+	maxSize int
 
 	lock sync.Mutex
 }
@@ -26,7 +24,8 @@ func NewBatchCache(maxSize int) *BatchCache {
 	return &BatchCache{
 		batchList:  list.New(),
 		batchCache: make(map[int64]*list.Element, maxSize),
-		maxSize:    maxSize,
+		//batchInUse: make(map[int64]bool),
+		maxSize: maxSize,
 	}
 }
 
@@ -44,9 +43,12 @@ func (bc *BatchCache) TryPopFront() *WrapRocksDBBatch {
 
 	if bc.batchList.Len() > bc.maxSize {
 		deathEle := bc.batchList.Front()
+		deathBatch := deathEle.Value.(*WrapRocksDBBatch)
+		//if bc.batchInUse[deathBatch.GetID()] {
+		//	return nil
+		//}
 		bc.batchList.Remove(deathEle)
 
-		deathBatch := deathEle.Value.(*WrapRocksDBBatch)
 		delete(bc.batchCache, deathBatch.GetID())
 
 		return deathBatch
@@ -62,6 +64,7 @@ func (bc *BatchCache) MoveToBack(id int64) {
 	if ele, ok := bc.batchCache[id]; ok {
 		bc.batchList.MoveToBack(ele)
 	}
+	//bc.batchInUse[id] = false
 }
 
 var (
@@ -73,7 +76,7 @@ var (
 
 func InstanceBatchCache() *BatchCache {
 	initRocksdbBatchOnce.Do(func() {
-		gBatchCache = NewBatchCache(1000)
+		gBatchCache = NewBatchCache(int(TrieRocksdbBatchSize))
 		fmt.Println("TrieRocksdbBatchSize", TrieRocksdbBatchSize)
 	})
 
@@ -102,16 +105,16 @@ func NewWrapRocksDBBatch(db *tmdb.RocksDB) *WrapRocksDBBatch {
 }
 
 func (wrsdbb *WrapRocksDBBatch) Put(key []byte, value []byte) error {
-	InstanceBatchCache().MoveToBack(wrsdbb.GetID())
 
 	wrsdbb.Set(key, value)
+	InstanceBatchCache().MoveToBack(wrsdbb.GetID())
 	return nil
 }
 
 func (wrsdbb *WrapRocksDBBatch) Delete(key []byte) error {
-	InstanceBatchCache().MoveToBack(wrsdbb.GetID())
 
 	wrsdbb.RocksDBBatch.Delete(key)
+	InstanceBatchCache().MoveToBack(wrsdbb.GetID())
 	return nil
 }
 
@@ -120,15 +123,15 @@ func (wrsdbb *WrapRocksDBBatch) ValueSize() int {
 }
 
 func (wrsdbb *WrapRocksDBBatch) Write() error {
-	InstanceBatchCache().MoveToBack(wrsdbb.GetID())
 
-	return wrsdbb.RocksDBBatch.WriteWithoutClose()
+	err := wrsdbb.RocksDBBatch.WriteWithoutClose()
+	InstanceBatchCache().MoveToBack(wrsdbb.GetID())
+	return err
+
 }
 
 // Replay replays the batch contents.
 func (wrsdbb *WrapRocksDBBatch) Replay(w ethdb.KeyValueWriter) error {
-	InstanceBatchCache().MoveToBack(wrsdbb.GetID())
-
 	rp := &replayer{writer: w}
 
 	itr := wrsdbb.NewIterator()
@@ -142,7 +145,7 @@ func (wrsdbb *WrapRocksDBBatch) Replay(w ethdb.KeyValueWriter) error {
 			rp.Delete(rcd.Key)
 		}
 	}
-
+	InstanceBatchCache().MoveToBack(wrsdbb.GetID())
 	return nil
 }
 
