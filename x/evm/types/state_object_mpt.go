@@ -3,6 +3,7 @@ package types
 import (
 	"bytes"
 	"fmt"
+	types2 "github.com/ethereum/go-ethereum/core/types"
 	"github.com/okx/okbchain/libs/cosmos-sdk/store/mpt"
 
 	ethcmn "github.com/ethereum/go-ethereum/common"
@@ -159,8 +160,24 @@ func (so *stateObject) CommitTrie(db ethstate.Database) error {
 // finalise moves all dirty storage slots into the pending area to be hashed or
 // committed later. It is invoked at the end of every transaction.
 func (so *stateObject) finalise(prefetch bool) {
+	var slotsToPrefetch [][]byte
+	if prefetch {
+		slotsToPrefetch = make([][]byte, 0, len(so.dirtyStorage))
+	}
+
 	for key, value := range so.dirtyStorage {
 		so.pendingStorage[key] = value
+		if prefetch && value != so.originStorage[key] {
+			slotsToPrefetch = append(slotsToPrefetch, ethcmn.CopyBytes(key[:])) // Copy needed for closure
+		}
+	}
+
+	if prefetch && len(slotsToPrefetch) > 0 && so.account.StateRoot != types2.EmptyRootHash {
+		mpt.GKeysToPrefetchChannel <- &mpt.PreFetcherData{
+			AddrHash:  so.addrHash,
+			StateRoot: so.account.StateRoot,
+			Keys:      slotsToPrefetch,
+		}
 	}
 
 	if len(so.dirtyStorage) > 0 {

@@ -55,7 +55,10 @@ type MptStore struct {
 	triegc              *prque.Prque
 	logger              tmlog.Logger
 
-	prefetcher   *TriePrefetcher
+	prefetcher *triePrefetcher
+
+	// originalRoot is the pre-state root, before any changes were made.
+	// It will be updated when the Commit is called.
 	originalRoot ethcmn.Hash
 	exitSignal   chan struct{}
 
@@ -64,10 +67,6 @@ type MptStore struct {
 	cmLock       sync.Mutex
 
 	retriever StateRootRetriever
-}
-
-func (ms *MptStore) CommitterCommitMap(deltaMap iavl.TreeDeltaMap) (_ types.CommitID, _ iavl.TreeDeltaMap) {
-	return
 }
 
 func (ms *MptStore) GetFlatKVReadTime() int {
@@ -220,16 +219,20 @@ func (ms *MptStore) Has(key []byte) bool {
 func (ms *MptStore) Set(key, value []byte) {
 	types.AssertValidValue(value)
 
-	if ms.prefetcher != nil {
-		ms.prefetcher.Used(ms.originalRoot, [][]byte{key})
-	}
 	switch mptKeyType(key) {
 	case storageType:
 		addr, stateRoot, realKey := decodeAddressStorageInfo(key)
 		t := ms.tryGetStorageTrie(addr, stateRoot, true)
 		t.TryUpdate(realKey, value)
+		if ms.prefetcher != nil {
+			addrHash := mpttype.Keccak256HashWithSyncPool(addr[:])
+			ms.prefetcher.used(addrHash, ms.originalRoot, realKey)
+		}
 	case addressType:
 		ms.trie.TryUpdate(key, value)
+		if ms.prefetcher != nil {
+			ms.prefetcher.used(ethcmn.Hash{}, ms.originalRoot, key)
+		}
 	default:
 		panic(fmt.Errorf("not support key %s for mpt set", hex.EncodeToString(key)))
 	}
@@ -238,16 +241,20 @@ func (ms *MptStore) Set(key, value []byte) {
 }
 
 func (ms *MptStore) Delete(key []byte) {
-	if ms.prefetcher != nil {
-		ms.prefetcher.Used(ms.originalRoot, [][]byte{key})
-	}
 	switch mptKeyType(key) {
 	case storageType:
 		addr, stateRoot, realKey := decodeAddressStorageInfo(key)
 		t := ms.tryGetStorageTrie(addr, stateRoot, true)
 		t.TryDelete(realKey)
+		if ms.prefetcher != nil {
+			addrHash := mpttype.Keccak256HashWithSyncPool(addr[:])
+			ms.prefetcher.used(addrHash, ms.originalRoot, realKey)
+		}
 	case addressType:
 		ms.trie.TryDelete(key)
+		if ms.prefetcher != nil {
+			ms.prefetcher.used(ethcmn.Hash{}, ms.originalRoot, key)
+		}
 	default:
 		panic(fmt.Errorf("not support key %s for mpt delete", hex.EncodeToString(key)))
 
@@ -591,19 +598,16 @@ func getVersionedWithProof(trie ethstate.Trie, key []byte) ([]byte, [][]byte, er
 
 func (ms *MptStore) StartPrefetcher(namespace string) {
 
-	if ms.prefetcher != nil {
-		ms.prefetcher.Close()
-		ms.prefetcher = nil
-	}
+	ms.StopPrefetcher()
 
-	ms.prefetcher = NewTriePrefetcher(ms.db, ms.originalRoot, namespace)
+	ms.prefetcher = newTriePrefetcher(ms.db, ms.originalRoot, namespace)
 }
 
 // StopPrefetcher terminates a running prefetcher and reports any leftover stats
 // from the gathered metrics.
 func (ms *MptStore) StopPrefetcher() {
 	if ms.prefetcher != nil {
-		ms.prefetcher.Close()
+		ms.prefetcher.close()
 		ms.prefetcher = nil
 	}
 }
@@ -616,14 +620,18 @@ func (ms *MptStore) prefetchData() {
 				return
 			case <-GAccTryUpdateTrieChannel:
 				if ms.prefetcher != nil {
-					if trie := ms.prefetcher.Trie(ms.originalRoot); trie != nil {
+					if trie := ms.prefetcher.trie(ethcmn.Hash{}, ms.originalRoot); trie != nil {
 						ms.trie = trie
 					}
 				}
 				GAccTrieUpdatedChannel <- struct{}{}
 			case addr := <-GAccToPrefetchChannel:
 				if ms.prefetcher != nil {
-					ms.prefetcher.Prefetch(ms.originalRoot, addr)
+					ms.prefetcher.prefetch(ethcmn.Hash{}, ms.originalRoot, addr)
+				}
+			case data := <-GKeysToPrefetchChannel:
+				if ms.prefetcher != nil {
+					ms.prefetcher.prefetch(data.AddrHash, data.StateRoot, data.Keys)
 				}
 			}
 		}
