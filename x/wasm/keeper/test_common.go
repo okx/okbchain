@@ -4,6 +4,7 @@ import (
 	"encoding/binary"
 	"encoding/json"
 	"fmt"
+	"github.com/okx/okbchain/x/common"
 	"io/ioutil"
 	"os"
 	"testing"
@@ -138,6 +139,7 @@ var TestingStakeParams = stakingtypes.Params{
 	MinDelegation:      sdk.OneDec(),
 	MinSelfDelegation:  sdk.OneDec(),
 	HistoricalEntries:  10,
+	ConsensusType:      common.PoA,
 }
 
 type TestFaucet struct {
@@ -348,7 +350,7 @@ func createTestInput(
 	faucet := NewTestFaucet(t, ctx, bankKeeper, supplyKeeper, mint.ModuleName, sdk.NewCoin("stake", sdk.NewInt(100_000_000_000)))
 
 	// set some funds ot pay out validatores, based on code from:
-	// https://github.com/okex/exchain/libs/cosmos-sdk/blob/fea231556aee4d549d7551a6190389c4328194eb/x/distribution/keeper/keeper_test.go#L50-L57
+	// https://github.com/okx/okbchain/libs/cosmos-sdk/blob/fea231556aee4d549d7551a6190389c4328194eb/x/distribution/keeper/keeper_test.go#L50-L57
 	distrAcc := distKeeper.GetDistributionAccount(ctx)
 	faucet.Fund(ctx, distrAcc.GetAddress(), sdk.NewCoin("stake", sdk.NewInt(2000000)))
 

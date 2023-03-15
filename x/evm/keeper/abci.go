@@ -36,7 +36,6 @@ func (k *Keeper) BeginBlock(ctx sdk.Context, req abci.RequestBeginBlock) {
 	k.SetBlockHeight(ctx, currentHash, height)
 	// Add latest block height and hash to cache
 	k.AddHeightHashToCache(req.Header.GetHeight(), blockHash.Hex())
-
 	// reset counters that are used on CommitStateDB.Prepare
 	if !ctx.IsTraceTx() {
 		k.Bloom = big.NewInt(0)
@@ -47,8 +46,6 @@ func (k *Keeper) BeginBlock(ctx sdk.Context, req abci.RequestBeginBlock) {
 
 		//that can make sure latest block has been committed
 		k.UpdatedAccount = k.UpdatedAccount[:0]
-		k.EvmStateDb = types.CreateEmptyCommitStateDB(k.GenerateCSDBParams(), ctx)
-		k.EvmStateDb.StartPrefetcher("evm")
 		k.Watcher.NewHeight(uint64(req.Header.GetHeight()), blockHash, req.Header)
 	}
 
@@ -120,8 +117,6 @@ func (k *Keeper) EndBlock(ctx sdk.Context, req abci.RequestEndBlock) []abci.Vali
 	}
 
 	k.UpdateInnerBlockData()
-
-	k.EvmStateDb.WithContext(ctx).Commit(true)
 
 	return []abci.ValidatorUpdate{}
 }

@@ -62,14 +62,12 @@ type Keeper struct {
 	// add inner block data
 	innerBlockData BlockInnerData
 
-	EvmStateDb     *types.CommitStateDB
 	UpdatedAccount []ethcmn.Address
 
 	db ethstate.Database
 
 	startHeight uint64
 	triegc      *prque.Prque
-	cmLock      sync.Mutex
 
 	// cache chain config
 	cci *chainConfigInfo
@@ -143,7 +141,6 @@ func NewKeeper(
 	ak.SetObserverKeeper(k)
 
 	//k.OpenTrie()
-	k.EvmStateDb = types.NewCommitStateDB(k.GenerateCSDBParams())
 	return k
 }
 
@@ -179,7 +176,6 @@ func NewSimulateKeeper(
 	}
 
 	//k.OpenTrie()
-	k.EvmStateDb = types.NewCommitStateDB(k.GenerateCSDBParams())
 
 	return k
 }

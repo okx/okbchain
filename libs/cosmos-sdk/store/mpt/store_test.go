@@ -4,6 +4,7 @@ import (
 	"crypto/rand"
 	"fmt"
 	"io/ioutil"
+	"math/big"
 	"os"
 	"sync"
 	"testing"
@@ -12,17 +13,21 @@ import (
 	"github.com/ethereum/go-ethereum/core/rawdb"
 	"github.com/ethereum/go-ethereum/core/state"
 	"github.com/ethereum/go-ethereum/ethdb/memorydb"
-	"github.com/stretchr/testify/require"
-
+	trie2 "github.com/ethereum/go-ethereum/trie"
 	"github.com/okx/okbchain/libs/cosmos-sdk/client/flags"
 	"github.com/okx/okbchain/libs/cosmos-sdk/store/types"
 	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
 	"github.com/spf13/viper"
+	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
 )
 
 var (
-	commonKeys   = []string{"key1", "key2", "key3", "key4", "key5"}
+	commonKeys = [][]byte{AddressStoreKey(common.BigToAddress(new(big.Int).SetInt64(1)).Bytes()),
+		AddressStoreKey(common.BigToAddress(new(big.Int).SetInt64(2)).Bytes()),
+		AddressStoreKey(common.BigToAddress(new(big.Int).SetInt64(3)).Bytes()),
+		AddressStoreKey(common.BigToAddress(new(big.Int).SetInt64(4)).Bytes()),
+		AddressStoreKey(common.BigToAddress(new(big.Int).SetInt64(5)).Bytes())}
 	commonValues = []string{"value1", "value2", "value3", "value4", "value5"}
 
 	randKeyNum = 1000
@@ -61,8 +66,9 @@ func (suite *StoreTestSuite) SetupTest() {
 		mptStore.Set([]byte(key), []byte(commonValues[0]))
 	}
 	for i := 0; i < randKeyNum; i++ {
-		key := randBytes(12)
+		key := randBytes(20)
 		value := randBytes(32)
+		key = AddressStoreKey(key)
 		mptStore.Set(key, value)
 	}
 	mptStore.CommitterCommit(nil)
@@ -133,7 +139,7 @@ func (suite *StoreTestSuite) TestMPTStoreNoNilSet() {
 
 func (suite *StoreTestSuite) TestGetImmutable() {
 	store := suite.mptStore
-	key := []byte(commonKeys[0])
+	key := commonKeys[0]
 	oldValue := store.Get(key)
 
 	newValue := randBytes(32)
@@ -152,7 +158,7 @@ func (suite *StoreTestSuite) TestGetImmutable() {
 	suite.Require().Equal(curStore.Get(key), newValue)
 
 	suite.Require().Panics(func() { curStore.Set(nil, nil) })
-	suite.Require().NotPanics(func() { curStore.Delete(nil) })
+	suite.Require().Panics(func() { curStore.Delete(nil) })
 }
 
 func (suite *StoreTestSuite) TestTestIterator() {
@@ -169,7 +175,7 @@ func (suite *StoreTestSuite) TestTestIterator() {
 }
 
 func nextVersion(iStore *MptStore) {
-	key := []byte(fmt.Sprintf("Key for tree: %d", iStore.LastCommitID().Version))
+	key := AddressStoreKey(common.BigToAddress(new(big.Int).SetInt64(iStore.LastCommitID().Version)).Bytes())
 	value := []byte(fmt.Sprintf("Value for tree: %d", iStore.LastCommitID().Version))
 	iStore.Set(key, value)
 	iStore.CommitterCommit(nil)
@@ -256,52 +262,6 @@ func (suite *StoreTestSuite) TestMPTStoreQuery() {
 	suite.Require().Equal(v3, qres.Value)
 }
 
-func TestTrieReadBad(t *testing.T) {
-	db := memorydb.New()
-
-	trie, err := state.NewDatabase(rawdb.NewDatabase(db)).OpenTrie(common.Hash{})
-	require.NoError(t, err)
-	require.NotNilf(t, trie, "trie is nil")
-
-	err = trie.TryUpdate([]byte("key1"), []byte("value1"))
-	require.NoError(t, err)
-
-	wg := sync.WaitGroup{}
-	wg.Add(2)
-
-	go func() {
-		defer wg.Done()
-		var res = map[string]struct{}{}
-		for i := 0; i < 10000; i++ {
-			value, err := trie.TryGet([]byte("key1"))
-			require.NoError(t, err)
-			res[string(value)] = struct{}{}
-			//require.Equal(t, []byte("value1"), value)
-		}
-		for v := range res {
-			t.Logf("bad read key1 value:\"%s\"", v)
-		}
-		delete(res, "value1")
-		require.NotEqual(t, 0, len(res))
-	}()
-
-	go func() {
-		defer wg.Done()
-		var res = map[string]struct{}{}
-		for i := 0; i < 10000; i++ {
-			value, _ := trie.TryGet([]byte("key2"))
-			res[string(value)] = struct{}{}
-			//require.Len(t, value, 0)
-		}
-		for v := range res {
-			t.Logf("bad read key2 value:\"%s\"", v)
-		}
-		require.NotEqual(t, 0, len(res))
-		require.NotEqual(t, 1, len(res))
-	}()
-	wg.Wait()
-}
-
 func TestTrieReadGood(t *testing.T) {
 	db := memorydb.New()
 
@@ -353,8 +313,13 @@ func TestSeparateTrieRead(t *testing.T) {
 		err = trie.TryUpdate([]byte(fmt.Sprintf("key%d", i)), []byte(fmt.Sprintf("value%d", i)))
 		require.NoError(t, err)
 	}
+	nodes := trie2.NewMergedNodeSet()
+	root, set, err := trie.Commit(false)
+	require.NoError(t, err)
 
-	root, err := trie.Commit(nil)
+	err = nodes.Merge(set)
+	require.NoError(t, err)
+	err = stateDb.TrieDB().Update(nodes)
 	require.NoError(t, err)
 
 	wg := sync.WaitGroup{}
