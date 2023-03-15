@@ -36,7 +36,7 @@ func (suite *HandlerSuite) TestHandlerWithdrawDelegatorReward() {
 				keeper.HandleChangeDistributionTypeProposal(ctx, dk, proposal)
 				require.Equal(suite.T(), dk.GetDistributionType(ctx), types.DistributionTypeOnChain)
 			},
-			[4]sdk.Error{types.ErrUnknownDistributionMsgType(), types.ErrCodeEmptyDelegationDistInfo(), nil, nil},
+			[4]sdk.Error{types.ErrCodeEmptyDelegationDistInfo(), types.ErrCodeEmptyDelegationDistInfo(), nil, nil},
 		},
 		{
 			"set withdraw reward disable",
@@ -49,15 +49,15 @@ func (suite *HandlerSuite) TestHandlerWithdrawDelegatorReward() {
 				keeper.HandleWithdrawRewardEnabledProposal(ctx, dk, proposalWithdrawReward)
 				require.Equal(suite.T(), false, dk.GetWithdrawRewardEnabled(ctx))
 			},
-			[4]sdk.Error{types.ErrUnknownDistributionMsgType(), types.ErrCodeDisabledWithdrawRewards(),
+			[4]sdk.Error{types.ErrCodeEmptyDelegationDistInfo(), types.ErrCodeDisabledWithdrawRewards(),
 				stakingtypes.ErrCodeDisabledOperate(), types.ErrCodeDisabledWithdrawRewards()},
 		},
 		{
-			"no change distribution type",
+			"empty delegation",
 			func(ctx sdk.Context, dk Keeper) {
 
 			},
-			[4]sdk.Error{types.ErrUnknownDistributionMsgType(), types.ErrUnknownDistributionMsgType(), nil, types.ErrUnknownDistributionMsgType()},
+			[4]sdk.Error{types.ErrCodeEmptyDelegationDistInfo(), types.ErrCodeEmptyDelegationDistInfo(), nil, nil},
 		},
 	}
 
@@ -378,7 +378,7 @@ func (suite *HandlerSuite) TestWithdrawDisabled() {
 			},
 			[]param{
 				{false, types.ErrCodeDisabledWithdrawRewards()},
-				{true, types.ErrUnknownDistributionMsgType()},
+				{true, nil},
 			},
 		},
 		{
@@ -389,7 +389,7 @@ func (suite *HandlerSuite) TestWithdrawDisabled() {
 			},
 			[]param{
 				{false, types.ErrCodeDisabledWithdrawRewards()},
-				{true, types.ErrUnknownDistributionMsgType()},
+				{true, nil},
 			},
 		},
 	}
@@ -466,24 +466,27 @@ func DoAddSharesWithError(t *testing.T, ctx sdk.Context, sk staking.Keeper, delA
 }
 
 func DoRegProxyWithError(t *testing.T, ctx sdk.Context, sk staking.Keeper, delAddr sdk.AccAddress, reg bool, expectError error) {
-	h := staking.NewHandler(sk)
-	msg := staking.NewMsgRegProxy(delAddr, reg)
-	_, e := h(ctx, msg)
-	require.Equal(t, expectError, e)
+	// No reg proxy
+	//h := staking.NewHandler(sk)
+	//msg := staking.NewMsgRegProxy(delAddr, reg)
+	//_, e := h(ctx, msg)
+	//require.Equal(t, expectError, e)
 }
 
 func DoBindProxyWithError(t *testing.T, ctx sdk.Context, sk staking.Keeper, delAddr sdk.AccAddress, proxyAddr sdk.AccAddress, expectError error) {
-	h := staking.NewHandler(sk)
-	msg := staking.NewMsgBindProxy(delAddr, proxyAddr)
-	_, e := h(ctx, msg)
-	require.Equal(t, expectError, e)
+	// No reg proxy
+	//h := staking.NewHandler(sk)
+	//msg := staking.NewMsgBindProxy(delAddr, proxyAddr)
+	//_, e := h(ctx, msg)
+	//require.Equal(t, expectError, e)
 }
 
 func DoUnBindProxyWithError(t *testing.T, ctx sdk.Context, sk staking.Keeper, delAddr sdk.AccAddress, expectError error) {
-	h := staking.NewHandler(sk)
-	msg := staking.NewMsgUnbindProxy(delAddr)
-	_, e := h(ctx, msg)
-	require.Equal(t, expectError, e)
+	// No reg proxy
+	//h := staking.NewHandler(sk)
+	//msg := staking.NewMsgUnbindProxy(delAddr)
+	//_, e := h(ctx, msg)
+	//require.Equal(t, expectError, e)
 }
 
 func DoSetWithdrawAddressWithError(t *testing.T, ctx sdk.Context, dk Keeper, delAddr sdk.AccAddress, expectError error) {

@@ -1,6 +1,7 @@
 package keeper_test
 
 import (
+	dbm "github.com/okx/okbchain/libs/tm-db"
 	"math/big"
 	"testing"
 	"time"
@@ -60,6 +61,7 @@ func (suite *KeeperTestSuite) SetupTest() {
 }
 
 func TestKeeperTestSuite(t *testing.T) {
+	viper.Set(sdk.FlagDBBackend, string(dbm.MemDBBackend))
 	suite.Run(t, new(KeeperTestSuite))
 }
 
@@ -145,8 +147,9 @@ func (suite *KeeperTestSuite) TestDBStorage() {
 	bloom := suite.app.EvmKeeper.GetBlockBloom(suite.ctx, 4)
 	suite.Require().Equal(bloom, testBloom)
 
-	suite.stateDB.WithContext(suite.ctx).IntermediateRoot(false)
-
+	suite.stateDB.WithContext(suite.ctx).Commit(false)
+	suite.app.Commit(abci.RequestCommit{})
+	types.ResetCommitStateDB(suite.stateDB, suite.app.EvmKeeper.GenerateCSDBParams(), &suite.ctx)
 	stg, err := suite.app.EvmKeeper.GetAccountStorage(suite.ctx, suite.address)
 	suite.Require().NoError(err, "failed to get account storage")
 	suite.Require().Equal(stg[0].Value, ethcmn.HexToHash("0x3"))
@@ -154,9 +157,6 @@ func (suite *KeeperTestSuite) TestDBStorage() {
 	// commit stateDB
 	_, err = suite.stateDB.WithContext(suite.ctx).Commit(false)
 	suite.Require().NoError(err, "failed to commit StateDB")
-
-	// simulate BaseApp EndBlocker commitment
-	suite.app.Commit(abci.RequestCommit{})
 }
 
 func (suite *KeeperTestSuite) TestChainConfig() {

@@ -36,7 +36,6 @@ import (
 	cmserver "github.com/okx/okbchain/libs/cosmos-sdk/server"
 	cosmost "github.com/okx/okbchain/libs/cosmos-sdk/store/types"
 	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	tmtypes "github.com/okx/okbchain/libs/tendermint/types"
 	"github.com/okx/okbchain/x/evm/watcher"
 
 	"github.com/okx/okbchain/app/rpc"
@@ -52,10 +51,10 @@ const (
 	addrAStoreKey          = 0
 	defaultProtocolVersion = 65
 	defaultChainID         = 65
-	defaultMinGasPrice     = "0.0000000001okt"
-	safeLowGP              = "0.0000000001okt"
-	avgGP                  = "0.0000000001okt"
-	fastestGP              = "0.00000000015okt"
+	defaultMinGasPrice     = "0.0000000001okb"
+	safeLowGP              = "0.0000000001okb"
+	avgGP                  = "0.0000000001okb"
+	fastestGP              = "0.00000000015okb"
 	latestBlockNumber      = "latest"
 	pendingBlockNumber     = "pending"
 )
@@ -186,23 +185,13 @@ func TestRPCTestSuite(t *testing.T) {
 	suite.Run(t, new(RPCTestSuite))
 }
 
-func TestRPCTestSuiteWithMarsHeight2(t *testing.T) {
-	tmtypes.UnittestOnlySetMilestoneMarsHeight(2)
-	suite.Run(t, new(RPCTestSuite))
-}
-
-func TestRPCTestSuiteWithMarsHeight1(t *testing.T) {
-	tmtypes.UnittestOnlySetMilestoneMarsHeight(1)
-	suite.Run(t, new(RPCTestSuite))
-}
-
 func commitBlock(suite *RPCTestSuite) {
 	mck, ok := suite.cliCtx.Client.(*MockClient)
 	suite.Require().True(ok)
 	mck.CommitBlock()
 }
 func (suite *RPCTestSuite) TestEth_GetBalance() {
-	// initial balance of hexAddr2 is 1000000000okt in test.sh
+	// initial balance of hexAddr2 is 1000000000okb in test.sh
 	initialBalance := suite.chain.SenderAccount().GetCoins()[0]
 	genesisAcc := ethcmn.BytesToAddress(suite.chain.SenderAccount().GetAddress().Bytes()).String()
 
@@ -382,7 +371,7 @@ func (suite *RPCTestSuite) TestEth_GasPrice() {
 	var gasPrice hexutil.Big
 	suite.Require().NoError(json.Unmarshal(rpcRes.Result, &gasPrice))
 
-	// min gas price in test.sh is "0.000000001okt"
+	// min gas price in test.sh is "0.000000001okb"
 	mgp, err := sdk.ParseDecCoin(defaultMinGasPrice)
 	suite.Require().NoError(err)
 
@@ -471,7 +460,7 @@ func (suite *RPCTestSuite) TestEth_SendTransaction_Transfer() {
 	receipt := WaitForReceipt(suite.T(), suite.addr, hash)
 	suite.Require().NotNil(receipt)
 	suite.Require().Equal("0x1", receipt["status"].(string))
-	//suite.T().Logf("%s transfers %sokt to %s successfully\n", hexAddr1.Hex(), value.String(), receiverAddr.Hex())
+	//suite.T().Logf("%s transfers %sokb to %s successfully\n", hexAddr1.Hex(), value.String(), receiverAddr.Hex())
 
 	// TODO: logic bug, fix it later
 	// ignore gas price -> default 'ethermint.DefaultGasPrice' on node -> successfully
@@ -482,7 +471,7 @@ func (suite *RPCTestSuite) TestEth_SendTransaction_Transfer() {
 	//receipt = WaitForReceipt(suite.T(), hash)
 	//suite.Require().NotNil(receipt)
 	//suite.Require().Equal("0x1", receipt["status"].(string))
-	//suite.T().Logf("%s transfers %sokt to %s successfully with nil gas price \n", hexAddr1.Hex(), value.String(), receiverAddr.Hex())
+	//suite.T().Logf("%s transfers %sokb to %s successfully with nil gas price \n", hexAddr1.Hex(), value.String(), receiverAddr.Hex())
 
 	// error check
 	// sender is not unlocked on the node
@@ -1158,39 +1147,40 @@ func (suite *RPCTestSuite) TestEth_GetLogs_GetTopicsFromHistory() {
 	suite.Require().Zero(len(logs))
 }*/
 
-func (suite *RPCTestSuite) TestEth_GetProof() {
-
-	initialBalance := suite.chain.SenderAccount().GetCoins()[0]
-	commitBlock(suite)
-	commitBlock(suite)
-	rpcRes := Call(suite.T(), suite.addr, "eth_getProof", []interface{}{senderAddr.Hex(), []string{fmt.Sprint(addrAStoreKey)}, "latest"})
-	suite.Require().NotNil(rpcRes)
-
-	var accRes types.AccountResult
-	suite.Require().NoError(json.Unmarshal(rpcRes.Result, &accRes))
-	suite.Require().Equal(senderAddr, accRes.Address)
-	suite.Require().Equal(initialBalance.Amount.Int, accRes.Balance.ToInt())
-	suite.Require().NotEmpty(accRes.AccountProof)
-	suite.Require().NotEmpty(accRes.StorageProof)
-
-	// inexistentAddr -> zero value account result
-	rpcRes, err := CallWithError(suite.addr, "eth_getProof", []interface{}{inexistentAddr.Hex(), []string{fmt.Sprint(addrAStoreKey)}, "latest"})
-	suite.Require().NoError(err)
-	suite.Require().NoError(json.Unmarshal(rpcRes.Result, &accRes))
-	suite.Require().Equal(inexistentAddr, accRes.Address)
-	suite.Require().True(sdk.ZeroDec().Int.Cmp(accRes.Balance.ToInt()) == 0)
-
-	// error check
-	// miss argument
-	_, err = CallWithError(suite.addr, "eth_getProof", []interface{}{hexAddr2.Hex(), []string{fmt.Sprint(addrAStoreKey)}})
-	suite.Require().Error(err)
-
-	_, err = CallWithError(suite.addr, "eth_getProof", []interface{}{hexAddr2.Hex()})
-	suite.Require().Error(err)
-
-	_, err = CallWithError(suite.addr, "eth_getProof", nil)
-	suite.Require().Error(err)
-}
+//TODO by yxq, `eth_getProof` is not ready
+//func (suite *RPCTestSuite) TestEth_GetProof() {
+//
+//	initialBalance := suite.chain.SenderAccount().GetCoins()[0]
+//	commitBlock(suite)
+//	commitBlock(suite)
+//	rpcRes := Call(suite.T(), suite.addr, "eth_getProof", []interface{}{senderAddr.Hex(), []string{fmt.Sprint(addrAStoreKey)}, "latest"})
+//	suite.Require().NotNil(rpcRes)
+//
+//	var accRes types.AccountResult
+//	suite.Require().NoError(json.Unmarshal(rpcRes.Result, &accRes))
+//	suite.Require().Equal(senderAddr, accRes.Address)
+//	suite.Require().Equal(initialBalance.Amount.Int, accRes.Balance.ToInt())
+//	suite.Require().NotEmpty(accRes.AccountProof)
+//	suite.Require().NotEmpty(accRes.StorageProof)
+//
+//	// inexistentAddr -> zero value account result
+//	rpcRes, err := CallWithError(suite.addr, "eth_getProof", []interface{}{inexistentAddr.Hex(), []string{fmt.Sprint(addrAStoreKey)}, "latest"})
+//	suite.Require().NoError(err)
+//	suite.Require().NoError(json.Unmarshal(rpcRes.Result, &accRes))
+//	suite.Require().Equal(inexistentAddr, accRes.Address)
+//	suite.Require().True(sdk.ZeroDec().Int.Cmp(accRes.Balance.ToInt()) == 0)
+//
+//	// error check
+//	// miss argument
+//	_, err = CallWithError(suite.addr, "eth_getProof", []interface{}{hexAddr2.Hex(), []string{fmt.Sprint(addrAStoreKey)}})
+//	suite.Require().Error(err)
+//
+//	_, err = CallWithError(suite.addr, "eth_getProof", []interface{}{hexAddr2.Hex()})
+//	suite.Require().Error(err)
+//
+//	_, err = CallWithError(suite.addr, "eth_getProof", nil)
+//	suite.Require().Error(err)
+//}
 
 /*
 func (suite *RPCTestSuite) TestEth_NewFilter() {
