@@ -3,6 +3,7 @@ package mpt
 import (
 	"encoding/hex"
 	"fmt"
+	cfg "github.com/okx/okbchain/libs/tendermint/config"
 	"io"
 	"sync"
 
@@ -600,7 +601,10 @@ func (ms *MptStore) StartPrefetcher(namespace string) {
 
 	ms.StopPrefetcher()
 
-	ms.prefetcher = newTriePrefetcher(ms.db, ms.originalRoot, namespace)
+	if cfg.DynamicConfig.GetEnablePGU() {
+		ms.prefetcher = newTriePrefetcher(ms.db, ms.originalRoot, namespace)
+	}
+
 }
 
 // StopPrefetcher terminates a running prefetcher and reports any leftover stats
