@@ -8,7 +8,6 @@ import (
 	"github.com/okx/okbchain/libs/cosmos-sdk/store"
 	"github.com/okx/okbchain/libs/cosmos-sdk/store/mpt"
 	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/auth"
 	"github.com/okx/okbchain/libs/cosmos-sdk/x/params"
 	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
 	tmlog "github.com/okx/okbchain/libs/tendermint/libs/log"
@@ -42,10 +41,8 @@ func NewEvmFactory(chainId string, q *watcher.Querier) EvmFactory {
 func initCommitMultiStore(storeKey *sdk.KVStoreKey) (sdk.CommitMultiStore, *sdk.KVStoreKey, *sdk.TransientStoreKey) {
 	db := dbm.NewMemDB()
 	cms := store.NewCommitMultiStore(db)
-	authKey := sdk.NewKVStoreKey(auth.StoreKey)
 	paramsKey := sdk.NewKVStoreKey(params.StoreKey)
 	paramsTKey := sdk.NewTransientStoreKey(params.TStoreKey)
-	cms.MountStoreWithDB(authKey, sdk.StoreTypeIAVL, db)
 	cms.MountStoreWithDB(paramsKey, sdk.StoreTypeIAVL, db)
 	cms.MountStoreWithDB(storeKey, sdk.StoreTypeMPT, db)
 	cms.MountStoreWithDB(paramsTKey, sdk.StoreTypeTransient, db)
