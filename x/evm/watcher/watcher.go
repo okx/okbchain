@@ -219,12 +219,13 @@ func (w *Watcher) SaveBlock(bloom ethtypes.Bloom) {
 	if w.InfuraKeeper != nil {
 		w.InfuraKeeper.OnSaveBlock(block)
 	}
-	wMsg := NewMsgBlock(block)
+	ethBlockHash := block.EthHash()
+	wMsg := NewMsgBlock(block, ethBlockHash)
 	if wMsg != nil {
 		w.batch = append(w.batch, wMsg)
 	}
 
-	wInfo := NewMsgBlockInfo(w.height, w.blockHash)
+	wInfo := NewMsgBlockInfo(w.height, ethBlockHash)
 	if wInfo != nil {
 		w.batch = append(w.batch, wInfo)
 	}
@@ -598,7 +599,7 @@ func filterDirtyList(datas [][]byte) [][]byte {
 	return ret
 }
 
-/////////// job
+// ///////// job
 func (w *Watcher) jobRoutine() {
 	if !w.Enabled() {
 		return

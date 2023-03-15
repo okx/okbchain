@@ -44,6 +44,7 @@ const (
 )
 
 var ErrTimeout = errors.New("query timeout exceeded")
+var ErrInvalidBlock = errors.New("invalid block with unknown transactions")
 
 // Backend implements the functionality needed to filter changes.
 // Implemented by EthermintBackend.
@@ -454,24 +455,34 @@ func (b *EthermintBackend) GetTransactionByHash(hash common.Hash) (tx *watcher.T
 
 // GetLogs returns all the logs from all the ethereum transactions in a block.
 func (b *EthermintBackend) GetLogs(height int64) ([][]*ethtypes.Log, error) {
-	block, err := b.Block(&height)
+	block, err := b.GetBlockByNumber(rpctypes.BlockNumber(height), false)
 	if err != nil {
 		return nil, err
 	}
+	transactions, ok := block.Transactions.([]interface{})
+	if !ok {
+		return nil, ErrInvalidBlock
+	}
+	txs := make([]common.Hash, len(transactions))
+	for i, txHash := range transactions {
+		txs[i] = common.HexToHash(txHash.(string))
+	}
+
+	ethBlockHash := block.EthHash()
 	// return empty directly when block was produced during stress testing.
 	var blockLogs = [][]*ethtypes.Log{}
-	if b.logsLimit > 0 && len(block.Block.Txs) > b.logsLimit {
+	if b.logsLimit > 0 && len(txs) > b.logsLimit {
 		return blockLogs, nil
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(b.logsTimeout)*time.Second)
 	defer cancel()
-	for _, tx := range block.Block.Txs {
+	for _, tx := range txs {
 		select {
 		case <-ctx.Done():
 			return nil, ErrTimeout
 		default:
 			// NOTE: we query the state in case the tx result logs are not persisted after an upgrade.
-			txRes, err := b.clientCtx.Client.Tx(tx.Hash(), !b.clientCtx.TrustNode)
+			txRes, err := b.clientCtx.Client.Tx(tx.Bytes(), !b.clientCtx.TrustNode)
 			if err != nil {
 				continue
 			}
@@ -481,7 +492,8 @@ func (b *EthermintBackend) GetLogs(height int64) ([][]*ethtypes.Log, error) {
 			}
 			var validLogs []*ethtypes.Log
 			for _, log := range execRes.Logs {
-				if int64(log.BlockNumber) == block.Block.Height {
+				if log.BlockNumber == uint64(block.Number) {
+					log.BlockHash = ethBlockHash
 					validLogs = append(validLogs, log)
 				}
 			}

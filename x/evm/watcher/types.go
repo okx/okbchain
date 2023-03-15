@@ -584,7 +584,7 @@ func (n *BlockNonce) UnmarshalText(input []byte) error {
 // Block represents a transaction returned to RPC clients.
 type Block struct {
 	Number           hexutil.Uint64 `json:"number"`
-	Hash             common.Hash    `json:"hash"`
+	Hash             common.Hash    `json:"hash" rlp:"-"`
 	ParentHash       common.Hash    `json:"parentHash"`
 	Nonce            BlockNonce     `json:"nonce"`
 	UncleHash        common.Hash    `json:"sha3Uncles"`
@@ -594,15 +594,36 @@ type Block struct {
 	Miner            common.Address `json:"miner"`
 	MixHash          common.Hash    `json:"mixHash"`
 	Difficulty       hexutil.Uint64 `json:"difficulty"`
-	TotalDifficulty  hexutil.Uint64 `json:"totalDifficulty"`
+	TotalDifficulty  hexutil.Uint64 `json:"totalDifficulty" rlp:"-"`
 	ExtraData        hexutil.Bytes  `json:"extraData"`
-	Size             hexutil.Uint64 `json:"size"`
+	Size             hexutil.Uint64 `json:"size" rlp:"-"`
 	GasLimit         hexutil.Uint64 `json:"gasLimit"`
 	GasUsed          *hexutil.Big   `json:"gasUsed"`
 	Timestamp        hexutil.Uint64 `json:"timestamp"`
-	Uncles           []common.Hash  `json:"uncles"`
+	Uncles           []common.Hash  `json:"uncles" rlp:"-"`
 	ReceiptsRoot     common.Hash    `json:"receiptsRoot"`
-	Transactions     interface{}    `json:"transactions"`
+	Transactions     interface{}    `json:"transactions" rlp:"-"`
+}
+
+// EthHash returns block hash encode by rlp for being compatible with ethereum
+func (b *Block) EthHash() common.Hash {
+	var enc ethtypes.Header
+	enc.ParentHash = b.ParentHash
+	enc.UncleHash = b.UncleHash
+	enc.Coinbase = b.Miner
+	enc.Root = b.StateRoot
+	enc.TxHash = b.TransactionsRoot
+	enc.ReceiptHash = b.ReceiptsRoot
+	enc.Bloom = b.LogsBloom
+	enc.Difficulty = big.NewInt(int64(b.Difficulty))
+	enc.Number = big.NewInt(int64(b.Number))
+	enc.GasLimit = uint64(b.GasLimit)
+	enc.GasUsed = b.GasUsed.ToInt().Uint64()
+	enc.Time = uint64(b.Timestamp)
+	enc.Extra = b.ExtraData
+	enc.MixDigest = b.MixHash
+	enc.Nonce = ethtypes.BlockNonce(b.Nonce)
+	return rlpHash(&enc)
 }
 
 // Transaction represents a transaction returned to RPC clients.
@@ -673,7 +694,7 @@ func newBlock(height uint64, blockBloom ethtypes.Bloom, blockHash common.Hash, h
 		Hash:             blockHash,
 		ParentHash:       common.BytesToHash(header.LastBlockId.Hash),
 		Nonce:            BlockNonce{},
-		UncleHash:        common.Hash{},
+		UncleHash:        ethtypes.EmptyUncleHash,
 		LogsBloom:        blockBloom,
 		TransactionsRoot: transactionsRoot,
 		StateRoot:        common.BytesToHash(header.AppHash),
@@ -687,17 +708,17 @@ func newBlock(height uint64, blockBloom ethtypes.Bloom, blockHash common.Hash, h
 		GasUsed:          (*hexutil.Big)(gasUsed),
 		Timestamp:        hexutil.Uint64(timestamp),
 		Uncles:           []common.Hash{},
-		ReceiptsRoot:     common.Hash{},
+		ReceiptsRoot:     ethtypes.EmptyRootHash,
 		Transactions:     txs,
 	}
 }
 
-func NewMsgBlock(b Block) *MsgBlock {
+func NewMsgBlock(b Block, blockHash common.Hash) *MsgBlock {
 	jsBlock, e := json.Marshal(b)
 	if e != nil {
 		return nil
 	}
-	return &MsgBlock{blockHash: b.Hash.Bytes(), block: string(jsBlock)}
+	return &MsgBlock{blockHash: blockHash.Bytes(), block: string(jsBlock)}
 }
 
 func (m MsgBlock) GetKey() []byte {
