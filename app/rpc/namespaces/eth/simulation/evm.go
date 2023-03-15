@@ -47,7 +47,7 @@ func initCommitMultiStore(storeKey *sdk.KVStoreKey) (sdk.CommitMultiStore, *sdk.
 	paramsTKey := sdk.NewTransientStoreKey(params.TStoreKey)
 	cms.MountStoreWithDB(authKey, sdk.StoreTypeIAVL, db)
 	cms.MountStoreWithDB(paramsKey, sdk.StoreTypeIAVL, db)
-	cms.MountStoreWithDB(storeKey, sdk.StoreTypeIAVL, db)
+	cms.MountStoreWithDB(storeKey, sdk.StoreTypeMPT, db)
 	cms.MountStoreWithDB(paramsTKey, sdk.StoreTypeTransient, db)
 	cms.LoadLatestVersion()
 	return cms, paramsKey, paramsTKey
