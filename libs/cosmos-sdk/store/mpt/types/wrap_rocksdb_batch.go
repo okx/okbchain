@@ -72,7 +72,7 @@ var (
 
 func InstanceBatchCache() *BatchCache {
 	initRocksdbBatchOnce.Do(func() {
-		gBatchCache = NewBatchCache(int(1000))
+		gBatchCache = NewBatchCache(int(TrieRocksdbBatchSize))
 	})
 
 	return gBatchCache
