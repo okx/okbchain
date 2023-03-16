@@ -47,6 +47,7 @@ func InstanceOfMptStore() ethstate.Database {
 			Cache:     int(TrieCacheSize),
 			Journal:   "",
 			Preimages: true,
+			EnableAC:  EnableAsyncCommit,
 		})
 	})
 
