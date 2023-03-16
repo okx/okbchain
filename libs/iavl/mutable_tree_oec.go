@@ -18,9 +18,7 @@ const (
 	FlagIavlMinCommitItemCount      = "iavl-min-commit-item-count"
 	FlagIavlHeightOrphansCacheSize  = "iavl-height-orphans-cache-size"
 	FlagIavlMaxCommittedHeightNum   = "iavl-max-committed-height-num"
-	FlagIavlEnableAsyncCommit       = "iavl-enable-async-commit"
 	FlagIavlFastStorageCacheSize    = "iavl-fast-storage-cache-size"
-	FlagIavlEnableFastStorage       = "iavl-enable-fast-storage"
 	FlagIavlDiscardFastStorage      = "discard-fast-storage"
 	DefaultIavlFastStorageCacheSize = 10000000
 )
