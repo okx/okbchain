@@ -279,8 +279,6 @@ func (ms *MptStore) ReverseIterator(start, end []byte) types.Iterator {
 func (ms *MptStore) CommitterCommit(inputDelta interface{}) (rootHash types.CommitID, outputDelta interface{}) {
 	ms.version++
 
-	fmt.Println("fsc:test================CommitterCommit:", ms.version, "c:", applyDelta, "p", produceDelta)
-
 	// stop pre round prefetch
 	ms.StopPrefetcher()
 	nodeSets := trie.NewMergedNodeSet()
