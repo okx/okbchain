@@ -117,6 +117,9 @@ func (p *triePrefetcher) prefetch(owner common.Hash, root common.Hash, keys [][]
 // trie returns the trie matching the root hash, or nil if the prefetcher doesn't
 // have it.
 func (p *triePrefetcher) trie(owner common.Hash, root common.Hash) ethstate.Trie {
+	if p == nil {
+		return nil
+	}
 	p.RLock()
 	defer p.RUnlock()
 

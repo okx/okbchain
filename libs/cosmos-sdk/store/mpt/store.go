@@ -276,7 +276,7 @@ func (ms *MptStore) CommitterCommit(delta *iavl.TreeDelta) (types.CommitID, *iav
 	ms.version++
 
 	// stop pre round prefetch
-	ms.StopPrefetcher()
+	//ms.StopPrefetcher()
 	nodeSets := trie.NewMergedNodeSet()
 	for addr, v := range ms.storageTrieForWrite {
 		stateR, set, err := v.Commit(false)
@@ -318,6 +318,14 @@ func (ms *MptStore) CommitterCommit(delta *iavl.TreeDelta) (types.CommitID, *iav
 	}
 	ms.SetMptRootHash(uint64(ms.version), root)
 	ms.originalRoot = root
+	if trie := ms.prefetcher.trie(ethcmn.Hash{}, ms.originalRoot); trie != nil {
+		ms.trie = trie
+	} else {
+		ms.trie, err = ms.db.OpenTrie(root)
+		if err != nil {
+			panic("Fail to open root mpt: " + err.Error())
+		}
+	}
 
 	// TODO: use a thread to push data to database
 	// push data to database
@@ -618,13 +626,13 @@ func (ms *MptStore) prefetchData() {
 			select {
 			case <-ms.exitSignal:
 				return
-			case <-GAccTryUpdateTrieChannel:
-				if ms.prefetcher != nil {
-					if trie := ms.prefetcher.trie(ethcmn.Hash{}, ms.originalRoot); trie != nil {
-						ms.trie = trie
-					}
-				}
-				GAccTrieUpdatedChannel <- struct{}{}
+			//case <-GAccTryUpdateTrieChannel:
+			//	if ms.prefetcher != nil {
+			//		if trie := ms.prefetcher.trie(ethcmn.Hash{}, ms.originalRoot); trie != nil {
+			//			ms.trie = trie
+			//		}
+			//	}
+			//	GAccTrieUpdatedChannel <- struct{}{}
 			case addr := <-GAccToPrefetchChannel:
 				if ms.prefetcher != nil {
 					ms.prefetcher.prefetch(ethcmn.Hash{}, ms.originalRoot, addr)
