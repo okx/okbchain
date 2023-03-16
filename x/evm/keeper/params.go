@@ -28,10 +28,11 @@ func (k *Keeper) getParams(ctx sdk.Context) (params types.Params) {
 
 // SetParams sets the evm parameters to the param space.
 func (k *Keeper) SetParams(ctx sdk.Context, params types.Params) {
-	if k.EvmStateDb != nil {
-		k.EvmStateDb.WithContext(ctx).SetParams(params)
-	}
 
 	k.paramSpace.SetParamSet(ctx, &params)
 	types.GetEvmParamsCache().SetNeedParamsUpdate()
+}
+
+func (k *Keeper) GetParamSubspace() types.Subspace {
+	return k.paramSpace
 }

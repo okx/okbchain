@@ -46,8 +46,6 @@ func (k *Keeper) BeginBlock(ctx sdk.Context, req abci.RequestBeginBlock) {
 
 		//that can make sure latest block has been committed
 		k.UpdatedAccount = k.UpdatedAccount[:0]
-		k.EvmStateDb = types.CreateEmptyCommitStateDB(k.GenerateCSDBParams(), ctx)
-		k.EvmStateDb.StartPrefetcher("evm")
 		k.Watcher.NewHeight(uint64(req.Header.GetHeight()), blockHash, req.Header)
 	}
 
@@ -88,7 +86,7 @@ func (k *Keeper) EndBlock(ctx sdk.Context, req abci.RequestEndBlock) []abci.Vali
 	}
 
 	if watcher.IsWatcherEnabled() && k.Watcher.IsFirstUse() {
-		store := ctx.KVStore(k.storeKey)
+		store := k.GetParamSubspace().CustomKVStore(ctx)
 		iteratorBlockedList := sdk.KVStorePrefixIterator(store, types.KeyPrefixContractBlockedList)
 		defer iteratorBlockedList.Close()
 		for ; iteratorBlockedList.Valid(); iteratorBlockedList.Next() {
@@ -119,8 +117,6 @@ func (k *Keeper) EndBlock(ctx sdk.Context, req abci.RequestEndBlock) []abci.Vali
 	}
 
 	k.UpdateInnerBlockData()
-
-	k.EvmStateDb.WithContext(ctx).Commit(true)
 
 	return []abci.ValidatorUpdate{}
 }

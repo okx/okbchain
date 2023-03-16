@@ -1159,8 +1159,12 @@ func commitStores(version int64, storeMap map[types.StoreKey]types.CommitKVStore
 	outputDeltaMap := tmtypes.NewTreeDelta()
 
 	// updata commit gap height
+	gap := config.DynamicConfig.GetCommitGapHeight()
 	if iavltree.EnableAsyncCommit {
-		iavltree.UpdateCommitGapHeight(config.DynamicConfig.GetCommitGapHeight())
+		iavltree.UpdateCommitGapHeight(gap)
+	}
+	if mpt.EnableAsyncCommit {
+		mpt.UpdateCommitGapHeight(gap)
 	}
 	for key, store := range storeMap {
 		if isUseless(key.Name(), version, store, filters) {
