@@ -6,7 +6,6 @@ package types
 import (
 	"github.com/ethereum/go-ethereum/ethdb"
 	tmdb "github.com/okx/okbchain/libs/tm-db"
-	"sync"
 )
 
 var _ ethdb.Batch = (*WrapRocksDBBatch)(nil)
@@ -20,12 +19,6 @@ type WrapRocksDBBatch struct {
 	db      *tmdb.RocksDB
 	records []record
 	size    int
-}
-
-var batchPool = sync.Pool{
-	New: func() interface{} {
-		return nil
-	},
 }
 
 func NewWrapRocksDBBatch(db *tmdb.RocksDB) *WrapRocksDBBatch {
@@ -54,23 +47,13 @@ func (wrb *WrapRocksDBBatch) ValueSize() int {
 }
 
 func (wrb *WrapRocksDBBatch) Write() error {
-	batch, ok := batchPool.Get().(*tmdb.RocksDBBatch)
-	if !ok {
-		batch = tmdb.NewRocksDBBatch(wrb.db)
-	}
-	defer batchPool.Put(batch)
 	for _, rcd := range wrb.records {
 		if rcd.value != nil {
-			batch.Set(rcd.key, rcd.value)
+			wrb.db.Set(rcd.key, rcd.value)
 		} else {
-			batch.Delete(rcd.key)
+			wrb.db.Delete(rcd.key)
 		}
 	}
-
-	if err := batch.WriteWithoutClose(); err != nil {
-		return err
-	}
-	batch.Reset()
 
 	return nil
 }
