@@ -202,7 +202,6 @@ func (ms *MptStore) flattenPersistSnapshot() error {
 		if err := ms.snaps.Update(root, parent, ms.snapDestructs, ms.snapAccounts, ms.snapStorage); err != nil && ms.logger != nil {
 			ms.logger.Error("Failed to update snapshot tree", "from", parent, "to", root, "err", err)
 		}
-		return ms.snaps.Cap(root, 0)
 	}
-	return fmt.Errorf("snapshot missing")
+	return ms.snaps.Cap(root, 0)
 }
