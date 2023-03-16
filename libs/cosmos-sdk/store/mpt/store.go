@@ -1,9 +1,12 @@
 package mpt
 
 import (
+	"bytes"
 	"encoding/hex"
 	"fmt"
 	"io"
+	stdlog "log"
+	"runtime/debug"
 	"sync"
 	"time"
 
@@ -191,31 +194,44 @@ func (ms *MptStore) Get(key []byte) []byte {
 	switch mptKeyType(key) {
 	case storageType:
 		addr, stateRoot, realKey := decodeAddressStorageInfo(key)
-		value, err := ms.getSnapStorage(addr, realKey)
+		v, err := ms.getSnapStorage(addr, realKey)
 		if err == nil {
-			return value
+			// return v
 		}
 		t := ms.tryGetStorageTrie(addr, stateRoot, false)
-		value, err = t.TryGet(realKey)
+		value, err := t.TryGet(realKey)
 		if err != nil {
 			return nil
 		}
+		if bytes.Compare(v, value) != 0 {
+			ms.logger.Error("storage get not equal", "key", fmt.Sprintf("%x", key))
+			debug.PrintStack()
+		}
+
 		return value
 	case addressType:
 		v, err := ms.getSnapAccount(key)
 		if err == nil {
-			return v
+			//	return v
 		}
 		value, err := ms.db.CopyTrie(ms.trie).TryGet(key)
 		if err != nil {
 			return nil
+		}
+		if bytes.Compare(v, value) != 0 {
+			ms.logger.Error("account get not equal", "key", fmt.Sprintf("%x", key))
+			snapAccount := ms.retriever.DecodeAccount(v)
+			trieAccount := ms.retriever.DecodeAccount(value)
+			stdlog.Printf("snapAccount %v\n", snapAccount)
+			stdlog.Printf("trieAccount %v\n", trieAccount)
+
+			debug.PrintStack()
 		}
 
 		return value
 	default:
 		panic(fmt.Errorf("not support key %s for mpt get", hex.EncodeToString(key)))
 	}
-
 }
 
 func (ms *MptStore) tryGetStorageTrie(addr ethcmn.Address, stateRoot ethcmn.Hash, useCache bool) ethstate.Trie {
