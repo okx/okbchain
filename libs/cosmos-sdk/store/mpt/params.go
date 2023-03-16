@@ -36,10 +36,17 @@ var (
 	KeyPrefixAccRootMptHash        = []byte{0x11}
 	KeyPrefixAccLatestStoredHeight = []byte{0x12}
 
+	GKeysToPrefetchChannel   = make(chan *PreFetcherData, 20000)
 	GAccToPrefetchChannel    = make(chan [][]byte, 2000)
 	GAccTryUpdateTrieChannel = make(chan struct{})
 	GAccTrieUpdatedChannel   = make(chan struct{})
 )
+
+type PreFetcherData struct {
+	AddrHash  ethcmn.Hash
+	StateRoot ethcmn.Hash
+	Keys      [][]byte
+}
 
 var (
 	NilHash = ethcmn.Hash{}

@@ -15,10 +15,9 @@ import (
 	"github.com/okx/okbchain/libs/tendermint/libs/log"
 )
 
-func (csdb *CommitStateDB) CommitMpt(prefetcher *mpt.TriePrefetcher) (ethcmn.Hash, error) {
+func (csdb *CommitStateDB) CommitMpt() (ethcmn.Hash, error) {
 	// Commit objects to the trie, measuring the elapsed time
 	codeWriter := csdb.db.TrieDB().DiskDB().NewBatch()
-	usedAddrs := make([][]byte, 0, len(csdb.stateObjectsPending))
 
 	for addr := range csdb.stateObjectsDirty {
 		if obj := csdb.stateObjects[addr]; !obj.deleted {
@@ -39,8 +38,6 @@ func (csdb *CommitStateDB) CommitMpt(prefetcher *mpt.TriePrefetcher) (ethcmn.Has
 				csdb.accountKeeper.SetAccount(csdb.ctx, ethermintAccount)
 			}
 		}
-
-		usedAddrs = append(usedAddrs, ethcmn.CopyBytes(addr[:])) // Copy needed for closure
 	}
 
 	if len(csdb.stateObjectsDirty) > 0 {
@@ -199,26 +196,4 @@ func (csdb *CommitStateDB) GetProofByHash(addrHash ethcmn.Hash) ([][]byte, error
 
 func (csdb *CommitStateDB) Logger() log.Logger {
 	return csdb.ctx.Logger().With("module", ModuleName)
-}
-
-// StartPrefetcher initializes a new trie prefetcher to pull in nodes from the
-// state trie concurrently while the state is mutated so that when we reach the
-// commit phase, most of the needed data is already hot.
-func (csdb *CommitStateDB) StartPrefetcher(namespace string) {
-
-	if csdb.prefetcher != nil {
-		csdb.prefetcher.Close()
-		csdb.prefetcher = nil
-	}
-
-	//csdb.prefetcher = mpt.NewTriePrefetcher(csdb.db, types2.EmptyRootHash, namespace)
-}
-
-// StopPrefetcher terminates a running prefetcher and reports any leftover stats
-// from the gathered metrics.
-func (csdb *CommitStateDB) StopPrefetcher() {
-	if csdb.prefetcher != nil {
-		csdb.prefetcher.Close()
-		csdb.prefetcher = nil
-	}
 }
