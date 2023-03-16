@@ -211,18 +211,25 @@ func (ms *MptStore) Get(key []byte) []byte {
 		return value
 	case addressType:
 		v, err := ms.getSnapAccount(key)
+		var gotsnapErr bool
 		if err == nil {
 			//	return v
+		} else {
+			gotsnapErr = true
+			ms.logger.Error("snap account get not error", "err", err)
 		}
 		value, err := ms.db.CopyTrie(ms.trie).TryGet(key)
 		if err != nil {
 			return nil
 		}
-		if bytes.Compare(v, value) != 0 {
+		if bytes.Compare(v, value) != 0 || gotsnapErr {
 			ms.logger.Error("account get not equal", "key", fmt.Sprintf("%x", key))
-			snapAccount := ms.retriever.DecodeAccount(v)
+			if !gotsnapErr {
+				snapAccount := ms.retriever.DecodeAccount(v)
+				stdlog.Printf("snapAccount %v\n", snapAccount)
+			}
+
 			trieAccount := ms.retriever.DecodeAccount(value)
-			stdlog.Printf("snapAccount %v\n", snapAccount)
 			stdlog.Printf("trieAccount %v\n", trieAccount)
 
 			debug.PrintStack()
