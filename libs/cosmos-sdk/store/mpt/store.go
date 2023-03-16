@@ -222,11 +222,13 @@ func (ms *MptStore) Get(key []byte) []byte {
 		if err != nil {
 			return nil
 		}
-		if bytes.Compare(v, value) != 0 || gotsnapErr {
-			ms.logger.Error("account get not equal", "key", fmt.Sprintf("%x", key))
+		if bytes.Compare(v, value) != 0 {
 			if !gotsnapErr {
-				snapAccount := ms.retriever.DecodeAccount(v)
-				stdlog.Printf("snapAccount %v\n", snapAccount)
+				ms.logger.Error("account get not equal", "key", fmt.Sprintf("%x", key), "snapv", fmt.Sprintf("snap %x", v), "triev", fmt.Sprintf("trie %v", value))
+				if !gotsnapErr {
+					snapAccount := ms.retriever.DecodeAccount(v)
+					stdlog.Printf("snapAccount %v\n", snapAccount)
+				}
 			}
 
 			trieAccount := ms.retriever.DecodeAccount(value)
