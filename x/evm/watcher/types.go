@@ -586,7 +586,7 @@ func (n *BlockNonce) UnmarshalText(input []byte) error {
 // Block represents a transaction returned to RPC clients.
 type Block struct {
 	Number           hexutil.Uint64 `json:"number"`
-	Hash             common.Hash    `json:"hash" rlp:"-"`
+	Hash             common.Hash    `json:"hash"`
 	ParentHash       common.Hash    `json:"parentHash"`
 	Nonce            BlockNonce     `json:"nonce"`
 	UncleHash        common.Hash    `json:"sha3Uncles"`
@@ -596,15 +596,15 @@ type Block struct {
 	Miner            common.Address `json:"miner"`
 	MixHash          common.Hash    `json:"mixHash"`
 	Difficulty       hexutil.Uint64 `json:"difficulty"`
-	TotalDifficulty  hexutil.Uint64 `json:"totalDifficulty" rlp:"-"`
+	TotalDifficulty  hexutil.Uint64 `json:"totalDifficulty"`
 	ExtraData        hexutil.Bytes  `json:"extraData"`
-	Size             hexutil.Uint64 `json:"size" rlp:"-"`
+	Size             hexutil.Uint64 `json:"size"`
 	GasLimit         hexutil.Uint64 `json:"gasLimit"`
 	GasUsed          *hexutil.Big   `json:"gasUsed"`
 	Timestamp        hexutil.Uint64 `json:"timestamp"`
-	Uncles           []common.Hash  `json:"uncles" rlp:"-"`
+	Uncles           []common.Hash  `json:"uncles"`
 	ReceiptsRoot     common.Hash    `json:"receiptsRoot"`
-	Transactions     interface{}    `json:"transactions" rlp:"-"`
+	Transactions     interface{}    `json:"transactions"`
 }
 
 // EthHash returns block hash encode by rlp for being compatible with ethereum
