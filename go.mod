@@ -184,7 +184,7 @@ replace (
 	github.com/cosmos/gorocksdb => github.com/okx/grocksdb v1.6.45-okc2
 	//github.com/ethereum/go-ethereum => github.com/okx/go-ethereum v1.10.8-okc1
 	//github.com/ethereum/go-ethereum => github.com/okx/go-ethereum v1.10.9-0.20230304105959-416ab4d761a9
-	github.com/ethereum/go-ethereum => github.com/okx/go-ethereum v1.10.9-0.20230310033014-0b0ee2a0b537
+	github.com/ethereum/go-ethereum => github.com/okx/go-ethereum v1.10.9-0.20230316065943-efdb90e14607
 	github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.3-alpha.regen.1
 	github.com/keybase/go-keychain => github.com/99designs/go-keychain v0.0.0-20191008050251-8e49817e8af4
 	github.com/tendermint/go-amino => github.com/okx/go-amino v0.15.1-okc4
