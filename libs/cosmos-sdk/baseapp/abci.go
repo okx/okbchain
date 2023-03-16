@@ -16,7 +16,6 @@ import (
 
 	"github.com/okx/okbchain/app/rpc/simulator"
 	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
-	"github.com/okx/okbchain/libs/cosmos-sdk/store/mpt"
 	"github.com/okx/okbchain/libs/cosmos-sdk/types"
 	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
 	sdkerrors "github.com/okx/okbchain/libs/cosmos-sdk/types/errors"
@@ -281,11 +280,11 @@ func (app *BaseApp) Commit(req abci.RequestCommit) abci.ResponseCommit {
 	}()
 	header := app.deliverState.ctx.BlockHeader()
 
-	if mptStore := app.cms.GetCommitKVStore(sdk.NewKVStoreKey(mpt.StoreKey)); mptStore != nil {
-		// notify mptStore to tryUpdateTrie, must call before app.deliverState.ms.Write()
-		mpt.GAccTryUpdateTrieChannel <- struct{}{}
-		<-mpt.GAccTrieUpdatedChannel
-	}
+	//if mptStore := app.cms.GetCommitKVStore(sdk.NewKVStoreKey(mpt.StoreKey)); mptStore != nil {
+	//	// notify mptStore to tryUpdateTrie, must call before app.deliverState.ms.Write()
+	//	mpt.GAccTryUpdateTrieChannel <- struct{}{}
+	//	<-mpt.GAccTrieUpdatedChannel
+	//}
 
 	// Write the DeliverTx state which is cache-wrapped and commit the MultiStore.
 	// The write to the DeliverTx state writes all state transitions to the root
