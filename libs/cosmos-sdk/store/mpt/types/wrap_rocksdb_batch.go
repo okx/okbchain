@@ -5,6 +5,7 @@ package types
 
 import (
 	"runtime"
+	"sync"
 
 	"github.com/cosmos/gorocksdb"
 	"github.com/ethereum/go-ethereum/ethdb"
@@ -13,18 +14,31 @@ import (
 
 var _ ethdb.Batch = (*WrapRocksDBBatch)(nil)
 
+var batchPool = &sync.Pool{
+	New: func() interface{} {
+		return (*tmdb.RocksDBBatch)(nil)
+	},
+}
+
 type WrapRocksDBBatch struct {
 	batch     *tmdb.RocksDBBatch
 	valueSize int
 }
 
 func NewWrapRocksDBBatch(db *tmdb.RocksDB) *WrapRocksDBBatch {
-	batch := tmdb.NewRocksDBBatch(db)
+	batch := batchPool.Get().(*tmdb.RocksDBBatch)
+	if batch == nil {
+		batch = tmdb.NewRocksDBBatch(db)
+	} else {
+		batch.Reset()
+	}
+
+	//batch := tmdb.NewRocksDBBatch(db)
 	runtime.SetFinalizer(batch, func(b *tmdb.RocksDBBatch) {
 		if b == nil {
 			return
 		}
-		b.Close()
+		batchPool.Put(b)
 		runtime.SetFinalizer(b, nil)
 	})
 	return &WrapRocksDBBatch{
