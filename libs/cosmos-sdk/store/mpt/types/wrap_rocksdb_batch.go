@@ -59,7 +59,8 @@ func (wrb *WrapRocksDBBatch) Delete(key []byte) error {
 }
 
 func (wrb *WrapRocksDBBatch) ValueSize() int {
-	return wrb.valueSize
+	return wrb.batch.Size()
+	//return wrb.valueSize
 }
 
 func (wrb *WrapRocksDBBatch) Write() error {
