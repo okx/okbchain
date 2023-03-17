@@ -19,7 +19,6 @@ const (
 	FlagIavlHeightOrphansCacheSize  = "iavl-height-orphans-cache-size"
 	FlagIavlMaxCommittedHeightNum   = "iavl-max-committed-height-num"
 	FlagIavlFastStorageCacheSize    = "iavl-fast-storage-cache-size"
-	FlagIavlEnableFastStorage       = "iavl-enable-fast-storage"
 	FlagIavlDiscardFastStorage      = "discard-fast-storage"
 	DefaultIavlFastStorageCacheSize = 10000000
 )
@@ -293,6 +292,9 @@ func (tree *MutableTree) pruningSchedule() {
 }
 
 func (tree *MutableTree) waitCurrentPruningScheduleDone() {
+	if !EnablePruningHistoryState {
+		return
+	}
 	pruneWg := &sync.WaitGroup{}
 	pruneWg.Add(1)
 	tree.pruneCh <- pruneEvent{-1, pruneWg}
