@@ -106,7 +106,7 @@ func (w preCommitClearMap) Put(key []byte, _ []byte) error {
 	if v, ok := w.data[string(key)]; ok {
 		if v.ele == w.store.waitClearPtr {
 			delete(w.data, amino.BytesToStr(key))
-			atomic.AddInt64(&w.store.clearNum, 1)
+			atomic.AddInt64(&w.store.pruneNum, 1)
 		}
 	}
 	return nil
@@ -116,7 +116,7 @@ func (w preCommitClearMap) Delete(key []byte) error {
 	if v, ok := w.data[string(key)]; ok {
 		if v.ele == w.store.waitClearPtr {
 			delete(w.data, amino.BytesToStr(key))
-			atomic.AddInt64(&w.store.clearNum, 1)
+			atomic.AddInt64(&w.store.pruneNum, 1)
 		}
 	}
 	return nil
@@ -146,10 +146,11 @@ type AsyncKeyValueStore struct {
 
 	logger log.Logger
 
-	waitClear  int64
+	waitPrune  int64
 	waitCommit int64
 
-	clearNum int64
+	pruneNum     int64
+	prunePercent int64
 }
 
 func NewAsyncKeyValueStore(db ethdb.KeyValueStore, autoClearOff bool) *AsyncKeyValueStore {
@@ -314,9 +315,9 @@ func (store *AsyncKeyValueStore) LogStats() {
 
 	store.logger.Info("AsyncKeyValueStore stats",
 		"waitCommitOp", atomic.LoadInt64(&store.waitCommit),
-		"waitClearOp", atomic.LoadInt64(&store.waitClear),
+		"waitPruneOp", atomic.LoadInt64(&store.waitPrune),
 		"preCommitMapSize", store.preCommit.Len(),
-		"clearInMap", atomic.LoadInt64(&store.clearNum),
+		"clearInMap", atomic.LoadInt64(&store.pruneNum),
 	)
 }
 
@@ -354,7 +355,7 @@ func (store *AsyncKeyValueStore) commitRoutine() {
 		atomic.AddInt64(&store.waitCommit, -1)
 
 		store.setPreCommitPtr(taskEle)
-		waitClear := atomic.AddInt64(&store.waitClear, 1)
+		waitClear := atomic.AddInt64(&store.waitPrune, 1)
 
 		if !store.disableAutoPrune {
 			if waitClear >= 100 || batchSize > 1_000_000 {
@@ -367,8 +368,11 @@ func (store *AsyncKeyValueStore) commitRoutine() {
 
 func (store *AsyncKeyValueStore) pruneRoutine() {
 	for _ = range store.clearCh {
+		percentage := atomic.LoadInt64(&store.prunePercent)
+		wantToPrune := atomic.LoadInt64(&store.waitPrune) * percentage / 100
+
 		preCommitPtr := store.getPreCommitPtr()
-		for store.waitClearPtr != preCommitPtr {
+		for store.waitClearPtr != preCommitPtr && wantToPrune > 0 {
 			needRemove := store.waitClearPtr
 			needClear := store.waitClearPtr.Next()
 			commitedTask := needClear.Value.(*commitTask)
@@ -378,40 +382,46 @@ func (store *AsyncKeyValueStore) pruneRoutine() {
 					store.waitClearPtr = needClear
 					_ = commitedTask.op.Replay(preCommitClearMap(store.preCommit))
 					store.mtx.Unlock()
-					atomic.AddInt64(&store.waitClear, -1)
+					atomic.AddInt64(&store.waitPrune, -1)
 					break
 				} else {
 					time.Sleep(1 * time.Millisecond)
 				}
 			}
+			wantToPrune--
 		}
 	}
 }
 
-func (store *AsyncKeyValueStore) Prune() {
-	if !store.disableAutoPrune {
+func (store *AsyncKeyValueStore) Prune(percentage int64) {
+	if store == nil || !store.disableAutoPrune {
 		return
 	}
+	if percentage > 100 || percentage <= 0 {
+		percentage = 100
+	}
 	if store.asyncPrune {
+		atomic.StoreInt64(&store.prunePercent, percentage)
 		store.clearCh <- struct{}{}
 	} else {
-		store.prune()
+		store.prune(percentage)
 	}
 }
 
-func (store *AsyncKeyValueStore) prune() {
+func (store *AsyncKeyValueStore) prune(percentage int64) {
 	store.mtx.Lock()
 	defer store.mtx.Unlock()
-
+	wantToPrune := atomic.LoadInt64(&store.waitPrune) * percentage / 100
 	preCommitPtr := store.getPreCommitPtr()
-	for store.waitClearPtr != preCommitPtr {
+	for store.waitClearPtr != preCommitPtr && wantToPrune > 0 {
 		needRemove := store.waitClearPtr
 		needClear := store.waitClearPtr.Next()
 		commitedTask := needClear.Value.(*commitTask)
 		store.preCommitList.Remove(needRemove)
 		store.waitClearPtr = needClear
 		_ = commitedTask.op.Replay(preCommitClearMap(store.preCommit))
-		atomic.AddInt64(&store.waitClear, -1)
+		atomic.AddInt64(&store.waitPrune, -1)
+		wantToPrune--
 	}
 }
 
