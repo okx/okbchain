@@ -430,7 +430,6 @@ func (ms *MptStore) otherNodePersist(curMptRoot ethcmn.Hash, curHeight int64) {
 			if err := triedb.Commit(chRoot, true, nil); err != nil {
 				panic("fail to commit mpt data: " + err.Error())
 			}
-			gAsyncDB.Prune()
 			gAsyncDB.LogStats()
 		}
 		ms.SetLatestStoredBlockHeight(uint64(curHeight))
@@ -438,6 +437,7 @@ func (ms *MptStore) otherNodePersist(curMptRoot ethcmn.Hash, curHeight int64) {
 			ms.logger.Info("async push acc data to db", "block", curHeight, "trieHash", chRoot)
 		}
 	}
+	gAsyncDB.Prune()
 	// Garbage collect anything below our required write retention
 	if curHeight > int64(TriesInMemory) {
 		for !ms.triegc.Empty() {
