@@ -191,21 +191,21 @@ func (ms *MptStore) Get(key []byte) []byte {
 	switch mptKeyType(key) {
 	case storageType:
 		addr, stateRoot, realKey := decodeAddressStorageInfo(key)
-		value, err := ms.getSnapStorage(addr, realKey)
-		if err == nil {
-			return value
-		}
+		//		value, err := ms.getSnapStorage(addr, realKey)
+		//		if err == nil {
+		//			return value
+		//		}
 		t := ms.tryGetStorageTrie(addr, stateRoot, false)
-		value, err = t.TryGet(realKey)
+		value, err := t.TryGet(realKey)
 		if err != nil {
 			return nil
 		}
 		return value
 	case addressType:
-		v, err := ms.getSnapAccount(key)
-		if err == nil {
-			return v
-		}
+		//v, err := ms.getSnapAccount(key)
+		//if err == nil {
+		//	return v
+		//}
 		value, err := ms.db.CopyTrie(ms.trie).TryGet(key)
 		if err != nil {
 			return nil
