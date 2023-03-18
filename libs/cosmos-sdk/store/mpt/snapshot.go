@@ -16,7 +16,7 @@ var (
 )
 
 const (
-	snapshotMemoryLayerCount = 1
+	snapshotMemoryLayerCount = 128
 )
 
 func DisableSnapshot() {
