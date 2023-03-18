@@ -430,6 +430,7 @@ func (ms *MptStore) otherNodePersist(curMptRoot ethcmn.Hash, curHeight int64) {
 			if err := triedb.Commit(chRoot, true, nil); err != nil {
 				panic("fail to commit mpt data: " + err.Error())
 			}
+			gAsyncDB.Prune()
 			gAsyncDB.LogStats()
 		}
 		ms.SetLatestStoredBlockHeight(uint64(curHeight))
