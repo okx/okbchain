@@ -86,16 +86,16 @@ func (ms *MptStore) commitSnap(root common.Hash) {
 	}
 	// Only update if there's a state transition (skip empty Clique blocks)
 	if parent := ms.snap.Root(); parent != root {
-		///if err := ms.snaps.Update(root, parent, ms.snapDestructs, ms.snapAccounts, ms.snapStorage); err != nil && ms.logger != nil {
-		///	ms.logger.Error("Failed to update snapshot tree", "from", parent, "to", root, "err", err)
-		///}
+		if err := ms.snaps.Update(root, parent, ms.snapDestructs, ms.snapAccounts, ms.snapStorage); err != nil && ms.logger != nil {
+			ms.logger.Error("Failed to update snapshot tree", "from", parent, "to", root, "err", err)
+		}
 		// Keep 128 diff layers in the memory, persistent layer is 129th.
 		// - head layer is paired with HEAD state
 		// - head-1 layer is paired with HEAD-1 state
 		// - head-127 layer(bottom-most diff layer) is paired with HEAD-127 state
-		//	if err := ms.snaps.Cap(root, snapshotMemoryLayerCount); err != nil && ms.logger != nil {
-		//		ms.logger.Error("Failed to cap snapshot tree", "root", root, "layers", 128, "err", err)
-		//	}
+		if err := ms.snaps.Cap(root, snapshotMemoryLayerCount); err != nil && ms.logger != nil {
+			ms.logger.Error("Failed to cap snapshot tree", "root", root, "layers", 128, "err", err)
+		}
 	}
 	ms.snap, ms.snapDestructs, ms.snapAccounts, ms.snapStorage = nil, nil, nil, nil
 
