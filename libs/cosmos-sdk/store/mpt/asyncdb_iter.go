@@ -98,10 +98,14 @@ func (a *asyncdbIterator) Next() bool {
 		if a.values[0].deleted {
 			return a.Next()
 		}
+		a.key = amino.StrToBytes(a.keys[0])
+		a.value = a.values[0].value
 		return true
 	}
 
 	if !a.memMoveNext {
+		a.key = a.dbKey
+		a.value = a.dbIter.Value()
 		return true
 	}
 
@@ -139,10 +143,16 @@ func (a *asyncdbIterator) memNext() bool {
 }
 
 func (a *asyncdbIterator) Key() []byte {
+	if len(a.keys) == 0 {
+		return a.dbIter.Key()
+	}
 	return a.key
 }
 
 func (a *asyncdbIterator) Value() []byte {
+	if len(a.keys) == 0 {
+		return a.dbIter.Value()
+	}
 	return a.value
 }
 
