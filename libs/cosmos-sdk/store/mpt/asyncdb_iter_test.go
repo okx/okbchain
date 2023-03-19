@@ -2,11 +2,12 @@ package mpt
 
 import (
 	"fmt"
+	"sync/atomic"
+	"testing"
+
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethdb/memorydb"
 	"github.com/stretchr/testify/require"
-	"sync/atomic"
-	"testing"
 )
 
 // this mock type should be used only for iterator test.
