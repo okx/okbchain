@@ -2,12 +2,11 @@ package mpt
 
 import (
 	"bytes"
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/tendermint/go-amino"
 	"sort"
 	"strings"
 
 	"github.com/ethereum/go-ethereum/ethdb"
+	"github.com/tendermint/go-amino"
 )
 
 func (store *AsyncKeyValueStore) NewIterator(prefix []byte, start []byte) ethdb.Iterator {
@@ -30,18 +29,26 @@ func (store *AsyncKeyValueStore) NewIterator(prefix []byte, start []byte) ethdb.
 			keys = append(keys, key)
 		}
 	}
+
+	dbIter := store.KeyValueStore.NewIterator(prefix, start)
+	if len(keys) == 0 {
+		return dbIter
+	}
+
 	// Sort the items and retrieve the associated values
 	sort.Strings(keys)
 	for _, key := range keys {
 		values = append(values, store.preCommit.data[key])
 	}
 
-	dbIter := store.KeyValueStore.NewIterator(prefix, start)
-
 	return &asyncdbIterator{
 		dbIter: dbIter,
 		keys:   keys,
 		values: values,
+
+		memMoveNext: true,
+		dbMoveNext:  dbIter.Next(),
+		dbKey:       dbIter.Key(),
 	}
 }
 
@@ -49,43 +56,78 @@ type asyncdbIterator struct {
 	dbIter ethdb.Iterator
 	keys   []string
 	values []preCommitValue
+
+	dbKey []byte
+	key   []byte
+	value []byte
+
+	dbMoveNext  bool
+	memMoveNext bool
+	moveMemOrDb byte // 0 for mem, 1 for db, 2 for both
+	init        bool
 }
 
 func (a *asyncdbIterator) Next() bool {
-	if len(a.keys) <= 0 {
+	if len(a.keys) == 0 {
 		return a.dbIter.Next()
 	}
 
-	memkey := amino.StrToBytes(a.keys[0])
-	dbKey := a.dbIter.Key()
-	switch bytes.Compare(memkey, dbKey) {
-	case -1:
-		if a.memNext() {
-			if a.values[0].deleted {
-				return a.Next()
-			}
+	if !a.init {
+		a.init = true
+	} else {
+		if a.moveMemOrDb == 0 {
+			a.memMoveNext = a.memNext()
+		} else if a.moveMemOrDb == 1 {
+			a.dbMoveNext = a.dbIter.Next()
+			a.dbKey = a.dbIter.Key()
+		} else if a.moveMemOrDb == 2 {
+			a.memMoveNext = a.memNext()
+			a.dbMoveNext = a.dbIter.Next()
+			a.dbKey = a.dbIter.Key()
 		}
-		return a.dbIter.Next()
-	case 0:
-		if a.memNext() {
-			if a.values[0].deleted {
-				return a.Next()
-			}
-			a.dbIter.Next()
-			return true
-		}
-		return a.dbIter.Next()
-	case 1:
-		if a.dbIter.Next() {
-			return true
-		}
-		if a.memNext() {
-			if a.values[0].deleted {
-				return a.Next()
-			}
-			return true
-		}
+	}
+
+	if !a.memMoveNext && !a.dbMoveNext {
+		a.key = nil
+		a.value = nil
 		return false
+	}
+
+	if !a.dbMoveNext {
+		a.moveMemOrDb = 0
+		if a.values[0].deleted {
+			return a.Next()
+		}
+		return true
+	}
+
+	if !a.memMoveNext {
+		return true
+	}
+
+	memkey := amino.StrToBytes(a.keys[0])
+	switch bytes.Compare(memkey, a.dbKey) {
+	case -1:
+		a.moveMemOrDb = 0
+		if a.values[0].deleted {
+			return a.Next()
+		}
+		a.key = memkey
+		a.value = a.values[0].value
+		return true
+	case 0:
+		a.moveMemOrDb = 2
+		if a.values[0].deleted {
+			return a.Next()
+		}
+		a.key = memkey
+		a.value = a.values[0].value
+		return true
+	case 1:
+		a.moveMemOrDb = 1
+		a.key = a.dbKey
+		a.value = a.dbIter.Value()
+		return true
 	}
 	return false
 }
@@ -97,55 +139,11 @@ func (a *asyncdbIterator) memNext() bool {
 }
 
 func (a *asyncdbIterator) Key() []byte {
-	if len(a.keys) <= 0 {
-		return a.dbIter.Key()
-	}
-	memkey := amino.StrToBytes(a.keys[0])
-	dbKey := a.dbIter.Key()
-	switch bytes.Compare(memkey, dbKey) {
-	case -1:
-		if a.values[0].deleted {
-			a.memNext()
-			return a.Key()
-		}
-		return common.CopyBytes(memkey)
-	case 0:
-		if a.values[0].deleted {
-			a.memNext()
-			a.dbIter.Next()
-			return a.Key()
-		}
-		return common.CopyBytes(memkey)
-	case 1:
-		return dbKey
-	}
-	return nil
+	return a.key
 }
 
 func (a *asyncdbIterator) Value() []byte {
-	if len(a.keys) <= 0 {
-		return a.dbIter.Value()
-	}
-	memkey := amino.StrToBytes(a.keys[0])
-	dbKey := a.dbIter.Key()
-	switch bytes.Compare(memkey, dbKey) {
-	case -1:
-		if a.values[0].deleted {
-			a.memNext()
-			return a.Value()
-		}
-		return common.CopyBytes(a.values[0].value)
-	case 0:
-		if a.values[0].deleted {
-			a.memNext()
-			a.dbIter.Next()
-			return a.Value()
-		}
-		return common.CopyBytes(a.values[0].value)
-	case 1:
-		return a.dbIter.Value()
-	}
-	return nil
+	return a.value
 }
 
 func (a *asyncdbIterator) Error() error {
