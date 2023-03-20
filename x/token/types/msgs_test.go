@@ -165,9 +165,9 @@ func TestNewTokenMsgSend(t *testing.T) {
 	}
 
 	Errorcoins := sdk.SysCoins{
-		sdk.NewDecCoinFromDec("okc", sdk.NewDec(100)),
-		sdk.NewDecCoinFromDec("okc", sdk.NewDec(100)),
-		sdk.NewDecCoinFromDec("oke", sdk.NewDec(100)),
+		sdk.NewDecCoinFromDec("okb", sdk.NewDec(100)),
+		sdk.NewDecCoinFromDec("okb", sdk.NewDec(100)),
+		sdk.NewDecCoinFromDec("okb", sdk.NewDec(100)),
 	}
 
 	// not valid coins
