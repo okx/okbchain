@@ -52,5 +52,9 @@ func (wrsdi *WrapRocksDBIterator) Error() error {
 // Release releases associated resources. Release should always succeed and can
 // be called multiple times without causing error.
 func (wrsdi *WrapRocksDBIterator) Release() {
+	if wrsdi.RocksDBIterator != nil {
+		wrsdi.RocksDBIterator.Close()
+		wrsdi.RocksDBIterator = nil
+	}
 	wrsdi.RocksDBIterator = wrsdi.RocksDBIterator.Release()
 }
