@@ -250,16 +250,18 @@ func TestTreeDeltaMarshalAndUnmarshal(t *testing.T) {
 	nodeDelta := make([]*trie.NodeDelta, 1)
 	nodeDelta[0] = &trie.NodeDelta{Key: "test-key", Val: []byte("test-val")}
 	mptDelta := trie.MptDeltaMap{"test1": &trie.MptDelta{NodeDelta: nodeDelta}}
-	type fields struct {
-		IavlTreeDelta iavl.TreeDeltaMap
-		MptTreeDelta  trie.MptDeltaMap
+	_ = &iavl.TreeDelta{
+		NodesDelta:         []*iavl.NodeJsonImp{},
+		OrphansDelta:       []*iavl.NodeJson{{Version: 3}, {Version: 4}},
+		CommitOrphansDelta: []*iavl.CommitOrphansImp{{"nd1", 1}, {"nd2", 2}},
 	}
+	iavlDelta := iavl.TreeDeltaMap{}
 	tests := []struct {
 		name   string
-		fields fields
+		fields TreeDelta
 	}{
 		// TODO: Add test cases.
-		{"normal", fields{MptTreeDelta: mptDelta}},
+		{"normal", TreeDelta{MptTreeDelta: mptDelta, IavlTreeDelta: iavlDelta}},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -268,9 +270,23 @@ func TestTreeDeltaMarshalAndUnmarshal(t *testing.T) {
 				MptTreeDelta:  tt.fields.MptTreeDelta,
 			}
 			outBytes := td.Marshal()
-			outDelta := TreeDelta{}
+
+			tdi := &TreeDeltaImp{}
+			if err := cdc.UnmarshalBinaryBare(outBytes, &tdi); err != nil {
+				assert.Nil(t, err)
+			}
+
+			// unmarshal mpt
+			outMptBytes := tdi.MptBytes
+			outMpt := trie.MptDeltaMap{}
+			err := outMpt.Unmarshal(outMptBytes)
+			assert.Nil(t, err)
+			assert.EqualValues(t, mptDelta, outMpt)
+
+			// unmarshal delta
+			outDelta := TreeDelta{MptTreeDelta: trie.MptDeltaMap{}, IavlTreeDelta: iavl.TreeDeltaMap{}}
 			outDelta.Unmarshal(outBytes)
-			assert.Equal(t, tt.fields, outDelta)
+			assert.EqualValues(t, tt.fields, outDelta)
 		})
 	}
 }
