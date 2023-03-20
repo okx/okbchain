@@ -12,7 +12,7 @@ import (
 
 var (
 	gDisableSnapshot = false
-	gSnapshotRebuild = false
+	gSnapshotRebuild = true
 )
 
 const (
