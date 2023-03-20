@@ -1,9 +1,11 @@
 package mpt
 
 import (
+	"bytes"
 	"encoding/hex"
 	"fmt"
 	"io"
+	stdlog "log"
 	"sync"
 	"time"
 
@@ -191,14 +193,18 @@ func (ms *MptStore) Get(key []byte) []byte {
 	switch mptKeyType(key) {
 	case storageType:
 		addr, stateRoot, realKey := decodeAddressStorageInfo(key)
-		//value, err := ms.getSnapStorage(addr, realKey)
-		//if err == nil {
-		//	return value
-		//}
+		v, err := ms.getSnapStorage(addr, realKey)
+		if err == nil {
+			//	return value
+		}
 		t := ms.tryGetStorageTrie(addr, stateRoot, false)
 		value, err := t.TryGet(realKey)
 		if err != nil {
 			return nil
+		}
+		if bytes.Compare(v, value) != 0 {
+			stdlog.Printf("addr %v stateRoot %v realKey %v v %v value %v\n",
+				addr.String(), stateRoot.String(), fmt.Sprintf("%x", realKey), v, value)
 		}
 		return value
 	case addressType:
