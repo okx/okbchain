@@ -454,6 +454,11 @@ func (c *MockClient) Block(heightPtr *int64) (*ctypes.ResultBlock, error) {
 	}
 	return &ctypes.ResultBlock{BlockID: blockMeta.BlockID, Block: block}, nil
 }
+
+func (c *MockClient) BlockByHash(hash []byte) (*ctypes.ResultBlock, error) {
+	return nil, nil
+}
+
 func (c *MockClient) Tx(hash []byte, prove bool) (*ctypes.ResultTx, error) {
 	// if index is disabled, return error
 	if _, ok := c.env.TxIndexer.(*null.TxIndex); ok {

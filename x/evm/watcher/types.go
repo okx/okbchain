@@ -682,7 +682,7 @@ func (tr *Transaction) GetValue() string {
 	return string(buf)
 }
 
-func newBlock(height uint64, blockBloom ethtypes.Bloom, blockHash common.Hash, header abci.Header, gasLimit uint64, gasUsed *big.Int, txs interface{}) Block {
+func NewBlock(height uint64, blockBloom ethtypes.Bloom, blockHash common.Hash, header abci.Header, gasLimit uint64, gasUsed *big.Int, txs interface{}) Block {
 	timestamp := header.Time.Unix()
 	if timestamp < 0 {
 		timestamp = time.Now().Unix()

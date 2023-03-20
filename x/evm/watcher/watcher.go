@@ -3,11 +3,9 @@ package watcher
 import (
 	"encoding/hex"
 	"fmt"
-	"math/big"
 	"sync"
 
 	"github.com/ethereum/go-ethereum/common"
-	ethtypes "github.com/ethereum/go-ethereum/core/types"
 	jsoniter "github.com/json-iterator/go"
 	"github.com/okx/okbchain/app/rpc/namespaces/eth/state"
 	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
@@ -211,15 +209,13 @@ func (w *Watcher) ExecuteDelayEraseKey(delayEraseKey [][]byte) {
 	}
 }
 
-func (w *Watcher) SaveBlock(bloom ethtypes.Bloom) {
+func (w *Watcher) SaveBlock(block Block, ethBlockHash common.Hash) {
 	if !w.Enabled() {
 		return
 	}
-	block := newBlock(w.height, bloom, w.blockHash, w.header, uint64(0xffffffff), big.NewInt(int64(w.gasUsed)), w.blockTxs)
 	if w.InfuraKeeper != nil {
 		w.InfuraKeeper.OnSaveBlock(block)
 	}
-	ethBlockHash := block.EthHash()
 	wMsg := NewMsgBlock(block, ethBlockHash)
 	if wMsg != nil {
 		w.batch = append(w.batch, wMsg)

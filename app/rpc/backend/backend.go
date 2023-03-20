@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/davecgh/go-spew/spew"
+
 	"github.com/okx/okbchain/libs/cosmos-sdk/server"
 	"github.com/okx/okbchain/libs/cosmos-sdk/store/types"
 
@@ -172,6 +174,7 @@ func (b *EthermintBackend) GetBlockByNumber(blockNum rpctypes.BlockNumber, fullT
 	}
 
 	block, err = rpctypes.RpcBlockFromTendermint(b.clientCtx, resBlock.Block, fullTx)
+	spew.Dump("GetBlockByNumber", block)
 	if err != nil {
 		return nil, err
 	}
@@ -193,17 +196,7 @@ func (b *EthermintBackend) GetBlockByHash(hash common.Hash, fullTx bool) (*watch
 		return block, nil
 	}
 	//query block from tendermint
-	res, _, err := b.clientCtx.Query(fmt.Sprintf("custom/%s/%s/%s", evmtypes.ModuleName, evmtypes.QueryHashToHeight, hash.Hex()))
-	if err != nil {
-		return nil, err
-	}
-
-	var out evmtypes.QueryResBlockNumber
-	if err := b.clientCtx.Codec.UnmarshalJSON(res, &out); err != nil {
-		return nil, err
-	}
-
-	resBlock, err := b.Block(&out.Number)
+	resBlock, err := b.BlockByHash(hash)
 	if err != nil {
 		return nil, nil
 	}
@@ -459,15 +452,17 @@ func (b *EthermintBackend) GetLogs(height int64) ([][]*ethtypes.Log, error) {
 	if err != nil {
 		return nil, err
 	}
-	transactions, ok := block.Transactions.([]interface{})
-	if !ok {
+	var txs []common.Hash
+	switch transactions := block.Transactions.(type) {
+	case []interface{}:
+		for i, txHash := range transactions {
+			txs[i] = common.HexToHash(txHash.(string))
+		}
+	case []common.Hash:
+		txs = transactions
+	default:
 		return nil, ErrInvalidBlock
 	}
-	txs := make([]common.Hash, len(transactions))
-	for i, txHash := range transactions {
-		txs[i] = common.HexToHash(txHash.(string))
-	}
-
 	ethBlockHash := block.EthHash()
 	// return empty directly when block was produced during stress testing.
 	var blockLogs = [][]*ethtypes.Log{}
@@ -640,4 +635,23 @@ func (b *EthermintBackend) Block(height *int64) (block *coretypes.ResultBlock, e
 		b.cacheBlock(block)
 	}
 	return block, nil
+}
+
+func (b *EthermintBackend) BlockByHash(hash common.Hash) (block *coretypes.ResultBlock, err error) {
+	// query height by hash
+	res, _, err := b.clientCtx.Query(fmt.Sprintf("custom/%s/%s/%s", evmtypes.ModuleName, evmtypes.QueryHashToHeight, hash.Hex()))
+	if err != nil {
+		b.clientCtx.Client.BlockByHash(hash.Bytes()) // if hash and height map not exist, use hash directly to query bloc
+	}
+
+	var out evmtypes.QueryResBlockNumber
+	if err := b.clientCtx.Codec.UnmarshalJSON(res, &out); err != nil {
+		return nil, err
+	}
+
+	resBlock, err := b.Block(&out.Number)
+	if err != nil {
+		return nil, nil
+	}
+	return resBlock, nil
 }

@@ -806,10 +806,12 @@ func (m *RequestDeliverTx) GetTx() []byte {
 }
 
 type RequestEndBlock struct {
-	Height               int64    `protobuf:"varint,1,opt,name=height,proto3" json:"height,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
+	Height               int64                `protobuf:"varint,1,opt,name=height,proto3" json:"height,omitempty"`
+	DeliverTxs           []*ResponseDeliverTx `json:"-"`
+	Hash                 []byte               `json:"-"`
+	XXX_NoUnkeyedLiteral struct{}             `json:"-"`
+	XXX_unrecognized     []byte               `json:"-"`
+	XXX_sizecache        int32                `json:"-"`
 }
 
 func (m *RequestEndBlock) Reset()         { *m = RequestEndBlock{} }
@@ -1709,6 +1711,8 @@ type ResponseDeliverTx struct {
 	GasWanted            int64    `protobuf:"varint,5,opt,name=gas_wanted,json=gas_wanted,proto3" json:"gas_wanted,omitempty"`
 	GasUsed              int64    `protobuf:"varint,6,opt,name=gas_used,json=gas_used,proto3" json:"gas_used,omitempty"`
 	Events               []Event  `protobuf:"bytes,7,rep,name=events,proto3" json:"events,omitempty"`
+	Hash                 []byte   `json:"-"`
+	Type                 int      `json:"-"`
 	Codespace            string   `protobuf:"bytes,8,opt,name=codespace,proto3" json:"codespace,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`

@@ -301,6 +301,8 @@ func (app *BaseApp) DeliverTx(req abci.RequestDeliverTx) abci.ResponseDeliverTx 
 		Log:       info.result.Log,
 		Data:      info.result.Data,
 		Events:    info.result.Events.ToABCIEvents(),
+		Hash:      realTx.TxHash(),
+		Type:      int(realTx.GetType()),
 	}
 }
 
@@ -342,13 +344,14 @@ func (app *BaseApp) DeliverRealTx(txes abci.TxEssentials) abci.ResponseDeliverTx
 	if err != nil {
 		return sdkerrors.ResponseDeliverTx(err, info.gInfo.GasWanted, info.gInfo.GasUsed, app.trace)
 	}
-
 	return abci.ResponseDeliverTx{
 		GasWanted: int64(info.gInfo.GasWanted), // TODO: Should type accept unsigned ints?
 		GasUsed:   int64(info.gInfo.GasUsed),   // TODO: Should type accept unsigned ints?
 		Log:       info.result.Log,
 		Data:      info.result.Data,
 		Events:    info.result.Events.ToABCIEvents(),
+		Hash:      realTx.TxHash(),
+		Type:      int(realTx.GetType()),
 	}
 }
 
