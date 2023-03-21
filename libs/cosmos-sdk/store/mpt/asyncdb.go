@@ -136,7 +136,7 @@ type AsyncKeyValueStore struct {
 	preCommitPtr  *list.Element
 	waitPrunePtr  *list.Element
 
-	enableCommit     bool
+	syncPrune        bool // this is used to control prune mode when disableAutoPrune is true
 	disableAutoPrune bool
 
 	commitCh chan struct{}
@@ -151,7 +151,7 @@ type AsyncKeyValueStore struct {
 	pruneNum int64
 }
 
-func NewAsyncKeyValueStore(db ethdb.KeyValueStore, autoPruneOff bool) *AsyncKeyValueStore {
+func NewAsyncKeyValueStore(db ethdb.KeyValueStore, autoPruneOff bool, syncPrune bool) *AsyncKeyValueStore {
 	store := &AsyncKeyValueStore{
 		KeyValueStore: db,
 		preCommit: preCommitMap{
@@ -162,6 +162,7 @@ func NewAsyncKeyValueStore(db ethdb.KeyValueStore, autoPruneOff bool) *AsyncKeyV
 		pruneCh:          make(chan struct{}, 10000*10),
 		logger:           log.NewNopLogger(),
 		disableAutoPrune: autoPruneOff,
+		syncPrune:        syncPrune,
 	}
 	store.preCommit.store = store
 	store.closeWg.Add(1)
@@ -390,6 +391,14 @@ func (store *AsyncKeyValueStore) Prune() {
 	if store == nil || !store.disableAutoPrune {
 		return
 	}
+	if !store.syncPrune {
+		store.pruneCh <- struct{}{}
+	} else {
+		store.prune()
+	}
+}
+
+func (store *AsyncKeyValueStore) prune() {
 	store.mtx.Lock()
 	defer store.mtx.Unlock()
 

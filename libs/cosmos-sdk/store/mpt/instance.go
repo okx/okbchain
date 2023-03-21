@@ -43,7 +43,7 @@ func InstanceOfMptStore() ethstate.Database {
 		}
 		nkvstore := NewStatKeyValueStore(kvstore, gStatic)
 		if EnableAsyncCommit && TrieAsyncDB {
-			gAsyncDB = NewAsyncKeyValueStore(nkvstore, TrieAsyncDBAutoPruningOff)
+			gAsyncDB = NewAsyncKeyValueStore(nkvstore, TrieAsyncDBAutoPruningOff, TrieAsyncDBSyncPruning)
 			nkvstore = gAsyncDB
 		}
 
