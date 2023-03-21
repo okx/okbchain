@@ -194,7 +194,8 @@ func (c *MockClient) CommitBlock() {
 			resDeliverTxs = append(resDeliverTxs, &resp)
 		}
 		endBlockResp := c.chain.App().EndBlock(abci.RequestEndBlock{
-			Height: blockHeight,
+			Height:     blockHeight,
+			DeliverTxs: resDeliverTxs,
 		})
 		blockResp := &tmstate.ABCIResponses{
 			DeliverTxs: resDeliverTxs,

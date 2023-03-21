@@ -273,7 +273,7 @@ func (suite *RPCPendingTestSuite) TestEth_Pending_GetBlockTransactionCountByNumb
 
 func (suite *RPCPendingTestSuite) TestEth_Pending_GetBlockByNumber() {
 	//waitForBlock(5)
-
+	commitBlock(suite)
 	rpcResLatest := util.Call(suite.T(), suite.addr, "eth_getBlockByNumber", []interface{}{latestBlockNumber, true})
 	rpcResPending := util.Call(suite.T(), suite.addr, "eth_getBlockByNumber", []interface{}{pendingBlockNumber, true})
 

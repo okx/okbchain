@@ -991,8 +991,7 @@ func (suite *RPCTestSuite) TestEth_GetBlockByNumber() {
 	suite.Require().NoError(json.Unmarshal(rpcRes.Result, &currentBlockHeight))
 
 	rpcRes, err := CallWithError(suite.addr, "eth_getBlockByNumber", []interface{}{currentBlockHeight + 100, false})
-	suite.Require().NoError(err)
-	assertNullFromJSONResponse(suite.T(), rpcRes.Result)
+	suite.Require().Error(err)
 
 	// miss argument
 	_, err = CallWithError(suite.addr, "eth_getBlockByNumber", []interface{}{currentBlockHeight})
