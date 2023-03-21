@@ -44,9 +44,9 @@ func TestAsyncDB(t *testing.T) {
 	wg.Wait()
 	require.Equal(t, 2, memDb.Len())
 
-	require.EqualValues(t, 5, asyncDb.waitClear)
+	require.EqualValues(t, 5, asyncDb.waitPrune)
 	asyncDb.Prune()
-	require.EqualValues(t, 0, asyncDb.waitClear)
+	require.EqualValues(t, 0, asyncDb.waitPrune)
 	require.Equal(t, 0, asyncDb.preCommit.Len())
 
 	err = asyncDb.Close()
