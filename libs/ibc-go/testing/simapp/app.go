@@ -380,7 +380,7 @@ func NewSimApp(
 	app.ParamsKeeper.SetStakingKeeper(stakingKeeper)
 	app.MintKeeper = mint.NewKeeper(
 		codecProxy.GetCdc(), keys[mint.StoreKey], app.subspaces[mint.ModuleName], stakingKeeper,
-		app.SupplyKeeper, auth.FeeCollectorName,
+		app.SupplyKeeper, &app.ParamsKeeper, auth.FeeCollectorName,
 	)
 	app.DistrKeeper = distr.NewKeeper(
 		codecProxy.GetCdc(), keys[distr.StoreKey], app.subspaces[distr.ModuleName], stakingKeeper,

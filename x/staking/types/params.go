@@ -34,7 +34,7 @@ const (
 
 	DefaultEpoch              uint16 = DefaultBlocksPerEpoch
 	DefaultMaxValsToAddShares uint16 = DefaultMaxValsToVote
-	DefaultConsensusType             = common.PoA
+	DefaultConsensusType             = common.DPoS
 )
 
 var (

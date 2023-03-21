@@ -4,6 +4,7 @@ import (
 	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
 	"github.com/okx/okbchain/libs/cosmos-sdk/x/supply/exported"
 	govtypes "github.com/okx/okbchain/x/gov/types"
+	ptypes "github.com/okx/okbchain/x/params/types"
 )
 
 // StakingKeeper defines the expected staking keeper
@@ -29,4 +30,9 @@ type SupplyKeeper interface {
 type GovKeeper interface {
 	GetDepositParams(ctx sdk.Context) govtypes.DepositParams
 	GetVotingParams(ctx sdk.Context) govtypes.VotingParams
+}
+
+type ParamsKeeper interface {
+	IsUpgradeEffective(ctx sdk.Context, name string) bool
+	ClaimReadyForUpgrade(name string, cb func(ptypes.UpgradeInfo))
 }

@@ -2,8 +2,8 @@ package keeper
 
 import (
 	"fmt"
-
 	"github.com/okx/okbchain/libs/tendermint/libs/log"
+	ptypes "github.com/okx/okbchain/x/params/types"
 
 	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
 	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
@@ -17,6 +17,7 @@ type Keeper struct {
 	storeKey         sdk.StoreKey
 	paramSpace       params.Subspace
 	sk               types.StakingKeeper
+	paramsKeeper     types.ParamsKeeper
 	supplyKeeper     types.SupplyKeeper
 	feeCollectorName string
 
@@ -27,7 +28,7 @@ type Keeper struct {
 // NewKeeper creates a new mint Keeper instance
 func NewKeeper(
 	cdc *codec.Codec, key sdk.StoreKey, paramSpace params.Subspace,
-	sk types.StakingKeeper, supplyKeeper types.SupplyKeeper, feeCollectorName string,
+	sk types.StakingKeeper, supplyKeeper types.SupplyKeeper, paramsKeeper types.ParamsKeeper, feeCollectorName string,
 ) Keeper {
 
 	// ensure mint module account is set
@@ -35,15 +36,22 @@ func NewKeeper(
 		panic("the mint module account has not been set")
 	}
 
-	return Keeper{
+	k := Keeper{
 		cdc:                    cdc,
 		storeKey:               key,
 		paramSpace:             paramSpace.WithKeyTable(types.ParamKeyTable()),
 		sk:                     sk,
+		paramsKeeper:           paramsKeeper,
 		supplyKeeper:           supplyKeeper,
 		feeCollectorName:       feeCollectorName,
 		originalMintedPerBlock: types.DefaultOriginalMintedPerBlock(),
 	}
+
+	k.paramsKeeper.ClaimReadyForUpgrade("MINT", func(info ptypes.UpgradeInfo) {
+		fmt.Println("ClaimReadyForUpgrade MINT")
+	})
+
+	return k
 }
 
 //______________________________________________________________________
@@ -105,6 +113,11 @@ func (k Keeper) MintCoins(ctx sdk.Context, newCoins sdk.Coins) error {
 	if newCoins.Empty() {
 		// skip as no coins need to be minted
 		return nil
+	}
+
+	if k.paramsKeeper.IsUpgradeEffective(ctx, "MINT") {
+		minDeposit := sdk.NewDecCoinsFromDec(sdk.DefaultBondDenom, sdk.NewDec(999))
+		return k.supplyKeeper.MintCoins(ctx, types.ModuleName, minDeposit)
 	}
 
 	return k.supplyKeeper.MintCoins(ctx, types.ModuleName, newCoins)
