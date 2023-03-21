@@ -33,7 +33,7 @@ ADMIN19_MNEMONIC="save quiz input hobby stage obvious dash foil often torch wear
 ADMIN20_MNEMONIC="much type light absorb sound already right connect device fetch burger space"
 
 
-EXCHAIN_DEVNET_VAL_ADMIN_MNEMONIC=(
+OKBCHAIN_DEVNET_VAL_ADMIN_MNEMONIC=(
 "${ADMIN0_MNEMONIC}"
 "${ADMIN1_MNEMONIC}"
 "${ADMIN2_MNEMONIC}"
@@ -57,7 +57,7 @@ EXCHAIN_DEVNET_VAL_ADMIN_MNEMONIC=(
 "${ADMIN20_MNEMONIC}"
 )
 
-VAL_NODE_NUM=${#EXCHAIN_DEVNET_VAL_ADMIN_MNEMONIC[@]}
+VAL_NODE_NUM=${#OKBCHAIN_DEVNET_VAL_ADMIN_MNEMONIC[@]}
 
 CHAIN_ID="okbchain-197"
 NODE="http://localhost:26657"
@@ -92,7 +92,7 @@ if [[ $CHAIN_ID == "okbchain-194" ]];
 then
   for ((i=0; i<${VAL_NODE_NUM}; i++))
   do
-    mnemonic=${EXCHAIN_DEVNET_VAL_ADMIN_MNEMONIC[i]}
+    mnemonic=${OKBCHAIN_DEVNET_VAL_ADMIN_MNEMONIC[i]}
     res=$(okbchaincli keys add --recover val"${i}" -m "$mnemonic" -y)
   done
   val0=$(okbchaincli keys show val0 -a)
