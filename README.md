@@ -12,7 +12,7 @@ The Infrastructure of Decentralized Exchange
 
 This repository hosts `OKBChain`, the implementation of the OKBChain based on the [Cosmos SDK](https://github.com/cosmos/cosmos-sdk).
 
-**Note**: Requires [Go 1.18](https://golang.org/dl/)
+**Note**: Requires [Go 1.20](https://golang.org/dl/)
 
 
 

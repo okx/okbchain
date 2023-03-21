@@ -222,12 +222,12 @@ Prepare() {
 
   v=$(/usr/local/go/bin/go version | { read _ _ v _; echo ${v#go}; })
   # shellcheck disable=SC2046
-  if [ $(checkgoversion "$v") -ge $(checkgoversion "1.18") ]
+  if [ $(checkgoversion "$v") -ge $(checkgoversion "1.20") ]
   then
     echo "$v"
     echo "should not install go"
   else
-    echo "should install go version above 1.18"
+    echo "should install go version above 1.20"
     installgo
   fi
 
