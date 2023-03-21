@@ -166,9 +166,7 @@ func NewAsyncKeyValueStore(db ethdb.KeyValueStore, autoPruneOff bool) *AsyncKeyV
 	store.preCommit.store = store
 	store.closeWg.Add(1)
 	go store.commitRoutine()
-	if !store.disableAutoPrune {
-		go store.pruneRoutine()
-	}
+	go store.pruneRoutine()
 	store.preCommitPtr = store.preCommitList.PushBack(nil)
 	store.waitPrunePtr = store.preCommitPtr
 	return store
@@ -356,9 +354,11 @@ func (store *AsyncKeyValueStore) commitRoutine() {
 		store.setPreCommitPtr(taskEle)
 		waitClear := atomic.AddInt64(&store.waitPrune, 1)
 
-		if waitClear >= 100 || batchSize > 1_000_000 {
-			store.pruneCh <- struct{}{}
-			batchSize = 0
+		if !store.disableAutoPrune {
+			if waitClear >= 100 || batchSize > 1_000_000 {
+				store.pruneCh <- struct{}{}
+				batchSize = 0
+			}
 		}
 	}
 }
@@ -387,7 +387,7 @@ func (store *AsyncKeyValueStore) pruneRoutine() {
 }
 
 func (store *AsyncKeyValueStore) Prune() {
-	if !store.disableAutoPrune {
+	if store == nil || !store.disableAutoPrune {
 		return
 	}
 	store.mtx.Lock()

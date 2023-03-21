@@ -14,24 +14,28 @@ const (
 )
 
 const (
-	FlagTrieDirtyDisabled  = "trie.dirty-disabled"
-	FlagTrieCacheSize      = "trie.cache-size"
-	FlagTrieNodesLimit     = "trie.nodes-limit"
-	FlagTrieImgsLimit      = "trie.imgs-limit"
-	FlagTrieInMemory       = "trie.in-memory"
-	FlagTrieAsyncDB        = "trie.asyncdb"
-	FlagTrieAsyncDBInitCap = "trie.asyncdb.init-cap"
+	FlagTrieDirtyDisabled = "trie.dirty-disabled"
+	FlagTrieCacheSize     = "trie.cache-size"
+	FlagTrieNodesLimit    = "trie.nodes-limit"
+	FlagTrieImgsLimit     = "trie.imgs-limit"
+	FlagTrieInMemory      = "trie.in-memory"
+
+	FlagTrieAsyncDB               = "trie.asyncdb"
+	FlagTrieAsyncDBInitCap        = "trie.asyncdb.init-cap"
+	FlagTrieAsyncDBAutoPruningOff = "trie.asyncdb.auto-pruning-off"
 )
 
 var (
-	TrieDirtyDisabled        = false
-	TrieCacheSize      uint  = 2048 // MB
-	TrieNodesLimit     uint  = 256  // MB
-	TrieImgsLimit      uint  = 4    // MB
-	TrieCommitGap      int64 = 100
-	TriesInMemory      uint  = 100
-	TrieAsyncDB              = true
-	TrieAsyncDBInitCap       = 200_0000
+	TrieDirtyDisabled       = false
+	TrieCacheSize     uint  = 2048 // MB
+	TrieNodesLimit    uint  = 256  // MB
+	TrieImgsLimit     uint  = 4    // MB
+	TrieCommitGap     int64 = 100
+	TriesInMemory     uint  = 100
+
+	TrieAsyncDB               = true
+	TrieAsyncDBInitCap        = 200_0000
+	TrieAsyncDBAutoPruningOff = false
 
 	EnableAsyncCommit = false
 )
