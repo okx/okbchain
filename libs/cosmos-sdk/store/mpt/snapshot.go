@@ -15,6 +15,8 @@ var (
 )
 
 const (
+	// snapshotMemoryLayerCount snapshot memory layer count
+	// as we dont rollback transactions so we only keep 1 memory layer
 	snapshotMemoryLayerCount = 1
 )
 
@@ -83,15 +85,15 @@ func (ms *MptStore) commitSnap(root common.Hash) {
 	if ms.snap == nil {
 		return
 	}
-	// Only update if there's a state transition (skip empty Clique blocks)
+	// Only update if there's a state transition
 	if parent := ms.snap.Root(); parent != root {
 		if err := ms.snaps.Update(root, parent, ms.snapDestructs, ms.snapAccounts, ms.snapStorage); err != nil && ms.logger != nil {
 			ms.logger.Error("Failed to update snapshot tree", "from", parent, "to", root, "err", err)
 		}
-		// Keep 128 diff layers in the memory, persistent layer is 129th.
+		// Keep snapshotMemoryLayerCount diff layers in the memory,
+		// persistent layer is snapshotMemoryLayerCount+1 th.
 		// - head layer is paired with HEAD state
 		// - head-1 layer is paired with HEAD-1 state
-		// - head-127 layer(bottom-most diff layer) is paired with HEAD-127 state
 		if err := ms.snaps.Cap(root, snapshotMemoryLayerCount); err != nil && ms.logger != nil {
 			ms.logger.Error("Failed to cap snapshot tree", "root", root, "layers", 128, "err", err)
 		}
