@@ -153,7 +153,7 @@ func (c Client) Block(height *int64) (*ctypes.ResultBlock, error) {
 	return core.Block(&rpctypes.Context{}, height)
 }
 
-func (c *Client) BlockByHash(hash []byte) (*ctypes.ResultBlock, error) {
+func (c Client) BlockByHash(hash []byte) (*ctypes.ResultBlock, error) {
 	return core.BlockByHash(&rpctypes.Context{}, hash)
 }
 
