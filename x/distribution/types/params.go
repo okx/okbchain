@@ -40,7 +40,7 @@ func DefaultParams() Params {
 	return Params{
 		CommunityTax:            sdk.NewDecWithPrec(2, 2), // 2%
 		WithdrawAddrEnabled:     true,
-		DistributionType:        0,
+		DistributionType:        1,
 		WithdrawRewardEnabled:   true,
 		RewardTruncatePrecision: 0,
 	}
