@@ -14,22 +14,24 @@ const (
 )
 
 const (
-	FlagTrieDirtyDisabled = "trie.dirty-disabled"
-	FlagTrieCacheSize     = "trie.cache-size"
-	FlagTrieNodesLimit    = "trie.nodes-limit"
-	FlagTrieImgsLimit     = "trie.imgs-limit"
-	FlagTrieInMemory      = "trie.in-memory"
-	FlagTrieAsyncDB       = "trie.asyncdb"
+	FlagTrieDirtyDisabled  = "trie.dirty-disabled"
+	FlagTrieCacheSize      = "trie.cache-size"
+	FlagTrieNodesLimit     = "trie.nodes-limit"
+	FlagTrieImgsLimit      = "trie.imgs-limit"
+	FlagTrieInMemory       = "trie.in-memory"
+	FlagTrieAsyncDB        = "trie.asyncdb"
+	FlagTrieAsyncDBInitCap = "trie.asyncdb.init-cap"
 )
 
 var (
-	TrieDirtyDisabled       = false
-	TrieCacheSize     uint  = 2048 // MB
-	TrieNodesLimit    uint  = 256  // MB
-	TrieImgsLimit     uint  = 4    // MB
-	TrieCommitGap     int64 = 100
-	TriesInMemory     uint  = 100
-	TrieAsyncDB             = true
+	TrieDirtyDisabled        = false
+	TrieCacheSize      uint  = 2048 // MB
+	TrieNodesLimit     uint  = 256  // MB
+	TrieImgsLimit      uint  = 4    // MB
+	TrieCommitGap      int64 = 100
+	TriesInMemory      uint  = 100
+	TrieAsyncDB              = true
+	TrieAsyncDBInitCap       = 200_0000
 
 	EnableAsyncCommit = false
 )

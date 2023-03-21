@@ -155,7 +155,7 @@ func NewAsyncKeyValueStore(db ethdb.KeyValueStore, autoPruneOff bool) *AsyncKeyV
 	store := &AsyncKeyValueStore{
 		KeyValueStore: db,
 		preCommit: preCommitMap{
-			data: make(map[string]preCommitValue, 200_0000),
+			data: make(map[string]preCommitValue, TrieAsyncDBInitCap),
 		},
 		preCommitList:    list.New(),
 		commitCh:         make(chan struct{}, 10000*10),
