@@ -282,7 +282,7 @@ func (ms *MptStore) Delete(key []byte) {
 		addr, stateRoot, realKey := decodeAddressStorageInfo(key)
 		t := ms.tryGetStorageTrie(addr, stateRoot, true)
 		t.TryDelete(realKey)
-		ms.updateStorageDestructs(addr.Bytes(), realKey)
+		ms.updateSnapStorages(addr, realKey, nil)
 	case addressType:
 		ms.trie.TryDelete(key)
 		ms.updateDestructs(key)
