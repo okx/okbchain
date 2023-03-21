@@ -113,6 +113,9 @@ func generateMptStore(logger tmlog.Logger, id types.CommitID, db ethstate.Databa
 		exitSignal:          make(chan struct{}),
 	}
 	err := mptStore.openTrie(id)
+	if logger != nil {
+		gAsyncDB.SetLogger(logger.With("module", "asyncdb"))
+	}
 
 	return mptStore, err
 }
@@ -450,6 +453,7 @@ func (ms *MptStore) otherNodePersist(curMptRoot ethcmn.Hash, curHeight int64) {
 			if err := triedb.Commit(chRoot, true, nil); err != nil {
 				panic("fail to commit mpt data: " + err.Error())
 			}
+			gAsyncDB.LogStats()
 		}
 		ms.SetLatestStoredBlockHeight(uint64(curHeight))
 		if ms.logger != nil {
@@ -517,6 +521,10 @@ func (ms *MptStore) StopWithVersion(targetVersion int64) error {
 
 		for !ms.triegc.Empty() {
 			ms.db.TrieDB().Dereference(ms.triegc.PopItem().(ethcmn.Hash))
+		}
+		err := gAsyncDB.Close()
+		if ms.logger != nil && err != nil {
+			ms.logger.Error("Close async db", "err", err)
 		}
 	}
 
