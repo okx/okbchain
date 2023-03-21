@@ -13,7 +13,7 @@ import (
 type UpgradeStatus uint32
 
 const (
-	ProposalTypeUpgrade = "oKBCUpgrade"
+	ProposalTypeUpgrade = "OKBCUpgrade"
 	UpgradeRouterKey    = "okbcUpgrade"
 
 	QueryUpgrade = "okbcUpgrade"
