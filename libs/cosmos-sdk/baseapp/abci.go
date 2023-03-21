@@ -158,10 +158,6 @@ func (app *BaseApp) BeginBlock(req abci.RequestBeginBlock) (res abci.ResponseBeg
 
 	app.deliverState.ctx.SetBlockGasMeter(gasMeter)
 
-	if app.beginBlocker != nil {
-		res = app.beginBlocker(app.deliverState.ctx, req)
-	}
-
 	// set the signed validators for addition to context in deliverTx
 	app.voteInfos = req.LastCommitInfo.GetVotes()
 
