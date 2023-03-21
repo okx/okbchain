@@ -181,9 +181,10 @@ func (store *AsyncKeyValueStore) SetLogger(logger log.Logger) {
 
 func (store *AsyncKeyValueStore) Has(key []byte) (bool, error) {
 	store.mtx.RLock()
-	defer store.mtx.RUnlock()
+	v, ok := store.preCommit.data[string(key)]
+	store.mtx.RUnlock()
 
-	if v, ok := store.preCommit.data[string(key)]; ok {
+	if ok {
 		return !v.deleted, nil
 	}
 
@@ -192,9 +193,10 @@ func (store *AsyncKeyValueStore) Has(key []byte) (bool, error) {
 
 func (store *AsyncKeyValueStore) Get(key []byte) ([]byte, error) {
 	store.mtx.RLock()
-	defer store.mtx.RUnlock()
+	v, ok := store.preCommit.data[string(key)]
+	store.mtx.RUnlock()
 
-	if v, ok := store.preCommit.data[string(key)]; ok {
+	if ok {
 		if v.deleted {
 			return nil, nil
 		}
