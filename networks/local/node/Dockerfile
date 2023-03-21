@@ -9,13 +9,13 @@ WORKDIR /okbchain
 # Add source files
 COPY . .
 
-# build exchain
+# build okbchain
 RUN make build-linux
 
 # Final image
 FROM golang:1.20 as final
 
-WORKDIR /exchaind
+WORKDIR /okbchaind
 # Copy over binaries from the build-env
 COPY --from=build-env /okbchain/build/okbchaind /usr/bin/okbchaind
 COPY --from=build-env /okbchain/build/okbchaincli /usr/bin/okbchaincli

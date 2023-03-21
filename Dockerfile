@@ -27,5 +27,5 @@ WORKDIR /root
 COPY --from=build-env /go/bin/okbchaind /usr/bin/okbchaind
 COPY --from=build-env /go/bin/okbchaincli /usr/bin/okbchaincli
 
-# Run okbchaind by default, omit entrypoint to ease using container with exchaincli
+# Run okbchaind by default, omit entrypoint to ease using container with okbchaincli
 CMD ["okbchaind"]
