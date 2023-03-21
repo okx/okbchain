@@ -426,13 +426,9 @@ func queryEthBlockByHeight(ctx sdk.Context, path []string, keeper Keeper) ([]byt
 			"Insufficient parameters, params[1] convert to int failed")
 	}
 
-	block, found := keeper.GetEthBlockByHeight(ctx, uint64(height))
+	res, found := keeper.GetEthBlockBytesByHeight(ctx, uint64(height))
 	if !found {
 		return nil, fmt.Errorf("not found block by heith(%d)", height)
-	}
-	res, err := json.Marshal(block)
-	if err != nil {
-		return nil, err
 	}
 
 	return res, nil
@@ -445,13 +441,9 @@ func queryEthBlockByHash(ctx sdk.Context, path []string, keeper Keeper) ([]byte,
 	}
 
 	blockHash := ethcmn.HexToHash(path[1])
-	block, found := keeper.GetEthBlockByHash(ctx, blockHash.Bytes())
+	res, found := keeper.GetEthBlockBytesByHash(ctx, blockHash.Bytes())
 	if !found {
 		return nil, fmt.Errorf("not found block by hash(%s)", blockHash.Hex())
-	}
-	res, err := json.Marshal(block)
-	if err != nil {
-		return nil, err
 	}
 
 	return res, nil

@@ -142,17 +142,13 @@ func (csdb *CommitStateDB) setEthBlockByHeightInRawDB(height uint64, block Block
 	csdb.db.TrieDB().DiskDB().Put(key, value)
 }
 
-func (csdb *CommitStateDB) getEthBlockByHeightInRawDB(height uint64) (*Block, bool) {
+func (csdb *CommitStateDB) getEthBlockBytesByHeightInRawDB(height uint64) ([]byte, bool) {
 	key := AppendBlockByHeightKey(height)
 	bz, err := csdb.db.TrieDB().DiskDB().Get(key)
 	if err != nil {
 		return nil, false
 	}
-	var b Block
-	if err := json.Unmarshal(bz, &b); err != nil {
-		return nil, false
-	}
-	return &b, true
+	return bz, true
 }
 
 func (csdb *CommitStateDB) setEthBlockByHashInRawDB(hash []byte, block Block) {
@@ -164,17 +160,13 @@ func (csdb *CommitStateDB) setEthBlockByHashInRawDB(hash []byte, block Block) {
 	csdb.db.TrieDB().DiskDB().Put(key, value)
 }
 
-func (csdb *CommitStateDB) getEthBlockByHashInRawDB(hash []byte) (*Block, bool) {
+func (csdb *CommitStateDB) getEthBlockBytesByHashInRawDB(hash []byte) ([]byte, bool) {
 	key := AppendBlockByHashKey(hash)
 	bz, err := csdb.db.TrieDB().DiskDB().Get(key)
 	if err != nil {
 		return nil, false
 	}
-	var b Block
-	if err := json.Unmarshal(bz, &b); err != nil {
-		return nil, false
-	}
-	return &b, true
+	return bz, true
 }
 
 // getDeletedStateObject is similar to getStateObject, but instead of returning

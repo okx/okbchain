@@ -368,8 +368,8 @@ func (csdb *CommitStateDB) SetEthBlockByHeight(height uint64, block Block) {
 	csdb.setEthBlockByHeightInRawDB(height, block)
 }
 
-func (csdb *CommitStateDB) GetEthBlockByHeight(height uint64) (*Block, bool) {
-	return csdb.getEthBlockByHeightInRawDB(height)
+func (csdb *CommitStateDB) GetEthBlockBytesByHeight(height uint64) ([]byte, bool) {
+	return csdb.getEthBlockBytesByHeightInRawDB(height)
 }
 
 func (csdb *CommitStateDB) SetEthBlockByHash(hash []byte, block Block) {
@@ -381,8 +381,8 @@ func (csdb *CommitStateDB) SetEthBlockByHash(hash []byte, block Block) {
 	csdb.setEthBlockByHashInRawDB(hash, block)
 }
 
-func (csdb *CommitStateDB) GetEthBlockByHash(hash []byte) (*Block, bool) {
-	return csdb.getEthBlockByHashInRawDB(hash)
+func (csdb *CommitStateDB) GetEthBlockBytesByHash(hash []byte) ([]byte, bool) {
+	return csdb.getEthBlockBytesByHashInRawDB(hash)
 }
 
 // SetParams sets the evm parameters to the param space.

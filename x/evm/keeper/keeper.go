@@ -272,16 +272,16 @@ func (k Keeper) SetEthBlockByHeight(ctx sdk.Context, height uint64, block types.
 	types.CreateEmptyCommitStateDB(k.GenerateCSDBParams(), ctx).SetEthBlockByHeight(height, block)
 }
 
-func (k Keeper) GetEthBlockByHeight(ctx sdk.Context, height uint64) (*types.Block, bool) {
-	return types.CreateEmptyCommitStateDB(k.GenerateCSDBParams(), ctx).GetEthBlockByHeight(height)
+func (k Keeper) GetEthBlockBytesByHeight(ctx sdk.Context, height uint64) ([]byte, bool) {
+	return types.CreateEmptyCommitStateDB(k.GenerateCSDBParams(), ctx).GetEthBlockBytesByHeight(height)
 }
 
 func (k Keeper) SetEthBlockByHash(ctx sdk.Context, hash []byte, block types.Block) {
 	types.CreateEmptyCommitStateDB(k.GenerateCSDBParams(), ctx).SetEthBlockByHash(hash, block)
 }
 
-func (k Keeper) GetEthBlockByHash(ctx sdk.Context, hash []byte) (*types.Block, bool) {
-	return types.CreateEmptyCommitStateDB(k.GenerateCSDBParams(), ctx).GetEthBlockByHash(hash)
+func (k Keeper) GetEthBlockBytesByHash(ctx sdk.Context, hash []byte) ([]byte, bool) {
+	return types.CreateEmptyCommitStateDB(k.GenerateCSDBParams(), ctx).GetEthBlockBytesByHash(hash)
 }
 
 // ----------------------------------------------------------------------------
