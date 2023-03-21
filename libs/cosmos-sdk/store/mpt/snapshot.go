@@ -68,6 +68,19 @@ func (ms *MptStore) updateDestructs(addr []byte) {
 	ms.snapRWLock.Unlock()
 }
 
+func (ms *MptStore) updateStorageDestructs(addr, realKey []byte) {
+	if ms.snap == nil {
+		return
+	}
+	addrHash := ethcrypto.Keccak256Hash(AddressStoreKey(addr))
+	storageHash := mpttypes.Keccak256HashWithSyncPool(realKey[:])
+	ms.snapRWLock.Lock()
+	if value, ok := ms.snapStorage[addrHash]; ok {
+		delete(value, storageHash)
+	}
+	ms.snapRWLock.Unlock()
+}
+
 func (ms *MptStore) genStorageKey(addr, realKey []byte) []byte {
 	//	addrHash := mpttypes.Keccak256HashWithSyncPool(AddressStoreKey(addr))
 	//	storageHash := mpttypes.Keccak256HashWithSyncPool(realKey[:])
