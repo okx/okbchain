@@ -68,6 +68,16 @@ func (ms *MptStore) updateDestructs(addr []byte) {
 	ms.snapRWLock.Unlock()
 }
 
+func (ms *MptStore) genStorageKey(addr, realKey []byte) []byte {
+	addrHash := mpttypes.Keccak256HashWithSyncPool(AddressStoreKey(addr))
+	storageHash := mpttypes.Keccak256HashWithSyncPool(realKey[:])
+	key := make([]byte, 0, len(addrHash)+len(storageHash))
+	key = append(key, addrHash.Bytes()...)
+	key = append(key, storageHash.Bytes()...)
+
+	return key
+}
+
 func (ms *MptStore) prepareSnap(root common.Hash) {
 	if ms.snaps == nil {
 		return
