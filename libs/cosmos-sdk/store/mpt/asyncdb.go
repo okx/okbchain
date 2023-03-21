@@ -313,9 +313,9 @@ func (store *AsyncKeyValueStore) LogStats() {
 
 	store.logger.Info("AsyncKeyValueStore stats",
 		"waitCommitOp", atomic.LoadInt64(&store.waitCommit),
-		"waitClearOp", atomic.LoadInt64(&store.waitPrune),
+		"waitPruneOp", atomic.LoadInt64(&store.waitPrune),
 		"preCommitMapSize", store.preCommit.Len(),
-		"clearInMap", atomic.LoadInt64(&store.pruneNum),
+		"pruneInMap", atomic.LoadInt64(&store.pruneNum),
 	)
 }
 
