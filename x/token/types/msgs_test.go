@@ -185,7 +185,7 @@ func TestNewTokenMsgSend(t *testing.T) {
 	}{
 		{NewMsgTokenSend(fromAddr, toAddr, coins), nil},
 		{NewMsgTokenSend(fromAddr, toAddr, sdk.SysCoins{}), common.ErrInsufficientCoins(DefaultParamspace, "")},
-		{NewMsgTokenSend(fromAddr, toAddr, Errorcoins), ErrInvalidCoins("100.000000000000000000okc,100.000000000000000000okc,100.000000000000000000oke")},
+		{NewMsgTokenSend(fromAddr, toAddr, Errorcoins), ErrInvalidCoins("100.000000000000000000okb,100.000000000000000000okb,100.000000000000000000okb")},
 		{NewMsgTokenSend(sdk.AccAddress{}, toAddr, coins), ErrAddressIsRequired()},
 		{NewMsgTokenSend(fromAddr, sdk.AccAddress{}, coins), ErrAddressIsRequired()},
 		{NewMsgTokenSend(fromAddr, toAddr, notValidCoins), ErrInvalidCoins("100.000000000000000000")},
