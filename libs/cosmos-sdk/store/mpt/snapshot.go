@@ -6,7 +6,6 @@ import (
 	"github.com/ethereum/go-ethereum/core/rawdb"
 	"github.com/ethereum/go-ethereum/core/state/snapshot"
 	ethcrypto "github.com/ethereum/go-ethereum/crypto"
-	snap "github.com/okx/okbchain/libs/cosmos-sdk/store/mpt/snapshot"
 	mpttypes "github.com/okx/okbchain/libs/cosmos-sdk/store/mpt/types"
 )
 
@@ -28,7 +27,7 @@ func SetSnapshotRebuild(rebuild bool) {
 }
 
 func (ms *MptStore) openSnapshot() error {
-	if ms == nil || ms.db == nil || ms.trie == nil || snap.GetDiskDB() == nil || gDisableSnapshot {
+	if ms == nil || ms.db == nil || ms.trie == nil || ms.db.TrieDB().DiskDB() == nil || gDisableSnapshot {
 		return fmt.Errorf("mpt store is nil or mpt trie is nil")
 	}
 	// If the chain was rewound past the snapshot persistent layer (causing
@@ -38,14 +37,14 @@ func (ms *MptStore) openSnapshot() error {
 	var recovery bool
 
 	version := ms.CurrentVersion()
-	if layer := rawdb.ReadSnapshotRecoveryNumber(snap.GetDiskDB()); layer != nil && *layer > uint64(version) {
+	if layer := rawdb.ReadSnapshotRecoveryNumber(ms.db.TrieDB().DiskDB()); layer != nil && *layer > uint64(version) {
 		if ms.logger != nil {
 			ms.logger.Error("Enabling snapshot recovery", "chainhead", version, "diskbase", *layer)
 		}
 		recovery = true
 	}
 	var err error
-	ms.snaps, err = snapshot.NewCustom(snap.GetDiskDB(), ms.db.TrieDB(), 256, ms.originalRoot, false, gSnapshotRebuild, recovery, ms.retriever)
+	ms.snaps, err = snapshot.NewCustom(ms.db.TrieDB().DiskDB(), ms.db.TrieDB(), 256, ms.originalRoot, false, gSnapshotRebuild, recovery, ms.retriever)
 	if err != nil {
 		if ms.logger != nil {
 			ms.logger.Error("open snapshot error", "chainhead", version, "error", err)
