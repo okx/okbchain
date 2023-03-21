@@ -182,6 +182,9 @@ func (ms *MptStore) getSnapStorage(addr common.Address, key []byte) ([]byte, err
 	storageHash := mpttypes.Keccak256HashWithSyncPool(key[:])
 	ms.snapRWLock.RLock()
 	defer ms.snapRWLock.RUnlock()
+	if _, ok := ms.snapDestructs[addrHash]; ok {
+		return nil, nil
+	}
 	if storage, ok := ms.snapStorage[addrHash]; ok {
 		if v, ok := storage[storageHash]; ok {
 			return v, nil
