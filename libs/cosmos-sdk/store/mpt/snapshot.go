@@ -71,8 +71,9 @@ func (ms *MptStore) updateDestructs(addr []byte) {
 func (ms *MptStore) genStorageKey(addr, realKey []byte) []byte {
 	//	addrHash := mpttypes.Keccak256HashWithSyncPool(AddressStoreKey(addr))
 	//	storageHash := mpttypes.Keccak256HashWithSyncPool(realKey[:])
-	key := make([]byte, 0, len(addr)+len(realKey))
-	key = append(key, addr...)
+	addrWithPrefix := AddressStoreKey(addr)
+	key := make([]byte, 0, len(addrWithPrefix)+len(realKey))
+	key = append(key, addrWithPrefix...)
 	key = append(key, realKey...)
 
 	return key
