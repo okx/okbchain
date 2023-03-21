@@ -3,8 +3,6 @@ package keeper
 import (
 	"math/big"
 
-	"github.com/davecgh/go-spew/spew"
-
 	"github.com/okx/okbchain/x/evm/watcher"
 
 	tmtypes "github.com/okx/okbchain/libs/tendermint/types"
@@ -30,7 +28,15 @@ func (k *Keeper) BeginBlock(ctx sdk.Context, req abci.RequestBeginBlock) {
 	// Gas costs are handled within msg handler so costs should be ignored
 	ctx.SetGasMeter(sdk.NewInfiniteGasMeter())
 
-	blockHash := common.BytesToHash(req.Hash)
+	// Set the hash -> height and height -> hash mapping.
+	currentHash := req.Hash
+	height := req.Header.GetHeight()
+	blockHash := common.BytesToHash(currentHash)
+	k.SetHeightHash(ctx, uint64(height), blockHash)
+	k.SetBlockHeight(ctx, currentHash, height)
+	// Add latest block height and hash to cache
+	k.AddHeightHashToCache(height, blockHash.Hex())
+	// Add latest block height and hash to cache
 	// reset counters that are used on CommitStateDB.Prepare
 	if !ctx.IsTraceTx() {
 		k.Bloom = big.NewInt(0)
@@ -60,7 +66,25 @@ func (k *Keeper) EndBlock(ctx sdk.Context, req abci.RequestEndBlock) []abci.Vali
 
 	// set the block bloom filter bytes to store
 	bloom := ethtypes.BytesToBloom(k.Bloom.Bytes())
+
 	k.SetBlockBloom(ctx, req.Height, bloom)
+	if types.GetEnableBloomFilter() {
+		// the hash of current block is stored when executing BeginBlock of next block.
+		// so update section in the next block.
+		if indexer := types.GetIndexer(); indexer != nil {
+			if types.GetIndexer().IsProcessing() {
+				// notify new height
+				go func() {
+					indexer.NotifyNewHeight(ctx)
+				}()
+			} else {
+				interval := uint64(req.Height - tmtypes.GetStartBlockHeight())
+				if interval >= (indexer.GetValidSections()+1)*types.BloomBitsBlocks {
+					go types.GetIndexer().ProcessSection(ctx, k, interval, k.Watcher.GetBloomDataPoint())
+				}
+			}
+		}
+	}
 
 	if watcher.IsWatcherEnabled() && k.Watcher.IsFirstUse() {
 		store := k.GetParamSubspace().CustomKVStore(ctx)
@@ -93,34 +117,11 @@ func (k *Keeper) EndBlock(ctx sdk.Context, req abci.RequestEndBlock) []abci.Vali
 			evmTxs = append(evmTxs, common.BytesToHash(txRes.Hash))
 		}
 	}
-	block := watcher.NewBlock(uint64(req.Height), bloom, common.BytesToHash(req.Hash),
+	block, ethBlockHash := watcher.NewBlock(uint64(req.Height), bloom,
 		ctx.BlockHeader(), uint64(0xffffffff), big.NewInt(gasUsed), evmTxs)
-	spew.Dump("end blocker block", block)
-	ethBlockHash := block.EthHash()
-	// Set the hash -> height and height -> hash mapping.
-	k.SetHeightHash(ctx, uint64(req.Height), ethBlockHash)
-	k.SetBlockHeight(ctx, ethBlockHash.Bytes(), req.Height)
-	// Add latest block height and hash to cache
-	k.AddHeightHashToCache(req.Height, ethBlockHash.Hex())
-	ctx.Logger().Error("end blocker", "hash", ethBlockHash.Hex(), "height", req.Height)
 
-	if types.GetEnableBloomFilter() {
-		// the hash of current block is stored when executing BeginBlock of next block.
-		// so update section in the next block.
-		if indexer := types.GetIndexer(); indexer != nil {
-			if types.GetIndexer().IsProcessing() {
-				// notify new height
-				go func() {
-					indexer.NotifyNewHeight(ctx)
-				}()
-			} else {
-				interval := uint64(req.Height - tmtypes.GetStartBlockHeight())
-				if interval >= (indexer.GetValidSections()+1)*types.BloomBitsBlocks {
-					go types.GetIndexer().ProcessSection(ctx, k, interval, k.Watcher.GetBloomDataPoint())
-				}
-			}
-		}
-	}
+	k.SetEthBlockByHeight(ctx, uint64(req.Height), block)
+	k.SetEthBlockByHash(ctx, ethBlockHash.Bytes(), block)
 
 	if watcher.IsWatcherEnabled() {
 		params := k.GetParams(ctx)

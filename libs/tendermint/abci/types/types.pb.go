@@ -808,7 +808,6 @@ func (m *RequestDeliverTx) GetTx() []byte {
 type RequestEndBlock struct {
 	Height               int64                `protobuf:"varint,1,opt,name=height,proto3" json:"height,omitempty"`
 	DeliverTxs           []*ResponseDeliverTx `json:"-"`
-	Hash                 []byte               `json:"-"`
 	XXX_NoUnkeyedLiteral struct{}             `json:"-"`
 	XXX_unrecognized     []byte               `json:"-"`
 	XXX_sizecache        int32                `json:"-"`

@@ -209,7 +209,7 @@ func (w *Watcher) ExecuteDelayEraseKey(delayEraseKey [][]byte) {
 	}
 }
 
-func (w *Watcher) SaveBlock(block Block, ethBlockHash common.Hash) {
+func (w *Watcher) SaveBlock(block evmtypes.Block, ethBlockHash common.Hash) {
 	if !w.Enabled() {
 		return
 	}

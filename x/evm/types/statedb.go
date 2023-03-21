@@ -4,12 +4,13 @@ import (
 	"bytes"
 	"encoding/hex"
 	"fmt"
-	"github.com/VictoriaMetrics/fastcache"
-	ethermint "github.com/okx/okbchain/app/types"
-	"github.com/tendermint/go-amino"
 	"math/big"
 	"sort"
 	"sync"
+
+	"github.com/VictoriaMetrics/fastcache"
+	ethermint "github.com/okx/okbchain/app/types"
+	"github.com/tendermint/go-amino"
 
 	"github.com/okx/okbchain/libs/system/trace"
 
@@ -356,6 +357,32 @@ func (csdb *CommitStateDB) SetHeightHash(height uint64, hash ethcmn.Hash) {
 	}
 
 	csdb.setHeightHashInRawDB(height, hash)
+}
+
+func (csdb *CommitStateDB) SetEthBlockByHeight(height uint64, block Block) {
+	if !csdb.ctx.IsCheckTx() {
+		funcName := "SetEthBlockByHeight"
+		trace.StartTxLog(funcName)
+		defer trace.StopTxLog(funcName)
+	}
+	csdb.setEthBlockByHeightInRawDB(height, block)
+}
+
+func (csdb *CommitStateDB) GetEthBlockByHeight(height uint64) (*Block, bool) {
+	return csdb.getEthBlockByHeightInRawDB(height)
+}
+
+func (csdb *CommitStateDB) SetEthBlockByHash(hash []byte, block Block) {
+	if !csdb.ctx.IsCheckTx() {
+		funcName := "SetEthBlockByHash"
+		trace.StartTxLog(funcName)
+		defer trace.StopTxLog(funcName)
+	}
+	csdb.setEthBlockByHashInRawDB(hash, block)
+}
+
+func (csdb *CommitStateDB) GetEthBlockByHash(hash []byte) (*Block, bool) {
+	return csdb.getEthBlockByHashInRawDB(hash)
 }
 
 // SetParams sets the evm parameters to the param space.
@@ -1151,8 +1178,8 @@ func (csdb *CommitStateDB) Prepare(thash, bhash ethcmn.Hash, txi int) {
 // CreateAccount is called during the EVM CREATE operation. The situation might
 // arise that a contract does the following:
 //
-//   1. sends funds to sha(account ++ (nonce + 1))
-//   2. tx_create(sha(account ++ nonce)) (note that this gets the address of 1)
+//  1. sends funds to sha(account ++ (nonce + 1))
+//  2. tx_create(sha(account ++ nonce)) (note that this gets the address of 1)
 //
 // Carrying over the balance ensures that Ether doesn't disappear.
 func (csdb *CommitStateDB) CreateAccount(addr ethcmn.Address) {

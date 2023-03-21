@@ -1,8 +1,10 @@
 package types
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
+
 	ethermint "github.com/okx/okbchain/app/types"
 
 	ethcmn "github.com/ethereum/go-ethereum/common"
@@ -131,6 +133,50 @@ func (csdb *CommitStateDB) getHeightHashInRawDB(height uint64) ethcmn.Hash {
 	return ethcmn.BytesToHash(bz)
 }
 
+func (csdb *CommitStateDB) setEthBlockByHeightInRawDB(height uint64, block Block) {
+	key := AppendBlockByHeightKey(height)
+	value, err := json.Marshal(block)
+	if err != nil {
+		panic(err)
+	}
+	csdb.db.TrieDB().DiskDB().Put(key, value)
+}
+
+func (csdb *CommitStateDB) getEthBlockByHeightInRawDB(height uint64) (*Block, bool) {
+	key := AppendBlockByHeightKey(height)
+	bz, err := csdb.db.TrieDB().DiskDB().Get(key)
+	if err != nil {
+		return nil, false
+	}
+	var b Block
+	if err := json.Unmarshal(bz, &b); err != nil {
+		return nil, false
+	}
+	return &b, true
+}
+
+func (csdb *CommitStateDB) setEthBlockByHashInRawDB(hash []byte, block Block) {
+	key := AppendBlockByHashKey(hash)
+	value, err := json.Marshal(block)
+	if err != nil {
+		panic(err)
+	}
+	csdb.db.TrieDB().DiskDB().Put(key, value)
+}
+
+func (csdb *CommitStateDB) getEthBlockByHashInRawDB(hash []byte) (*Block, bool) {
+	key := AppendBlockByHashKey(hash)
+	bz, err := csdb.db.TrieDB().DiskDB().Get(key)
+	if err != nil {
+		return nil, false
+	}
+	var b Block
+	if err := json.Unmarshal(bz, &b); err != nil {
+		return nil, false
+	}
+	return &b, true
+}
+
 // getDeletedStateObject is similar to getStateObject, but instead of returning
 // nil for a deleted state object, it returns the actual object with the deleted
 // flag set. This is needed by the state journal to revert to the correct s-
@@ -168,7 +214,7 @@ func (csdb *CommitStateDB) MarkUpdatedAcc(addList []ethcmn.Address) {
 	}
 }
 
-//TODO this line code only get contract_storage_merkle_proof, have not acc_merkle_proof
+// TODO this line code only get contract_storage_merkle_proof, have not acc_merkle_proof
 // GetStorageProof returns the Merkle proof for given storage slot.
 func (csdb *CommitStateDB) GetStorageProof(a ethcmn.Address, key ethcmn.Hash) ([][]byte, error) {
 	var proof mpt.ProofList

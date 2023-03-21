@@ -268,6 +268,22 @@ func (k Keeper) SetHeightHash(ctx sdk.Context, height uint64, hash ethcmn.Hash) 
 	types.CreateEmptyCommitStateDB(k.GenerateCSDBParams(), ctx).SetHeightHash(height, hash)
 }
 
+func (k Keeper) SetEthBlockByHeight(ctx sdk.Context, height uint64, block types.Block) {
+	types.CreateEmptyCommitStateDB(k.GenerateCSDBParams(), ctx).SetEthBlockByHeight(height, block)
+}
+
+func (k Keeper) GetEthBlockByHeight(ctx sdk.Context, height uint64) (*types.Block, bool) {
+	return types.CreateEmptyCommitStateDB(k.GenerateCSDBParams(), ctx).GetEthBlockByHeight(height)
+}
+
+func (k Keeper) SetEthBlockByHash(ctx sdk.Context, hash []byte, block types.Block) {
+	types.CreateEmptyCommitStateDB(k.GenerateCSDBParams(), ctx).SetEthBlockByHash(hash, block)
+}
+
+func (k Keeper) GetEthBlockByHash(ctx sdk.Context, hash []byte) (*types.Block, bool) {
+	return types.CreateEmptyCommitStateDB(k.GenerateCSDBParams(), ctx).GetEthBlockByHash(hash)
+}
+
 // ----------------------------------------------------------------------------
 // Block bloom bits mapping functions
 // Required by Web3 API.
