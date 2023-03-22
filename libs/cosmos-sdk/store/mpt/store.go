@@ -500,9 +500,19 @@ func (ms *MptStore) StopWithVersion(targetVersion int64) error {
 		for !ms.triegc.Empty() {
 			ms.db.TrieDB().Dereference(ms.triegc.PopItem().(ethcmn.Hash))
 		}
+	}
+
+	if gAsyncDB != nil {
+		if ms.logger != nil {
+			ms.logger.Error("Closing async database")
+		}
 		err := gAsyncDB.Close()
-		if ms.logger != nil && err != nil {
-			ms.logger.Error("Close async db", "err", err)
+		if ms.logger != nil {
+			if err != nil {
+				ms.logger.Error("Close async db", "err", err)
+			} else {
+				ms.logger.Error("Close async db OK.")
+			}
 		}
 	}
 
