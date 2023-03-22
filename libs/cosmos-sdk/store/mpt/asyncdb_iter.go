@@ -22,6 +22,7 @@ func (store *AsyncKeyValueStore) NewIterator(prefix []byte, start []byte) ethdb.
 	}, true)
 
 	wg.Wait()
+	return store.KeyValueStore.NewIterator(prefix, start)
 
 	var (
 		pr     = string(prefix)
