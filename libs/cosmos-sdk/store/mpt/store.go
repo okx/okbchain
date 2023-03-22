@@ -120,12 +120,9 @@ func generateMptStore(logger tmlog.Logger, id types.CommitID, db ethstate.Databa
 	if err != nil {
 		return mptStore, err
 	}
-	if err = mptStore.openSnapshot(); err != nil {
-		if mptStore.logger != nil {
-			mptStore.logger.Error("open snapshot fail", "warn", err)
-		}
-		err = nil
-	} else if mptStore.logger != nil {
+	if err := mptStore.openSnapshot(); err != nil {
+		mptStore.logger.Error("open snapshot fail", "warn", err)
+	} else {
 		mptStore.logger.Info("open snapshot successfully", "snapshot", "ok")
 	}
 
@@ -540,10 +537,10 @@ func (ms *MptStore) StopWithVersion(targetVersion int64) error {
 		}
 	}
 	ts := time.Now()
-	if err := ms.flattenPersistSnapshot(); err != nil && ms.logger != nil {
+	if err := ms.flattenPersistSnapshot(); err != nil {
 		ms.logger.Error("Writing snapshot state to disk", "error", err)
-	} else if ms.logger != nil {
-		ms.logger.Info("Writing snapshot successfully", "cost", time.Since(ts))
+	} else {
+		ms.logger.Error("Writing snapshot successfully", "cost", time.Since(ts))
 	}
 
 	return nil

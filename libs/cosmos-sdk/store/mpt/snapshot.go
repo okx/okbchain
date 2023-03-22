@@ -40,17 +40,13 @@ func (ms *MptStore) openSnapshot() error {
 
 	version := ms.CurrentVersion()
 	if layer := rawdb.ReadSnapshotRecoveryNumber(ms.db.TrieDB().DiskDB()); layer != nil && *layer > uint64(version) {
-		if ms.logger != nil {
-			ms.logger.Error("Enabling snapshot recovery", "chainhead", version, "diskbase", *layer)
-		}
+		ms.logger.Error("Enabling snapshot recovery", "chainhead", version, "diskbase", *layer)
 		recovery = true
 	}
 	var err error
 	ms.snaps, err = snapshot.NewCustom(ms.db.TrieDB().DiskDB(), ms.db.TrieDB(), 256, ms.originalRoot, false, gSnapshotRebuild, recovery, ms.retriever)
 	if err != nil {
-		if ms.logger != nil {
-			ms.logger.Error("open snapshot error", "chainhead", version, "error", err)
-		}
+		ms.logger.Error("open snapshot error", "chainhead", version, "error", err)
 		return fmt.Errorf("open snapshot error %v", err)
 	}
 
@@ -87,14 +83,14 @@ func (ms *MptStore) commitSnap(root common.Hash) {
 	}
 	// Only update if there's a state transition
 	if parent := ms.snap.Root(); parent != root {
-		if err := ms.snaps.Update(root, parent, ms.snapDestructs, ms.snapAccounts, ms.snapStorage); err != nil && ms.logger != nil {
+		if err := ms.snaps.Update(root, parent, ms.snapDestructs, ms.snapAccounts, ms.snapStorage); err != nil {
 			ms.logger.Error("Failed to update snapshot tree", "from", parent, "to", root, "err", err)
 		}
 		// Keep snapshotMemoryLayerCount diff layers in the memory,
 		// persistent layer is snapshotMemoryLayerCount+1 th.
 		// - head layer is paired with HEAD state
 		// - head-1 layer is paired with HEAD-1 state
-		if err := ms.snaps.Cap(root, snapshotMemoryLayerCount); err != nil && ms.logger != nil {
+		if err := ms.snaps.Cap(root, snapshotMemoryLayerCount); err != nil {
 			ms.logger.Error("Failed to cap snapshot tree", "root", root, "layers", snapshotMemoryLayerCount, "err", err)
 		}
 	}
@@ -197,7 +193,7 @@ func (ms *MptStore) flattenPersistSnapshot() error {
 	latestStoreVersion := ms.GetLatestStoredBlockHeight()
 	root := ms.GetMptRootHash(latestStoreVersion)
 	if parent := ms.snap.Root(); parent != root {
-		if err := ms.snaps.Update(root, parent, ms.snapDestructs, ms.snapAccounts, ms.snapStorage); err != nil && ms.logger != nil {
+		if err := ms.snaps.Update(root, parent, ms.snapDestructs, ms.snapAccounts, ms.snapStorage); err != nil {
 			ms.logger.Error("Failed to update snapshot tree", "from", parent, "to", root, "err", err)
 		}
 	}
