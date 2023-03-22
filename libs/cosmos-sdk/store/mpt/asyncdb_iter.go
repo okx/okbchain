@@ -17,6 +17,7 @@ func (store *AsyncKeyValueStore) NewIterator(prefix []byte, start []byte) ethdb.
 	atomic.AddUint64(&GCounter, 1)
 
 	var wg sync.WaitGroup
+	wg.Add(1)
 	store.ActionAfterWriteDone(func() {
 		wg.Done()
 	}, true)
