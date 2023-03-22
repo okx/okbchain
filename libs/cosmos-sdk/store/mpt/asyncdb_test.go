@@ -13,6 +13,7 @@ func TestAsyncDB(t *testing.T) {
 
 	asyncDb := NewAsyncKeyValueStoreWithOptions(memDb, AsyncKeyValueStoreOptions{
 		DisableAutoPrune: true,
+		SyncPrune:        true,
 	})
 
 	t.Logf("asyncDB started")
