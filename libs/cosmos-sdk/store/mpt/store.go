@@ -285,13 +285,8 @@ func (ms *MptStore) commitStorageWithDelta(storageDelta []*trie.StorageDelta, no
 	}
 	for _, storage := range storageDelta {
 		addr := storage.Addr
-		key := AddressStoreKey(addr.Bytes())
-		preValue, err := ms.trie.TryGet(key)
-		if err != nil {
-			panic(fmt.Errorf("unexcepted err:%v while update get acc %s ", err, addr.String()))
-		}
 		addrHash := mpttype.Keccak256HashWithSyncPool(addr[:])
-		stateRoot := ms.retriever.GetAccStateRoot(preValue)
+		stateRoot := ms.retriever.GetAccStateRoot(storage.PreAcc)
 		t, err := ms.db.OpenStorageTrie(addrHash, stateRoot)
 		if err != nil {
 			panic(err)
@@ -327,7 +322,7 @@ func (ms *MptStore) commitStorageForDelta(nodeSets *trie.MergedNodeSet) []*trie.
 				panic("fail to commit trie data(storage nodeSets merge): " + err.Error())
 			}
 		}
-		storageDelta = append(storageDelta, &trie.StorageDelta{Addr: addr, NodeDelta: outStorageDelta})
+		storageDelta = append(storageDelta, &trie.StorageDelta{Addr: addr, PreAcc: preValue, NodeDelta: outStorageDelta})
 		delete(ms.storageTrieForWrite, addr)
 	}
 	return storageDelta
