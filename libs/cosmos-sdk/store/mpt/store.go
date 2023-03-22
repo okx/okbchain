@@ -102,6 +102,9 @@ func generateMptStore(logger tmlog.Logger, id types.CommitID, db ethstate.Databa
 		exitSignal:          make(chan struct{}),
 	}
 	err := mptStore.openTrie(id)
+	if logger != nil {
+		gAsyncDB.SetLogger(logger.With("module", "asyncdb"))
+	}
 
 	return mptStore, err
 }
@@ -427,12 +430,14 @@ func (ms *MptStore) otherNodePersist(curMptRoot ethcmn.Hash, curHeight int64) {
 			if err := triedb.Commit(chRoot, true, nil); err != nil {
 				panic("fail to commit mpt data: " + err.Error())
 			}
+			gAsyncDB.LogStats()
 		}
 		ms.SetLatestStoredBlockHeight(uint64(curHeight))
 		if ms.logger != nil {
 			ms.logger.Info("async push acc data to db", "block", curHeight, "trieHash", chRoot)
 		}
 	}
+	gAsyncDB.Prune()
 	// Garbage collect anything below our required write retention
 	if curHeight > int64(TriesInMemory) {
 		for !ms.triegc.Empty() {
@@ -466,12 +471,12 @@ func (ms *MptStore) StopWithVersion(targetVersion int64) error {
 	// Ensure the state of a recent block is also stored to disk before exiting.
 	if !TrieDirtyDisabled {
 		triedb := ms.db.TrieDB()
-		oecStartHeight := uint64(tmtypes.GetStartBlockHeight()) // start height of oec
+		okbcStartHeight := uint64(tmtypes.GetStartBlockHeight()) // start height of okbc
 
 		latestStoreVersion := ms.GetLatestStoredBlockHeight()
 
 		for version := latestStoreVersion; version <= curVersion; version++ {
-			if version <= oecStartHeight || version <= uint64(ms.startVersion) {
+			if version <= okbcStartHeight || version <= uint64(ms.startVersion) {
 				continue
 			}
 
@@ -494,6 +499,10 @@ func (ms *MptStore) StopWithVersion(targetVersion int64) error {
 
 		for !ms.triegc.Empty() {
 			ms.db.TrieDB().Dereference(ms.triegc.PopItem().(ethcmn.Hash))
+		}
+		err := gAsyncDB.Close()
+		if ms.logger != nil && err != nil {
+			ms.logger.Error("Close async db", "err", err)
 		}
 	}
 
@@ -633,12 +642,13 @@ func (ms *MptStore) prefetchData() {
 func (ms *MptStore) SetUpgradeVersion(i int64) {}
 
 var (
-	keyPrefixStorageMpt = byte(0)
-	keyPrefixAddrMpt    = byte(1) // TODO auth.AddressStoreKeyPrefix
-	prefixSizeInMpt     = 1
-	storageKeySize      = prefixSizeInMpt + len(ethcmn.Address{}) + len(ethcmn.Hash{}) + len(ethcmn.Hash{})
-	addrKeySize         = prefixSizeInMpt + sdk.AddrLen
-	wasmContractKeySize = prefixSizeInMpt + sdk.WasmContractAddrLen
+	keyPrefixStorageMpt  = byte(0)
+	keyPrefixAddrMpt     = byte(1) // TODO auth.AddressStoreKeyPrefix
+	prefixSizeInMpt      = 1
+	storageKeySize       = prefixSizeInMpt + len(ethcmn.Address{}) + len(ethcmn.Hash{}) + len(ethcmn.Hash{})
+	addrKeySize          = prefixSizeInMpt + sdk.AddrLen
+	wasmContractKeySize  = prefixSizeInMpt + sdk.WasmContractAddrLen
+	storageKeyPrefixSize = prefixSizeInMpt + len(ethcmn.Address{}) + len(ethcmn.Hash{})
 )
 
 func AddressStoragePrefixMpt(address ethcmn.Address, stateRoot ethcmn.Hash) []byte {
@@ -684,4 +694,12 @@ func mptKeyType(key []byte) int {
 		return -1
 
 	}
+}
+
+func IsStoragePrefix(prefix []byte) bool {
+	return len(prefix) == storageKeyPrefixSize && prefix[0] == keyPrefixStorageMpt
+}
+
+func GetAddressFromStoragePrefix(prefix []byte) ethcmn.Address {
+	return ethcmn.BytesToAddress(prefix[1:21])
 }

@@ -1,6 +1,6 @@
 module github.com/okx/okbchain
 
-go 1.17
+go 1.20
 
 require (
 	github.com/99designs/keyring v1.1.6
