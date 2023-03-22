@@ -126,6 +126,12 @@ type commitTask struct {
 	op replayer
 }
 
+type AsyncKeyValueStoreOptions struct {
+	DisableAutoPrune bool
+	SyncPrune        bool
+	InitCap          int
+}
+
 type AsyncKeyValueStore struct {
 	ethdb.KeyValueStore
 
@@ -151,18 +157,18 @@ type AsyncKeyValueStore struct {
 	pruneNum int64
 }
 
-func NewAsyncKeyValueStore(db ethdb.KeyValueStore, autoPruneOff bool, syncPrune bool) *AsyncKeyValueStore {
+func NewAsyncKeyValueStoreWithOptions(db ethdb.KeyValueStore, options AsyncKeyValueStoreOptions) *AsyncKeyValueStore {
 	store := &AsyncKeyValueStore{
 		KeyValueStore: db,
 		preCommit: preCommitMap{
-			data: make(map[string]preCommitValue, TrieAsyncDBInitCap),
+			data: make(map[string]preCommitValue, options.InitCap),
 		},
 		preCommitList:    list.New(),
 		commitCh:         make(chan struct{}, 10000*10),
 		pruneCh:          make(chan struct{}, 10000*10),
 		logger:           log.NewNopLogger(),
-		disableAutoPrune: autoPruneOff,
-		syncPrune:        syncPrune,
+		disableAutoPrune: options.DisableAutoPrune,
+		syncPrune:        options.SyncPrune,
 	}
 	store.preCommit.store = store
 	store.closeWg.Add(1)
@@ -171,6 +177,10 @@ func NewAsyncKeyValueStore(db ethdb.KeyValueStore, autoPruneOff bool, syncPrune 
 	store.preCommitPtr = store.preCommitList.PushBack(nil)
 	store.waitPrunePtr = store.preCommitPtr
 	return store
+}
+
+func NewAsyncKeyValueStore(db ethdb.KeyValueStore) *AsyncKeyValueStore {
+	return NewAsyncKeyValueStoreWithOptions(db, AsyncKeyValueStoreOptions{})
 }
 
 func (store *AsyncKeyValueStore) SetLogger(logger log.Logger) {
