@@ -4,14 +4,24 @@ import (
 	"bytes"
 	"sort"
 	"strings"
+	"sync"
+	"sync/atomic"
 
 	"github.com/ethereum/go-ethereum/ethdb"
 	"github.com/tendermint/go-amino"
 )
 
+var GCounter uint64
+
 func (store *AsyncKeyValueStore) NewIterator(prefix []byte, start []byte) ethdb.Iterator {
-	store.mtx.RLock()
-	defer store.mtx.RUnlock()
+	atomic.AddUint64(&GCounter, 1)
+
+	var wg sync.WaitGroup
+	store.ActionAfterWriteDone(func() {
+		wg.Done()
+	}, true)
+
+	wg.Wait()
 
 	var (
 		pr     = string(prefix)

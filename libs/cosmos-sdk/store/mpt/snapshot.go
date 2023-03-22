@@ -7,6 +7,7 @@ import (
 	"github.com/ethereum/go-ethereum/core/state/snapshot"
 	ethcrypto "github.com/ethereum/go-ethereum/crypto"
 	mpttypes "github.com/okx/okbchain/libs/cosmos-sdk/store/mpt/types"
+	"sync/atomic"
 )
 
 var (
@@ -97,6 +98,9 @@ func (ms *MptStore) commitSnap(root common.Hash) {
 	ms.snap, ms.snapDestructs, ms.snapAccounts, ms.snapStorage = nil, nil, nil, nil
 
 	ms.prepareSnap(root)
+
+	ms.logger.Error("statistics iter couerter", "counter", atomic.LoadUint64(&GCounter))
+	atomic.StoreUint64(&GCounter, 0)
 }
 
 func (ms *MptStore) updateSnapAccounts(addr, bz []byte) {
