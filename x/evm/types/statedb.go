@@ -359,32 +359,6 @@ func (csdb *CommitStateDB) SetHeightHash(height uint64, hash ethcmn.Hash) {
 	csdb.setHeightHashInRawDB(height, hash)
 }
 
-func (csdb *CommitStateDB) SetEthBlockByHeight(height uint64, block Block) {
-	if !csdb.ctx.IsCheckTx() {
-		funcName := "SetEthBlockByHeight"
-		trace.StartTxLog(funcName)
-		defer trace.StopTxLog(funcName)
-	}
-	csdb.setEthBlockByHeightInRawDB(height, block)
-}
-
-func (csdb *CommitStateDB) GetEthBlockBytesByHeight(height uint64) ([]byte, bool) {
-	return csdb.getEthBlockBytesByHeightInRawDB(height)
-}
-
-func (csdb *CommitStateDB) SetEthBlockByHash(hash []byte, block Block) {
-	if !csdb.ctx.IsCheckTx() {
-		funcName := "SetEthBlockByHash"
-		trace.StartTxLog(funcName)
-		defer trace.StopTxLog(funcName)
-	}
-	csdb.setEthBlockByHashInRawDB(hash, block)
-}
-
-func (csdb *CommitStateDB) GetEthBlockBytesByHash(hash []byte) ([]byte, bool) {
-	return csdb.getEthBlockBytesByHashInRawDB(hash)
-}
-
 // SetParams sets the evm parameters to the param space.
 func (csdb *CommitStateDB) SetParams(params Params) {
 	csdb.params = &params

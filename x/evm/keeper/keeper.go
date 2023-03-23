@@ -1,6 +1,7 @@
 package keeper
 
 import (
+	"encoding/json"
 	"math/big"
 	"sync"
 
@@ -269,19 +270,39 @@ func (k Keeper) SetHeightHash(ctx sdk.Context, height uint64, hash ethcmn.Hash) 
 }
 
 func (k Keeper) SetEthBlockByHeight(ctx sdk.Context, height uint64, block types.Block) {
-	types.CreateEmptyCommitStateDB(k.GenerateCSDBParams(), ctx).SetEthBlockByHeight(height, block)
+	key := types.AppendBlockByHeightKey(height)
+	value, err := json.Marshal(block)
+	if err != nil {
+		panic(err)
+	}
+	k.db.TrieDB().DiskDB().Put(key, value)
 }
 
 func (k Keeper) GetEthBlockBytesByHeight(ctx sdk.Context, height uint64) ([]byte, bool) {
-	return types.CreateEmptyCommitStateDB(k.GenerateCSDBParams(), ctx).GetEthBlockBytesByHeight(height)
+	key := types.AppendBlockByHeightKey(height)
+	bz, err := k.db.TrieDB().DiskDB().Get(key)
+	if err != nil {
+		return nil, false
+	}
+	return bz, true
 }
 
 func (k Keeper) SetEthBlockByHash(ctx sdk.Context, hash []byte, block types.Block) {
-	types.CreateEmptyCommitStateDB(k.GenerateCSDBParams(), ctx).SetEthBlockByHash(hash, block)
+	key := types.AppendBlockByHashKey(hash)
+	value, err := json.Marshal(block)
+	if err != nil {
+		panic(err)
+	}
+	k.db.TrieDB().DiskDB().Put(key, value)
 }
 
 func (k Keeper) GetEthBlockBytesByHash(ctx sdk.Context, hash []byte) ([]byte, bool) {
-	return types.CreateEmptyCommitStateDB(k.GenerateCSDBParams(), ctx).GetEthBlockBytesByHash(hash)
+	key := types.AppendBlockByHashKey(hash)
+	bz, err := k.db.TrieDB().DiskDB().Get(key)
+	if err != nil {
+		return nil, false
+	}
+	return bz, true
 }
 
 // ----------------------------------------------------------------------------

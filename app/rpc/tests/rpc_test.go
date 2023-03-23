@@ -93,6 +93,7 @@ func (suite *RPCTestSuite) SetupTest() {
 
 	viper.Set(rpc.FlagDebugAPI, true)
 	viper.Set(cmserver.FlagPruning, cosmost.PruningOptionNothing)
+	viper.Set("tx_index.indexer", "kv")
 	// set okbchaincli path
 	cliDir, err := ioutil.TempDir("", ".okbchaincli")
 	if err != nil {
@@ -1078,7 +1079,6 @@ func (suite *RPCTestSuite) TestEth_PendingTransactions() {
 
 func (suite *RPCTestSuite) TestBlockBloom() {
 	hash, receipt := deployTestContract(suite, suite.addr, senderAddr, testContractKind)
-
 	rpcRes := Call(suite.T(), suite.addr, "eth_getBlockByNumber", []interface{}{receipt["blockNumber"].(string), false})
 	var blockInfo map[string]interface{}
 	suite.Require().NoError(json.Unmarshal(rpcRes.Result, &blockInfo))
