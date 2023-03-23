@@ -294,6 +294,19 @@ func (store *AsyncKeyValueStore) ActionAfterWriteDone(act func(), once bool) {
 	store.commitCh <- struct{}{}
 }
 
+func (store *AsyncKeyValueStore) WaitCurrentWriteDone() {
+	if store == nil || atomic.LoadInt64(&store.waitCommit) == 0 {
+		return
+	}
+
+	wg := sync.WaitGroup{}
+	wg.Add(1)
+	store.ActionAfterWriteDone(func() {
+		wg.Done()
+	}, true)
+	wg.Wait()
+}
+
 func (store *AsyncKeyValueStore) NewBatch() ethdb.Batch {
 	return newAsyncBatch(store)
 }
