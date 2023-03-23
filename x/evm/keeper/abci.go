@@ -108,28 +108,30 @@ func (k *Keeper) EndBlock(ctx sdk.Context, req abci.RequestEndBlock) []abci.Vali
 		k.Watcher.Used()
 	}
 
-	// eth block
-	var evmTxs []common.Hash
-	var gasUsed int64
-	for _, txRes := range req.DeliverTxs {
-		if txRes.Type == int(sdk.EvmTxType) {
-			gasUsed += txRes.GasUsed
-			evmTxs = append(evmTxs, common.BytesToHash(txRes.Hash))
+	if watcher.IsRpcNode() {
+		// eth block
+		var evmTxs []common.Hash
+		var gasUsed int64
+		for _, txRes := range req.DeliverTxs {
+			if txRes.Type == int(sdk.EvmTxType) {
+				gasUsed += txRes.GasUsed
+				evmTxs = append(evmTxs, common.BytesToHash(txRes.Hash))
+			}
 		}
-	}
-	block, ethBlockHash := watcher.NewBlock(uint64(req.Height), bloom,
-		ctx.BlockHeader(), uint64(0xffffffff), big.NewInt(gasUsed), evmTxs)
+		block, ethBlockHash := watcher.NewBlock(uint64(req.Height), bloom,
+			ctx.BlockHeader(), uint64(0xffffffff), big.NewInt(gasUsed), evmTxs)
 
-	k.SetEthBlockByHeight(ctx, uint64(req.Height), block)
-	k.SetEthBlockByHash(ctx, ethBlockHash.Bytes(), block)
+		k.SetEthBlockByHeight(ctx, uint64(req.Height), block)
+		k.SetEthBlockByHash(ctx, ethBlockHash.Bytes(), block)
 
-	if watcher.IsWatcherEnabled() {
-		params := k.GetParams(ctx)
-		k.Watcher.SaveParams(params)
+		if watcher.IsWatcherEnabled() {
+			params := k.GetParams(ctx)
+			k.Watcher.SaveParams(params)
 
-		k.Watcher.SaveBlock(block, ethBlockHash)
+			k.Watcher.SaveBlock(block, ethBlockHash)
 
-		k.Watcher.SaveBlockStdTxHash()
+			k.Watcher.SaveBlockStdTxHash()
+		}
 	}
 
 	k.UpdateInnerBlockData()

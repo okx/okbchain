@@ -56,7 +56,18 @@ var (
 	watcherLruSize = 1000
 	onceEnable     sync.Once
 	onceLru        sync.Once
+	onceCheckRpc   sync.Once
+	isRpcNode      = false
 )
+
+func IsRpcNode() bool {
+	onceCheckRpc.Do(func() {
+		if viper.GetString("tx_index.indexer") == "kv" {
+			isRpcNode = true
+		}
+	})
+	return isRpcNode
+}
 
 func IsWatcherEnabled() bool {
 	onceEnable.Do(func() {
