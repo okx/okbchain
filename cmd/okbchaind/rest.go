@@ -84,7 +84,7 @@ func registerRoutesV1(rs *lcd.RestServer) {
 }
 
 func registerRoutesV2(rs *lcd.RestServer) {
-	v2Router := rs.Mux.PathPrefix("/v2").Name("v1").Subrouter()
+	v2Router := rs.Mux.PathPrefix("/v2").Name("v2").Subrouter()
 	client.RegisterRoutes(rs.CliCtx, v2Router)
 	authrest.RegisterRoutes(rs.CliCtx, v2Router, auth.StoreKey)
 	bankrest.RegisterRoutes(rs.CliCtx, v2Router)
