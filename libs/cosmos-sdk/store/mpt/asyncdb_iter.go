@@ -4,12 +4,14 @@ import (
 	"bytes"
 	"sort"
 	"strings"
+	"sync/atomic"
 
 	"github.com/ethereum/go-ethereum/ethdb"
 	"github.com/tendermint/go-amino"
 )
 
 func (store *AsyncKeyValueStore) NewIterator(prefix []byte, start []byte) ethdb.Iterator {
+	atomic.AddInt64(&store.iterNum, 1)
 	store.mtx.RLock()
 	defer store.mtx.RUnlock()
 
