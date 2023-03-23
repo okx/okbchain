@@ -7,7 +7,7 @@ export GO111MODULE=on
 
 GithubTop=github.com
 
-GO_VERSION=1.17
+GO_VERSION=1.20
 ROCKSDB_VERSION=6.27.3
 IGNORE_CHECK_GO=false
 install_rocksdb_version:=$(ROCKSDB_VERSION)
@@ -20,8 +20,6 @@ Iavl=v0.14.3
 Name=okbchain
 ServerName=okbchaind
 ClientName=okbchaincli
-
-MarsHeight=1
 
 LINK_STATICALLY = false
 cgo_flags=
@@ -68,8 +66,7 @@ ldflags = -X $(GithubTop)/okx/okbchain/libs/cosmos-sdk/version.Version=$(Version
   -X $(GithubTop)/okx/okbchain/libs/cosmos-sdk/version.Commit=$(COMMIT) \
   -X $(GithubTop)/okx/okbchain/libs/cosmos-sdk/version.CosmosSDK=$(CosmosSDK) \
   -X $(GithubTop)/okx/okbchain/libs/cosmos-sdk/version.Tendermint=$(Tendermint) \
-  -X "$(GithubTop)/okx/okbchain/libs/cosmos-sdk/version.BuildTags=$(build_tags)" \
-  -X $(GithubTop)/okx/okbchain/libs/tendermint/types.MILESTONE_MARS_HEIGHT=$(MarsHeight)
+  -X "$(GithubTop)/okx/okbchain/libs/cosmos-sdk/version.BuildTags=$(build_tags)"
 
 
 ifeq ($(WITH_ROCKSDB),true)
@@ -77,18 +74,18 @@ ifeq ($(WITH_ROCKSDB),true)
 endif
 
 ifeq ($(MAKECMDGOALS),testnet)
-  ldflags += -X github.com/okx/okbchain/libs/cosmos-sdk/server.ChainID=okbchain-65
+  ldflags += -X github.com/okx/okbchain/libs/cosmos-sdk/server.ChainID=okbchaintest-195
 endif
 
 ifeq ($(LINK_STATICALLY),true)
 	ldflags += -linkmode=external -extldflags "-Wl,-z,muldefs -static"
 endif
 
-ifeq ($(OKCMALLOC),tcmalloc)
+ifeq ($(OKBCMALLOC),tcmalloc)
   ldflags += -extldflags "-ltcmalloc_minimal"
 endif
 
-ifeq ($(OKCMALLOC),jemalloc)
+ifeq ($(OKBCMALLOC),jemalloc)
   ldflags += -extldflags "-ljemalloc"
 endif
 
