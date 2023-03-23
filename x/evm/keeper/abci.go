@@ -113,9 +113,9 @@ func (k *Keeper) EndBlock(ctx sdk.Context, req abci.RequestEndBlock) []abci.Vali
 		var evmTxs []common.Hash
 		var gasUsed int64
 		for _, txRes := range req.DeliverTxs {
-			if txRes.Type == int(sdk.EvmTxType) {
+			if txRes.GetType() == int(sdk.EvmTxType) {
 				gasUsed += txRes.GasUsed
-				evmTxs = append(evmTxs, common.BytesToHash(txRes.Hash))
+				evmTxs = append(evmTxs, common.BytesToHash(txRes.GetHash()))
 			}
 		}
 		block, ethBlockHash := watcher.NewBlock(uint64(req.Height), bloom,
