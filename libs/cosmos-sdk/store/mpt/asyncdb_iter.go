@@ -4,11 +4,18 @@ import (
 	"bytes"
 	"sort"
 	"strings"
+	"sync"
 	"sync/atomic"
 
 	"github.com/ethereum/go-ethereum/ethdb"
 	"github.com/tendermint/go-amino"
 )
+
+var iterMapPool = &sync.Pool{
+	New: func() interface{} {
+		return make(map[string]int)
+	},
+}
 
 func (store *AsyncKeyValueStore) NewIterator(prefix []byte, start []byte) ethdb.Iterator {
 	atomic.AddInt64(&store.iterNum, 1)
@@ -44,7 +51,11 @@ func (store *AsyncKeyValueStore) NewIterator(prefix []byte, start []byte) ethdb.
 		return store.KeyValueStore.NewIterator(prefix, start)
 	}
 
-	var m = make(map[string]int, count)
+	var m = iterMapPool.Get().(map[string]int)
+	defer iterMapPool.Put(m)
+	for k := range m {
+		delete(m, k)
+	}
 
 	var singleOpHandler = func(op *singleOp, pr, st string, m map[string]int, ops *[]singleOp) {
 		strKey := amino.BytesToStr(op.key)
