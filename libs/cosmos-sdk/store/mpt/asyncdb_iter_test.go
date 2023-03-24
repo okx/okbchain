@@ -183,6 +183,57 @@ func TestAsyncdbIterator(t *testing.T) {
 	require.Nil(t, iter.Key())
 	require.Nil(t, iter.Value())
 	require.NoError(t, iter.Error())
+
+	memDb = memorydb.New()
+	asyncDb = &mockIterTestAsycnDB{
+		NewAsyncKeyValueStoreWithOptions(memDb, AsyncKeyValueStoreOptions{
+			DisableAutoPrune: true,
+		}),
+	}
+
+	for i := 0; i < 100; i++ {
+		key := []byte(fmt.Sprintf("key%2d", i))
+		value := []byte(fmt.Sprintf("value%2d", i))
+		if i%2 == 0 {
+			require.NoError(t, asyncDb.Put(key, value))
+		} else {
+			require.NoError(t, memDb.Put(key, value))
+		}
+	}
+
+	iter = asyncDb.NewIterator([]byte("key"), nil)
+
+	for i := 0; i < 100; i++ {
+		require.True(t, iter.Next())
+		key := []byte(fmt.Sprintf("key%2d", i))
+		value := []byte(fmt.Sprintf("value%2d", i))
+		require.Equal(t, string(key), string(iter.Key()))
+		require.Equal(t, string(value), string(iter.Value()))
+	}
+	require.False(t, iter.Next())
+	require.Nil(t, iter.Key())
+	require.Nil(t, iter.Value())
+	require.NoError(t, iter.Error())
+
+	iter = asyncDb.NewIterator([]byte("ke"), []byte("y"))
+
+	for i := 0; i < 100; i++ {
+		require.True(t, iter.Next())
+		key := []byte(fmt.Sprintf("key%2d", i))
+		value := []byte(fmt.Sprintf("value%2d", i))
+		require.Equal(t, string(key), string(iter.Key()))
+		require.Equal(t, string(value), string(iter.Value()))
+	}
+	require.False(t, iter.Next())
+	require.Nil(t, iter.Key())
+	require.Nil(t, iter.Value())
+	require.NoError(t, iter.Error())
+
+	iter = asyncDb.NewIterator([]byte("z"), []byte(""))
+	require.False(t, iter.Next())
+	require.Nil(t, iter.Key())
+	require.Nil(t, iter.Value())
+	require.NoError(t, iter.Error())
 }
 
 func BenchmarkAsyncdbIterator(b *testing.B) {
