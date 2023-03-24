@@ -77,8 +77,12 @@ func (td *TreeDelta) Unmarshal(deltaBytes []byte) error {
 	if err := cdc.UnmarshalBinaryBare(deltaBytes, &tdi); err != nil {
 		return err
 	}
-	_ = td.IavlTreeDelta.UnmarshalFromAmino(cdc, tdi.IavlBytes)
-	_ = td.MptTreeDelta.Unmarshal(tdi.MptBytes)
+	if err := td.IavlTreeDelta.UnmarshalFromAmino(cdc, tdi.IavlBytes); err != nil {
+		return err
+	}
+	if err := td.MptTreeDelta.Unmarshal(tdi.MptBytes); err != nil {
+		return err
+	}
 	return nil
 }
 
