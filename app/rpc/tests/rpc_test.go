@@ -93,6 +93,7 @@ func (suite *RPCTestSuite) SetupTest() {
 
 	viper.Set(rpc.FlagDebugAPI, true)
 	viper.Set(cmserver.FlagPruning, cosmost.PruningOptionNothing)
+	viper.Set("tx_index.indexer", "kv")
 	// set okbchaincli path
 	cliDir, err := ioutil.TempDir("", ".okbchaincli")
 	if err != nil {
@@ -937,7 +938,7 @@ func (suite *RPCTestSuite) TestEth_GetBlockByHash() {
 	hash := sendTestTransaction(suite.T(), suite.addr, senderAddr, receiverAddr, 1024)
 	expectedBlockHash := getBlockHashFromTxHash(suite.T(), suite.addr, hash)
 
-	// TODO: OKExChain only supports the block query with txs' hash inside no matter what the second bool argument is.
+	// TODO: okbchain only supports the block query with txs' hash inside no matter what the second bool argument is.
 	// 		eth rpc: 	false -> txs' hash inside
 	//				  	true  -> txs full content
 
@@ -973,7 +974,7 @@ func (suite *RPCTestSuite) TestEth_GetBlockByNumber() {
 
 	expectedHeight := getBlockHeightFromTxHash(suite.T(), suite.addr, hash)
 
-	// TODO: OKExChain only supports the block query with txs' hash inside no matter what the second bool argument is.
+	// TODO: okbchain only supports the block query with txs' hash inside no matter what the second bool argument is.
 	// 		eth rpc: 	false -> txs' hash inside
 	rpcRes := Call(suite.T(), suite.addr, "eth_getBlockByNumber", []interface{}{expectedHeight, false})
 	var res map[string]interface{}
@@ -991,8 +992,7 @@ func (suite *RPCTestSuite) TestEth_GetBlockByNumber() {
 	suite.Require().NoError(json.Unmarshal(rpcRes.Result, &currentBlockHeight))
 
 	rpcRes, err := CallWithError(suite.addr, "eth_getBlockByNumber", []interface{}{currentBlockHeight + 100, false})
-	suite.Require().NoError(err)
-	assertNullFromJSONResponse(suite.T(), rpcRes.Result)
+	suite.Require().Error(err)
 
 	// miss argument
 	_, err = CallWithError(suite.addr, "eth_getBlockByNumber", []interface{}{currentBlockHeight})
@@ -1079,7 +1079,6 @@ func (suite *RPCTestSuite) TestEth_PendingTransactions() {
 
 func (suite *RPCTestSuite) TestBlockBloom() {
 	hash, receipt := deployTestContract(suite, suite.addr, senderAddr, testContractKind)
-
 	rpcRes := Call(suite.T(), suite.addr, "eth_getBlockByNumber", []interface{}{receipt["blockNumber"].(string), false})
 	var blockInfo map[string]interface{}
 	suite.Require().NoError(json.Unmarshal(rpcRes.Result, &blockInfo))

@@ -7,11 +7,12 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/okx/okbchain/libs/cosmos-sdk/store/mpt"
 	"math/big"
 	"strconv"
 	"sync"
 	"time"
+
+	"github.com/okx/okbchain/libs/cosmos-sdk/store/mpt"
 
 	"github.com/ethereum/go-ethereum/accounts"
 	"github.com/ethereum/go-ethereum/accounts/keystore"
@@ -261,7 +262,7 @@ func (api *PublicEthereumAPI) GasPrice() *hexutil.Big {
 	maxGP := new(big.Int).Mul(minGP, big.NewInt(5000))
 
 	rgp := new(big.Int).Set(minGP)
-	if appconfig.GetOecConfig().GetDynamicGpMode() != tmtypes.MinimalGpMode {
+	if appconfig.GetOkbcConfig().GetDynamicGpMode() != tmtypes.MinimalGpMode {
 		// If current block is not congested, rgp == minimal gas price.
 		if mempool.IsCongested {
 			rgp.Set(mempool.GlobalRecommendedGP)
@@ -271,8 +272,8 @@ func (api *PublicEthereumAPI) GasPrice() *hexutil.Big {
 			rgp.Set(minGP)
 		}
 
-		if appconfig.GetOecConfig().GetDynamicGpCoefficient() > 1 {
-			coefficient := big.NewInt(int64(appconfig.GetOecConfig().GetDynamicGpCoefficient()))
+		if appconfig.GetOkbcConfig().GetDynamicGpCoefficient() > 1 {
+			coefficient := big.NewInt(int64(appconfig.GetOkbcConfig().GetDynamicGpCoefficient()))
 			rgp = new(big.Int).Mul(rgp, coefficient)
 		}
 
@@ -292,7 +293,7 @@ func (api *PublicEthereumAPI) GasPriceIn3Gears() *rpctypes.GPIn3Gears {
 	maxGP := new(big.Int).Mul(minGP, big.NewInt(5000))
 
 	avgGP := new(big.Int).Set(minGP)
-	if appconfig.GetOecConfig().GetDynamicGpMode() != tmtypes.MinimalGpMode {
+	if appconfig.GetOkbcConfig().GetDynamicGpMode() != tmtypes.MinimalGpMode {
 		if mempool.IsCongested {
 			avgGP.Set(mempool.GlobalRecommendedGP)
 		}
@@ -301,8 +302,8 @@ func (api *PublicEthereumAPI) GasPriceIn3Gears() *rpctypes.GPIn3Gears {
 			avgGP.Set(minGP)
 		}
 
-		if appconfig.GetOecConfig().GetDynamicGpCoefficient() > 1 {
-			coefficient := big.NewInt(int64(appconfig.GetOecConfig().GetDynamicGpCoefficient()))
+		if appconfig.GetOkbcConfig().GetDynamicGpCoefficient() > 1 {
+			coefficient := big.NewInt(int64(appconfig.GetOkbcConfig().GetDynamicGpCoefficient()))
 			avgGP = new(big.Int).Mul(avgGP, coefficient)
 		}
 
@@ -356,7 +357,7 @@ func (api *PublicEthereumAPI) accounts() ([]common.Address, error) {
 func (api *PublicEthereumAPI) BlockNumber() (hexutil.Uint64, error) {
 	monitor := monitor.GetMonitor("eth_blockNumber", api.logger, api.Metrics).OnBegin()
 	defer monitor.OnEnd()
-	return api.backend.BlockNumber()
+	return hexutil.Uint64(api.backend.BlockNumber()), nil
 }
 
 // GetBalance returns the provided account's balance up to the provided block number.
@@ -1071,7 +1072,7 @@ func (api *PublicEthereumAPI) EstimateGas(args rpctypes.CallArgs) (hexutil.Uint6
 		return hexutil.Uint64(estimatedGas), nil
 	}
 
-	gasBuffer := estimatedGas / 100 * config.GetOecConfig().GetGasLimitBuffer()
+	gasBuffer := estimatedGas / 100 * config.GetOkbcConfig().GetGasLimitBuffer()
 	//EvmHookGasEstimate: evm tx with cosmos hook,we cannot estimate hook gas
 	//simple add EvmHookGasEstimate,run tx will refund the extra gas
 	gas := estimatedGas + gasBuffer + EvmHookGasEstimate
@@ -1083,7 +1084,7 @@ func (api *PublicEthereumAPI) EstimateGas(args rpctypes.CallArgs) (hexutil.Uint6
 }
 
 // GetBlockByHash returns the block identified by hash.
-func (api *PublicEthereumAPI) GetBlockByHash(hash common.Hash, fullTx bool) (*watcher.Block, error) {
+func (api *PublicEthereumAPI) GetBlockByHash(hash common.Hash, fullTx bool) (*evmtypes.Block, error) {
 	monitor := monitor.GetMonitor("eth_getBlockByHash", api.logger, api.Metrics).OnBegin()
 	defer monitor.OnEnd("hash", hash, "full", fullTx)
 	blockRes, err := api.backend.GetBlockByHash(hash, fullTx)
@@ -1093,7 +1094,7 @@ func (api *PublicEthereumAPI) GetBlockByHash(hash common.Hash, fullTx bool) (*wa
 	return blockRes, err
 }
 
-func (api *PublicEthereumAPI) getBlockByNumber(blockNum rpctypes.BlockNumber, fullTx bool) (blockRes *watcher.Block, err error) {
+func (api *PublicEthereumAPI) getBlockByNumber(blockNum rpctypes.BlockNumber, fullTx bool) (blockRes *evmtypes.Block, err error) {
 	if blockNum != rpctypes.PendingBlockNumber {
 		blockRes, err = api.backend.GetBlockByNumber(blockNum, fullTx)
 		return
@@ -1142,7 +1143,7 @@ func (api *PublicEthereumAPI) getBlockByNumber(blockNum rpctypes.BlockNumber, fu
 }
 
 // GetBlockByNumber returns the block identified by number.
-func (api *PublicEthereumAPI) GetBlockByNumber(blockNum rpctypes.BlockNumber, fullTx bool) (*watcher.Block, error) {
+func (api *PublicEthereumAPI) GetBlockByNumber(blockNum rpctypes.BlockNumber, fullTx bool) (*evmtypes.Block, error) {
 	monitor := monitor.GetMonitor("eth_getBlockByNumber", api.logger, api.Metrics).OnBegin()
 	defer monitor.OnEnd("number", blockNum, "full", fullTx)
 

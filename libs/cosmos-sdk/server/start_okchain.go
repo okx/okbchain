@@ -32,7 +32,6 @@ const (
 	FlagListenAddr         = "rest.laddr"
 	FlagUlockKey           = "rest.unlock_key"
 	FlagUlockKeyHome       = "rest.unlock_key_home"
-	FlagRestPathPrefix     = "rest.path_prefix"
 	FlagCORS               = "cors"
 	FlagMaxOpenConnections = "max-open"
 	FlagHookstartInProcess = "startInProcess"
@@ -245,7 +244,6 @@ func RegisterServerFlags(cmd *cobra.Command) *cobra.Command {
 	cmd.Flags().String(FlagListenAddr, "tcp://0.0.0.0:26659", "EVM RPC and cosmos-sdk REST API listen address.")
 	cmd.Flags().String(FlagUlockKey, "", "Select the keys to unlock on the RPC server")
 	cmd.Flags().String(FlagUlockKeyHome, os.ExpandEnv(system.ClientHome), "The keybase home path")
-	cmd.Flags().String(FlagRestPathPrefix, "okbchain", "Path prefix for registering rest api route.")
 	cmd.Flags().String(flags.FlagKeyringBackend, flags.DefaultKeyringBackend, "Select keyring's backend (os|file|test)")
 	cmd.Flags().String(FlagCORS, "", "Set the rest-server domains that can make CORS requests (* for all)")
 	cmd.Flags().Int(FlagMaxOpenConnections, 1000, "The number of maximum open connections of rest-server")
@@ -261,7 +259,10 @@ func RegisterServerFlags(cmd *cobra.Command) *cobra.Command {
 	cmd.Flags().UintVar(&mpt.TrieAccStoreCache, mpt.FlagTrieAccStoreCache, 32, "Size (MB) to cache account")
 	cmd.Flags().UintVar(&mpt.TriesInMemory, mpt.FlagTrieInMemory, 100, "Max cache tire count in Memory")
 	cmd.Flags().BoolVar(&mpt.TrieAsyncDB, mpt.FlagTrieAsyncDB, true, "Enable async commit to trie db")
-	cmd.Flags().Int64(FlagCommitGapHeight, 100, "Block interval to commit cached data into db, affects iavl & mpt")
+	cmd.Flags().IntVar(&mpt.TrieAsyncDBInitCap, mpt.FlagTrieAsyncDBInitCap, 200_0000, "Init cap of trie async db")
+	cmd.Flags().BoolVar(&mpt.TrieAsyncDBAutoPruningOff, mpt.FlagTrieAsyncDBAutoPruningOff, false, "Disable auto prune of trie async db")
+	cmd.Flags().BoolVar(&mpt.TrieAsyncDBSyncPruning, mpt.FlagTrieAsyncDBSyncPruning, false, "if auto pruning is off and this is on, trie async db will be pruned every block in sync mode")
+	cmd.Flags().Int64(FlagCommitGapHeight, 10, "Block interval to commit cached data into db, affects iavl & mpt")
 
 	cmd.Flags().Int64(FlagFastSyncGap, 20, "Block height interval to switch fast-sync mode")
 

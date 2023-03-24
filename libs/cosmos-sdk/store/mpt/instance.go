@@ -42,8 +42,12 @@ func InstanceOfMptStore() ethstate.Database {
 			panic("fail to open database: " + e.Error())
 		}
 		nkvstore := NewStatKeyValueStore(kvstore, gStatic)
-		if EnableAsyncCommit && TrieAsyncDB {
-			gAsyncDB = NewAsyncKeyValueStore(nkvstore, false)
+		if EnableAsyncCommit && TrieAsyncDB && !TrieDirtyDisabled {
+			gAsyncDB = NewAsyncKeyValueStoreWithOptions(nkvstore, AsyncKeyValueStoreOptions{
+				DisableAutoPrune: TrieAsyncDBAutoPruningOff,
+				SyncPrune:        TrieAsyncDBSyncPruning,
+				InitCap:          TrieAsyncDBInitCap,
+			})
 			nkvstore = gAsyncDB
 		}
 
