@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"container/list"
 	"fmt"
-	"github.com/tendermint/go-amino"
+	"math/rand"
 	"sort"
 	"strings"
 	"sync"
@@ -14,6 +14,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethdb/memorydb"
 	"github.com/stretchr/testify/require"
+	"github.com/tendermint/go-amino"
 )
 
 // this mock type should be used only for iterator test.
@@ -227,6 +228,8 @@ func BenchmarkAsyncdbIterator(b *testing.B) {
 		st     = string(append(prefix, []byte{}...))
 	)
 
+	isStEqPr := st == pr
+
 	b.ResetTimer()
 
 	b.Run("1", func(b *testing.B) {
@@ -240,7 +243,7 @@ func BenchmarkAsyncdbIterator(b *testing.B) {
 				if !strings.HasPrefix(key, pr) {
 					continue
 				}
-				if key >= st {
+				if isStEqPr || key >= st {
 					keys = append(keys, key)
 				}
 			}
@@ -268,15 +271,15 @@ func BenchmarkAsyncdbIterator(b *testing.B) {
 			}
 			count = 2_0000
 
-			//var ops = make([]singleOp, 0, count)
-			var opsPtr = pool2.Get().(*[]singleOp)
-			defer pool2.Put(opsPtr)
-			var ops = *opsPtr
-			if cap(ops) < count {
-				pool2.Put(opsPtr)
-				ops = make([]singleOp, 0, count)
-				opsPtr = &ops
-			}
+			var ops = make([]singleOp, 0, count)
+			//var opsPtr = pool2.Get().(*[]singleOp)
+			//defer pool2.Put(opsPtr)
+			//var ops = *opsPtr
+			//if cap(ops) < count {
+			//	pool2.Put(opsPtr)
+			//	ops = make([]singleOp, 0, count)
+			//	opsPtr = &ops
+			//}
 			ops = ops[:0]
 
 			//var m = make(map[string]int, count)
@@ -291,7 +294,7 @@ func BenchmarkAsyncdbIterator(b *testing.B) {
 				if !strings.HasPrefix(strKey, pr) {
 					return
 				}
-				if strKey >= st {
+				if isStEqPr || strKey >= st {
 					if index, ok := m[strKey]; ok {
 						(*ops)[index] = *op
 					} else {
@@ -322,4 +325,31 @@ func BenchmarkAsyncdbIterator(b *testing.B) {
 
 	_ = pool
 	_ = pool2
+}
+
+func BenchmarkAtomic(b *testing.B) {
+	var num = int64(rand.Int31n(100))
+	var res *int
+
+	b.Run("1", func(b *testing.B) {
+		for i := 0; i < b.N; i++ {
+			if num == 200 {
+				old := res
+				res = new(int)
+				*res = *old + 1
+			}
+		}
+	})
+
+	b.Run("2", func(b *testing.B) {
+		for i := 0; i < b.N; i++ {
+			if atomic.LoadInt64(&num) == 200 {
+				old := res
+				res = new(int)
+				*res = *old + 1
+			}
+		}
+	})
+
+	_ = res
 }
