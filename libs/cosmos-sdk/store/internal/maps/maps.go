@@ -186,7 +186,6 @@ func ProofsFromMap(m map[string][]byte) ([]byte, map[string]*merkle2.SimpleProof
 	for k, v := range m {
 		sm.Set(k, v)
 	}
-	sm.Set("evm", []byte{})
 
 	sm.Sort()
 	kvs := sm.Kvs
