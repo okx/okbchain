@@ -5,6 +5,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/rawdb"
 	"github.com/ethereum/go-ethereum/core/state/snapshot"
+	"github.com/ethereum/go-ethereum/trie"
 	mpttypes "github.com/okx/okbchain/libs/cosmos-sdk/store/mpt/types"
 )
 
@@ -200,4 +201,51 @@ func (ms *MptStore) flattenPersistSnapshot() error {
 		}
 	}
 	return ms.snaps.Cap(root, 0)
+}
+
+func (ms *MptStore) updateSnapStoragesWithDelta(addrHash common.Hash, delta *trie.SnapDelta) {
+	if ms.snap == nil || delta == nil {
+		return
+	}
+
+	// The snapshot storage map for the object
+	var storage map[common.Hash][]byte
+	// If state snapshotting is active, cache the data til commit
+	ms.snapRWLock.Lock()
+	for k, v := range delta.InsertVal {
+		// Retrieve the old storage map, if available, create a new one otherwise
+		if storage = ms.snapStorage[addrHash]; storage == nil {
+			storage = make(map[common.Hash][]byte)
+			ms.snapStorage[addrHash] = storage
+		}
+		storageHash := common.BytesToHash([]byte(k))
+		storage[storageHash] = v // v will be nil if value is 0x00
+	}
+	for k, _ := range delta.DelVal {
+		// Retrieve the old storage map, if available, create a new one otherwise
+		if storage = ms.snapStorage[addrHash]; storage == nil {
+			storage = make(map[common.Hash][]byte)
+			ms.snapStorage[addrHash] = storage
+		}
+		storageHash := common.BytesToHash([]byte(k))
+		storage[storageHash] = nil // v will be nil if value is 0x00
+	}
+	ms.snapRWLock.Unlock()
+}
+
+func (ms *MptStore) updateSnapAccountsWithDelta(delta *trie.SnapDelta) {
+	if ms.snap == nil || delta == nil {
+		return
+	}
+	ms.snapRWLock.Lock()
+	for k, v := range delta.InsertVal {
+		addrHash := mpttypes.Keccak256HashWithSyncPool([]byte(k))
+		ms.snapAccounts[addrHash] = v
+	}
+
+	for k := range delta.DelVal {
+		addrHash := mpttypes.Keccak256HashWithSyncPool([]byte(k))
+		ms.snapDestructs[addrHash] = struct{}{}
+	}
+	ms.snapRWLock.Unlock()
 }
