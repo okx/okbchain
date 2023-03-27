@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/okx/okbchain/cmd/okbchaind/base"
 	"github.com/okx/okbchain/libs/cosmos-sdk/store/mpt"
 	"log"
 	"net/http"
@@ -65,6 +66,7 @@ func setExternalPackageValue() {
 		tmiavl.SetIgnoreAutoUpgrade(true)
 	}
 	if !viper.GetBool(tmiavl.FlagIavlDiscardFastStorage) {
+		mpt.AccountStateRootRetriever = base.AccountStateRootRetriever{}
 		mpt.SetSnapshotRebuild(true)
 	}
 }

@@ -1,7 +1,7 @@
 package mpt
 
 import (
-	"github.com/ethereum/go-ethereum/common"
+	"github.com/okx/okbchain/cmd/okbchaind/base"
 	"github.com/okx/okbchain/libs/cosmos-sdk/server"
 	"github.com/okx/okbchain/libs/cosmos-sdk/store/mpt"
 	"github.com/okx/okbchain/libs/cosmos-sdk/store/rootmulti"
@@ -39,7 +39,7 @@ func genSnapshot(ctx *server.Context) {
 	}
 
 	mpt.SetSnapshotRebuild(true)
-	mpt.AccountStateRootRetriever = accountStateRootRetriever{}
+	mpt.AccountStateRootRetriever = base.AccountStateRootRetriever{}
 	rs := rootmulti.NewStore(db)
 	logger := log.NewTMLogger(log.NewSyncWriter(os.Stdout))
 
@@ -48,21 +48,4 @@ func genSnapshot(ctx *server.Context) {
 	rs.SetLogger(logger)
 	rs.MountStoreWithDB(sdk.NewKVStoreKey(mpt.StoreKey), sdk.StoreTypeMPT, nil)
 	rs.LoadLatestVersion()
-}
-
-type accountStateRootRetriever struct{}
-
-func (a accountStateRootRetriever) RetrieveStateRoot(bz []byte) common.Hash {
-	acc := DecodeAccount("", bz)
-	return acc.GetStateRoot()
-}
-
-func (a accountStateRootRetriever) ModifyAccStateRoot(before []byte, rootHash common.Hash) []byte {
-	//TODO implement me
-	panic("implement me")
-}
-
-func (a accountStateRootRetriever) GetAccStateRoot(rootBytes []byte) common.Hash {
-	//TODO implement me
-	panic("implement me")
 }
