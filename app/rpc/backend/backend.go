@@ -186,6 +186,23 @@ func (b *EthermintBackend) getBlockFullTxs(height int64, blockHash common.Hash) 
 	}
 	return ethTxs, nil
 }
+func (b *EthermintBackend) formatEthBlock(res []byte, fullTx bool) (*evmtypes.Block, error) {
+	var ethBlock evmtypes.Block
+	if err := json.Unmarshal(res, &ethBlock); err != nil {
+		b.logger.Error("ethBlockByHash unMarshal error", "errMsg", err.Error())
+		return nil, err
+	}
+
+	if fullTx {
+		ethTxs, err := b.getBlockFullTxs(int64(ethBlock.Number), ethBlock.Hash)
+		if err != nil {
+			b.logger.Error("ethBlockByHash getBlockFullTxs error", "errMsg", err.Error())
+			return nil, err
+		}
+		ethBlock.Transactions = ethTxs
+	}
+	return &ethBlock, nil
+}
 
 // GetBlockByHash returns the block identified by hash.
 func (b *EthermintBackend) GetBlockByHash(hash common.Hash, fullTx bool) (*evmtypes.Block, error) {
@@ -197,22 +214,11 @@ func (b *EthermintBackend) GetBlockByHash(hash common.Hash, fullTx bool) (*evmty
 	// query block by eth block hash
 	res, _, err := b.clientCtx.Query(fmt.Sprintf("custom/%s/%s/%s", evmtypes.ModuleName, evmtypes.QueryEthBlockByHash, hash.Hex()))
 	if err == nil {
-		var ethBlock evmtypes.Block
-		if err := json.Unmarshal(res, &ethBlock); err != nil {
-			b.logger.Error("ethBlockByHash unMarshal error", "errMsg", err.Error())
-			return nil, err
+		ethBlock, err := b.formatEthBlock(res, fullTx)
+		if err == nil {
+			b.backendCache.AddOrUpdateBlock(hash, ethBlock, fullTx)
+			return ethBlock, nil
 		}
-
-		if fullTx {
-			ethTxs, err := b.getBlockFullTxs(int64(ethBlock.Number), ethBlock.Hash)
-			if err != nil {
-				b.logger.Error("ethBlockByHash getBlockFullTxs error", "errMsg", err.Error())
-				return nil, err
-			}
-			ethBlock.Transactions = ethTxs
-		}
-		b.backendCache.AddOrUpdateBlock(hash, &ethBlock, fullTx)
-		return &ethBlock, nil
 	} else {
 		b.logger.Error("ethBlockByHash error", "errMsg", err.Error())
 	}

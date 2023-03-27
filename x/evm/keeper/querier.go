@@ -443,7 +443,10 @@ func queryEthBlockByHash(ctx sdk.Context, path []string, keeper Keeper) ([]byte,
 	blockHash := ethcmn.HexToHash(path[1])
 	res, found := keeper.GetEthBlockBytesByHash(ctx, blockHash.Bytes())
 	if !found {
+		keeper.logger.Error("queryEthBlockByHash not found")
 		return nil, fmt.Errorf("not found block by hash(%s)", blockHash.Hex())
+	} else {
+		keeper.logger.Error("queryEthBlockByHash found", "res", string(res))
 	}
 
 	return res, nil
