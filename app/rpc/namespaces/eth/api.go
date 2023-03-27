@@ -1096,6 +1096,7 @@ func (api *PublicEthereumAPI) GetBlockByHash(hash common.Hash, fullTx bool) (*ev
 	defer monitor.OnEnd("hash", hash, "full", fullTx)
 	blockRes, err := api.backend.GetBlockByHash(hash, fullTx)
 	if err != nil {
+		api.logger.Error("GetBlockByHash error", "errMsg", err.Error())
 		return nil, TransformDataError(err, RPCEthGetBlockByHash)
 	}
 	return blockRes, err

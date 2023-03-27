@@ -191,6 +191,7 @@ func (b *EthermintBackend) getBlockFullTxs(height int64, blockHash common.Hash) 
 func (b *EthermintBackend) GetBlockByHash(hash common.Hash, fullTx bool) (*evmtypes.Block, error) {
 	//query block in cache first
 	if block, err := b.backendCache.GetBlockByHash(hash, fullTx); err == nil {
+		b.logger.Error("GetBlockByHash from cache")
 		return block, err
 	}
 	// query block by eth block hash
@@ -198,26 +199,32 @@ func (b *EthermintBackend) GetBlockByHash(hash common.Hash, fullTx bool) (*evmty
 	if err == nil {
 		var ethBlock evmtypes.Block
 		if err := json.Unmarshal(res, &ethBlock); err != nil {
+			b.logger.Error("ethBlockByHash unMarshal error", "errMsg", err.Error())
 			return nil, err
 		}
 
 		if fullTx {
 			ethTxs, err := b.getBlockFullTxs(int64(ethBlock.Number), ethBlock.Hash)
 			if err != nil {
+				b.logger.Error("ethBlockByHash getBlockFullTxs error", "errMsg", err.Error())
 				return nil, err
 			}
 			ethBlock.Transactions = ethTxs
 		}
 		b.backendCache.AddOrUpdateBlock(hash, &ethBlock, fullTx)
 		return &ethBlock, nil
+	} else {
+		b.logger.Error("ethBlockByHash error", "errMsg", err.Error())
 	}
 	// query block by tendermint block hash
 	resBlock, err := b.clientCtx.Client.BlockByHash(hash.Bytes())
 	if err != nil {
+		b.logger.Error("BlockByHash error", "errMsg", err.Error())
 		return nil, err
 	}
-	block, err := rpctypes.RpcBlockFromTendermint(b.clientCtx, resBlock.Block, fullTx)
+	block, err := rpctypes.RpcBlockFromTendermint(b.clientCtx, resBlock.Block, fullTx, b.logger)
 	if err != nil {
+		b.logger.Error("BlockByHash RpcBlockFromTendermint error", "errMsg", err.Error())
 		return nil, err
 	}
 	b.backendCache.AddOrUpdateBlock(hash, block, fullTx)

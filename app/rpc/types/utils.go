@@ -7,6 +7,8 @@ import (
 	"fmt"
 	"math/big"
 
+	"github.com/okx/okbchain/libs/tendermint/libs/log"
+
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	ethtypes "github.com/ethereum/go-ethereum/core/types"
@@ -62,7 +64,7 @@ func ToTransaction(tx *evmtypes.MsgEthereumTx, from *common.Address) *watcher.Tr
 }
 
 // RpcBlockFromTendermint returns a JSON-RPC compatible Ethereum blockfrom a given Tendermint block.
-func RpcBlockFromTendermint(clientCtx clientcontext.CLIContext, block *tmtypes.Block, fullTx bool) (*evmtypes.Block, error) {
+func RpcBlockFromTendermint(clientCtx clientcontext.CLIContext, block *tmtypes.Block, fullTx bool, logger log.Logger) (*evmtypes.Block, error) {
 	gasLimit, err := BlockMaxGasFromConsensusParams(context.Background(), clientCtx)
 	if err != nil {
 		return nil, err
@@ -78,8 +80,12 @@ func RpcBlockFromTendermint(clientCtx clientcontext.CLIContext, block *tmtypes.B
 	res, _, err := clientCtx.Query(fmt.Sprintf("custom/%s/%s/%d", evmtypes.ModuleName, evmtypes.QueryBloom, block.Height))
 	if err == nil {
 		var bloomRes evmtypes.QueryBloomFilter
-		clientCtx.Codec.MustUnmarshalJSON(res, &bloomRes)
-		bloom = bloomRes.Bloom
+		err := clientCtx.Codec.UnmarshalJSON(res, &bloomRes)
+		if err == nil {
+			bloom = bloomRes.Bloom
+		} else {
+			logger.Error(" RpcBlockFromTendermint UnmarshalJSON error", "errMsg", err.Error())
+		}
 	}
 
 	return FormatBlock(block.Header, block.Size(), block.Hash(), gasLimit, gasUsed, ethTxs, bloom, fullTx), nil
