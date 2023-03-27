@@ -145,6 +145,7 @@ func (b *EthermintBackend) BlockNumber() int64 {
 func (b *EthermintBackend) GetBlockByNumber(blockNum rpctypes.BlockNumber, fullTx bool) (*evmtypes.Block, error) {
 	//query block in cache first
 	if block, err := b.backendCache.GetBlockByNumber(uint64(blockNum), fullTx); err == nil {
+		b.logger.Error("GetBlockByNumber from cache", "hash", block.Hash.Hex())
 		return block, nil
 	}
 	height := blockNum.Int64()

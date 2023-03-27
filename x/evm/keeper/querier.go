@@ -446,7 +446,7 @@ func queryEthBlockByHash(ctx sdk.Context, path []string, keeper Keeper) ([]byte,
 		keeper.logger.Error("queryEthBlockByHash not found")
 		return nil, fmt.Errorf("not found block by hash(%s)", blockHash.Hex())
 	} else {
-		keeper.logger.Error("queryEthBlockByHash found", "res", string(res))
+		keeper.logger.Error("queryEthBlockByHash found", "size", len(res), "res", string(res))
 	}
 
 	return res, nil
