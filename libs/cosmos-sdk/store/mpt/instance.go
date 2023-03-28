@@ -2,6 +2,7 @@ package mpt
 
 import (
 	"encoding/binary"
+	"github.com/ethereum/go-ethereum/ethdb"
 	"path/filepath"
 	"sync"
 
@@ -25,6 +26,7 @@ var (
 	initMptOnce  sync.Once
 	gStatic      = NewRuntimeState()
 	gAsyncDB     *AsyncKeyValueStore
+	gEthDB       ethdb.Database
 )
 
 func InstanceOfMptStore() ethstate.Database {
@@ -52,6 +54,7 @@ func InstanceOfMptStore() ethstate.Database {
 		}
 
 		db := rawdb.NewDatabase(nkvstore)
+		gEthDB = db
 		gMptDatabase = ethstate.NewDatabaseWithConfig(db, &trie.Config{
 			Cache:     int(TrieCacheSize),
 			Journal:   "",
@@ -60,6 +63,11 @@ func InstanceOfMptStore() ethstate.Database {
 	})
 
 	return gMptDatabase
+}
+
+func GetEthDB() ethdb.Database {
+	InstanceOfMptStore()
+	return gEthDB
 }
 
 // GetLatestStoredBlockHeight get latest mpt storage height

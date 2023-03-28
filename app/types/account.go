@@ -392,3 +392,7 @@ func (acc EthAccount) GetStateRoot() ethcmn.Hash {
 func (acc *EthAccount) SetStateRoot(hash ethcmn.Hash) {
 	acc.StateRoot = hash
 }
+
+func (acc EthAccount) GetCodeHash() []byte {
+	return acc.CodeHash
+}

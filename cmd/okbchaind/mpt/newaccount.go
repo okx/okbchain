@@ -10,6 +10,7 @@ import (
 	ethcrypto "github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/trie"
 	apptypes "github.com/okx/okbchain/app/types"
+	"github.com/okx/okbchain/cmd/okbchaind/base"
 	"github.com/okx/okbchain/libs/cosmos-sdk/server"
 	"github.com/okx/okbchain/libs/cosmos-sdk/store/mpt"
 	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
@@ -89,7 +90,7 @@ func getAccountFromMpt(height uint64) map[string]interface{} {
 	for itr.Next() {
 		addr := ethcmn.BytesToAddress(accTrie.GetKey(itr.Key))
 		addrHash := ethcrypto.Keccak256Hash(addr[:])
-		acc := DecodeAccount(addr.String(), itr.Value)
+		acc := base.DecodeAccount(addr.String(), itr.Value)
 		buff, err := json.Marshal(acc)
 		panicError(err)
 		// check if the account is a contract account
