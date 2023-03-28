@@ -304,6 +304,9 @@ func (w *Watcher) CommitStateToRpcDb(addr common.Address, key, value []byte) {
 		return
 	}
 	wMsg := NewMsgState(addr, key, value)
+	if value == nil {
+		return
+	}
 	if wMsg != nil {
 		w.store.Set(append(prefixRpcDb, wMsg.GetKey()...), []byte(wMsg.GetValue()))
 	}
