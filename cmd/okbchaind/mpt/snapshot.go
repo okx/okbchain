@@ -1,18 +1,15 @@
 package mpt
 
 import (
+	"encoding/binary"
+	"fmt"
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/core/state/snapshot"
 	"github.com/okx/okbchain/libs/cosmos-sdk/server"
 	"github.com/okx/okbchain/libs/cosmos-sdk/store/mpt"
-	"github.com/okx/okbchain/libs/cosmos-sdk/store/rootmulti"
 	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	cfg "github.com/okx/okbchain/libs/tendermint/config"
-	tmflags "github.com/okx/okbchain/libs/tendermint/libs/cli/flags"
-	"github.com/okx/okbchain/libs/tendermint/libs/log"
 	"github.com/spf13/cobra"
 	stdlog "log"
-	"os"
-	"path/filepath"
 )
 
 func genSnapCmd(ctx *server.Context) *cobra.Command {
@@ -24,31 +21,24 @@ func genSnapCmd(ctx *server.Context) *cobra.Command {
 		},
 		Run: func(cmd *cobra.Command, args []string) {
 			stdlog.Println("--------- generate snapshot start ---------")
-			dataDir := filepath.Join(ctx.Config.RootDir, "data")
-			GenSnapshot(dataDir)
+			GenSnapshot()
 			stdlog.Println("--------- generate snapshot end ---------")
 		},
 	}
 	return cmd
 }
 
-func GenSnapshot(dataDir string) {
-	db, err := sdk.NewDB(applicationDB, dataDir)
-	if err != nil {
-		panic("fail to open application db: " + err.Error())
-	}
-	defer db.Close()
+func GenSnapshot() {
+	latestHeight := getLatestHeight()
+	rootHash := getMptRootHash(latestHeight)
+	db := mpt.InstanceOfMptStore()
 
-	mpt.SetSnapshotRebuild(true)
-	mpt.AccountStateRootRetriever = accountStateRootRetriever{}
-	rs := rootmulti.NewStore(db)
-	logger := log.NewTMLogger(log.NewSyncWriter(os.Stdout))
+	_, err := db.OpenTrie(rootHash)
+	panicError(err)
+	snaps, err := snapshot.NewCustom(db.TrieDB().DiskDB(), db.TrieDB(), 256, rootHash, false, true, false, accountStateRootRetriever{})
+	panicError(err)
 
-	const logLevel = "main:info,iavl:info,*:error,state:info,provider:info,root-multi:info"
-	logger, err = tmflags.ParseLogLevel(logLevel, logger, cfg.DefaultLogLevel())
-	rs.SetLogger(logger)
-	rs.MountStoreWithDB(sdk.NewKVStoreKey(mpt.StoreKey), sdk.StoreTypeMPT, nil)
-	rs.LoadLatestVersion()
+	snaps.Rebuild(rootHash)
 }
 
 type accountStateRootRetriever struct{}
@@ -66,4 +56,25 @@ func (a accountStateRootRetriever) ModifyAccStateRoot(before []byte, rootHash co
 func (a accountStateRootRetriever) GetAccStateRoot(rootBytes []byte) common.Hash {
 	//TODO implement me
 	panic("implement me")
+}
+
+func getLatestHeight() uint64 {
+	db := mpt.InstanceOfMptStore()
+	rst, err := db.TrieDB().DiskDB().Get(mpt.KeyPrefixAccLatestStoredHeight)
+	if err != nil || len(rst) == 0 {
+		panic(fmt.Sprintf("%v %v", err, len(rst)))
+	}
+
+	return binary.BigEndian.Uint64(rst)
+}
+
+func getMptRootHash(height uint64) common.Hash {
+	db := mpt.InstanceOfMptStore()
+	hhash := sdk.Uint64ToBigEndian(height)
+	rst, err := db.TrieDB().DiskDB().Get(append(mpt.KeyPrefixAccRootMptHash, hhash...))
+	if err != nil || len(rst) == 0 {
+		return common.Hash{}
+	}
+
+	return common.BytesToHash(rst)
 }
