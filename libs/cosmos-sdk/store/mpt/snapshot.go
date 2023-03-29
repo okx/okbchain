@@ -51,6 +51,7 @@ func (ms *MptStore) openSnapshot() error {
 	}
 
 	ms.prepareSnap(ms.originalRoot)
+	ms.snaps.Verify(ms.originalRoot)
 
 	return nil
 }
