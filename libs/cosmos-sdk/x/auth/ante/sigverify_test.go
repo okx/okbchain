@@ -2,6 +2,7 @@ package ante_test
 
 import (
 	"fmt"
+	"github.com/spf13/viper"
 	"testing"
 
 	"github.com/okx/okbchain/libs/tendermint/crypto"
@@ -15,6 +16,7 @@ import (
 	"github.com/okx/okbchain/libs/cosmos-sdk/types/tx/signing"
 	"github.com/okx/okbchain/libs/cosmos-sdk/x/auth/ante"
 	"github.com/okx/okbchain/libs/cosmos-sdk/x/auth/types"
+	tmtypes "github.com/okx/okbchain/libs/tendermint/types"
 )
 
 func TestSetPubKey(t *testing.T) {
@@ -305,5 +307,145 @@ func TestIncrementSequenceDecorator(t *testing.T) {
 		_, err := antehandler(tc.ctx, tx, tc.simulate)
 		require.NoError(t, err, "unexpected error; tc #%d, %v", i, tc)
 		require.Equal(t, tc.expectedSeq, app.AccountKeeper.GetAccount(ctx, addr).GetSequence())
+	}
+}
+
+func TestVerifySig(t *testing.T) {
+	// setup
+	app, ctx := createTestApp(true)
+	// make block height non-zero to ensure account numbers part of signBytes
+	ctx.SetBlockHeight(1)
+	viper.SetDefault(tmtypes.FlagSigCacheSize, 30000)
+	tmtypes.InitSignatureCache()
+
+	// keys and addresses
+	priv1, _, addr1 := types.KeyTestPubAddr()
+	priv2, _, addr2 := types.KeyTestPubAddr()
+	priv3, _, addr3 := types.KeyTestPubAddr()
+
+	addrs := []sdk.AccAddress{addr1, addr2, addr3}
+	msgList := [][]sdk.Msg{}
+	for i := range addrs {
+		msgs := []sdk.Msg{types.NewTestMsg(addrs[i])}
+		acc := app.AccountKeeper.NewAccountWithAddress(ctx, addrs[i])
+		require.NoError(t, acc.SetAccountNumber(uint64(i)))
+		app.AccountKeeper.SetAccount(ctx, acc)
+		msgList = append(msgList, msgs)
+	}
+
+	fee := types.NewTestStdFee()
+	spkd := ante.NewSetPubKeyDecorator(app.AccountKeeper)
+	svd := ante.NewSigVerificationDecorator(app.AccountKeeper)
+	antehandler := sdk.ChainAnteDecorators(spkd, svd)
+
+	type testCase struct {
+		name         string
+		privs        []crypto.PrivKey
+		seqs         []uint64
+		cacheHandler func(tx sdk.Tx)
+		shouldErr    []bool
+	}
+	testCases := []testCase{
+		{
+			"error priv", []crypto.PrivKey{priv3, priv1, priv2}, []uint64{0, 0, 0},
+			func(tx sdk.Tx) { antehandler(ctx, tx, false) }, []bool{true, true, true},
+		},
+		{
+			"error seq", []crypto.PrivKey{priv1, priv2, priv3}, []uint64{1, 2, 3},
+			func(tx sdk.Tx) { antehandler(ctx, tx, false) }, []bool{true, true, true},
+		},
+		{
+			"valid tx", []crypto.PrivKey{priv1, priv2, priv3}, []uint64{0, 0, 0},
+			func(tx sdk.Tx) { antehandler(ctx, tx, false) }, []bool{false, false, false},
+		},
+		{
+			"error priv", []crypto.PrivKey{priv3, priv1, priv2}, []uint64{0, 0, 0},
+			func(tx sdk.Tx) { antehandler(ctx, tx, false) }, []bool{true, true, true},
+		},
+		{
+			"error priv", []crypto.PrivKey{priv3, priv1, priv2}, []uint64{1, 1, 1},
+			func(tx sdk.Tx) { antehandler(ctx, tx, false) }, []bool{true, true, true},
+		},
+		{
+			"error seq", []crypto.PrivKey{priv1, priv2, priv3}, []uint64{2, 2, 2},
+			func(tx sdk.Tx) { antehandler(ctx, tx, false) }, []bool{true, true, true},
+		},
+		{
+			"error seq", []crypto.PrivKey{priv1, priv2, priv3}, []uint64{0, 0, 0},
+			func(tx sdk.Tx) { antehandler(ctx, tx, false) }, []bool{true, true, true},
+		},
+		{
+			"valid tx", []crypto.PrivKey{priv1, priv2, priv3}, []uint64{1, 1, 1},
+			func(tx sdk.Tx) { antehandler(ctx, tx, false) }, []bool{false, false, false},
+		},
+		{
+			"valid tx", []crypto.PrivKey{priv1, priv2, priv3}, []uint64{2, 2, 2},
+			func(tx sdk.Tx) { antehandler(ctx, tx, false) }, []bool{false, false, false},
+		},
+		{
+			"1 valid tx", []crypto.PrivKey{priv3, priv2, priv1}, []uint64{3, 3, 3},
+			func(tx sdk.Tx) { antehandler(ctx, tx, false) }, []bool{true, false, true},
+		},
+	}
+	for i, tc := range testCases {
+		for n := range addrs {
+			sigs := NewSig(ctx, msgList[n], tc.privs[n], uint64(n), tc.seqs[n], fee)
+			tx := NewTestTx(msgList[n], sigs, fee)
+			tc.cacheHandler(tx)
+			_, err := antehandler(ctx, tx, false)
+			if tc.shouldErr[n] {
+				require.NotNil(t, err, "TestCase %d: %s did not error as expected", i, tc.name)
+			} else {
+				require.Nil(t, err, "TestCase %d: %s errored unexpectedly. Err: %v", i, tc.name, err)
+				acc := app.AccountKeeper.GetAccount(ctx, addrs[n])
+				acc.SetSequence(acc.GetSequence() + 1)
+				app.AccountKeeper.SetAccount(ctx, acc)
+			}
+		}
+	}
+}
+
+func NewSig(ctx sdk.Context, msgs []sdk.Msg, priv crypto.PrivKey, accNum uint64, seq uint64, fee types.StdFee) []types.StdSignature {
+	signBytes := types.StdSignBytes(ctx.ChainID(), accNum, seq, fee, msgs, "")
+	sig, err := priv.Sign(signBytes)
+	if err != nil {
+		panic(err)
+	}
+
+	sigs := types.StdSignature{PubKey: priv.PubKey(), Signature: sig}
+	return []types.StdSignature{sigs}
+}
+
+func NewTestTx(msgs []sdk.Msg, sigs []types.StdSignature, fee types.StdFee) sdk.Tx {
+	tx := types.NewStdTx(msgs, fee, sigs, "")
+	return tx
+}
+
+func BenchmarkVerifySig(b *testing.B) {
+	app, ctx := createTestApp(true)
+	// make block height non-zero to ensure account numbers part of signBytes
+	ctx.SetBlockHeight(1)
+	viper.SetDefault(tmtypes.FlagSigCacheSize, 30000)
+	tmtypes.InitSignatureCache()
+	priv, _, addr := types.KeyTestPubAddr()
+	msgs := []sdk.Msg{types.NewTestMsg(addr)}
+	acc := app.AccountKeeper.NewAccountWithAddress(ctx, addr)
+	require.NoError(b, acc.SetAccountNumber(uint64(0)))
+	app.AccountKeeper.SetAccount(ctx, acc)
+	fee := types.NewTestStdFee()
+	anteHandler := sdk.ChainAnteDecorators(ante.NewSetPubKeyDecorator(app.AccountKeeper), ante.NewSigVerificationDecorator(app.AccountKeeper))
+
+	type testCase struct {
+		name string
+		priv crypto.PrivKey
+		seq  uint64
+	}
+	tc := testCase{"valid tx", priv, 0}
+	b.ResetTimer()
+	for i := 0; i < 2; i++ {
+		sigs := NewSig(ctx, msgs, tc.priv, 0, tc.seq, fee)
+		tx := NewTestTx(msgs, sigs, fee)
+		_, err := anteHandler(ctx, tx, false)
+		require.Nil(b, err, "TestCase %s errored unexpectedly. Err: %v", tc.name, err)
 	}
 }
