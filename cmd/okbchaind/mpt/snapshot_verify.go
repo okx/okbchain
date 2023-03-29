@@ -2,6 +2,7 @@ package mpt
 
 import (
 	"github.com/ethereum/go-ethereum/core/state/snapshot"
+	"github.com/okx/okbchain/cmd/okbchaind/base"
 	"github.com/okx/okbchain/libs/cosmos-sdk/server"
 	"github.com/okx/okbchain/libs/cosmos-sdk/store/mpt"
 	"github.com/spf13/cobra"
@@ -31,7 +32,7 @@ func verifySnapshot() {
 	db := mpt.InstanceOfMptStore()
 	_, err := db.OpenTrie(rootHash)
 	panicError(err)
-	snaps, err := snapshot.NewCustom(db.TrieDB().DiskDB(), db.TrieDB(), 256, rootHash, false, false, false, accountStateRootRetriever{})
+	snaps, err := snapshot.NewCustom(db.TrieDB().DiskDB(), db.TrieDB(), 256, rootHash, false, false, false, base.AccountStateRootRetriever{})
 	panicError(err)
 	err = snaps.Verify(rootHash)
 	if err != nil {
