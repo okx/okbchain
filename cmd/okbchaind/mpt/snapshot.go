@@ -4,13 +4,18 @@ import (
 	"encoding/binary"
 	"fmt"
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/core/state/snapshot"
 	"github.com/okx/okbchain/cmd/okbchaind/base"
 	"github.com/okx/okbchain/libs/cosmos-sdk/server"
 	"github.com/okx/okbchain/libs/cosmos-sdk/store/mpt"
+	"github.com/okx/okbchain/libs/cosmos-sdk/store/rootmulti"
 	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
+	cfg "github.com/okx/okbchain/libs/tendermint/config"
+	tmflags "github.com/okx/okbchain/libs/tendermint/libs/cli/flags"
+	"github.com/okx/okbchain/libs/tendermint/libs/log"
 	"github.com/spf13/cobra"
 	stdlog "log"
+	"os"
+	"path/filepath"
 )
 
 func genSnapCmd(ctx *server.Context) *cobra.Command {
@@ -22,24 +27,31 @@ func genSnapCmd(ctx *server.Context) *cobra.Command {
 		},
 		Run: func(cmd *cobra.Command, args []string) {
 			stdlog.Println("--------- generate snapshot start ---------")
-			GenSnapshot()
+			dataDir := filepath.Join(ctx.Config.RootDir, "data")
+			GenSnapshot(dataDir)
 			stdlog.Println("--------- generate snapshot end ---------")
 		},
 	}
 	return cmd
 }
 
-func GenSnapshot() {
-	latestHeight := getLatestHeight()
-	rootHash := getMptRootHash(latestHeight)
-	db := mpt.InstanceOfMptStore()
+func GenSnapshot(dataDir string) {
+	db, err := sdk.NewDB(applicationDB, dataDir)
+	if err != nil {
+		panic("fail to open application db: " + err.Error())
+	}
+	defer db.Close()
 
-	_, err := db.OpenTrie(rootHash)
-	panicError(err)
-	snaps, err := snapshot.NewCustom(db.TrieDB().DiskDB(), db.TrieDB(), 256, rootHash, false, true, false, base.AccountStateRootRetriever{})
-	panicError(err)
+	mpt.SetSnapshotRebuild(true)
+	mpt.AccountStateRootRetriever = base.AccountStateRootRetriever{}
+	rs := rootmulti.NewStore(db)
+	logger := log.NewTMLogger(log.NewSyncWriter(os.Stdout))
 
-	snaps.Rebuild(rootHash)
+	const logLevel = "main:info,iavl:info,*:error,state:info,provider:info,root-multi:info"
+	logger, err = tmflags.ParseLogLevel(logLevel, logger, cfg.DefaultLogLevel())
+	rs.SetLogger(logger)
+	rs.MountStoreWithDB(sdk.NewKVStoreKey(mpt.StoreKey), sdk.StoreTypeMPT, nil)
+	rs.LoadLatestVersion()
 }
 
 func getLatestHeight() uint64 {

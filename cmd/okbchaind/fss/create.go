@@ -28,7 +28,8 @@ It will take long based on the original database size.`,
 		outputModules(storeKeys)
 
 		log.Println("--------- generate snapshot start ---------")
-		mpt.GenSnapshot()
+		dataDir := viper.GetString(flagDataDir)
+		mpt.GenSnapshot(dataDir)
 		log.Println("--------- generate snapshot end ---------")
 
 		return createIndex(storeKeys)

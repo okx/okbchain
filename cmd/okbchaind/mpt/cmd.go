@@ -20,6 +20,7 @@ func MptCmd(ctx *server.Context) *cobra.Command {
 		AccountGetCmd(ctx),
 		genSnapCmd(ctx),
 		verifySnapshotCmd(ctx),
+		snapshotViewerCmd(ctx),
 	)
 
 	cmd.PersistentFlags().String(sdk.FlagDBBackend, tmtypes.DBBackend, "Database backend: goleveldb | rocksdb")

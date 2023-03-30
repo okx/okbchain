@@ -37,6 +37,7 @@ func verifySnapshot() {
 	err = snaps.Verify(rootHash)
 	if err != nil {
 		stdlog.Printf("snapshot state is stale, please generate it again. error %v\n", err)
+		return
 	}
 
 	stdlog.Println("snapshot state verify ok.")
