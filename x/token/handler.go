@@ -3,10 +3,11 @@ package token
 import (
 	"fmt"
 
-	"github.com/okx/okbchain/x/common"
-
 	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
+	"github.com/okx/okbchain/libs/cosmos-sdk/x/auth"
 	"github.com/okx/okbchain/libs/tendermint/libs/log"
+	tmtypes "github.com/okx/okbchain/libs/tendermint/types"
+	"github.com/okx/okbchain/x/common"
 	"github.com/okx/okbchain/x/common/perf"
 	"github.com/okx/okbchain/x/common/version"
 	"github.com/okx/okbchain/x/token/types"
@@ -136,7 +137,11 @@ func handleMsgTokenIssue(ctx sdk.Context, keeper Keeper, msg types.MsgTokenIssue
 
 	// deduction fee
 	feeDecCoins := keeper.GetParams(ctx).FeeIssue.ToCoins()
-	err = keeper.supplyKeeper.SendCoinsFromAccountToModule(ctx, token.Owner, keeper.feeCollectorName, feeDecCoins)
+	if keeper.paramKeeper.IsUpgradeEffective(ctx, tmtypes.MILESTONE_Venus) {
+		err = keeper.supplyKeeper.SendCoinsFromAccountToModule(ctx, msg.Owner, auth.ExtraFeeCollectorName, feeDecCoins)
+	} else {
+		err = keeper.supplyKeeper.SendCoinsFromAccountToModule(ctx, token.Owner, keeper.feeCollectorName, feeDecCoins)
+	}
 	if err != nil {
 		return types.ErrSendCoinsFromAccountToModuleFailed(err.Error()).Result()
 	}
@@ -186,7 +191,11 @@ func handleMsgTokenBurn(ctx sdk.Context, keeper Keeper, msg types.MsgTokenBurn, 
 
 	// deduction fee
 	feeDecCoins := keeper.GetParams(ctx).FeeBurn.ToCoins()
-	err = keeper.supplyKeeper.SendCoinsFromAccountToModule(ctx, msg.Owner, keeper.feeCollectorName, feeDecCoins)
+	if keeper.paramKeeper.IsUpgradeEffective(ctx, tmtypes.MILESTONE_Venus) {
+		err = keeper.supplyKeeper.SendCoinsFromAccountToModule(ctx, msg.Owner, auth.ExtraFeeCollectorName, feeDecCoins)
+	} else {
+		err = keeper.supplyKeeper.SendCoinsFromAccountToModule(ctx, msg.Owner, keeper.feeCollectorName, feeDecCoins)
+	}
 	if err != nil {
 		return types.ErrSendCoinsFromAccountToModuleFailed(feeDecCoins.String()).Result()
 	}
@@ -243,7 +252,11 @@ func handleMsgTokenMint(ctx sdk.Context, keeper Keeper, msg types.MsgTokenMint, 
 
 	// deduction fee
 	feeDecCoins := keeper.GetParams(ctx).FeeMint.ToCoins()
-	err = keeper.supplyKeeper.SendCoinsFromAccountToModule(ctx, msg.Owner, keeper.feeCollectorName, feeDecCoins)
+	if keeper.paramKeeper.IsUpgradeEffective(ctx, tmtypes.MILESTONE_Venus) {
+		err = keeper.supplyKeeper.SendCoinsFromAccountToModule(ctx, msg.Owner, auth.ExtraFeeCollectorName, feeDecCoins)
+	} else {
+		err = keeper.supplyKeeper.SendCoinsFromAccountToModule(ctx, msg.Owner, keeper.feeCollectorName, feeDecCoins)
+	}
 	if err != nil {
 		return types.ErrSendCoinsFromAccountToModuleFailed(feeDecCoins.String()).Result()
 	}
@@ -355,7 +368,12 @@ func handleMsgTransferOwnership(ctx sdk.Context, keeper Keeper, msg types.MsgTra
 	}
 	// deduction fee
 	feeDecCoins := keeper.GetParams(ctx).FeeChown.ToCoins()
-	err := keeper.supplyKeeper.SendCoinsFromAccountToModule(ctx, msg.FromAddress, keeper.feeCollectorName, feeDecCoins)
+	var err error
+	if keeper.paramKeeper.IsUpgradeEffective(ctx, tmtypes.MILESTONE_Venus) {
+		err = keeper.supplyKeeper.SendCoinsFromAccountToModule(ctx, msg.FromAddress, auth.ExtraFeeCollectorName, feeDecCoins)
+	} else {
+		err = keeper.supplyKeeper.SendCoinsFromAccountToModule(ctx, msg.FromAddress, keeper.feeCollectorName, feeDecCoins)
+	}
 	if err != nil {
 		return types.ErrSendCoinsFromAccountToModuleFailed(err.Error()).Result()
 	}
@@ -440,7 +458,12 @@ func handleMsgTokenModify(ctx sdk.Context, keeper Keeper, msg types.MsgTokenModi
 
 	// deduction fee
 	feeDecCoins := keeper.GetParams(ctx).FeeModify.ToCoins()
-	err := keeper.supplyKeeper.SendCoinsFromAccountToModule(ctx, msg.Owner, keeper.feeCollectorName, feeDecCoins)
+	var err error
+	if keeper.paramKeeper.IsUpgradeEffective(ctx, tmtypes.MILESTONE_Venus) {
+		err = keeper.supplyKeeper.SendCoinsFromAccountToModule(ctx, msg.Owner, auth.ExtraFeeCollectorName, feeDecCoins)
+	} else {
+		err = keeper.supplyKeeper.SendCoinsFromAccountToModule(ctx, msg.Owner, keeper.feeCollectorName, feeDecCoins)
+	}
 	if err != nil {
 		return types.ErrSendCoinsFromAccountToModuleFailed(feeDecCoins.String()).Result()
 	}

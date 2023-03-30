@@ -28,6 +28,7 @@ const (
 
 	MILESTONE_EARTH  = "earth"
 	MILESTONE_Venus4 = "venus4"
+	MILESTONE_Venus  = "venus"
 )
 
 func init() {

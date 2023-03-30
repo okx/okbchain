@@ -5,6 +5,7 @@ import (
 	supplyexported "github.com/okx/okbchain/libs/cosmos-sdk/x/supply/exported"
 	"github.com/okx/okbchain/x/common"
 	govtypes "github.com/okx/okbchain/x/gov/types"
+	ptypes "github.com/okx/okbchain/x/params/types"
 	stakingexported "github.com/okx/okbchain/x/staking/exported"
 )
 
@@ -69,6 +70,8 @@ type SupplyKeeper interface {
 	SendCoinsFromModuleToModule(ctx sdk.Context, senderModule string, recipientModule string, amt sdk.Coins) error
 	SendCoinsFromModuleToAccount(ctx sdk.Context, senderModule string, recipientAddr sdk.AccAddress, amt sdk.Coins) error
 	SendCoinsFromAccountToModule(ctx sdk.Context, senderAddr sdk.AccAddress, recipientModule string, amt sdk.Coins) error
+
+	RegisterPerAddr(name string, permissions []string)
 }
 
 // GovKeeper defines the expected gov Keeper
@@ -76,4 +79,9 @@ type GovKeeper interface {
 	GetDepositParams(ctx sdk.Context) govtypes.DepositParams
 	GetVotingParams(ctx sdk.Context) govtypes.VotingParams
 	CheckMsgSubmitProposal(ctx sdk.Context, msg govtypes.MsgSubmitProposal) sdk.Error
+}
+
+type ParamsKeeper interface {
+	ClaimReadyForUpgrade(name string, cb func(ptypes.UpgradeInfo))
+	IsUpgradeEffective(ctx sdk.Context, name string) bool
 }

@@ -37,6 +37,10 @@ func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, ak types.AccountKeeper, bk ty
 	}
 }
 
+func (k Keeper) RegisterPerAddr(name string, permissions []string) {
+	k.permAddrs[name] = types.NewPermissionsForAddress(name, permissions)
+}
+
 // Logger returns a module-specific logger.
 func (k Keeper) Logger(ctx sdk.Context) log.Logger {
 	return ctx.Logger().With("module", fmt.Sprintf("x/%s", types.ModuleName))

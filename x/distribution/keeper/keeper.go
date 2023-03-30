@@ -19,6 +19,7 @@ type Keeper struct {
 	stakingKeeper types.StakingKeeper
 	supplyKeeper  types.SupplyKeeper
 	govKeeper     types.GovKeeper
+	paramKeeper   types.ParamsKeeper
 
 	blacklistedAddrs map[string]bool
 
@@ -28,7 +29,7 @@ type Keeper struct {
 // NewKeeper creates a new distribution Keeper instance
 func NewKeeper(
 	cdc *codec.Codec, key sdk.StoreKey, paramSpace params.Subspace,
-	sk types.StakingKeeper, supplyKeeper types.SupplyKeeper, feeCollectorName string,
+	sk types.StakingKeeper, supplyKeeper types.SupplyKeeper, pk types.ParamsKeeper, feeCollectorName string,
 	blacklistedAddrs map[string]bool,
 ) Keeper {
 
@@ -48,6 +49,7 @@ func NewKeeper(
 		paramSpace:       paramSpace,
 		stakingKeeper:    sk,
 		supplyKeeper:     supplyKeeper,
+		paramKeeper:      pk,
 		feeCollectorName: feeCollectorName,
 		blacklistedAddrs: blacklistedAddrs,
 	}
@@ -115,4 +117,8 @@ func (k Keeper) WithdrawValidatorCommission(ctx sdk.Context, valAddr sdk.ValAddr
 	)
 
 	return commission, nil
+}
+
+func (k Keeper) GetParamKeeper() types.ParamsKeeper {
+	return k.paramKeeper
 }

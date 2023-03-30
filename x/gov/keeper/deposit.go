@@ -4,6 +4,8 @@ import (
 	"fmt"
 
 	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
+	"github.com/okx/okbchain/libs/cosmos-sdk/x/auth"
+	tmtypes "github.com/okx/okbchain/libs/tendermint/types"
 	"github.com/okx/okbchain/x/gov/types"
 )
 
@@ -129,8 +131,14 @@ func (keeper Keeper) DistributeDeposits(ctx sdk.Context, proposalID uint64) {
 	deposits := keeper.GetDeposits(ctx, proposalID)
 	for i := 0; i < len(deposits); i++ {
 		deposit := deposits[i]
-		err := keeper.supplyKeeper.SendCoinsFromModuleToModule(ctx, types.ModuleName, keeper.feeCollectorName,
-			deposit.Amount)
+		var err error
+		if keeper.paramsKeeper.IsUpgradeEffective(ctx, tmtypes.MILESTONE_Venus) {
+			err = keeper.supplyKeeper.SendCoinsFromModuleToModule(ctx, types.ModuleName, auth.ExtraFeeCollectorName,
+				deposit.Amount)
+		} else {
+			err = keeper.supplyKeeper.SendCoinsFromModuleToModule(ctx, types.ModuleName, keeper.feeCollectorName,
+				deposit.Amount)
+		}
 		if err != nil {
 			panic(err)
 		}

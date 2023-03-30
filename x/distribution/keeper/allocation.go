@@ -2,8 +2,8 @@ package keeper
 
 import (
 	"fmt"
-
 	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
+	"github.com/okx/okbchain/libs/cosmos-sdk/x/auth"
 	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
 
 	"github.com/okx/okbchain/x/distribution/types"
@@ -28,11 +28,18 @@ func (k Keeper) AllocateTokens(ctx sdk.Context, totalPreviousPower int64,
 	feeCollector := k.supplyKeeper.GetModuleAccount(ctx, k.feeCollectorName)
 	feesCollected := feeCollector.GetCoins()
 
-	if feesCollected.Empty() {
+	extraFeesCollected := sdk.ZeroFee().ToCoins()
+	extraFeeCollector := k.supplyKeeper.GetModuleAccount(ctx, auth.ExtraFeeCollectorName)
+	if extraFeeCollector != nil {
+		extraFeesCollected = extraFeeCollector.GetCoins()
+	}
+
+	if feesCollected.Empty() && extraFeesCollected.Empty() {
 		logger.Debug("No fee to distributed.")
 		return
 	}
-	logger.Debug("AllocateTokens", "TotalFee", feesCollected.String())
+	totalFeesCollected := feesCollected.Add2(extraFeesCollected)
+	logger.Debug("AllocateTokens", "TotalFee", totalFeesCollected.String())
 
 	// transfer collected fees to the distribution module account
 	err := k.supplyKeeper.SendCoinsFromModuleToModule(ctx, k.feeCollectorName, types.ModuleName, feesCollected)
@@ -40,11 +47,18 @@ func (k Keeper) AllocateTokens(ctx sdk.Context, totalPreviousPower int64,
 		panic(err)
 	}
 
+	if extraFeeCollector != nil {
+		err = k.supplyKeeper.SendCoinsFromModuleToModule(ctx, auth.ExtraFeeCollectorName, types.ModuleName, feesCollected)
+		if err != nil {
+			panic(err)
+		}
+	}
+
 	feePool := k.GetFeePool(ctx)
 	if totalPreviousPower == 0 {
-		feePool.CommunityPool = feePool.CommunityPool.Add(feesCollected...)
+		feePool.CommunityPool = feePool.CommunityPool.Add(totalFeesCollected...)
 		k.SetFeePool(ctx, feePool)
-		logger.Debug("totalPreviousPower is zero, send fees to community pool", "fees", feesCollected)
+		logger.Debug("totalPreviousPower is zero, send fees to community pool", "fees", totalFeesCollected)
 		return
 	}
 
@@ -61,9 +75,9 @@ func (k Keeper) AllocateTokens(ctx sdk.Context, totalPreviousPower int64,
 				"We recommend you investigate immediately.", previousProposer.String()))
 	}
 
-	feesToVals := feesCollected.MulDecTruncate(sdk.OneDec().Sub(k.GetCommunityTax(ctx)))
+	feesToVals := totalFeesCollected.MulDecTruncate(sdk.OneDec().Sub(k.GetCommunityTax(ctx)))
 	feeByEqual, feeByVote := feesToVals.MulDecTruncate(valPortion), feesToVals.MulDecTruncate(votePortion)
-	feesToCommunity := feesCollected.Sub(feeByEqual.Add(feeByVote...))
+	feesToCommunity := totalFeesCollected.Sub(feeByEqual.Add(feeByVote...))
 	remainByEqual := k.allocateByEqual(ctx, feeByEqual, previousVotes) //allocate rewards equally between validators
 	remainByShare := k.allocateByShares(ctx, feeByVote)                //allocate rewards by shares
 	feesToCommunity = feesToCommunity.Add(remainByEqual.Add(remainByShare...)...)
@@ -76,7 +90,7 @@ func (k Keeper) AllocateTokens(ctx sdk.Context, totalPreviousPower int64,
 	}
 }
 
-// AllocateTokens allocates fees from fee_collector
+// PoAAllocateTokens allocates fees from fee_collector
 // 100% rewards to validators, equally.
 func (k Keeper) PoAAllocateTokens(ctx sdk.Context, previousVotes []abci.VoteInfo) {
 	logger := k.Logger(ctx)
@@ -86,11 +100,18 @@ func (k Keeper) PoAAllocateTokens(ctx sdk.Context, previousVotes []abci.VoteInfo
 	feeCollector := k.supplyKeeper.GetModuleAccount(ctx, k.feeCollectorName)
 	feesCollected := feeCollector.GetCoins()
 
-	if feesCollected.Empty() {
+	extraFeesCollected := sdk.ZeroFee().ToCoins()
+	extraFeeCollector := k.supplyKeeper.GetModuleAccount(ctx, auth.ExtraFeeCollectorName)
+	if extraFeeCollector != nil {
+		extraFeesCollected = extraFeeCollector.GetCoins()
+	}
+
+	if feesCollected.Empty() && extraFeesCollected.Empty() {
 		logger.Debug("No fee to distributed.")
 		return
 	}
-	logger.Debug("AllocateTokens", "TotalFee", feesCollected.String())
+	totalFeesCollected := feesCollected.Add2(extraFeesCollected)
+	logger.Debug("AllocateTokens", "TotalFee", totalFeesCollected.String())
 
 	// transfer collected fees to the distribution module account
 	err := k.supplyKeeper.SendCoinsFromModuleToModule(ctx, k.feeCollectorName, types.ModuleName, feesCollected)
@@ -98,8 +119,15 @@ func (k Keeper) PoAAllocateTokens(ctx sdk.Context, previousVotes []abci.VoteInfo
 		panic(err)
 	}
 
+	if extraFeeCollector != nil {
+		err = k.supplyKeeper.SendCoinsFromModuleToModule(ctx, auth.ExtraFeeCollectorName, types.ModuleName, extraFeesCollected)
+		if err != nil {
+			panic(err)
+		}
+	}
+
 	feePool := k.GetFeePool(ctx)
-	remainByEqual := k.allocateByEqual(ctx, feesCollected, previousVotes) //allocate rewards equally between validators
+	remainByEqual := k.allocateByEqual(ctx, totalFeesCollected, previousVotes) //allocate rewards equally between validators
 	// allocate community funding
 	if !remainByEqual.IsZero() {
 		feePool.CommunityPool = feePool.CommunityPool.Add(remainByEqual...)

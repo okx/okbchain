@@ -17,6 +17,7 @@ const (
 	ModuleName                    = types.ModuleName
 	StoreKey                      = mpt.StoreKey //types.StoreKey
 	FeeCollectorName              = types.FeeCollectorName
+	ExtraFeeCollectorName         = types.ExtraFeeCollectorName
 	QuerierRoute                  = types.QuerierRoute
 	DefaultParamspace             = types.DefaultParamspace
 	DefaultMaxMemoCharacters      = types.DefaultMaxMemoCharacters

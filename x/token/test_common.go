@@ -69,6 +69,7 @@ func CreateParam(t *testing.T, isCheckTx bool) (sdk.Context, Keeper, *sdk.KVStor
 		pk.Subspace(DefaultParamspace),
 		auth.FeeCollectorName,
 		supplyKeeper,
+		pk,
 		keyToken,
 		keyLock,
 		cdc,

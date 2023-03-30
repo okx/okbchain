@@ -24,7 +24,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-//nolint: deadcode unused
+// nolint: deadcode unused
 var (
 	delPk1   = ed25519.GenPrivKey().PubKey()
 	delPk2   = ed25519.GenPrivKey().PubKey()
@@ -242,7 +242,7 @@ func CreateTestInputAdvanced(t *testing.T, isCheckTx bool, initPower int64, comm
 		pk.Subspace(staking.DefaultParamspace))
 	sk.SetParams(ctx, staking.DefaultDposParams())
 
-	keeper := NewKeeper(cdc, keyDistr, pk.Subspace(types.DefaultParamspace), sk, supplyKeeper,
+	keeper := NewKeeper(cdc, keyDistr, pk.Subspace(types.DefaultParamspace), sk, supplyKeeper, &pk,
 		auth.FeeCollectorName, blacklistedAddrs)
 
 	keeper.SetWithdrawAddrEnabled(ctx, true)

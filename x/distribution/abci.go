@@ -1,11 +1,13 @@
 package distribution
 
 import (
+	"fmt"
+
+	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
+	"github.com/okx/okbchain/libs/cosmos-sdk/x/auth"
 	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
 	tmtypes "github.com/okx/okbchain/libs/tendermint/types"
 	"github.com/okx/okbchain/x/common"
-
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
 	"github.com/okx/okbchain/x/distribution/keeper"
 )
 
@@ -18,6 +20,12 @@ func BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock, k keeper.Keeper) 
 		previousTotalPower += voteInfo.Validator.Power
 	}
 
+	if k.GetParamKeeper().IsUpgradeEffective(ctx, tmtypes.MILESTONE_Venus) {
+		moduleAcc := k.GetExtraFeeAccount(ctx)
+		if moduleAcc == nil {
+			panic(fmt.Sprintf("%s module account has not been set", auth.ExtraFeeCollectorName))
+		}
+	}
 	// TODO this is Tendermint-dependent
 	// ref https://github.com/cosmos/cosmos-sdk/issues/3095
 	if ctx.BlockHeight() > tmtypes.GetStartBlockHeight()+1 {

@@ -331,6 +331,7 @@ func createTestInput(
 		subspace(distributiontypes.ModuleName),
 		stakingKeeper,
 		supplyKeeper,
+		&paramsKeeper,
 		authtypes.FeeCollectorName,
 		blockedAddrs,
 	)

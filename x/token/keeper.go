@@ -21,6 +21,7 @@ type Keeper struct {
 	bankKeeper       bank.Keeper
 	supplyKeeper     SupplyKeeper
 	accountKeeper    types.AccountKeeper
+	paramKeeper      params.Keeper
 	feeCollectorName string // name of the FeeCollector ModuleAccount
 
 	// The reference to the Paramstore to get and set gov specific params
@@ -40,7 +41,7 @@ type Keeper struct {
 
 // NewKeeper creates a new token keeper
 func NewKeeper(bankKeeper bank.Keeper, paramSpace params.Subspace,
-	feeCollectorName string, supplyKeeper SupplyKeeper, tokenStoreKey, lockStoreKey sdk.StoreKey,
+	feeCollectorName string, supplyKeeper SupplyKeeper, paramKeeper params.Keeper, tokenStoreKey, lockStoreKey sdk.StoreKey,
 	cdc *codec.Codec, enableBackend bool, ak types.AccountKeeper) Keeper {
 
 	k := Keeper{
@@ -48,6 +49,7 @@ func NewKeeper(bankKeeper bank.Keeper, paramSpace params.Subspace,
 		paramSpace:       paramSpace.WithKeyTable(types.ParamKeyTable()),
 		feeCollectorName: feeCollectorName,
 		supplyKeeper:     supplyKeeper,
+		paramKeeper:      paramKeeper,
 		accountKeeper:    ak,
 		tokenStoreKey:    tokenStoreKey,
 		lockStoreKey:     lockStoreKey,

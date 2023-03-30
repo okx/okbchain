@@ -4,15 +4,15 @@ import (
 	"fmt"
 	"time"
 
-	supplyexported "github.com/okx/okbchain/libs/cosmos-sdk/x/supply/exported"
-	"github.com/okx/okbchain/x/common"
-	"github.com/okx/okbchain/x/gov/types"
-	"github.com/okx/okbchain/x/staking/exported"
-
 	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
 	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
+	supplyexported "github.com/okx/okbchain/libs/cosmos-sdk/x/supply/exported"
 	"github.com/okx/okbchain/libs/tendermint/libs/log"
+	tmtypes "github.com/okx/okbchain/libs/tendermint/types"
+	"github.com/okx/okbchain/x/common"
+	"github.com/okx/okbchain/x/gov/types"
 	"github.com/okx/okbchain/x/params"
+	"github.com/okx/okbchain/x/staking/exported"
 )
 
 // Keeper defines governance keeper
@@ -85,6 +85,8 @@ func NewKeeper(
 		proposalHandlerRouter: phr,
 	}
 	keeper.proposalHandlerRouter = keeper.proposalHandlerRouter.AddRoute(types.RouterKey, keeper)
+
+	keeper.paramsKeeper.ClaimReadyForUpgrade(tmtypes.MILESTONE_Venus, nil)
 	return keeper
 }
 

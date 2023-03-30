@@ -369,7 +369,7 @@ func NewOKBChainApp(
 	)
 	app.DistrKeeper = distr.NewKeeper(
 		codecProxy.GetCdc(), keys[distr.StoreKey], app.subspaces[distr.ModuleName], &stakingKeeper,
-		app.SupplyKeeper, auth.FeeCollectorName, app.ModuleAccountAddrs(),
+		app.SupplyKeeper, &app.ParamsKeeper, auth.FeeCollectorName, app.ModuleAccountAddrs(),
 	)
 	app.SlashingKeeper = slashing.NewKeeper(
 		codecProxy.GetCdc(), keys[slashing.StoreKey], &stakingKeeper, app.subspaces[slashing.ModuleName],
@@ -383,7 +383,7 @@ func NewOKBChainApp(
 		app.marshal.GetCdc(), keys[mpt.StoreKey], app.subspaces[evm.ModuleName], &app.AccountKeeper, app.SupplyKeeper, app.BankKeeper, &stakingKeeper, logger)
 	(&bankKeeper).SetInnerTxKeeper(app.EvmKeeper)
 
-	app.TokenKeeper = token.NewKeeper(app.BankKeeper, app.subspaces[token.ModuleName], auth.FeeCollectorName, app.SupplyKeeper,
+	app.TokenKeeper = token.NewKeeper(app.BankKeeper, app.subspaces[token.ModuleName], auth.FeeCollectorName, app.SupplyKeeper, app.ParamsKeeper,
 		keys[token.StoreKey], keys[token.KeyLock], app.marshal.GetCdc(), false, &app.AccountKeeper)
 
 	app.InfuraKeeper = infura.NewKeeper(app.EvmKeeper, logger, streamMetrics)
