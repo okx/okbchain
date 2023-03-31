@@ -22,7 +22,7 @@ import (
 	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
 	"github.com/okx/okbchain/libs/cosmos-sdk/x/auth"
 	authexported "github.com/okx/okbchain/libs/cosmos-sdk/x/auth/exported"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/params"
+	"github.com/okx/okbchain/x/params"
 )
 
 const chainID = ""
@@ -68,7 +68,7 @@ func NewApp() *App {
 	}
 
 	// define keepers
-	app.ParamsKeeper = params.NewKeeper(app.Cdc.GetCdc(), app.KeyParams, app.TKeyParams)
+	app.ParamsKeeper = params.NewKeeper(app.Cdc.GetCdc(), app.KeyParams, app.TKeyParams, app.Logger())
 
 	app.AccountKeeper = auth.NewAccountKeeper(
 		app.Cdc.GetCdc(),
