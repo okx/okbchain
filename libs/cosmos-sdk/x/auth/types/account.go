@@ -352,5 +352,5 @@ func NewModuleAddress(name string) sdk.AccAddress {
 }
 
 func (acc BaseAccount) GetCodeHash() []byte {
-	return nil
+	panic("not implemented")
 }
