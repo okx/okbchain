@@ -160,8 +160,10 @@ func (b *EthermintBackend) GetBlockByNumber(blockNum rpctypes.BlockNumber, fullT
 	if err := json.Unmarshal(res, &ethBlock); err != nil {
 		return nil, err
 	}
-
-	if fullTx {
+	// return empty slice instead of null when there is no transactions in block
+	if ethBlock.TransactionsRoot == ethtypes.EmptyRootHash {
+		ethBlock.Transactions = []common.Hash{}
+	} else if fullTx {
 		ethTxs, err := b.getBlockFullTxs(height, ethBlock.Hash)
 		if err != nil {
 			return nil, err
@@ -200,8 +202,10 @@ func (b *EthermintBackend) GetBlockByHash(hash common.Hash, fullTx bool) (*evmty
 		if err := json.Unmarshal(res, &ethBlock); err != nil {
 			return nil, err
 		}
-
-		if fullTx {
+		// return empty slice instead of null when there is no transactions in block
+		if ethBlock.TransactionsRoot == ethtypes.EmptyRootHash {
+			ethBlock.Transactions = []common.Hash{}
+		} else if fullTx {
 			ethTxs, err := b.getBlockFullTxs(int64(ethBlock.Number), ethBlock.Hash)
 			if err != nil {
 				return nil, err
