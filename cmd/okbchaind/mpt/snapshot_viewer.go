@@ -39,7 +39,6 @@ func viewSnapshot() {
 	for iter.Next() {
 		acc := base.DecodeAccount(iter.Hash().String(), iter.Account())
 		fmt.Printf("%v: %v\n", iter.Hash().String(), acc)
-		fmt.Printf("%v: %v\n", iter.Hash().String(), acc)
 	}
 }
 
