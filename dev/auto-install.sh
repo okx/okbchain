@@ -1,26 +1,5 @@
 #!/bin/bash
 
-printLogo() {
-  echo '
-     OOOOOOOOO     KKKKKKKKK    KKKKKKKEEEEEEEEEEEEEEEEEEEEEE                                        hhhhhhh                                 iiii
-   OO:::::::::OO   K:::::::K    K:::::KE::::::::::::::::::::E                                        h:::::h                                i::::i
- OO:::::::::::::OO K:::::::K    K:::::KE::::::::::::::::::::E                                        h:::::h                                 iiii
-O:::::::OOO:::::::OK:::::::K   K::::::KEE::::::EEEEEEEEE::::E                                        h:::::h
-O::::::O   O::::::OKK::::::K  K:::::KKK  E:::::E       EEEEEExxxxxxx      xxxxxxx    cccccccccccccccc h::::h hhhhh         aaaaaaaaaaaaa   iiiiiii nnnn  nnnnnnnn
-O:::::O     O:::::O  K:::::K K:::::K     E:::::E              x:::::x    x:::::x   cc:::::::::::::::c h::::hh:::::hhh      a::::::::::::a  i:::::i n:::nn::::::::nn
-O:::::O     O:::::O  K::::::K:::::K      E::::::EEEEEEEEEE     x:::::x  x:::::x   c:::::::::::::::::c h::::::::::::::hh    aaaaaaaaa:::::a  i::::i n::::::::::::::nn
-O:::::O     O:::::O  K:::::::::::K       E:::::::::::::::E      x:::::xx:::::x   c:::::::cccccc:::::c h:::::::hhh::::::h            a::::a  i::::i nn:::::::::::::::n
-O:::::O     O:::::O  K:::::::::::K       E:::::::::::::::E       x::::::::::x    c::::::c     ccccccc h::::::h   h::::::h    aaaaaaa:::::a  i::::i   n:::::nnnn:::::n
-O:::::O     O:::::O  K::::::K:::::K      E::::::EEEEEEEEEE        x::::::::x     c:::::c              h:::::h     h:::::h  aa::::::::::::a  i::::i   n::::n    n::::n
-O:::::O     O:::::O  K:::::K K:::::K     E:::::E                  x::::::::x     c:::::c              h:::::h     h:::::h a::::aaaa::::::a  i::::i   n::::n    n::::n
-O::::::O   O::::::OKK::::::K  K:::::KKK  E:::::E       EEEEEE    x::::::::::x    c::::::c     ccccccc h:::::h     h:::::ha::::a    a:::::a  i::::i   n::::n    n::::n
-O:::::::OOO:::::::OK:::::::K   K::::::KEE::::::EEEEEEEE:::::E   x:::::xx:::::x   c:::::::cccccc:::::c h:::::h     h:::::ha::::a    a:::::a i::::::i  n::::n    n::::n
- OO:::::::::::::OO K:::::::K    K:::::KE::::::::::::::::::::E  x:::::x  x:::::x   c:::::::::::::::::c h:::::h     h:::::ha:::::aaaa::::::a i::::::i  n::::n    n::::n
-   OO:::::::::OO   K:::::::K    K:::::KE::::::::::::::::::::E x:::::x    x:::::x   cc:::::::::::::::c h:::::h     h:::::h a::::::::::aa:::ai::::::i  n::::n    n::::n
-     OOOOOOOOO     KKKKKKKKK    KKKKKKKEEEEEEEEEEEEEEEEEEEEEExxxxxxx      xxxxxxx    cccccccccccccccc hhhhhhh     hhhhhhh  aaaaaaaaaa  aaaaiiiiiiii  nnnnnn    nnnnnn
-  '
-}
-
 getOSName() {
     if [ ! -f "/etc/os-release" ]; then
       if [ -f "/etc/centos-release" ]; then
@@ -283,7 +262,6 @@ Installokbchain() {
     export PATH=$PATH:$HOME/go/bin
   fi
   echo "Installokbchain completed"
-  printLogo
 }
 
 GetArchitecture

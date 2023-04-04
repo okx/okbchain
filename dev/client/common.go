@@ -5,24 +5,24 @@ import (
 	"context"
 	"crypto/ecdsa"
 	"fmt"
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	"io/ioutil"
+	"log"
+	"math/big"
+	"time"
+
+	ethereum "github.com/ethereum/go-ethereum"
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethclient"
-	"github.com/okx/okbchain-ethereum-compatible/utils"
-
-	"io/ioutil"
-	"log"
-	"math/big"
-	"time"
+	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
 )
 
 const (
 	RpcUrl        = "http://127.0.0.1:8545"
-	ChainId int64 = 197 //  okbc
+	ChainId int64 = 67 //  okbc
 	//ChainId int64   = 196 //  okbc
 	GasPrice int64  = 100000000 // 0.1 gwei
 	GasLimit uint64 = 3000000
@@ -269,11 +269,7 @@ func deployContract(client *ethclient.Client, fromAddress common.Address,
 	}
 
 	// 4. get the contract address based on tx hash
-	hash, err := utils.Hash(signedTx)
-	if err != nil {
-		log.Printf("Hash tx err: %s", err)
-		return err
-	}
+	hash := signedTx.Hash()
 
 	var receipt *types.Receipt
 	var retry int
