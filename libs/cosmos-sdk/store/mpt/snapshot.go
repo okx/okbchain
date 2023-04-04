@@ -62,6 +62,8 @@ func (ms *MptStore) updateDestructs(addr []byte) {
 	addrHash := mpttypes.Keccak256HashWithSyncPool(addr[:])
 	ms.snapRWLock.Lock()
 	ms.snapDestructs[addrHash] = struct{}{}
+	delete(ms.snapAccounts, addrHash)
+	delete(ms.snapStorage, addrHash)
 	ms.snapRWLock.Unlock()
 }
 
@@ -108,6 +110,7 @@ func (ms *MptStore) updateSnapAccounts(addr, bz []byte) {
 	addrHash := ethcrypto.Keccak256Hash(addr[:])
 	ms.snapRWLock.Lock()
 	ms.snapAccounts[addrHash] = bz
+	delete(ms.snapDestructs, addrHash)
 	ms.snapRWLock.Unlock()
 }
 
