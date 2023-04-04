@@ -4,8 +4,6 @@
 package types
 
 import (
-	"fmt"
-
 	"github.com/ethereum/go-ethereum/ethdb"
 	tmdb "github.com/okx/okbchain/libs/tm-db"
 )
@@ -31,6 +29,9 @@ func (wrsdi *WrapRocksDBIterator) Value() []byte {
 }
 
 func (wrsdi *WrapRocksDBIterator) Next() bool {
+	if !wrsdi.Valid() {
+		return false
+	}
 	if wrsdi.Valid() {
 		k, v := wrsdi.RocksDBIterator.Key(), wrsdi.RocksDBIterator.Value()
 		wrsdi.key, wrsdi.value = k, v
@@ -43,9 +44,6 @@ func (wrsdi *WrapRocksDBIterator) Next() bool {
 }
 
 func (wrsdi *WrapRocksDBIterator) Error() error {
-	if !wrsdi.Valid() {
-		return fmt.Errorf("iterator is invalid")
-	}
 	return wrsdi.RocksDBIterator.Error()
 }
 

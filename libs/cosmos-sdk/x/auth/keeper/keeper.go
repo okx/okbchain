@@ -6,7 +6,6 @@ import (
 	"fmt"
 	ethcmn "github.com/ethereum/go-ethereum/common"
 	ethtypes "github.com/ethereum/go-ethereum/core/types"
-
 	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
 	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
 	sdkerrors "github.com/okx/okbchain/libs/cosmos-sdk/types/errors"
@@ -138,4 +137,10 @@ func (ak AccountKeeper) ModifyAccStateRoot(before []byte, rootHash ethcmn.Hash) 
 func (ak AccountKeeper) GetAccStateRoot(rootBytes []byte) ethcmn.Hash {
 	acc := ak.decodeAccount(rootBytes)
 	return acc.GetStateRoot()
+}
+
+func (ak AccountKeeper) GetStateRootAndCodeHash(bz []byte) (ethcmn.Hash, []byte) {
+	acc := ak.decodeAccount(bz)
+
+	return acc.GetStateRoot(), acc.GetCodeHash()
 }

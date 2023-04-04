@@ -22,6 +22,7 @@ type Account interface {
 	SpendableCoins(blockTime time.Time) Coins
 	String() string
 	GetStateRoot() ethcmn.Hash
+	GetCodeHash() []byte
 }
 
 type ModuleAccount interface {
