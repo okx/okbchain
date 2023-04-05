@@ -188,7 +188,7 @@ func (app *BaseApp) fixFeeCollector() {
 
 	ctx.SetMultiStore(app.parallelTxManage.cms)
 	// The feesplit is only processed at the endblock
-	if err := app.updateFeeCollectorAccHandler(ctx, app.parallelTxManage.currTxFee, nil); err != nil {
+	if err := app.updateFeeCollectorAccHandler(ctx, app.parallelTxManage.currTxFee); err != nil {
 		panic(err)
 	}
 }
@@ -285,8 +285,6 @@ func (app *BaseApp) runTxs() []*abci.ResponseDeliverTx {
 	pm.stop <- struct{}{}
 
 	// fix logs
-	app.feeChanged = true
-	app.feeCollector = app.parallelTxManage.currTxFee
 	receiptsLogs := app.endParallelTxs(pm.txSize)
 	for index, v := range receiptsLogs {
 		if len(v) != 0 { // only update evm tx result
@@ -315,7 +313,7 @@ func (app *BaseApp) endParallelTxs(txSize int) [][]byte {
 	resp := make([]abci.ResponseDeliverTx, txSize)
 	watchers := make([]sdk.IWatcher, txSize)
 	txs := make([]sdk.Tx, txSize)
-	app.FeeSplitCollector = make([]*sdk.FeeSplitInfo, 0)
+
 	for index := 0; index < txSize; index++ {
 		txRes := app.parallelTxManage.finalResult[index]
 		logIndex[index] = txRes.paraMsg.LogIndex
@@ -324,9 +322,6 @@ func (app *BaseApp) endParallelTxs(txSize int) [][]byte {
 		resp[index] = txRes.resp
 		watchers[index] = txRes.watcher
 		txs[index] = app.parallelTxManage.extraTxsInfo[index].stdTx
-		if txRes.FeeSpiltInfo.HasFee {
-			app.FeeSplitCollector = append(app.FeeSplitCollector, txRes.FeeSpiltInfo)
-		}
 	}
 	app.watcherCollector(watchers...)
 	app.parallelTxManage.clear()
@@ -334,8 +329,8 @@ func (app *BaseApp) endParallelTxs(txSize int) [][]byte {
 	return app.logFix(txs, logIndex, hasEnterEvmTx, errs, resp)
 }
 
-//we reuse the nonce that changed by the last async call
-//if last ante handler has been failed, we need rerun it ? or not?
+// we reuse the nonce that changed by the last async call
+// if last ante handler has been failed, we need rerun it ? or not?
 func (app *BaseApp) deliverTxWithCache(txIndex int) *executeResult {
 	app.parallelTxManage.currentRerunIndex = txIndex
 	defer func() {
@@ -345,7 +340,7 @@ func (app *BaseApp) deliverTxWithCache(txIndex int) *executeResult {
 
 	if txStatus.stdTx == nil {
 		asyncExe := newExecuteResult(sdkerrors.ResponseDeliverTx(txStatus.decodeErr,
-			0, 0, app.trace), nil, uint32(txIndex), nil, 0, sdk.EmptyWatcher{}, nil, app.parallelTxManage, nil)
+			0, 0, app.trace), nil, uint32(txIndex), nil, 0, sdk.EmptyWatcher{}, nil, app.parallelTxManage)
 		return asyncExe
 	}
 	var (
@@ -367,27 +362,26 @@ func (app *BaseApp) deliverTxWithCache(txIndex int) *executeResult {
 	}
 
 	asyncExe := newExecuteResult(resp, info.msCacheAnte, uint32(txIndex), info.ctx.ParaMsg(),
-		0, info.runMsgCtx.GetWatcher(), info.tx.GetMsgs(), app.parallelTxManage, info.ctx.GetFeeSplitInfo())
+		0, info.runMsgCtx.GetWatcher(), info.tx.GetMsgs(), app.parallelTxManage)
 	app.parallelTxManage.addMultiCache(info.msCacheAnte, info.msCache)
 	return asyncExe
 }
 
 type executeResult struct {
-	resp         abci.ResponseDeliverTx
-	ms           sdk.CacheMultiStore
-	msIsNil      bool // TODO delete it
-	counter      uint32
-	paraMsg      *sdk.ParaMsg
-	blockHeight  int64
-	watcher      sdk.IWatcher
-	msgs         []sdk.Msg
-	FeeSpiltInfo *sdk.FeeSplitInfo
+	resp        abci.ResponseDeliverTx
+	ms          sdk.CacheMultiStore
+	msIsNil     bool // TODO delete it
+	counter     uint32
+	paraMsg     *sdk.ParaMsg
+	blockHeight int64
+	watcher     sdk.IWatcher
+	msgs        []sdk.Msg
 
 	rwSet types.MsRWSet
 }
 
 func newExecuteResult(r abci.ResponseDeliverTx, ms sdk.CacheMultiStore, counter uint32,
-	paraMsg *sdk.ParaMsg, height int64, watcher sdk.IWatcher, msgs []sdk.Msg, para *parallelTxManager, feeSpiltInfo *sdk.FeeSplitInfo) *executeResult {
+	paraMsg *sdk.ParaMsg, height int64, watcher sdk.IWatcher, msgs []sdk.Msg, para *parallelTxManager) *executeResult {
 
 	rwSet := para.chainMpCache.GetRWSet()
 	if ms != nil {
@@ -395,20 +389,16 @@ func newExecuteResult(r abci.ResponseDeliverTx, ms sdk.CacheMultiStore, counter 
 	}
 	para.blockMpCache.PutRwSet(rwSet)
 
-	if feeSpiltInfo == nil {
-		feeSpiltInfo = &sdk.FeeSplitInfo{}
-	}
 	ans := &executeResult{
-		resp:         r,
-		ms:           ms,
-		msIsNil:      ms == nil,
-		counter:      counter,
-		paraMsg:      paraMsg,
-		blockHeight:  height,
-		watcher:      watcher,
-		msgs:         msgs,
-		rwSet:        rwSet,
-		FeeSpiltInfo: feeSpiltInfo,
+		resp:        r,
+		ms:          ms,
+		msIsNil:     ms == nil,
+		counter:     counter,
+		paraMsg:     paraMsg,
+		blockHeight: height,
+		watcher:     watcher,
+		msgs:        msgs,
+		rwSet:       rwSet,
 	}
 
 	if paraMsg == nil {

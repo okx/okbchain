@@ -453,7 +453,7 @@ func NewOKBChainApp(
 		app.AccountKeeper, app.SupplyKeeper, app.BankKeeper, app.EvmKeeper, app.TransferKeeper)
 
 	app.FeeSplitKeeper = feesplit.NewKeeper(
-		app.keys[feesplit.StoreKey], app.marshal.GetCdc(), app.subspaces[feesplit.ModuleName],
+		app.keys[feesplit.StoreKey], app.marshal.GetCdc(), app.subspaces[feesplit.ModuleName], auth.FeeCollectorName,
 		app.EvmKeeper, app.SupplyKeeper, app.AccountKeeper)
 	app.ParamsKeeper.RegisterSignal(feesplit.SetParamsNeedUpdate)
 

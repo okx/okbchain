@@ -2,7 +2,6 @@ package app
 
 import (
 	"encoding/hex"
-	"sort"
 	"strings"
 
 	ethermint "github.com/okx/okbchain/app/types"
@@ -18,23 +17,10 @@ import (
 
 // feeCollectorHandler set or get the value of feeCollectorAcc
 func updateFeeCollectorHandler(bk bank.Keeper, sk supply.Keeper) sdk.UpdateFeeCollectorAccHandler {
-	return func(ctx sdk.Context, balance sdk.Coins, txFeesplit []*sdk.FeeSplitInfo) error {
+	return func(ctx sdk.Context, balance sdk.Coins) error {
 		err := bk.SetCoins(ctx, sk.GetModuleAccount(ctx, auth.FeeCollectorName).GetAddress(), balance)
 		if err != nil {
 			return err
-		}
-
-		// split fee
-		// come from feesplit module
-		if txFeesplit != nil {
-			feesplits, sortAddrs := groupByAddrAndSortFeeSplits(txFeesplit)
-			for _, addr := range sortAddrs {
-				acc := sdk.MustAccAddressFromBech32(addr)
-				err = sk.SendCoinsFromModuleToAccount(ctx, auth.FeeCollectorName, acc, feesplits[addr])
-				if err != nil {
-					return err
-				}
-			}
 		}
 		return nil
 	}
@@ -105,27 +91,4 @@ func getTxFeeAndFromHandler(ak auth.AccountKeeper) sdk.GetTxFeeAndFromHandler {
 
 		return
 	}
-}
-
-// groupByAddrAndSortFeeSplits
-// feesplits must be ordered, not map(random),
-// to ensure that the account number of the withdrawer(new account) is consistent
-func groupByAddrAndSortFeeSplits(txFeesplit []*sdk.FeeSplitInfo) (feesplits map[string]sdk.Coins, sortAddrs []string) {
-	feesplits = make(map[string]sdk.Coins)
-	for _, f := range txFeesplit {
-		feesplits[f.Addr.String()] = feesplits[f.Addr.String()].Add(f.Fee...)
-	}
-	if len(feesplits) == 0 {
-		return
-	}
-
-	sortAddrs = make([]string, len(feesplits))
-	index := 0
-	for key := range feesplits {
-		sortAddrs[index] = key
-		index++
-	}
-	sort.Strings(sortAddrs)
-
-	return
 }
