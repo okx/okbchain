@@ -3,8 +3,6 @@ package ante
 import (
 	"bytes"
 	"encoding/hex"
-	"reflect"
-
 	"github.com/okx/okbchain/app/crypto/ethsecp256k1"
 	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
 	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
@@ -132,10 +130,8 @@ func isPubKeyNeedChange(pk1, pk2 crypto.PubKey) bool {
 		return true
 	}
 
-	// check if two interfaces are equal
-	return reflect.TypeOf(pk1).Kind() != reflect.TypeOf(pk2).Kind() ||
-		reflect.TypeOf(pk1).PkgPath() != reflect.TypeOf(pk2).PkgPath() ||
-		reflect.TypeOf(pk1).Name() != reflect.TypeOf(pk2).Name()
+	// check if two public keys are equal
+	return pk1.Equals(pk2)
 }
 
 // Consume parameter-defined amount of gas for each signature according to the passed-in SignatureVerificationGasConsumer function
