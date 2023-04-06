@@ -350,3 +350,7 @@ func (acc BaseAccount) GetStateRoot() ethcmn.Hash {
 func NewModuleAddress(name string) sdk.AccAddress {
 	return sdk.AccAddress(crypto.AddressHash([]byte(name)))
 }
+
+func (acc BaseAccount) GetCodeHash() []byte {
+	return nil
+}

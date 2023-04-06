@@ -3,12 +3,10 @@ package mpt
 import (
 	"encoding/binary"
 	"fmt"
+	"github.com/okx/okbchain/cmd/okbchaind/base"
 	"strconv"
 
 	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/auth"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/auth/exported"
-	"github.com/status-im/keycard-go/hexutils"
 	"log"
 
 	ethcmn "github.com/ethereum/go-ethereum/common"
@@ -72,7 +70,7 @@ func iterateAccMpt(height uint64) {
 
 	itr := trie.NewIterator(accTrie.NodeIterator(nil))
 	for itr.Next() {
-		acc := DecodeAccount(ethcmn.Bytes2Hex(itr.Key), itr.Value)
+		acc := base.DecodeAccount(ethcmn.Bytes2Hex(itr.Key), itr.Value)
 		if acc != nil {
 			fmt.Printf("%s: %s\n", ethcmn.Bytes2Hex(itr.Key), acc.String())
 		}
@@ -103,7 +101,7 @@ func iterateEvmMpt(height uint64) {
 	for itr.Next() {
 		addr := ethcmn.BytesToAddress(accTrie.GetKey(itr.Key))
 		addrHash := ethcrypto.Keccak256Hash(addr[:])
-		acc := DecodeAccount(addr.String(), itr.Value)
+		acc := base.DecodeAccount(addr.String(), itr.Value)
 		if acc == nil {
 			continue
 		}
@@ -117,18 +115,4 @@ func iterateEvmMpt(height uint64) {
 			fmt.Printf("%s: %s\n", ethcmn.Bytes2Hex(cItr.Key), ethcmn.Bytes2Hex(cItr.Value))
 		}
 	}
-}
-
-func DecodeAccount(key string, bz []byte) exported.Account {
-	val, err := auth.ModuleCdc.UnmarshalBinaryBareWithRegisteredUnmarshaller(bz, (*exported.Account)(nil))
-	if err == nil {
-		return val.(exported.Account)
-	}
-	var acc exported.Account
-	err = auth.ModuleCdc.UnmarshalBinaryBare(bz, &acc)
-	if err != nil {
-		fmt.Printf(" key(%s) value(%s) err(%s)\n", key, hexutils.BytesToHex(bz), err)
-		panic(err)
-	}
-	return acc
 }

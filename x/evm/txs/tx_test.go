@@ -34,6 +34,7 @@ func (e EmptyAccount) SetCoins(coins sdk.Coins) error               { return nil
 func (e EmptyAccount) SpendableCoins(blockTime time.Time) sdk.Coins { return sdk.Coins{} }
 func (e EmptyAccount) String() string                               { return "ut" }
 func (e EmptyAccount) GetStateRoot() ethcmn.Hash                    { return ethcmn.Hash{} }
+func (e EmptyAccount) GetCodeHash() []byte                          { return nil }
 
 type EmptyTx struct {
 	PrepareFail        bool

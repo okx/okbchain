@@ -1,7 +1,12 @@
 package main
 
 import (
+	"encoding/binary"
 	"fmt"
+	ethcmn "github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/core/state/pruner"
+	"github.com/okx/okbchain/cmd/okbchaind/base"
+	"github.com/okx/okbchain/libs/cosmos-sdk/store/mpt"
 	"io/ioutil"
 	"log"
 	"os"
@@ -50,6 +55,7 @@ const (
 	blockDBName = "blockstore"
 	stateDBName = "state"
 	appDBName   = "application"
+	mptDBName   = "mpt"
 )
 
 var wg sync.WaitGroup
@@ -107,19 +113,21 @@ func pruneAllCmd(ctx *server.Context) *cobra.Command {
 				baseHeight, retainHeight := getPruneBlockParams(blockStoreDB)
 
 				log.Println("--------- pruning start... ---------")
-				wg.Add(3)
+				wg.Add(4)
 				go pruneBlocks(blockStoreDB, baseHeight, retainHeight)
 				go pruneStates(stateDB, baseHeight, retainHeight)
 				go pruneApp(appDB, baseHeight, retainHeight)
+				go pruneMpt()
 				wg.Wait()
 				log.Println("--------- pruning end!!!   ---------")
 			}
 
 			log.Println("--------- compact start... ---------")
-			wg.Add(3)
+			wg.Add(4)
 			go compactDB(blockStoreDB, blockDBName, dbm.BackendType(ctx.Config.DBBackend))
 			go compactDB(stateDB, stateDBName, dbm.BackendType(ctx.Config.DBBackend))
 			go compactDB(appDB, appDBName, dbm.BackendType(ctx.Config.DBBackend))
+			go compactMpt()
 			wg.Wait()
 			log.Println("--------- compact end!!!   ---------")
 
@@ -147,14 +155,16 @@ func pruneAppCmd(ctx *server.Context) *cobra.Command {
 			if viper.GetBool(flagPruning) {
 				retainHeight := getPruneAppParams(appDB)
 
-				wg.Add(1)
+				wg.Add(2)
 				go pruneApp(appDB, 1, retainHeight)
+				go pruneMpt()
 				wg.Wait()
 			}
 
 			log.Println("--------- compact start ---------")
-			wg.Add(1)
+			wg.Add(2)
 			go compactDB(appDB, appDBName, dbm.BackendType(ctx.Config.DBBackend))
+			go compactMpt()
 			wg.Wait()
 			log.Println("--------- compact end ---------")
 
@@ -331,7 +341,7 @@ func checkBackend(dbType dbm.BackendType) error {
 }
 
 func initDB(config *cfg.Config, dbName string) dbm.DB {
-	if dbName != blockDBName && dbName != stateDBName && dbName != appDBName {
+	if dbName != blockDBName && dbName != stateDBName && dbName != appDBName && dbName != mptDBName {
 		panic(fmt.Sprintf("unknow db name:%s", dbName))
 	}
 
@@ -573,4 +583,30 @@ func init() {
 	}
 
 	registerDBCompactor(dbm.GoLevelDBBackend, dbCompactor)
+}
+
+func pruneMpt() {
+	defer wg.Done()
+
+	accMptDb := mpt.InstanceOfMptStore()
+	heightBytes, err := accMptDb.TrieDB().DiskDB().Get(mpt.KeyPrefixAccLatestStoredHeight)
+	panicError(err)
+	latestHeight := binary.BigEndian.Uint64(heightBytes)
+	hhash := sdk.Uint64ToBigEndian(latestHeight)
+	rootHashValue, err := accMptDb.TrieDB().DiskDB().Get(append(mpt.KeyPrefixAccRootMptHash, hhash...))
+	rootHash := ethcmn.BytesToHash(rootHashValue)
+	p, err := pruner.NewPrunerCustom(mpt.GetEthDB(), "", "", 256, rootHash, base.AccountStateRootRetriever{})
+	panicError(err)
+	log.Printf("Prune mpt %v...\n", rootHash.String())
+	err = p.Prune(rootHash)
+	panicError(err)
+}
+
+func compactMpt() {
+	log.Printf("Compact mpt... \n")
+	ts := time.Now()
+	defer wg.Done()
+	err := mpt.GetEthDB().Compact(nil, nil)
+	panicError(err)
+	log.Printf("Compact mpt done in %v\n", time.Since(ts))
 }
