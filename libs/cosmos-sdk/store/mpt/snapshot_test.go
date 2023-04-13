@@ -11,7 +11,7 @@ import (
 	"testing"
 )
 
-func TestMptStore_openSnapshot(t *testing.T) {
+func TestMptStoreSnapshotDeleteAccount(t *testing.T) {
 	db := memorydb.New()
 	ethDb := rawdb.NewDatabase(db)
 	stateDb := state.NewDatabase(ethDb)
