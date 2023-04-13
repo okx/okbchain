@@ -5,7 +5,6 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/rawdb"
 	"github.com/ethereum/go-ethereum/core/state/snapshot"
-	ethcrypto "github.com/ethereum/go-ethereum/crypto"
 	mpttypes "github.com/okx/okbchain/libs/cosmos-sdk/store/mpt/types"
 )
 
@@ -107,7 +106,7 @@ func (ms *MptStore) updateSnapAccounts(addr, bz []byte) {
 	}
 
 	// If state snapshotting is active, cache the data til commit
-	addrHash := ethcrypto.Keccak256Hash(addr[:])
+	addrHash := mpttypes.Keccak256HashWithSyncPool(addr[:])
 	ms.snapRWLock.Lock()
 	ms.snapAccounts[addrHash] = bz
 	delete(ms.snapDestructs, addrHash)
