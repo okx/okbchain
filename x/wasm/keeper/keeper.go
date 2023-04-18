@@ -69,6 +69,7 @@ type WasmVMResponseHandler interface {
 // Keeper will have a reference to Wasmer with it's own data directory.
 type Keeper struct {
 	storeKey              sdk.StoreKey
+	storageStoreKey       sdk.StoreKey // wasm contract storage will store into mpt store
 	cdc                   *codec.CodecProxy
 	accountKeeper         types.AccountKeeper
 	bank                  CoinTransferrer
@@ -102,6 +103,7 @@ func (d defaultAdapter) NewStore(_ sdk.GasMeter, store sdk.KVStore, pre []byte) 
 func NewKeeper(
 	cdc *codec.CodecProxy,
 	storeKey sdk.StoreKey,
+	storageKey sdk.StoreKey,
 	paramSpace paramtypes.Subspace,
 	accountKeeper types.AccountKeeper,
 	bankKeeper types.BankKeeper,
@@ -122,7 +124,7 @@ func NewKeeper(
 		paramSpace = paramSpace.WithKeyTable(types.ParamKeyTable())
 	}
 	watcher.SetWatchDataManager()
-	k := newKeeper(cdc, storeKey, paramSpace, accountKeeper, bankKeeper, channelKeeper, portKeeper, capabilityKeeper, portSource, router, queryRouter, homeDir, wasmConfig, supportedFeatures, defaultAdapter{}, opts...)
+	k := newKeeper(cdc, storeKey, storageKey,paramSpace, accountKeeper, bankKeeper, channelKeeper, portKeeper, capabilityKeeper, portSource, router, queryRouter, homeDir, wasmConfig, supportedFeatures, defaultAdapter{}, opts...)
 	accountKeeper.SetObserverKeeper(k)
 
 	return k
@@ -131,6 +133,7 @@ func NewKeeper(
 func NewSimulateKeeper(
 	cdc *codec.CodecProxy,
 	storeKey sdk.StoreKey,
+	storageStoreKey sdk.StoreKey,
 	paramSpace types.Subspace,
 	accountKeeper types.AccountKeeper,
 	bankKeeper types.BankKeeper,
@@ -145,11 +148,12 @@ func NewSimulateKeeper(
 	supportedFeatures string,
 	opts ...Option,
 ) Keeper {
-	return newKeeper(cdc, storeKey, paramSpace, accountKeeper, bankKeeper, channelKeeper, portKeeper, capabilityKeeper, portSource, router, queryRouter, homeDir, wasmConfig, supportedFeatures, watcher.Adapter{}, opts...)
+	return newKeeper(cdc, storeKey, storageStoreKey, paramSpace, accountKeeper, bankKeeper, channelKeeper, portKeeper, capabilityKeeper, portSource, router, queryRouter, homeDir, wasmConfig, supportedFeatures, watcher.Adapter{}, opts...)
 }
 
 func newKeeper(cdc *codec.CodecProxy,
 	storeKey sdk.StoreKey,
+	storageStoreKey sdk.StoreKey,
 	paramSpace types.Subspace,
 	accountKeeper types.AccountKeeper,
 	bankKeeper types.BankKeeper,
@@ -172,6 +176,7 @@ func newKeeper(cdc *codec.CodecProxy,
 
 	keeper := &Keeper{
 		storeKey:          storeKey,
+		storageStoreKey:   storageStoreKey,
 		cdc:               cdc,
 		wasmVM:            wasmer,
 		accountKeeper:     accountKeeper,
