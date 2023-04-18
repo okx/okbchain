@@ -5,6 +5,7 @@ package types
 
 import (
 	"container/list"
+	"fmt"
 	"sync"
 	"sync/atomic"
 
@@ -73,6 +74,7 @@ var (
 func InstanceBatchCache() *BatchCache {
 	initRocksdbBatchOnce.Do(func() {
 		gBatchCache = NewBatchCache(int(TrieRocksdbBatchSize))
+		fmt.Println("scf-log", TrieRocksdbBatchSize)
 	})
 
 	return gBatchCache
