@@ -391,6 +391,7 @@ func createTestInput(
 	keeper := NewKeeper(
 		&appCodec,
 		keys[types.StoreKey],
+		keys[mpt.StoreKey],
 		subspace(types.ModuleName),
 		&accountKeeper,
 		bank.NewBankKeeperAdapter(bankKeeper),
@@ -419,7 +420,7 @@ func createTestInput(
 	configurator := module.NewConfigurator(legacyAmino, msgRouter, querier)
 	am.RegisterServices(configurator)
 	types.RegisterMsgServer(msgRouter, NewMsgServerImpl(NewDefaultPermissionKeeper(keeper)))
-	types.RegisterQueryServer(querier, NewGrpcQuerier(appCodec, keys[types.ModuleName], keeper, keeper.queryGasLimit))
+	types.RegisterQueryServer(querier, NewGrpcQuerier(appCodec, keys[types.ModuleName], keys[mpt.StoreKey], keeper, keeper.queryGasLimit))
 
 	govRouter := gov.NewRouter().
 		AddRoute(govtypes.RouterKey, govtypes.ProposalHandler).

@@ -126,5 +126,10 @@ type readStore struct {
 	dbadapter.Store
 }
 
+func (r *readStore) Get(key []byte) []byte {
+	newKey := rmStorageRootFromWatchKey(key)
+
+	return r.Store.Get(newKey)
+}
 func (r *readStore) Set(key, value []byte) {}
 func (r *readStore) Delete(key []byte)     {}

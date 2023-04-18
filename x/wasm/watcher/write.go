@@ -74,7 +74,9 @@ func WrapWriteKVStore(store sdk.KVStore) sdk.KVStore {
 
 func (w *writeKVStore) Set(key, value []byte) {
 	w.KVStore.Set(key, value)
-	txStateCache = append(txStateCache, &WatchMessage{Key: key, Value: value})
+	newKey := rmStorageRootFromWatchKey(key)
+
+	txStateCache = append(txStateCache, &WatchMessage{Key: newKey, Value: value})
 }
 
 func (w *writeKVStore) Delete(key []byte) {

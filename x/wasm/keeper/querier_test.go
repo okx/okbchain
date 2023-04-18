@@ -538,7 +538,7 @@ func TestQueryContractInfo(t *testing.T) {
 	)
 
 	k := keepers.WasmKeeper
-	querier := NewGrpcQuerier(*k.cdc, k.storeKey, k, k.queryGasLimit)
+	querier := NewGrpcQuerier(*k.cdc, k.storeKey, k.storageStoreKey, k, k.queryGasLimit)
 	myExtension := func(info *types.ContractInfo) {
 		//TODO proposal need not support
 		//// abuse gov proposal as a random protobuf extension with an Any type

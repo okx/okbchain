@@ -563,6 +563,7 @@ func NewSimApp(
 	app.wasmKeeper = wasm.NewKeeper(
 		app.marshal,
 		keys[wasm.StoreKey],
+		keys[mpt.StoreKey],
 		app.subspaces[wasm.ModuleName],
 		&app.AccountKeeper,
 		bank.NewBankKeeperAdapter(app.BankKeeper),

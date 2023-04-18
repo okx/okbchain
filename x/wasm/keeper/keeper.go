@@ -69,6 +69,7 @@ type WasmVMResponseHandler interface {
 // Keeper will have a reference to Wasmer with it's own data directory.
 type Keeper struct {
 	storeKey              sdk.StoreKey
+	storageStoreKey       sdk.StoreKey // wasm contract storage will store into mpt store
 	cdc                   *codec.CodecProxy
 	accountKeeper         types.AccountKeeper
 	bank                  CoinTransferrer
@@ -102,6 +103,7 @@ func (d defaultAdapter) NewStore(_ sdk.GasMeter, store sdk.KVStore, pre []byte) 
 func NewKeeper(
 	cdc *codec.CodecProxy,
 	storeKey sdk.StoreKey,
+	storageKey sdk.StoreKey,
 	paramSpace paramtypes.Subspace,
 	accountKeeper types.AccountKeeper,
 	bankKeeper types.BankKeeper,
@@ -122,7 +124,7 @@ func NewKeeper(
 		paramSpace = paramSpace.WithKeyTable(types.ParamKeyTable())
 	}
 	watcher.SetWatchDataManager()
-	k := newKeeper(cdc, storeKey, paramSpace, accountKeeper, bankKeeper, channelKeeper, portKeeper, capabilityKeeper, portSource, router, queryRouter, homeDir, wasmConfig, supportedFeatures, defaultAdapter{}, opts...)
+	k := newKeeper(cdc, storeKey, storageKey, paramSpace, accountKeeper, bankKeeper, channelKeeper, portKeeper, capabilityKeeper, portSource, router, queryRouter, homeDir, wasmConfig, supportedFeatures, defaultAdapter{}, opts...)
 	accountKeeper.SetObserverKeeper(k)
 
 	return k
@@ -131,6 +133,7 @@ func NewKeeper(
 func NewSimulateKeeper(
 	cdc *codec.CodecProxy,
 	storeKey sdk.StoreKey,
+	storageStoreKey sdk.StoreKey,
 	paramSpace types.Subspace,
 	accountKeeper types.AccountKeeper,
 	bankKeeper types.BankKeeper,
@@ -145,11 +148,12 @@ func NewSimulateKeeper(
 	supportedFeatures string,
 	opts ...Option,
 ) Keeper {
-	return newKeeper(cdc, storeKey, paramSpace, accountKeeper, bankKeeper, channelKeeper, portKeeper, capabilityKeeper, portSource, router, queryRouter, homeDir, wasmConfig, supportedFeatures, watcher.Adapter{}, opts...)
+	return newKeeper(cdc, storeKey, storageStoreKey, paramSpace, accountKeeper, bankKeeper, channelKeeper, portKeeper, capabilityKeeper, portSource, router, queryRouter, homeDir, wasmConfig, supportedFeatures, watcher.Adapter{}, opts...)
 }
 
 func newKeeper(cdc *codec.CodecProxy,
 	storeKey sdk.StoreKey,
+	storageStoreKey sdk.StoreKey,
 	paramSpace types.Subspace,
 	accountKeeper types.AccountKeeper,
 	bankKeeper types.BankKeeper,
@@ -172,6 +176,7 @@ func newKeeper(cdc *codec.CodecProxy,
 
 	keeper := &Keeper{
 		storeKey:          storeKey,
+		storageStoreKey:   storageStoreKey,
 		cdc:               cdc,
 		wasmVM:            wasmer,
 		accountKeeper:     accountKeeper,
@@ -196,6 +201,10 @@ func newKeeper(cdc *codec.CodecProxy,
 
 func (k Keeper) GetStoreKey() sdk.StoreKey {
 	return k.storeKey
+}
+
+func (k Keeper) GetStorageStoreKey() sdk.StoreKey {
+	return k.storageStoreKey
 }
 
 func (k Keeper) IsContractMethodBlocked(ctx sdk.Context, contractAddr, method string) bool {
@@ -455,7 +464,6 @@ func (k Keeper) instantiate(ctx sdk.Context, codeID uint64, creator, admin sdk.W
 	}
 
 	// get contact info
-	store := k.ada.NewStore(ctx.GasMeter(), ctx.KVStore(k.storeKey), nil)
 	codeInfo := k.GetCodeInfo(ctx, codeID)
 	if codeInfo == nil {
 		return nil, nil, sdkerrors.Wrap(types.ErrNotFound, "code")
@@ -471,8 +479,8 @@ func (k Keeper) instantiate(ctx sdk.Context, codeID uint64, creator, admin sdk.W
 	info := types.NewInfo(creator, adapters)
 
 	// create prefixed data store
-	// 0x03 | BuildContractAddress (sdk.WasmAddress)
-	prefixStore := prefix.NewStore(store, types.GetContractStorePrefix(contractAddress))
+	// 0x00 | BuildContractAddress (sdk.WasmAddress) | stateRoot
+	prefixStore := k.getStorageStoreWithWatch(ctx, contractAddress)
 	prefixStoreAdapter := types.NewStoreAdapter(prefixStore)
 
 	// prepare querier
@@ -626,8 +634,8 @@ func (k Keeper) migrate(ctx sdk.Context, contractAddress sdk.WasmAddress, caller
 	// prepare querier
 	querier := k.newQueryHandler(ctx, contractAddress)
 
-	prefixStoreKey := types.GetContractStorePrefix(contractAddress)
-	prefixStore := k.ada.NewStore(ctx.GasMeter(), ctx.KVStore(k.storeKey), prefixStoreKey)
+	prefixStore := k.getStorageStore(ctx, contractAddress)
+
 	prefixAdapater := types.NewStoreAdapter(prefixStore)
 
 	gas := k.runtimeGasForContract(ctx)
@@ -889,8 +897,8 @@ func (k Keeper) QueryRaw(ctx sdk.Context, contractAddress sdk.WasmAddress, key [
 	if key == nil {
 		return nil
 	}
-	prefixStoreKey := types.GetContractStorePrefix(contractAddress)
-	prefixStore := k.ada.NewStore(ctx.GasMeter(), ctx.KVStore(k.storeKey), prefixStoreKey)
+	prefixStore := k.getStorageStoreW(ctx, contractAddress)
+
 	return prefixStore.Get(key)
 }
 
@@ -909,8 +917,8 @@ func (k Keeper) contractInstance(ctx sdk.Context, contractAddress sdk.WasmAddres
 	}
 	var codeInfo types.CodeInfo
 	k.cdc.GetProtocMarshal().MustUnmarshal(codeInfoBz, &codeInfo)
-	prefixStoreKey := types.GetContractStorePrefix(contractAddress)
-	prefixStore := prefix.NewStore(store, prefixStoreKey)
+	prefixStore := k.getStorageStoreW(ctx, contractAddress)
+
 	return contractInfo, codeInfo, types.NewStoreAdapter(prefixStore), nil
 }
 
@@ -954,8 +962,7 @@ func (k Keeper) IterateContractInfo(ctx sdk.Context, cb func(sdk.WasmAddress, ty
 // IterateContractState iterates through all elements of the key value store for the given contract address and passes
 // them to the provided callback function. The callback method can return true to abort early.
 func (k Keeper) IterateContractState(ctx sdk.Context, contractAddress sdk.WasmAddress, cb func(key, value []byte) bool) {
-	prefixStoreKey := types.GetContractStorePrefix(contractAddress)
-	prefixStore := k.ada.NewStore(ctx.GasMeter(), ctx.KVStore(k.storeKey), prefixStoreKey)
+	prefixStore := k.getStorageStore(ctx, contractAddress)
 
 	iter := prefixStore.Iterator(nil, nil)
 	defer iter.Close()
@@ -968,8 +975,7 @@ func (k Keeper) IterateContractState(ctx sdk.Context, contractAddress sdk.WasmAd
 }
 
 func (k Keeper) importContractState(ctx sdk.Context, contractAddress sdk.WasmAddress, models []types.Model) error {
-	prefixStoreKey := types.GetContractStorePrefix(contractAddress)
-	prefixStore := k.ada.NewStore(ctx.GasMeter(), ctx.KVStore(k.storeKey), prefixStoreKey)
+	prefixStore := k.getStorageStore(ctx, contractAddress)
 	for _, model := range models {
 		if model.Value == nil {
 			model.Value = []byte{}
@@ -1276,7 +1282,7 @@ func moduleLogger(ctx sdk.Context) log.Logger {
 
 // Querier creates a new grpc querier instance
 func Querier(k *Keeper) *grpcQuerier {
-	return NewGrpcQuerier(*k.cdc, k.storeKey, k, k.queryGasLimit)
+	return NewGrpcQuerier(*k.cdc, k.storeKey, k.storageStoreKey, k, k.queryGasLimit)
 }
 
 // QueryGasLimit returns the gas limit for smart queries.
