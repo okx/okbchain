@@ -49,7 +49,6 @@ func NewTxCmd(cdc *codec.CodecProxy, reg codectypes.InterfaceRegistry) *cobra.Co
 		NewExecuteContractCmd(cdc, reg),
 		NewMigrateContractCmd(cdc, reg),
 		NewUpdateContractAdminCmd(cdc, reg),
-		NewClearContractAdminCmd(cdc, reg),
 	)
 	return txCmd
 }
@@ -179,31 +178,6 @@ func NewUpdateContractAdminCmd(m *codec.CodecProxy, reg codectypes.InterfaceRegi
 			msg, err := parseUpdateContractAdminArgs(args, clientCtx)
 			if err != nil {
 				return err
-			}
-			if err := msg.ValidateBasic(); err != nil {
-				return err
-			}
-			return utils.GenerateOrBroadcastMsgs(clientCtx, txBldr, []sdk.Msg{msg})
-		},
-	}
-	flags.AddTxFlagsToCmd(cmd)
-	return cmd
-}
-
-func NewClearContractAdminCmd(m *codec.CodecProxy, reg codectypes.InterfaceRegistry) *cobra.Command {
-	cmd := &cobra.Command{
-		Use:     "clear-contract-admin [contract_addr_bech32]",
-		Short:   "Clears admin for a contract to prevent further migrations",
-		Aliases: []string{"clear-admin", "clr-adm"},
-		Args:    cobra.ExactArgs(1),
-		RunE: func(cmd *cobra.Command, args []string) error {
-			inBuf := bufio.NewReader(cmd.InOrStdin())
-			txBldr := auth.NewTxBuilderFromCLI(inBuf).WithTxEncoder(utils.GetTxEncoder(m.GetCdc()))
-			clientCtx := clientCtx.NewCLIContext().WithCodec(m.GetCdc()).WithInterfaceRegistry(reg)
-
-			msg := types.MsgClearAdmin{
-				Sender:   clientCtx.GetFromAddress().String(),
-				Contract: args[0],
 			}
 			if err := msg.ValidateBasic(); err != nil {
 				return err
