@@ -221,7 +221,7 @@ func (suite *KeeperTestSuite) TestSendToWasmEventHandler_Handle() {
 				suite.Require().NoError(err)
 				suite.Require().Equal("{\"balance\":\"1\"}", string(result))
 			},
-			types.ErrIsNotOKCAddr,
+			types.ErrIsNotOKBCAddr,
 		},
 		{
 			"normal topic,recipient is ex",

@@ -6,10 +6,11 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"strings"
+
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/okx/okbchain/libs/tendermint/libs/bech32"
 	"gopkg.in/yaml.v2"
-	"strings"
 )
 
 var _ Address = AccAddress{}

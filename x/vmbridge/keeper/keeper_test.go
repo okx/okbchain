@@ -4,6 +4,11 @@ import (
 	"bytes"
 	_ "embed"
 	"fmt"
+	"io/ioutil"
+	"math/big"
+	"testing"
+	"time"
+
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/okx/okbchain/app"
@@ -14,10 +19,6 @@ import (
 	"github.com/okx/okbchain/x/vmbridge/keeper"
 	wasmtypes "github.com/okx/okbchain/x/wasm/types"
 	"github.com/stretchr/testify/suite"
-	"io/ioutil"
-	"math/big"
-	"testing"
-	"time"
 )
 
 func TestKeeperTestSuite(t *testing.T) {
@@ -32,7 +33,7 @@ type KeeperTestSuite struct {
 	suite.Suite
 
 	ctx sdk.Context
-	app *app.OKExChainApp
+	app *app.OKBChainApp
 
 	keeper *keeper.Keeper
 

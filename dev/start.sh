@@ -24,7 +24,7 @@ run() {
     LOG_LEVEL=main:info,iavl:info,*:error,state:info,provider:info
 #--mempool.enable_delete_min_gp_tx false \
 #    okbchaind start --pruning=nothing --rpc.unsafe \
-    okbchaind start --rpc.unsafe \
+    nohup okbchaind start --rpc.unsafe \
       --local-rpc-port 26657 \
       --log_level $LOG_LEVEL \
       --log_file json \
@@ -53,7 +53,7 @@ run() {
 #      --iavl-max-committed-height-num int                Max committed version to cache in memory (default 8)
 #      --iavl-min-commit-item-count int                   Min nodes num to triggle node cache commit (default 500000)
 #      --iavl-output-modules
-    exit
+#    exit
 }
 
 
