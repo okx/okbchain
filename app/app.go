@@ -698,6 +698,7 @@ func NewOKBChainApp(
 	app.SetGetTxFeeHandler(getTxFeeHandler())
 	app.SetEvmSysContractAddressHandler(NewEvmSysContractAddressHandler(app.EvmKeeper))
 	app.SetEvmWatcherCollector(app.EvmKeeper.Watcher.Collect)
+	app.SetUpdateCMTxNonceHandler(NewUpdateCMTxNonceHandler())
 	mpt.AccountStateRootRetriever = app.AccountKeeper
 	if loadLatest {
 		err := app.LoadLatestVersion(app.keys[bam.MainStoreKey])
@@ -920,5 +921,14 @@ func NewEvmSysContractAddressHandler(ak *evm.Keeper) sdk.EvmSysContractAddressHa
 			return false
 		}
 		return ak.IsMatchSysContractAddress(ctx, addr)
+	}
+}
+
+func NewUpdateCMTxNonceHandler() sdk.UpdateCMTxNonceHandler {
+	return func(tx sdk.Tx, nonce uint64) {
+		stdtx, ok := tx.(*authtypes.StdTx)
+		if ok && nonce != 0 {
+			stdtx.Nonce = nonce
+		}
 	}
 }

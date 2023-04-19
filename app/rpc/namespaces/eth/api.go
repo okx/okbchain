@@ -51,9 +51,11 @@ import (
 	"github.com/okx/okbchain/libs/tendermint/global"
 	"github.com/okx/okbchain/libs/tendermint/libs/log"
 	tmtypes "github.com/okx/okbchain/libs/tendermint/types"
+	"github.com/okx/okbchain/x/erc20"
 	"github.com/okx/okbchain/x/evm"
 	evmtypes "github.com/okx/okbchain/x/evm/types"
 	"github.com/okx/okbchain/x/evm/watcher"
+	"github.com/okx/okbchain/x/vmbridge"
 )
 
 const (
