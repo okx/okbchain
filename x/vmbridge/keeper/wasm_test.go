@@ -543,7 +543,7 @@ func (suite *KeeperTestSuite) TestKeeper_CallToWasm() {
 				balance = suite.queryCoins(sdk.WasmToAccAddress(suite.freeCallWasmContract))
 				suite.Require().Equal(sdk.Coins{sdk.NewInt64Coin(sdk.DefaultBondDenom, 1)}.String(), balance.String())
 			},
-			errors.New("insufficient funds: insufficient account funds; 1.000000000000000000okt < 2.000000000000000000okt"),
+			errors.New("insufficient funds: insufficient account funds; 1.000000000000000000okb < 2.000000000000000000okb"),
 		},
 		{
 			"caller(20),wasmContract(ex 20),value(-1 negative),calldata(normal)",

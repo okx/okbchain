@@ -1,6 +1,6 @@
 #!/bin/bash
 
-OPTIONS="--from captain --gas-prices 0.0000000001okt --gas auto -b block --gas-adjustment 1.5 -y"
+OPTIONS="--from captain --gas-prices 0.0000000001okb --gas auto -b block --gas-adjustment 1.5 -y"
 
 okbchaincli tx wasm store ./counter.wasm ${OPTIONS}
 okbchaincli tx wasm instantiate 1 '{}' ${OPTIONS}

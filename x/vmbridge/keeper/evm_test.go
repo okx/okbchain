@@ -779,7 +779,7 @@ func (suite *KeeperTestSuite) TestCallToWasmEventHandler_Handle() {
 			},
 			func() {
 			},
-			errors.New("insufficient funds: insufficient account funds; 1.000000000000000000okt < 2.000000000000000000okt"),
+			errors.New("insufficient funds: insufficient account funds; 1.000000000000000000okb < 2.000000000000000000okb"),
 		},
 		{
 			"caller(exist),wasmContract(0x 20),value(-1),data(normal)",

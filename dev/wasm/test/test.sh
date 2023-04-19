@@ -65,7 +65,7 @@ BURNER_CODE_ID=$(echo "$RESP" | jq -r '.logs[0].events[1].attributes[-1].value')
 echo "### Migrate to code id: $BURNER_CODE_ID"
 
 DEST_ACCOUNT=$(okbchaincli keys show fred | jq -r '.eth_address')
-okbchaincli tx wasm migrate "$CONTRACT" "$BURNER_CODE_ID" "{\"payout\": \"$DEST_ACCOUNT\"}" --from fred  --fees 0.001okt \
+okbchaincli tx wasm migrate "$CONTRACT" "$BURNER_CODE_ID" "{\"payout\": \"$DEST_ACCOUNT\"}" --from fred  --fees 0.001okb \
  -b block -y -o json | jq
 
 echo "### Query destination account: $BURNER_CODE_ID"
