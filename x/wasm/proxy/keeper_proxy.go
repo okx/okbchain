@@ -16,9 +16,12 @@ import (
 	"github.com/okx/okbchain/libs/cosmos-sdk/x/supply"
 	supplyexported "github.com/okx/okbchain/libs/cosmos-sdk/x/supply/exported"
 	"github.com/okx/okbchain/libs/tendermint/global"
+	"github.com/okx/okbchain/x/ammswap"
+	dex "github.com/okx/okbchain/x/dex/types"
 	distr "github.com/okx/okbchain/x/distribution"
+	"github.com/okx/okbchain/x/farm"
 	"github.com/okx/okbchain/x/gov"
-	ptypes "github.com/okx/okbchain/x/params/types"
+	"github.com/okx/okbchain/x/order"
 	"github.com/okx/okbchain/x/staking"
 	token "github.com/okx/okbchain/x/token/types"
 	"github.com/okx/okbchain/x/wasm/types"
@@ -116,6 +119,12 @@ func NewBankKeeperProxy(akp AccountKeeperProxy) BankKeeperProxy {
 		staking.NotBondedPoolName: {supply.Burner, supply.Staking},
 		gov.ModuleName:            nil,
 		token.ModuleName:          {supply.Minter, supply.Burner},
+		dex.ModuleName:            nil,
+		order.ModuleName:          nil,
+		ammswap.ModuleName:        {supply.Minter, supply.Burner},
+		farm.ModuleName:           nil,
+		farm.YieldFarmingAccount:  nil,
+		farm.MintFarmingAccount:   {supply.Burner},
 	}
 
 	for acc := range maccPerms {
@@ -128,7 +137,7 @@ func NewBankKeeperProxy(akp AccountKeeperProxy) BankKeeperProxy {
 }
 
 func (b BankKeeperProxy) GetAllBalances(ctx sdk.Context, addr sdk.AccAddress) sdk.Coins {
-	acc, err := watcher.GetAccount(addr)
+	acc, err := watcher.GetAccount(sdk.AccToAWasmddress(addr))
 	if err == nil {
 		return acc.GetCoins()
 	}
@@ -235,7 +244,3 @@ type PortKeeperProxy struct{}
 func (p PortKeeperProxy) BindPort(ctx sdk.Context, portID string) *capabilitytypes.Capability {
 	return nil
 }
-
-type ParamsKeeperProxy struct{}
-
-func (p ParamsKeeperProxy) ClaimReadyForUpgrade(name string, cb func(ptypes.UpgradeInfo)) {}
