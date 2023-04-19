@@ -23,5 +23,6 @@ okbchaincli query wasm contract-state all "$contractAddr"
 echo "#### raw state"
 okbchaincli query wasm contract-state raw "$contractAddr" 0006636F6E666967636F6E7374616E7473
 echo "#### smart state"
+echo "$contractAddr"
 okbchaincli query wasm contract-state smart "$contractAddr" '{"balance":{"address":"0xbbE4733d85bc2b90682147779DA49caB38C0aA1F"}}'
 okbchaincli query wasm contract-state smart "$contractAddr" '{"balance":{"address":"0xCf164e001d86639231d92Ab1D71DB8353E43C295"}}'

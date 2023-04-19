@@ -9,9 +9,10 @@ import (
 	"testing"
 	"time"
 
-	okbccodec "github.com/okx/okbchain/app/codec"
 	"github.com/okx/okbchain/x/wasm/keeper/testdata"
 
+	chaincodec "github.com/okx/okbchain/app/codec"
+	chain "github.com/okx/okbchain/app/types"
 	"github.com/okx/okbchain/libs/cosmos-sdk/baseapp"
 	"github.com/okx/okbchain/libs/cosmos-sdk/client"
 	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
@@ -111,7 +112,7 @@ func MakeTestCodec(t testing.TB) codec.CodecProxy {
 }
 
 func MakeEncodingConfig(_ testing.TB) EncodingConfig {
-	codecProxy, interfaceReg := okbccodec.MakeCodecSuit(moduleBasics)
+	codecProxy, interfaceReg := chaincodec.MakeCodecSuit(moduleBasics)
 	txConfig := ibc_tx.NewTxConfig(codecProxy.GetProtocMarshal(), ibc_tx.DefaultSignModes)
 	encodingConfig := EncodingConfig{
 		InterfaceRegistry: interfaceReg,
@@ -227,8 +228,6 @@ func createTestInput(
 		os.RemoveAll(tempDir)
 	})
 
-	keyMpt := sdk.NewKVStoreKey(mpt.StoreKey)
-
 	keys := sdk.NewKVStoreKeys(
 		auth.StoreKey, staking.StoreKey,
 		supply.StoreKey, mint.StoreKey, distr.StoreKey, slashing.StoreKey,
@@ -240,7 +239,6 @@ func createTestInput(
 		types.StoreKey,
 	)
 	ms := store.NewCommitMultiStore(db)
-	ms.MountStoreWithDB(keyMpt, sdk.StoreTypeMPT, db)
 	for _, v := range keys {
 		ms.MountStoreWithDB(v, sdk.StoreTypeIAVL, db)
 	}
@@ -303,7 +301,7 @@ func createTestInput(
 		erc20.ModuleName:            {authtypes.Minter, authtypes.Burner},
 		types.ModuleName:            nil,
 	}
-	accountKeeper := auth.NewAccountKeeper(legacyAmino, keyMpt, paramsKeeper.Subspace(auth.DefaultParamspace), auth.ProtoBaseAccount)
+	accountKeeper := auth.NewAccountKeeper(legacyAmino, keys[mpt.StoreKey], subspace(authtypes.ModuleName), chain.ProtoAccount)
 	blockedAddrs := make(map[string]bool)
 	for acc := range maccPerms {
 		blockedAddrs[authtypes.NewModuleAddress(acc).String()] = true

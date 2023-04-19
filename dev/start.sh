@@ -53,7 +53,7 @@ run() {
 #      --iavl-max-committed-height-num int                Max committed version to cache in memory (default 8)
 #      --iavl-min-commit-item-count int                   Min nodes num to triggle node cache commit (default 500000)
 #      --iavl-output-modules
-#    exit
+
 }
 
 
