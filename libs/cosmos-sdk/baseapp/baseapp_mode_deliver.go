@@ -28,8 +28,8 @@ func (m *modeHandlerDeliver) handleRunMsg(info *runTxInfo) (err error) {
 
 type CacheTxContextFunc func(ctx sdk.Context, txBytes []byte) (sdk.Context, sdk.CacheMultiStore)
 
-//this handleGasRefund func is also called by modeHandlerTrace.handleDeferRefund
-//in this func, edit any member in BaseApp is prohibited
+// this handleGasRefund func is also called by modeHandlerTrace.handleDeferRefund
+// in this func, edit any member in BaseApp is prohibited
 func handleGasRefund(info *runTxInfo, cacheTxCtxFunc CacheTxContextFunc, gasRefundHandler sdk.GasRefundHandler) sdk.DecCoins {
 	var gasRefundCtx sdk.Context
 	if cms, ok := info.GetCacheMultiStore(); ok {
@@ -39,6 +39,7 @@ func handleGasRefund(info *runTxInfo, cacheTxCtxFunc CacheTxContextFunc, gasRefu
 		gasRefundCtx, info.msCache = cacheTxCtxFunc(info.ctx, info.txBytes)
 	}
 
+	gasRefundCtx.SetOutOfGas(info.outOfGas)
 	refund, err := gasRefundHandler(gasRefundCtx, info.tx)
 	if err != nil {
 		panic(err)

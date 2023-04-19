@@ -61,6 +61,11 @@ func (tx *Tx) Transition(config types.ChainConfig) (result Result, err error) {
 	}
 
 	// call evm hooks
+	// After TransitionDb, some account balance may be changed, hooks logic may use this account.
+	// So if have not fllow code to make account to account cachedb, the hook may be got a wrong result when simluate tx.
+	if tx.Ctx.IsCheckTx() {
+		tx.StateTransition.Csdb.IntermediateRoot(true)
+	}
 	receipt := &ethtypes.Receipt{
 		Status:           ethtypes.ReceiptStatusSuccessful,
 		Bloom:            result.ResultData.Bloom,

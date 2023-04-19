@@ -161,6 +161,7 @@ var (
 			wasmclient.UnpinCodesProposalHandler,
 			wasmclient.UpdateDeploymentWhitelistProposalHandler,
 			wasmclient.UpdateWASMContractMethodBlockedListProposalHandler,
+			wasmclient.GetCmdExtraProposal,
 			stakingclient.ProposeValidatorProposalHandler,
 		),
 		params.AppModuleBasic{},
@@ -469,7 +470,6 @@ func NewOKBChainApp(
 		app.subspaces[wasm.ModuleName],
 		&app.AccountKeeper,
 		bank.NewBankKeeperAdapter(app.BankKeeper),
-		&app.ParamsKeeper,
 		v2keeper.ChannelKeeper,
 		&v2keeper.PortKeeper,
 		nil,
@@ -714,6 +714,8 @@ func NewOKBChainApp(
 		if err := app.ParamsKeeper.ApplyEffectiveUpgrade(ctx); err != nil {
 			tmos.Exit(fmt.Sprintf("failed apply effective upgrade height info: %s", err))
 		}
+
+		app.WasmKeeper.UpdateGasRegister(ctx)
 	}
 
 	app.ScopedIBCKeeper = scopedIBCKeeper

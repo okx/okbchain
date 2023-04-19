@@ -65,6 +65,10 @@ func IsTestNet() bool {
 	return false
 }
 
+func IsPrivateNet() bool {
+	return !IsMainNet() && !IsTestNet()
+}
+
 func GetStartBlockHeight() int64 {
 	return 0
 }

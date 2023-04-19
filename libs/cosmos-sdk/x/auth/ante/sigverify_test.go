@@ -12,6 +12,7 @@ import (
 	"github.com/okx/okbchain/libs/tendermint/crypto/multisig"
 	"github.com/okx/okbchain/libs/tendermint/crypto/secp256k1"
 	tmtypes "github.com/okx/okbchain/libs/tendermint/types"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"

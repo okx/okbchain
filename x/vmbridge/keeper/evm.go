@@ -3,7 +3,6 @@ package keeper
 import (
 	"encoding/hex"
 	"fmt"
-	"math/big"
 	"github.com/ethereum/go-ethereum/common"
 	ethermint "github.com/okx/okbchain/app/types"
 	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
@@ -13,6 +12,7 @@ import (
 	evmtypes "github.com/okx/okbchain/x/evm/types"
 	"github.com/okx/okbchain/x/evm/watcher"
 	"github.com/okx/okbchain/x/vmbridge/types"
+	"math/big"
 )
 
 // event __SendToWasmEventName(string wasmAddr,string recipient, string amount)
@@ -196,7 +196,7 @@ func (k Keeper) CallEvm(ctx sdk.Context, callerAddr common.Address, to *common.A
 		acc = k.accountKeeper.NewAccountWithAddress(ctx, callerAddr.Bytes())
 	}
 	nonce := acc.GetSequence()
-	txHash := tmtypes.Tx(ctx.TxBytes()).Hash(ctx.BlockHeight())
+	txHash := tmtypes.Tx(ctx.TxBytes()).Hash()
 	ethTxHash := common.BytesToHash(txHash)
 
 	gasLimit := ctx.GasMeter().Limit()

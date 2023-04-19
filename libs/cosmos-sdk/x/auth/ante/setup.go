@@ -2,6 +2,7 @@ package ante
 
 import (
 	"fmt"
+	"github.com/okx/okbchain/libs/cosmos-sdk/baseapp"
 
 	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
 	sdkerrors "github.com/okx/okbchain/libs/cosmos-sdk/types/errors"
@@ -21,6 +22,12 @@ func NewSetUpContextDecorator() SetUpContextDecorator {
 func (sud SetUpContextDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, next sdk.AnteHandler) (newCtx sdk.Context, err error) {
 	// all transactions must implement GasTx
 	gasTx := tx
+
+	if simulate {
+		ctx.SetGasMeter(sdk.NewGasMeter(baseapp.SimulationGasLimit))
+	} else {
+		SetGasMeter(simulate, &ctx, gasTx.GetGas())
+	}
 
 	SetGasMeter(simulate, &ctx, gasTx.GetGas())
 	newCtx = ctx

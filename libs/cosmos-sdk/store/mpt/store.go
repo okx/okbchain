@@ -779,7 +779,7 @@ var (
 	prefixSizeInMpt      = 1
 	storageKeySize       = prefixSizeInMpt + len(ethcmn.Address{}) + len(ethcmn.Hash{}) + len(ethcmn.Hash{})
 	addrKeySize          = prefixSizeInMpt + sdk.AddrLen
-	wasmContractKeySize  = prefixSizeInMpt + sdk.WasmContractAddrLen
+	wasmContractKeySize  = prefixSizeInMpt + sdk.LongAddrLen
 	storageKeyPrefixSize = prefixSizeInMpt + len(ethcmn.Address{}) + len(ethcmn.Hash{})
 )
 

@@ -4,16 +4,14 @@ import (
 	"encoding/binary"
 	"encoding/json"
 	"fmt"
-	"github.com/okx/okbchain/x/common"
 	"io/ioutil"
 	"os"
 	"testing"
 	"time"
 
+	okbccodec "github.com/okx/okbchain/app/codec"
 	"github.com/okx/okbchain/x/wasm/keeper/testdata"
 
-	chaincodec "github.com/okx/okbchain/app/codec"
-	chain "github.com/okx/okbchain/app/types"
 	"github.com/okx/okbchain/libs/cosmos-sdk/baseapp"
 	"github.com/okx/okbchain/libs/cosmos-sdk/client"
 	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
@@ -42,13 +40,8 @@ import (
 	"github.com/okx/okbchain/libs/cosmos-sdk/x/upgrade"
 	upgradekeeper "github.com/okx/okbchain/libs/cosmos-sdk/x/upgrade"
 	upgradetypes "github.com/okx/okbchain/libs/cosmos-sdk/x/upgrade"
-	"github.com/okx/okbchain/x/ammswap"
-	dex "github.com/okx/okbchain/x/dex/types"
 	distr "github.com/okx/okbchain/x/distribution"
 	"github.com/okx/okbchain/x/erc20"
-	"github.com/okx/okbchain/x/evm"
-	"github.com/okx/okbchain/x/farm"
-	"github.com/okx/okbchain/x/order"
 	"github.com/okx/okbchain/x/staking"
 	token "github.com/okx/okbchain/x/token/types"
 
@@ -118,7 +111,7 @@ func MakeTestCodec(t testing.TB) codec.CodecProxy {
 }
 
 func MakeEncodingConfig(_ testing.TB) EncodingConfig {
-	codecProxy, interfaceReg := okexchaincodec.MakeCodecSuit(moduleBasics)
+	codecProxy, interfaceReg := okbccodec.MakeCodecSuit(moduleBasics)
 	txConfig := ibc_tx.NewTxConfig(codecProxy.GetProtocMarshal(), ibc_tx.DefaultSignModes)
 	encodingConfig := EncodingConfig{
 		InterfaceRegistry: interfaceReg,
@@ -234,18 +227,20 @@ func createTestInput(
 		os.RemoveAll(tempDir)
 	})
 
+	keyMpt := sdk.NewKVStoreKey(mpt.StoreKey)
+
 	keys := sdk.NewKVStoreKeys(
 		auth.StoreKey, staking.StoreKey,
 		supply.StoreKey, mint.StoreKey, distr.StoreKey, slashing.StoreKey,
 		gov.StoreKey, params.StoreKey, upgrade.StoreKey, evidence.StoreKey,
-		evm.StoreKey, token.StoreKey, token.KeyLock, dex.StoreKey, dex.TokenPairStoreKey,
-		order.OrderStoreKey, ammswap.StoreKey, farm.StoreKey, ibctransfertypes.StoreKey, capabilitytypes.StoreKey,
+		token.StoreKey, token.KeyLock, ibctransfertypes.StoreKey, capabilitytypes.StoreKey,
 		ibchost.StoreKey,
 		erc20.StoreKey,
 		mpt.StoreKey,
 		types.StoreKey,
 	)
 	ms := store.NewCommitMultiStore(db)
+	ms.MountStoreWithDB(keyMpt, sdk.StoreTypeMPT, db)
 	for _, v := range keys {
 		ms.MountStoreWithDB(v, sdk.StoreTypeIAVL, db)
 	}
@@ -304,17 +299,11 @@ func createTestInput(
 		staking.NotBondedPoolName:   {supply.Burner, supply.Staking},
 		gov.ModuleName:              nil,
 		token.ModuleName:            {supply.Minter, supply.Burner},
-		dex.ModuleName:              nil,
-		order.ModuleName:            nil,
-		ammswap.ModuleName:          {supply.Minter, supply.Burner},
-		farm.ModuleName:             nil,
-		farm.YieldFarmingAccount:    nil,
-		farm.MintFarmingAccount:     {supply.Burner},
 		ibctransfertypes.ModuleName: {authtypes.Minter, authtypes.Burner},
 		erc20.ModuleName:            {authtypes.Minter, authtypes.Burner},
 		types.ModuleName:            nil,
 	}
-	accountKeeper := auth.NewAccountKeeper(legacyAmino, keys[authtypes.StoreKey], keys[mpt.StoreKey], subspace(authtypes.ModuleName), okexchain.ProtoAccount)
+	accountKeeper := auth.NewAccountKeeper(legacyAmino, keyMpt, paramsKeeper.Subspace(auth.DefaultParamspace), auth.ProtoBaseAccount)
 	blockedAddrs := make(map[string]bool)
 	for acc := range maccPerms {
 		blockedAddrs[authtypes.NewModuleAddress(acc).String()] = true
