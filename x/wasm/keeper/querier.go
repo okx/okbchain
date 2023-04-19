@@ -124,7 +124,8 @@ func (q grpcQuerier) AllContractState(c context.Context, req *types.QueryAllCont
 	}
 
 	r := make([]types.Model, 0)
-	prefixStore := q.PrefixStore(c, types.GetContractStorePrefix(contractAddr))
+	// prefixStore := q.PrefixStore(c, types.GetContractStorePrefix(contractAddr))
+	prefixStore := q.keeper.GetStorageStore(q.UnwrapSDKContext(c), contractAddr)
 
 	pageRes, err := query.FilteredPaginate(prefixStore, req.Pagination, func(key []byte, value []byte, accumulate bool) (bool, error) {
 		if accumulate {

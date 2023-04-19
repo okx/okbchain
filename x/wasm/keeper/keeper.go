@@ -415,7 +415,7 @@ func (k Keeper) instantiate(ctx sdk.Context, codeID uint64, creator, admin sdk.A
 	}
 
 	// get contact info
-	store := k.ada.NewStore(ctx.GasMeter(), ctx.KVStore(k.storeKey), nil)
+	// store := k.ada.NewStore(ctx.GasMeter(), ctx.KVStore(k.storeKey), nil)
 	codeInfo := k.GetCodeInfo(ctx, codeID)
 	if codeInfo == nil {
 		return nil, nil, sdkerrors.Wrap(types.ErrNotFound, "code")
@@ -432,7 +432,8 @@ func (k Keeper) instantiate(ctx sdk.Context, codeID uint64, creator, admin sdk.A
 
 	// create prefixed data store
 	// 0x03 | BuildContractAddress (sdk.AccAddress)
-	prefixStore := prefix.NewStore(store, types.GetContractStorePrefix(contractAddress))
+	prefixStore := k.GetStorageStore(ctx, contractAddress)
+	// prefixStore := prefix.NewStore(storageStore, types.GetContractStorePrefix(contractAddress))
 	prefixStoreAdapter := types.NewStoreAdapter(prefixStore)
 
 	// prepare querier
@@ -586,8 +587,10 @@ func (k Keeper) migrate(ctx sdk.Context, contractAddress sdk.AccAddress, caller 
 	// prepare querier
 	querier := k.newQueryHandler(ctx, contractAddress)
 
-	prefixStoreKey := types.GetContractStorePrefix(contractAddress)
-	prefixStore := k.ada.NewStore(ctx.GasMeter(), ctx.KVStore(k.storeKey), prefixStoreKey)
+	//	prefixStoreKey := types.GetContractStorePrefix(contractAddress)
+	//	prefixStore := k.ada.NewStore(ctx.GasMeter(), ctx.KVStore(k.storeKey), prefixStoreKey)
+	prefixStore := k.GetStorageStore(ctx, contractAddress)
+
 	prefixAdapater := types.NewStoreAdapter(prefixStore)
 
 	gas := k.runtimeGasForContract(ctx)
@@ -849,8 +852,10 @@ func (k Keeper) QueryRaw(ctx sdk.Context, contractAddress sdk.AccAddress, key []
 	if key == nil {
 		return nil
 	}
-	prefixStoreKey := types.GetContractStorePrefix(contractAddress)
-	prefixStore := k.ada.NewStore(ctx.GasMeter(), ctx.KVStore(k.storeKey), prefixStoreKey)
+	//	prefixStoreKey := types.GetContractStorePrefix(contractAddress)
+	//	prefixStore := k.ada.NewStore(ctx.GasMeter(), ctx.KVStore(k.storeKey), prefixStoreKey)
+	prefixStore := k.GetStorageStore(ctx, contractAddress)
+
 	return prefixStore.Get(key)
 }
 
@@ -869,8 +874,10 @@ func (k Keeper) contractInstance(ctx sdk.Context, contractAddress sdk.AccAddress
 	}
 	var codeInfo types.CodeInfo
 	k.cdc.GetProtocMarshal().MustUnmarshal(codeInfoBz, &codeInfo)
-	prefixStoreKey := types.GetContractStorePrefix(contractAddress)
-	prefixStore := prefix.NewStore(store, prefixStoreKey)
+	// prefixStoreKey := types.GetContractStorePrefix(contractAddress)
+	// prefixStore := prefix.NewStore(store, prefixStoreKey)
+	prefixStore := k.GetStorageStore(ctx, contractAddress)
+
 	return contractInfo, codeInfo, types.NewStoreAdapter(prefixStore), nil
 }
 
@@ -914,8 +921,9 @@ func (k Keeper) IterateContractInfo(ctx sdk.Context, cb func(sdk.AccAddress, typ
 // IterateContractState iterates through all elements of the key value store for the given contract address and passes
 // them to the provided callback function. The callback method can return true to abort early.
 func (k Keeper) IterateContractState(ctx sdk.Context, contractAddress sdk.AccAddress, cb func(key, value []byte) bool) {
-	prefixStoreKey := types.GetContractStorePrefix(contractAddress)
-	prefixStore := k.ada.NewStore(ctx.GasMeter(), ctx.KVStore(k.storeKey), prefixStoreKey)
+	// prefixStoreKey := types.GetContractStorePrefix(contractAddress)
+	// prefixStore := k.ada.NewStore(ctx.GasMeter(), ctx.KVStore(k.storeKey), prefixStoreKey)
+	prefixStore := k.GetStorageStore(ctx, contractAddress)
 
 	iter := prefixStore.Iterator(nil, nil)
 	defer iter.Close()
@@ -928,8 +936,9 @@ func (k Keeper) IterateContractState(ctx sdk.Context, contractAddress sdk.AccAdd
 }
 
 func (k Keeper) importContractState(ctx sdk.Context, contractAddress sdk.AccAddress, models []types.Model) error {
-	prefixStoreKey := types.GetContractStorePrefix(contractAddress)
-	prefixStore := k.ada.NewStore(ctx.GasMeter(), ctx.KVStore(k.storeKey), prefixStoreKey)
+	// prefixStoreKey := types.GetContractStorePrefix(contractAddress)
+	// prefixStore := k.ada.NewStore(ctx.GasMeter(), ctx.KVStore(k.storeKey), prefixStoreKey)
+	prefixStore := k.GetStorageStore(ctx, contractAddress)
 	for _, model := range models {
 		if model.Value == nil {
 			model.Value = []byte{}
