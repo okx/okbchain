@@ -24,7 +24,7 @@ okbchaincli query wasm list-code --node=http://localhost:26657 -o json | jq
 
 echo "2-----------------------"
 echo "## Create new contract instance"
-INIT="{\"verifier\":\"$(okbchaincli keys show captain -a)\", \"beneficiary\":\"$(okbchaincli keys show fred -a)\"}"
+INIT="{\"verifier\":\"$(okbchaincli keys show captain | jq -r '.eth_address')\", \"beneficiary\":\"$(okbchaincli keys show fred | jq -r '.eth_address')\"}"
 okbchaincli tx wasm instantiate "$CODE_ID" "$INIT" --admin="$(okbchaincli keys show captain -a)" \
   --from captain  --fees 0.001okb --amount="100okb" --label "local0.1.0" \
   --gas 1000000 -y -b block -o json | jq
@@ -64,8 +64,8 @@ RESP=$(okbchaincli tx wasm store "$DIR/../../../x/wasm/keeper/testdata/burner.wa
 BURNER_CODE_ID=$(echo "$RESP" | jq -r '.logs[0].events[1].attributes[-1].value')
 echo "### Migrate to code id: $BURNER_CODE_ID"
 
-DEST_ACCOUNT=$(okbchaincli keys show fred -a)
-okbchaincli tx wasm migrate "$CONTRACT" "$BURNER_CODE_ID" "{\"payout\": \"$DEST_ACCOUNT\"}" --from fred  --fees 0.001okb \
+DEST_ACCOUNT=$(okbchaincli keys show fred | jq -r '.eth_address')
+okbchaincli tx wasm migrate "$CONTRACT" "$BURNER_CODE_ID" "{\"payout\": \"$DEST_ACCOUNT\"}" --from fred  --fees 0.001okt \
  -b block -y -o json | jq
 
 echo "### Query destination account: $BURNER_CODE_ID"

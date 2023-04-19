@@ -33,6 +33,7 @@ run() {
       --enable-preruntx=1 \
       --tree-enable-async-commit=false \
       --enable-gid \
+      --fast-query=false \
       --append-pid=true \
       --iavl-output-modules evm=0,acc=0 \
       --commit-gap-height 3 \
