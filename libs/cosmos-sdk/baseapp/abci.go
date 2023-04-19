@@ -441,6 +441,7 @@ func handleSimulate(app *BaseApp, path []string, height int64, txBytes []byte, o
 			}
 		}
 	}
+
 	var tx sdk.Tx
 	var err error
 	if mem := GetGlobalMempool(); mem != nil {

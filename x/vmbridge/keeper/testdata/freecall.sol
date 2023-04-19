@@ -7,7 +7,7 @@ contract FreeCall {
     address public constant moduleAddress =
     address(0x1033796B018B2bf0Fc9CB88c0793b2F275eDB624);
 
-    event __OKCCallToWasm(string wasmAddr, uint256 value, string data);
+    event __OKBCCallToWasm(string wasmAddr, uint256 value, string data);
 
     function callByWasm(string memory callerWasmAddr,string memory  data) public payable returns (string memory response) {
         string memory temp1 = strConcat("callByWasm return: ",callerWasmAddr);
@@ -18,7 +18,7 @@ contract FreeCall {
 
 
     function callToWasm(string memory wasmAddr, uint256 value, string memory data) public returns (bool success){
-        emit __OKCCallToWasm(wasmAddr,value,data);
+        emit __OKBCCallToWasm(wasmAddr,value,data);
         return true;
     }
 

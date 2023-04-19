@@ -1,7 +1,7 @@
 [package]
 name = "counter"
 version = "0.1.0"
-authors = ["OKC <okc@okg.com>"]
+authors = ["OKBC <okbc@okg.com>"]
 edition = "2018"
 
 exclude = [

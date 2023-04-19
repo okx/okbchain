@@ -29,7 +29,6 @@ func (sud SetUpContextDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate
 		SetGasMeter(simulate, &ctx, gasTx.GetGas())
 	}
 
-	SetGasMeter(simulate, &ctx, gasTx.GetGas())
 	newCtx = ctx
 
 	// Decorator will catch an OutOfGasPanic caused in the next antehandler

@@ -57,7 +57,7 @@ func (h SendToWasmEventHandler) Handle(ctx sdk.Context, contract common.Address,
 	return h.Keeper.SendToWasm(ctx, caller, wasmAddr, recipient, amount)
 }
 
-// event __OKCCallToWasm(string wasmAddr,uint256 value, string calldata)
+// event __OKBCCallToWasm(string wasmAddr,uint256 value, string calldata)
 type CallToWasmEventHandler struct {
 	Keeper
 }

@@ -11,13 +11,13 @@ import (
 )
 
 const (
-	SendToWasmEventName  = "__OKCSendToWasm"
+	SendToWasmEventName  = "__OKBCSendToWasm"
 	WasmCalledMethodName = "mintCW20"
 
 	SendToEvmSubMsgName = "send-to-evm"
 	EvmCalledMethodName = "mintERC20"
 
-	CallToWasmEventName = "__OKCCallToWasm"
+	CallToWasmEventName = "__OKBCCallToWasm"
 
 	WasmEvent2EvmMsgName = "call-to-wasm"
 )
@@ -28,7 +28,7 @@ var (
 	SendToWasmEvent abi.Event
 
 	// CallToWasmEvent represent the signature of
-	// `event __OKCCallToWasm(string wasmAddr,uint256 value, string calldata)`
+	// `event __OKBCCallToWasm(string wasmAddr,uint256 value, string calldata)`
 	CallToWasmEvent abi.Event
 
 	EvmABI abi.ABI
