@@ -4,6 +4,7 @@ import (
 	"encoding/binary"
 	"encoding/json"
 	"fmt"
+	"github.com/okx/okbchain/x/common"
 	"io/ioutil"
 	"os"
 	"testing"
@@ -137,6 +138,7 @@ var TestingStakeParams = stakingtypes.Params{
 	MinDelegation:      sdk.OneDec(),
 	MinSelfDelegation:  sdk.OneDec(),
 	HistoricalEntries:  10,
+	ConsensusType:      common.PoA,
 }
 
 type TestFaucet struct {
