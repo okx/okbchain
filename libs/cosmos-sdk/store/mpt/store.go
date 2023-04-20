@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/okx/okbchain/libs/system/trace/persist"
 	"io"
+	"log"
 	"sync"
 	"time"
 
@@ -275,6 +276,7 @@ func (ms *MptStore) Set(key, value []byte) {
 		t.TryUpdate(realKey, value)
 		ms.updateSnapStorages(addr, realKey, value)
 	case addressType:
+		key = AddressStoreKey(ethcmn.BytesToAddress(key).Bytes())
 		ms.trie.TryUpdate(key, value)
 		ms.updateSnapAccounts(key, value)
 	default:
@@ -372,6 +374,9 @@ func (ms *MptStore) commitStorage(nodeSets *trie.MergedNodeSet) {
 		}
 		key := AddressStoreKey(addr.Bytes())
 		preValue, err := ms.trie.TryGet(key)
+		if len(preValue) == 0 {
+			log.Printf("giskook value nil %s len %v \n", ethcmn.BytesToAddress(key).String(), len(key))
+		}
 		if err == nil { // maybe acc already been deleted
 			newValue := ms.retriever.ModifyAccStateRoot(preValue, stateR)
 			if err := ms.trie.TryUpdate(key, newValue); err != nil {
@@ -818,10 +823,10 @@ func mptKeyType(key []byte) int {
 		}
 		return -1
 	case keyPrefixStorageMpt:
-		if len(key) == storageKeySize {
-			return storageType
-		}
-		return -1
+		// if len(key) == storageKeySize {
+		return storageType
+		// }
+		// return -1
 	default:
 		return -1
 

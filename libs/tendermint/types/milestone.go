@@ -31,7 +31,9 @@ const (
 )
 
 func init() {
-	once.Do(func() {})
+	once.Do(func() {
+		milestoneEarthHeight = 1
+	})
 }
 
 func string2number(input string) int64 {
