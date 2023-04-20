@@ -615,7 +615,9 @@ func (suite *EvmTestSuite) TestSimulateConflict() {
 
 	suite.ctx.SetGasMeter(sdk.NewInfiniteGasMeter())
 	suite.ctx.SetIsCheckTx(true).SetIsDeliverTx(false)
-	result, err := suite.handler(suite.ctx, tx)
+
+	cacheCtx, _ := suite.ctx.CacheContext()
+	result, err := suite.handler(cacheCtx, tx)
 	suite.Require().NotNil(result)
 	suite.Require().Nil(err)
 
