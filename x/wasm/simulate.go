@@ -11,6 +11,7 @@ import (
 	"github.com/okx/okbchain/x/wasm/keeper"
 	"github.com/okx/okbchain/x/wasm/proxy"
 	"github.com/okx/okbchain/x/wasm/types"
+	"sync"
 )
 
 type Simulator struct {
@@ -80,4 +81,19 @@ func NewProxyKeeper() keeper.Keeper {
 	bank.RegisterBankMsgServer(msgRouter, bank.NewMsgServerImpl(bkp))
 	bank.RegisterQueryServer(queryRouter, bank.NewBankQueryServer(bkp, skp))
 	return k
+}
+
+var (
+	storageStoreKeyOnce sync.Once
+	gStorageStoreKey    sdk.StoreKey
+)
+
+func getStoreKey() sdk.StoreKey {
+	storageStoreKeyOnce.Do(
+		func() {
+			gStorageStoreKey = sdk.NewKVStoreKey(mpt.StoreKey)
+		},
+	)
+
+	return gStorageStoreKey
 }
