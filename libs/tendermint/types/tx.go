@@ -64,6 +64,14 @@ func (tx Tx) Hash() []byte {
 	return etherhash.Sum(tx)
 }
 
+func (tx Tx) EvmHash() []byte {
+	return etherhash.Sum(tx)
+}
+
+func (tx Tx) TmHash() []byte {
+	return tmhash.Sum(tx)
+}
+
 // String returns the hex-encoded transaction as a string.
 func (tx Tx) String() string {
 	return fmt.Sprintf("Tx{%X}", []byte(tx))

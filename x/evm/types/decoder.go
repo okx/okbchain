@@ -56,7 +56,11 @@ func TxDecoder(cdc codec.CdcAbstraction) sdk.TxDecoder {
 		} {
 			if tx, err = f(cdc, txBytes); err == nil {
 				tx.SetRaw(txBytes)
-				tx.SetTxHash(types.Tx(txBytes).Hash())
+				if tx.GetType() == sdk.EvmTxType {
+					tx.SetTxHash(types.Tx(txBytes).EvmHash())
+				} else {
+					tx.SetTxHash(types.Tx(txBytes).TmHash())
+				}
 				// index=0 means it is a evmtx(evmDecoder) ,we wont verify again
 				// height > IGNORE_HEIGHT_CHECKING means it is a query request
 				if index > 0 && height > IGNORE_HEIGHT_CHECKING {
