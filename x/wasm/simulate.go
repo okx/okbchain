@@ -83,7 +83,7 @@ func NewProxyKeeper() keeper.Keeper {
 	queryRouter := baseapp.NewGRPCQueryRouter()
 	queryRouter.SetInterfaceRegistry(interfaceReg)
 
-	k := keeper.NewSimulateKeeper(codec.NewCodecProxy(protoCdc, cdc), getStoreKey(),sdk.NewKVStoreKey(mpt.StoreKey), ss, akp, bkp, nil, pkp, ckp, nil, msgRouter, queryRouter, WasmDir(), WasmConfig(), SupportedFeatures)
+	k := keeper.NewSimulateKeeper(codec.NewCodecProxy(protoCdc, cdc), getStoreKey(),getStorageStoreKey(), ss, akp, bkp, nil, pkp, ckp, nil, msgRouter, queryRouter, WasmDir(), WasmConfig(), SupportedFeatures)
 	types.RegisterMsgServer(msgRouter, keeper.NewMsgServerImpl(keeper.NewDefaultPermissionKeeper(k)))
 	types.RegisterQueryServer(queryRouter, NewQuerier(&k))
 	bank.RegisterBankMsgServer(msgRouter, bank.NewMsgServerImpl(bkp))
@@ -104,4 +104,19 @@ func getStoreKey() sdk.StoreKey {
 	)
 
 	return gStoreKey
+}
+
+var (
+	storageStoreKeyOnce sync.Once
+	gStorageStoreKey    sdk.StoreKey
+)
+
+func getStorageStoreKey() sdk.StoreKey {
+	storageStoreKeyOnce.Do(
+		func() {
+			gStorageStoreKey = sdk.NewKVStoreKey(mpt.StoreKey)
+		},
+	)
+
+	return gStorageStoreKey
 }
