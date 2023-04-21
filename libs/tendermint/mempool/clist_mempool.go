@@ -373,7 +373,7 @@ func (mem *CListMempool) CheckTx(tx types.Tx, cb func(*abci.Response), txInfo Tx
 
 		}
 	}
-	reqRes.SetCallback(mem.reqResCb(tx, txInfo, cb))
+	reqRes.SetCallback(mem.reqResCb(tx, txkey, txInfo, cb))
 	atomic.AddInt64(&mem.checkCnt, 1)
 
 	if cfg.DynamicConfig.GetMempoolCheckTxCost() {
@@ -423,6 +423,7 @@ func (mem *CListMempool) globalCb(req *abci.Request, res *abci.Response) {
 // Used in CheckTx to record PeerID who sent us the tx.
 func (mem *CListMempool) reqResCb(
 	tx []byte,
+	txkey [32]byte,
 	txInfo TxInfo,
 	externalCb func(*abci.Response),
 ) func(res *abci.Response) {
@@ -432,7 +433,7 @@ func (mem *CListMempool) reqResCb(
 			panic("recheck cursor is not nil in reqResCb")
 		}
 
-		mem.resCbFirstTime(tx, txInfo, res)
+		mem.resCbFirstTime(tx, txkey, txInfo, res)
 
 		// update metrics
 		mem.metrics.Size.Set(float64(mem.Size()))
@@ -631,6 +632,7 @@ func (mem *CListMempool) logAddTx(memTx *mempoolTx, r *abci.Response_CheckTx) {
 // handled by the resCbRecheck callback.
 func (mem *CListMempool) resCbFirstTime(
 	tx []byte,
+	txkey [32]byte,
 	txInfo TxInfo,
 	res *abci.Response,
 ) {
@@ -640,11 +642,6 @@ func (mem *CListMempool) resCbFirstTime(
 		if mem.postCheck != nil {
 			postCheckErr = mem.postCheck(tx, r.CheckTx)
 		}
-		var txHash []byte
-		if r.CheckTx != nil && r.CheckTx.Tx != nil {
-			txHash = r.CheckTx.Tx.TxHash()
-		}
-		txkey := txOrTxHashToKey(tx, txHash)
 
 		if (r.CheckTx.Code == abci.CodeTypeOK) && postCheckErr == nil {
 			// Check mempool isn't full again to reduce the chance of exceeding the
