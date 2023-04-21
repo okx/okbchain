@@ -66,7 +66,8 @@ ldflags = -X $(GithubTop)/okx/okbchain/libs/cosmos-sdk/version.Version=$(Version
   -X $(GithubTop)/okx/okbchain/libs/cosmos-sdk/version.Commit=$(COMMIT) \
   -X $(GithubTop)/okx/okbchain/libs/cosmos-sdk/version.CosmosSDK=$(CosmosSDK) \
   -X $(GithubTop)/okx/okbchain/libs/cosmos-sdk/version.Tendermint=$(Tendermint) \
-  -X "$(GithubTop)/okx/okbchain/libs/cosmos-sdk/version.BuildTags=$(build_tags)"
+  -X "$(GithubTop)/okx/okbchain/libs/cosmos-sdk/version.BuildTags=$(build_tags)" \
+  -X $(GithubTop)/okx/okbchain/libs/tendermint/types.MILESTONE_EARTH_HEIGHT=$(EarthHeight) \
 
 
 ifeq ($(WITH_ROCKSDB),true)

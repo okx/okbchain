@@ -13,8 +13,9 @@ import (
 // 4. ibc
 
 var (
-	milestoneEarthHeight  int64
-	milestoneVenus4Height int64
+	MILESTONE_EARTH_HEIGHT string
+	milestoneEarthHeight   int64
+	milestoneVenus4Height  int64
 
 	// note: it stores the earlies height of the node,and it is used by cli
 	nodePruneHeight int64
@@ -31,7 +32,9 @@ const (
 )
 
 func init() {
-	once.Do(func() {})
+	once.Do(func() {
+		milestoneEarthHeight = string2number(MILESTONE_EARTH_HEIGHT)
+	})
 }
 
 func string2number(input string) int64 {
