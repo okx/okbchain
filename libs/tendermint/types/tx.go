@@ -2,6 +2,7 @@ package types
 
 import (
 	"bytes"
+	"encoding/binary"
 	"errors"
 	"fmt"
 	"google.golang.org/protobuf/encoding/protowire"
@@ -49,7 +50,7 @@ type ethTxData struct {
 // Hash computes the TMHASH hash of the wire encoded transaction.
 func (tx Tx) Hash() []byte {
 	// if we can't get length-prefixed bytes, this tx should not be an amino-encoded tx
-	if _, err := amino.GetBinaryBareFromBinaryLengthPrefixed(tx); err != nil {
+	if _, n := binary.Uvarint(tx); n <= 0 {
 		// if we can't get proto tag, this tx should not be a proto-encoded tx
 		_, _, length := protowire.ConsumeTag(tx)
 		if length < 0 {
