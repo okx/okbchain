@@ -10,7 +10,6 @@ import (
 	clientcontext "github.com/okx/okbchain/libs/cosmos-sdk/client/context"
 	"github.com/okx/okbchain/libs/cosmos-sdk/store"
 	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/auth"
 	"github.com/okx/okbchain/libs/cosmos-sdk/x/params"
 	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
 	tmlog "github.com/okx/okbchain/libs/tendermint/libs/log"
@@ -24,8 +23,8 @@ func SetCliContext(ctx clientcontext.CLIContext) {
 	clientCtx = ctx
 }
 
-func MakeContext(storeKey sdk.StoreKey) sdk.Context {
-	initCommitMultiStore(storeKey)
+func MakeContext(storeKey, storageStoreKey sdk.StoreKey) sdk.Context {
+	initCommitMultiStore(storeKey, storageStoreKey)
 	header := getHeader()
 	cms := getCommitMultiStore()
 
@@ -70,14 +69,14 @@ var (
 	gCommitMultiStore types.CommitMultiStore
 )
 
-func initCommitMultiStore(storeKey sdk.StoreKey) sdk.CommitMultiStore {
+func initCommitMultiStore(storeKey, storageStoreKey sdk.StoreKey) sdk.CommitMultiStore {
 	cmsOnce.Do(func() {
 		db := dbm.NewMemDB()
 		cms := store.NewCommitMultiStore(db)
-		authKey := sdk.NewKVStoreKey(auth.StoreKey)
+		// authKey := sdk.NewKVStoreKey(auth.StoreKey)
 		paramsKey := sdk.NewKVStoreKey(params.StoreKey)
 		paramsTKey := sdk.NewTransientStoreKey(params.TStoreKey)
-		cms.MountStoreWithDB(authKey, sdk.StoreTypeIAVL, db)
+		cms.MountStoreWithDB(storageStoreKey, sdk.StoreTypeMPT, db)
 		cms.MountStoreWithDB(paramsKey, sdk.StoreTypeIAVL, db)
 		cms.MountStoreWithDB(storeKey, sdk.StoreTypeIAVL, db)
 		cms.MountStoreWithDB(paramsTKey, sdk.StoreTypeTransient, db)

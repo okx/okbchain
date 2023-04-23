@@ -25,6 +25,7 @@ type ViewKeeper interface {
 	GetParams(ctx sdk.Context) Params
 	GetStorageStore(ctx sdk.Context, acc sdk.WasmAddress) sdk.KVStore
 	GetGasFactor(ctx sdk.Context) uint64
+	GetStorageStoreW(ctx sdk.Context, acc sdk.WasmAddress) sdk.KVStore
 }
 
 // ContractOpsKeeper contains mutable operations on a contract.

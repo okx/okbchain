@@ -1,6 +1,7 @@
 package watcher
 
 import (
+	"fmt"
 	"log"
 
 	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
@@ -74,7 +75,11 @@ func WrapWriteKVStore(store sdk.KVStore) sdk.KVStore {
 
 func (w *writeKVStore) Set(key, value []byte) {
 	w.KVStore.Set(key, value)
-	txStateCache = append(txStateCache, &WatchMessage{Key: key, Value: value})
+	log.Printf("watch set key %s\n", fmt.Sprintf("%x", key))
+	log.Printf("watch set key %s\n", string(key))
+	newKey := rmStorageRootFromWatchKey(key)
+
+	txStateCache = append(txStateCache, &WatchMessage{Key: newKey, Value: value})
 }
 
 func (w *writeKVStore) Delete(key []byte) {

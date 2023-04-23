@@ -24,7 +24,7 @@ type Simulator struct {
 func NewWasmSimulator() simulator.Simulator {
 	k := NewProxyKeeper()
 	h := NewHandler(keeper.NewDefaultPermissionKeeper(k))
-	ctx := proxy.MakeContext(k.GetStoreKey())
+	ctx := proxy.MakeContext(k.GetStoreKey(), k.GetStorageStoreKey())
 	return &Simulator{
 		handler: h,
 		k:       &k,
@@ -83,7 +83,7 @@ func NewProxyKeeper() keeper.Keeper {
 	queryRouter := baseapp.NewGRPCQueryRouter()
 	queryRouter.SetInterfaceRegistry(interfaceReg)
 
-	k := keeper.NewSimulateKeeper(codec.NewCodecProxy(protoCdc, cdc), getStoreKey(),getStorageStoreKey(), ss, akp, bkp, nil, pkp, ckp, nil, msgRouter, queryRouter, WasmDir(), WasmConfig(), SupportedFeatures)
+	k := keeper.NewSimulateKeeper(codec.NewCodecProxy(protoCdc, cdc), getStoreKey(), getStorageStoreKey(), ss, akp, bkp, nil, pkp, ckp, nil, msgRouter, queryRouter, WasmDir(), WasmConfig(), SupportedFeatures)
 	types.RegisterMsgServer(msgRouter, keeper.NewMsgServerImpl(keeper.NewDefaultPermissionKeeper(k)))
 	types.RegisterQueryServer(queryRouter, NewQuerier(&k))
 	bank.RegisterBankMsgServer(msgRouter, bank.NewMsgServerImpl(bkp))

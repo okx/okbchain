@@ -33,6 +33,8 @@ import (
 
 const (
 	FlagTrieAccStoreCache = "trie.account-store-cache"
+
+	StorageRootLen = len(ethcmn.Hash{})
 )
 
 var (
@@ -786,11 +788,18 @@ var (
 	addrKeySize          = prefixSizeInMpt + sdk.AddrLen
 	wasmContractKeySize  = prefixSizeInMpt + sdk.LongAddrLen
 	storageKeyPrefixSize = prefixSizeInMpt + len(ethcmn.Address{}) + len(ethcmn.Hash{})
+
+	minWasmStorageKeySize = prefixSizeInMpt + len(ethcmn.Address{}) + StorageRootLen
+	PrefixSizeInMpt       = prefixSizeInMpt
 )
 
 func AddressStoragePrefixMpt(address ethcmn.Address, stateRoot ethcmn.Hash) []byte {
 	t1 := append([]byte{keyPrefixStorageMpt}, address.Bytes()...)
 	return append(t1, stateRoot.Bytes()...)
+}
+
+func AddressStorageWithoutStorageRootPrefixMpt(address ethcmn.Address) []byte {
+	return append([]byte{keyPrefixStorageMpt}, address.Bytes()...)
 }
 
 func decodeAddressStorageInfo(key []byte) (ethcmn.Address, ethcmn.Hash, []byte) {
@@ -839,4 +848,9 @@ func IsStoragePrefix(prefix []byte) bool {
 
 func GetAddressFromStoragePrefix(prefix []byte) ethcmn.Address {
 	return ethcmn.BytesToAddress(prefix[1:21])
+}
+
+// IsStorageKey used for wasm contract storage key.
+func IsStorageKey(key []byte) bool {
+	return key[0] == keyPrefixStorageMpt && len(key) > minWasmStorageKeySize
 }

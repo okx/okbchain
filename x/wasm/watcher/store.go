@@ -2,6 +2,7 @@ package watcher
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"path/filepath"
 	"sync"
@@ -126,5 +127,12 @@ type readStore struct {
 	dbadapter.Store
 }
 
+func (r *readStore) Get(key []byte) []byte {
+	log.Printf("watch get key %s\n", fmt.Sprintf("%x", key))
+	log.Printf("watch get key %s\n", string(key))
+	newKey := rmStorageRootFromWatchKey(key)
+
+	return r.Store.Get(newKey)
+}
 func (r *readStore) Set(key, value []byte) {}
 func (r *readStore) Delete(key []byte)     {}
