@@ -308,10 +308,22 @@ func (ms *MptStore) Delete(key []byte) {
 }
 
 func (ms *MptStore) Iterator(start, end []byte) types.Iterator {
+	if IsStorageKey(start) {
+		addr, stateRoot, _ := decodeAddressStorageInfo(start)
+		t := ms.tryGetStorageTrie(addr, stateRoot, false)
+
+		return newMptIterator(t, start, end)
+	}
 	return newMptIterator(ms.db.CopyTrie(ms.trie), start, end)
 }
 
 func (ms *MptStore) ReverseIterator(start, end []byte) types.Iterator {
+	if IsStorageKey(start) {
+		addr, stateRoot, _ := decodeAddressStorageInfo(start)
+		t := ms.tryGetStorageTrie(addr, stateRoot, false)
+
+		return newMptIterator(t, start, end)
+	}
 	return newMptIterator(ms.db.CopyTrie(ms.trie), start, end)
 }
 
@@ -852,5 +864,5 @@ func GetAddressFromStoragePrefix(prefix []byte) ethcmn.Address {
 
 // IsStorageKey used for wasm contract storage key.
 func IsStorageKey(key []byte) bool {
-	return key[0] == keyPrefixStorageMpt && len(key) > minWasmStorageKeySize
+	return key[0] == keyPrefixStorageMpt && len(key) >= minWasmStorageKeySize
 }
