@@ -476,6 +476,7 @@ func execBlockOnProxyApp(context *executionTask) (*ABCIResponses, error) {
 
 	var validTxs, invalidTxs = 0, 0
 
+	t0 := tmtime.Now()
 	txIndex := 0
 	abciResponses := NewABCIResponses(block)
 
@@ -501,6 +502,7 @@ func execBlockOnProxyApp(context *executionTask) (*ABCIResponses, error) {
 	// proxyAppConn.ParallelTxs(transTxsToBytes(block.Txs), true)
 	commitInfo, byzVals := getBeginBlockValidatorInfo(block, stateDB)
 
+	t1 := tmtime.Now()
 	// Begin block
 	var err error
 	abciResponses.BeginBlock, err = proxyAppConn.BeginBlockSync(abci.RequestBeginBlock{
@@ -514,6 +516,7 @@ func execBlockOnProxyApp(context *executionTask) (*ABCIResponses, error) {
 		return nil, err
 	}
 
+	t2 := tmtime.Now()
 	realTxCh := make(chan abci.TxEssentials, len(block.Txs))
 	stopedCh := make(chan struct{}, 1)
 
@@ -540,6 +543,7 @@ func execBlockOnProxyApp(context *executionTask) (*ABCIResponses, error) {
 	}
 	close(stopedCh)
 
+	t3 := tmtime.Now()
 	// End block.
 
 	abciResponses.EndBlock, err = proxyAppConn.EndBlockSync(abci.RequestEndBlock{
@@ -551,6 +555,7 @@ func execBlockOnProxyApp(context *executionTask) (*ABCIResponses, error) {
 		return nil, err
 	}
 
+	fmt.Printf("h:%d, preExe:%v, beginBlock:%v, deliverTx:%v, endBlock:%v\n", block.Height, t1.Sub(t0), t2.Sub(t1), t3.Sub(t2), tmtime.Now().Sub(t3))
 	trace.GetElapsedInfo().AddInfo(trace.InvalidTxs, fmt.Sprintf("%d", invalidTxs))
 
 	return abciResponses, nil
