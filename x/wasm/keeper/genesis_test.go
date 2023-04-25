@@ -6,8 +6,10 @@ import (
 	"encoding/base64"
 	"errors"
 	"fmt"
+	chain "github.com/okx/okbchain/app/types"
 	"github.com/okx/okbchain/libs/cosmos-sdk/store/mpt"
-	authkeeper "github.com/okx/okbchain/libs/cosmos-sdk/x/auth/keeper"
+	"github.com/okx/okbchain/libs/cosmos-sdk/x/auth"
+	authtypes "github.com/okx/okbchain/libs/cosmos-sdk/x/auth/types"
 	"io/ioutil"
 	"math/rand"
 	"os"
@@ -81,8 +83,12 @@ func TestGenesisExportImport(t *testing.T) {
 		wasmKeeper.storeContractInfo(srcCtx, contractAddr, &contract)
 		wasmKeeper.appendToContractHistory(srcCtx, contractAddr, history...)
 
+		contractAccount := wasmKeeper.accountKeeper.NewAccountWithAddress(srcCtx, sdk.WasmToAccAddress(contractAddr))
+		wasmKeeper.accountKeeper.SetAccount(srcCtx, contractAccount)
 		wasmKeeper.importContractState(srcCtx, contractAddr, stateModels)
 	}
+	srcCtx.MultiStore().GetKVStore(srcStoreKeys[2]).(*mpt.MptStore).CommitterCommit(nil)
+
 	var wasmParams types.Params
 	f.NilChance(0).Fuzz(&wasmParams)
 	wasmKeeper.SetParams(srcCtx, wasmParams)
@@ -661,11 +667,31 @@ func setupKeeper(t *testing.T) (*Keeper, sdk.Context, []sdk.StoreKey) {
 
 	wasmConfig := wasmTypes.DefaultWasmConfig()
 	pk := paramskeeper.NewKeeper(encodingConfig.Amino, keyParams, tkeyParams)
+	for _, m := range []string{authtypes.ModuleName,
+		//		bank.ModuleName,
+		//		stakingtypes.ModuleName,
+		//		mint.ModuleName,
+		//		distributiontypes.ModuleName,
+		//		slashingtypes.ModuleName,
+		//		crisistypes.ModuleName,
+		//		ibctransfertypes.ModuleName,
+		//		capabilitytypes.ModuleName,
+		//		ibchost.ModuleName,
+		//		govtypes.ModuleName,
+		types.ModuleName,
+	} {
+		pk.Subspace(m)
+	}
+	subspace := func(m string) paramtypes.Subspace {
+		r, ok := pk.GetSubspace(m)
+		require.True(t, ok)
+		return r
+	}
 
-	//	legacyAmino := encodingConfig.Amino
-	//	accountKeeper := auth.NewAccountKeeper(legacyAmino, keys[mpt.StoreKey], subspace(authtypes.ModuleName), chain.ProtoAccount)
-	srcKeeper := NewKeeper(&encodingConfig.Marshaler, keyWasm, keyMpt, pk.Subspace(wasmTypes.ModuleName), &authkeeper.AccountKeeper{}, nil, nil, nil, nil, nil, nil, nil, tempDir, wasmConfig, SupportedFeatures)
-	return &srcKeeper, ctx, []sdk.StoreKey{keyWasm, keyParams}
+	accountKeeper := auth.NewAccountKeeper(encodingConfig.Amino, keyMpt, subspace(authtypes.ModuleName), chain.ProtoAccount)
+	srcKeeper := NewKeeper(&encodingConfig.Marshaler, keyWasm, keyMpt, subspace(wasmTypes.ModuleName), &accountKeeper, nil, nil, nil, nil, nil, nil, nil, tempDir, wasmConfig, SupportedFeatures)
+
+	return &srcKeeper, ctx, []sdk.StoreKey{keyWasm, keyParams, keyMpt}
 }
 
 type StakingKeeperMock struct {
