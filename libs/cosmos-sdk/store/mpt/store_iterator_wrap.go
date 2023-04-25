@@ -18,14 +18,14 @@ type wrapIterator struct {
 	isStorage bool
 }
 
-func newWrapIterator(t ethstate.Trie, start, end []byte) *wrapIterator {
+func newWrapIterator(t ethstate.Trie, start, end []byte, ascending bool) *wrapIterator {
 	if IsStorageKey(start) {
-		return newWrapIteratorStorage(t, start, end)
+		return newWrapIteratorStorage(t, start, end, ascending)
 	}
-	return newWrapIteratorAcc(t, start, end)
+	return newWrapIteratorAcc(t, start, end, ascending)
 }
 
-func newWrapIteratorAcc(t ethstate.Trie, start, end []byte) *wrapIterator {
+func newWrapIteratorAcc(t ethstate.Trie, start, end []byte, ascending bool) *wrapIterator {
 	var keys [][]byte
 	mptIter := newOriginIterator(t, nil, nil)
 	for ; mptIter.Valid(); mptIter.Next() {
@@ -52,7 +52,7 @@ func newWrapIteratorAcc(t ethstate.Trie, start, end []byte) *wrapIterator {
 	}
 }
 
-func newWrapIteratorStorage(t ethstate.Trie, startIn, endIn []byte) *wrapIterator {
+func newWrapIteratorStorage(t ethstate.Trie, startIn, endIn []byte, ascending bool) *wrapIterator {
 	var keys [][]byte
 	_, _, start := decodeAddressStorageInfo(startIn)
 	_, _, end := decodeAddressStorageInfo(endIn)

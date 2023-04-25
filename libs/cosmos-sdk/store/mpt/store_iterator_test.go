@@ -26,7 +26,7 @@ func Test_Store_Iterate(t *testing.T) {
 	for i, c := range cases {
 		t.Run(fmt.Sprintf("test-%d", i), func(t *testing.T) {
 			trie, kvs := fullFillStore(c.num)
-			iter := newMptIterator(trie, nil, nil)
+			iter := newMptIterator(trie, nil, nil, true)
 			defer iter.Close()
 			count := 0
 			iKvs := make(map[string]string, c.num)
@@ -64,7 +64,7 @@ func TestWrapIterator(t *testing.T) {
 	total := 10000
 	trie, kvs := fullFillStore(total)
 
-	iter := newMptIterator(trie, nil, nil)
+	iter := newMptIterator(trie, nil, nil, true)
 	defer iter.Close()
 	var count int
 	for ; iter.Valid(); iter.Next() {
@@ -73,7 +73,7 @@ func TestWrapIterator(t *testing.T) {
 	require.Equal(t, len(kvs), count)
 
 	startIndex := 3000
-	iter2 := newMptIterator(trie, []byte(fmt.Sprintf(keyFormat, startIndex)), nil)
+	iter2 := newMptIterator(trie, []byte(fmt.Sprintf(keyFormat, startIndex)), nil, true)
 	defer iter2.Close()
 	var count2 int
 	for ; iter2.Valid(); iter2.Next() {
