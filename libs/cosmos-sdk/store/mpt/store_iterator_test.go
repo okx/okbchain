@@ -1,6 +1,7 @@
 package mpt
 
 import (
+	"bytes"
 	"fmt"
 	"testing"
 
@@ -10,36 +11,58 @@ import (
 )
 
 var cases = []struct {
-	num int
+	num       int
+	ascending bool
 }{
-	{0},
-	{1},
-	{2},
-	{100},
-	{1000},
-	{10000},
+	{0, true},
+	{1, true},
+	{2, true},
+	{100, true},
+	{1000, true},
+	{10000, true},
+	{0, false},
+	{1, false},
+	{2, false},
+	{100, false},
+	{1000, false},
+	{10000, false},
 }
 
 var keyFormat = "key-%08d"
 
-func Test_Store_Iterate(t *testing.T) {
+func TestStoreIterate(t *testing.T) {
 	for i, c := range cases {
 		t.Run(fmt.Sprintf("test-%d", i), func(t *testing.T) {
 			trie, kvs := fullFillStore(c.num)
-			iter := newMptIterator(trie, nil, nil, true)
+			iter := newMptIterator(trie, nil, nil, c.ascending)
 			defer iter.Close()
 			count := 0
 			iKvs := make(map[string]string, c.num)
+			var beforeKey []byte
 			for ; iter.Valid(); iter.Next() {
 				require.NotNil(t, iter.Key())
+				curKey := iter.Key()
 				iKvs[string(iter.Key())] = string(iter.Value())
 				count++
+				if len(beforeKey) > 0 {
+					if c.ascending {
+						require.Equal(t, bytes.Compare(beforeKey, curKey), -1)
+					} else {
+						require.Equal(t, bytes.Compare(beforeKey, curKey), 1)
+					}
+				}
+				beforeKey = curKey
 			}
+
 			require.EqualValues(t, kvs, iKvs)
 			require.Equal(t, c.num, len(iKvs))
 			require.Equal(t, c.num, count)
 		})
 	}
+}
+
+func TestStoreReiterate(t *testing.T) {
+	// TODO for reiterate
 }
 
 func fullFillStore(num int) (ethstate.Trie, map[string]string) {
