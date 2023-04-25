@@ -6,6 +6,8 @@ import (
 	"encoding/base64"
 	"errors"
 	"fmt"
+	"github.com/okx/okbchain/libs/cosmos-sdk/store/mpt"
+	authkeeper "github.com/okx/okbchain/libs/cosmos-sdk/x/auth/keeper"
 	"io/ioutil"
 	"math/rand"
 	"os"
@@ -16,7 +18,6 @@ import (
 	"github.com/okx/okbchain/libs/cosmos-sdk/store"
 	"github.com/okx/okbchain/libs/cosmos-sdk/store/prefix"
 	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	authkeeper "github.com/okx/okbchain/libs/cosmos-sdk/x/auth/keeper"
 	paramskeeper "github.com/okx/okbchain/libs/cosmos-sdk/x/params"
 	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
 	"github.com/okx/okbchain/libs/tendermint/libs/log"
@@ -79,6 +80,7 @@ func TestGenesisExportImport(t *testing.T) {
 		contractAddr := wasmKeeper.generateContractAddress(srcCtx, codeID)
 		wasmKeeper.storeContractInfo(srcCtx, contractAddr, &contract)
 		wasmKeeper.appendToContractHistory(srcCtx, contractAddr, history...)
+
 		wasmKeeper.importContractState(srcCtx, contractAddr, stateModels)
 	}
 	var wasmParams types.Params
@@ -634,6 +636,8 @@ func setupKeeper(t *testing.T) (*Keeper, sdk.Context, []sdk.StoreKey) {
 		keyParams  = sdk.NewKVStoreKey(paramtypes.StoreKey)
 		tkeyParams = sdk.NewTransientStoreKey(paramtypes.TStoreKey)
 		keyWasm    = sdk.NewKVStoreKey(wasmTypes.StoreKey)
+
+		keyMpt = sdk.NewKVStoreKey(mpt.StoreKey)
 	)
 
 	db := dbm.NewMemDB()
@@ -641,6 +645,7 @@ func setupKeeper(t *testing.T) (*Keeper, sdk.Context, []sdk.StoreKey) {
 	ms.MountStoreWithDB(keyWasm, sdk.StoreTypeIAVL, db)
 	ms.MountStoreWithDB(keyParams, sdk.StoreTypeIAVL, db)
 	ms.MountStoreWithDB(tkeyParams, sdk.StoreTypeTransient, db)
+	ms.MountStoreWithDB(keyMpt, sdk.StoreTypeMPT, db)
 	require.NoError(t, ms.LoadLatestVersion())
 
 	ctx := sdk.NewContext(ms, abci.Header{
@@ -656,7 +661,10 @@ func setupKeeper(t *testing.T) (*Keeper, sdk.Context, []sdk.StoreKey) {
 
 	wasmConfig := wasmTypes.DefaultWasmConfig()
 	pk := paramskeeper.NewKeeper(encodingConfig.Amino, keyParams, tkeyParams)
-	srcKeeper := NewKeeper(&encodingConfig.Marshaler, keyWasm, pk.Subspace(wasmTypes.ModuleName), &authkeeper.AccountKeeper{}, nil, nil, nil, nil, nil, nil, nil, tempDir, wasmConfig, SupportedFeatures)
+
+	//	legacyAmino := encodingConfig.Amino
+	//	accountKeeper := auth.NewAccountKeeper(legacyAmino, keys[mpt.StoreKey], subspace(authtypes.ModuleName), chain.ProtoAccount)
+	srcKeeper := NewKeeper(&encodingConfig.Marshaler, keyWasm, keyMpt, pk.Subspace(wasmTypes.ModuleName), &authkeeper.AccountKeeper{}, nil, nil, nil, nil, nil, nil, nil, tempDir, wasmConfig, SupportedFeatures)
 	return &srcKeeper, ctx, []sdk.StoreKey{keyWasm, keyParams}
 }
 
