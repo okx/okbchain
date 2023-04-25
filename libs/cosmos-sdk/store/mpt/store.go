@@ -856,5 +856,8 @@ func GetAddressFromStoragePrefix(prefix []byte) ethcmn.Address {
 
 // IsStorageKey used for wasm contract storage key.
 func IsStorageKey(key []byte) bool {
+	if key == nil {
+		return false
+	}
 	return key[0] == keyPrefixStorageMpt && len(key) >= minWasmStorageKeySize
 }
