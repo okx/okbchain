@@ -398,7 +398,7 @@ func TestInstantiate(t *testing.T) {
 
 	gasAfter := ctx.GasMeter().GasConsumed()
 	if types.EnableGasVerification {
-		require.Equal(t, uint64(0x16f41), gasAfter-gasBefore)
+		require.Equal(t, uint64(0x1744f), gasAfter-gasBefore)
 	}
 
 	// ensure it is stored properly
@@ -522,6 +522,7 @@ func TestInstantiateWithPermissions(t *testing.T) {
 		},
 		"onlyAddress with non matching address": {
 			srcPermission: types.AccessTypeOnlyAddress.With(otherAddr),
+			srcActor:      bytes.Repeat([]byte{4}, types.SDKAddrLen),
 			expError:      sdkerrors.ErrUnauthorized,
 		},
 	}
