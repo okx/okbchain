@@ -1,14 +1,22 @@
 package wasm
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/okx/okbchain/libs/cosmos-sdk/store/mpt"
+	"github.com/okx/okbchain/libs/cosmos-sdk/x/auth"
+	"github.com/okx/okbchain/libs/cosmos-sdk/x/auth/exported"
+	"github.com/status-im/keycard-go/hexutils"
+	"github.com/tendermint/go-amino"
 	"io/ioutil"
 	"testing"
 
 	"github.com/okx/okbchain/x/wasm/keeper/testdata"
 
 	"github.com/dvsekhvalnov/jose2go/base64url"
+	sdktypes "github.com/okx/okbchain/libs/cosmos-sdk/store/types"
 	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
 	"github.com/okx/okbchain/libs/cosmos-sdk/types/module"
 	authkeeper "github.com/okx/okbchain/libs/cosmos-sdk/x/auth/keeper"
@@ -37,9 +45,12 @@ type testData struct {
 	bankKeeper    bankkeeper.Keeper
 	stakingKeeper stakingkeeper.Keeper
 	faucet        *keeper.TestFaucet
+
+	mptKey *sdk.KVStoreKey
 }
 
 func setupTest(t *testing.T) testData {
+	mpt.AccountStateRootRetriever = accountStateRootRetriever{}
 	ctx, keepers := CreateTestInput(t, false, SupportedFeatures)
 	cdc := keeper.MakeTestCodec(t)
 	data := testData{
@@ -50,7 +61,10 @@ func setupTest(t *testing.T) testData {
 		bankKeeper:    keepers.BankKeeper,
 		stakingKeeper: keepers.StakingKeeper,
 		faucet:        keepers.Faucet,
+
+		mptKey: ctx.Value("mptStoreKey").(*sdktypes.KVStoreKey),
 	}
+
 	return data
 }
 
@@ -186,6 +200,8 @@ func TestHandleInstantiate(t *testing.T) {
 	require.NoError(t, err)
 	contractBech32Addr := parseInitResponse(t, res.Data)
 
+	data.ctx.MultiStore().GetKVStore(data.mptKey).(*mpt.MptStore).CommitterCommit(nil)
+
 	require.Equal(t, "0x5A8D648DEE57b2fc90D98DC17fa887159b69638b", contractBech32Addr)
 	// this should be standard x/wasm init event, nothing from contract
 	require.Equal(t, 3, len(res.Events), prettyEvents(res.Events))
@@ -245,6 +261,8 @@ func TestHandleExecute(t *testing.T) {
 	res, err = h(data.ctx, &initCmd)
 	require.NoError(t, err)
 	contractBech32Addr := parseInitResponse(t, res.Data)
+
+	data.ctx.MultiStore().GetKVStore(data.mptKey).(*mpt.MptStore).CommitterCommit(nil)
 
 	require.Equal(t, "0x5A8D648DEE57b2fc90D98DC17fa887159b69638b", contractBech32Addr)
 	// this should be standard x/wasm message event,  init event, plus a bank send event (2), with no custom contract events
@@ -366,6 +384,8 @@ func TestHandleExecuteEscrow(t *testing.T) {
 	require.NoError(t, err)
 	contractBech32Addr := parseInitResponse(t, res.Data)
 	require.Equal(t, "0x5A8D648DEE57b2fc90D98DC17fa887159b69638b", contractBech32Addr)
+
+	data.ctx.MultiStore().GetKVStore(data.mptKey).(*mpt.MptStore).CommitterCommit(nil)
 
 	handleMsg := map[string]interface{}{
 		"release": map[string]interface{}{},
@@ -582,4 +602,70 @@ func assertContractInfo(t *testing.T, q sdk.Querier, ctx sdk.Context, contractBe
 
 	assert.Equal(t, codeID, res.CodeID)
 	assert.Equal(t, creator.String(), res.Creator)
+}
+
+// accountStateRootRetriever should just used in test code
+type accountStateRootRetriever struct{}
+
+func (a accountStateRootRetriever) RetrieveStateRoot(bz []byte) common.Hash {
+	acc := decodeAccount("", bz)
+	return acc.GetStateRoot()
+}
+
+func (a accountStateRootRetriever) ModifyAccStateRoot(before []byte, rootHash common.Hash) []byte {
+	acc := decodeAccount("", before)
+	if bytes.Equal(acc.GetStateRoot().Bytes(), rootHash.Bytes()) {
+		return before
+	}
+
+	if eAcc, ok := acc.(interface{ SetStateRoot(hash common.Hash) }); ok {
+		eAcc.SetStateRoot(rootHash)
+	} else {
+		panic("unExcepted behavior: mpt store acc should implement SetStateRoot ")
+	}
+	return encodeAccount(acc)
+}
+
+func (a accountStateRootRetriever) GetAccStateRoot(rootBytes []byte) common.Hash {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (a accountStateRootRetriever) GetStateRootAndCodeHash(bz []byte) (common.Hash, []byte) {
+	acc := decodeAccount("", bz)
+
+	return acc.GetStateRoot(), acc.GetCodeHash()
+}
+
+func decodeAccount(key string, bz []byte) exported.Account {
+	val, err := auth.ModuleCdc.UnmarshalBinaryBareWithRegisteredUnmarshaller(bz, (*exported.Account)(nil))
+	if err == nil {
+		return val.(exported.Account)
+	}
+	var acc exported.Account
+	err = auth.ModuleCdc.UnmarshalBinaryBare(bz, &acc)
+	if err != nil {
+		fmt.Printf(" key(%s) value(%s) err(%s)\n", key, hexutils.BytesToHex(bz), err)
+		panic(err)
+	}
+	return acc
+}
+
+func encodeAccount(acc exported.Account) (bz []byte) {
+	var err error
+	if accSizer, ok := acc.(amino.MarshalBufferSizer); ok {
+		bz, err = auth.ModuleCdc.MarshalBinaryWithSizer(accSizer, false)
+		if err == nil {
+			return bz
+		}
+	}
+
+	bz, err = auth.ModuleCdc.MarshalBinaryBareWithRegisteredMarshaller(acc)
+	if err != nil {
+		bz, err = auth.ModuleCdc.MarshalBinaryBare(acc)
+	}
+	if err != nil {
+		panic(err)
+	}
+	return bz
 }
