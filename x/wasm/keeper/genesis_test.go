@@ -8,6 +8,7 @@ import (
 	"fmt"
 	chain "github.com/okx/okbchain/app/types"
 	"github.com/okx/okbchain/libs/cosmos-sdk/store/mpt"
+	sdktypes "github.com/okx/okbchain/libs/cosmos-sdk/store/types"
 	"github.com/okx/okbchain/libs/cosmos-sdk/x/auth"
 	authtypes "github.com/okx/okbchain/libs/cosmos-sdk/x/auth/types"
 	"io/ioutil"
@@ -46,6 +47,8 @@ func TestGenesisExportImport(t *testing.T) {
 
 	wasmKeeper.SetParams(srcCtx, types.DefaultParams())
 
+	accounts := make([]sdk.WasmAddress, 0)
+
 	for i := 0; i < 25; i++ {
 		var (
 			codeInfo          types.CodeInfo
@@ -82,6 +85,8 @@ func TestGenesisExportImport(t *testing.T) {
 		contractAddr := wasmKeeper.generateContractAddress(srcCtx, codeID)
 		wasmKeeper.storeContractInfo(srcCtx, contractAddr, &contract)
 		wasmKeeper.appendToContractHistory(srcCtx, contractAddr, history...)
+
+		accounts = append(accounts, contractAddr)
 
 		contractAccount := wasmKeeper.accountKeeper.NewAccountWithAddress(srcCtx, sdk.WasmToAccAddress(contractAddr))
 		wasmKeeper.accountKeeper.SetAccount(srcCtx, contractAccount)
@@ -133,7 +138,14 @@ func TestGenesisExportImport(t *testing.T) {
 	var importState wasmTypes.GenesisState
 	err = dstKeeper.cdc.GetProtocMarshal().UnmarshalJSON(exportedGenesis, &importState)
 	require.NoError(t, err)
+
+	for _, acc := range accounts {
+		contractAddr := dstKeeper.accountKeeper.NewAccountWithAddress(dstCtx, sdk.WasmToAccAddress(acc))
+		dstKeeper.accountKeeper.SetAccount(dstCtx, contractAddr)
+	}
+
 	InitGenesis(dstCtx, dstKeeper, importState, TestHandler(contractKeeper))
+	dstCtx.MultiStore().GetKVStore(dstStoreKeys[2]).(*mpt.MptStore).CommitterCommit(nil)
 
 	// compare whole DB
 	for j := range srcStoreKeys {
@@ -433,10 +445,18 @@ func TestGenesisInit(t *testing.T) {
 	}
 	for msg, spec := range specs {
 		t.Run(msg, func(t *testing.T) {
-			keeper, ctx, _ := setupKeeper(t)
+			keeper, ctx, storeKeys := setupKeeper(t)
 
 			require.NoError(t, types.ValidateGenesis(spec.src))
+			for _, contract := range spec.src.GetContracts() {
+				contractAccount := keeper.accountKeeper.NewAccountWithAddress(ctx, sdk.MustAccAddressFromBech32(contract.ContractAddress))
+				keeper.accountKeeper.SetAccount(ctx, contractAccount)
+			}
 			gotValidatorSet, gotErr := InitGenesis(ctx, keeper, spec.src, spec.msgHandlerMock.Handle)
+			if len(spec.src.GetContracts()) > 0 {
+				ctx.MultiStore().GetKVStore(storeKeys[2]).(*mpt.MptStore).CommitterCommit(nil)
+			}
+
 			if !spec.expSuccess {
 				require.Error(t, gotErr)
 				return
@@ -491,7 +511,7 @@ func TestImportContractWithCodeHistoryReset(t *testing.T) {
   {"id_key": "BGxhc3RDb250cmFjdElk", "value": "3"}
   ]
 }`
-	keeper, ctx, _ := setupKeeper(t)
+	keeper, ctx, storeKeys := setupKeeper(t)
 	contractKeeper := NewGovPermissionKeeper(keeper)
 
 	wasmCode, err := ioutil.ReadFile("./testdata/hackatom.wasm")
@@ -510,8 +530,11 @@ func TestImportContractWithCodeHistoryReset(t *testing.T) {
 	ctx.SetGasMeter(sdk.NewInfiniteGasMeter())
 
 	// when
+	contractAccount := keeper.accountKeeper.NewAccountWithAddress(ctx, sdk.MustAccAddressFromBech32("0x5A8D648DEE57b2fc90D98DC17fa887159b69638b"))
+	keeper.accountKeeper.SetAccount(ctx, contractAccount)
 	_, err = InitGenesis(ctx, keeper, importState, TestHandler(contractKeeper))
 	require.NoError(t, err)
+	ctx.MultiStore().GetKVStore(storeKeys[2]).(*mpt.MptStore).CommitterCommit(nil)
 
 	// verify wasm code
 	gotWasmCode, err := keeper.GetByteCode(ctx, 1)
@@ -613,8 +636,13 @@ func TestSupportedGenMsgTypes(t *testing.T) {
 	keepers.Faucet.Fund(ctx, myAddress, sdk.NewCoin(denom, sdk.NewInt(100)))
 
 	// when
-	_, err = InitGenesis(ctx, keeper, importState, TestHandler(keepers.ContractKeeper))
+	//	contractAccount := keeper.accountKeeper.NewAccountWithAddress(ctx, sdk.MustAccAddressFromBech32(BuildContractAddress(1, 1).String()))
+	//	keeper.accountKeeper.SetAccount(ctx, contractAccount)
+	handler := TestHandler(keepers.ContractKeeper)
+	ctx.MultiStore().GetKVStore(ctx.Value("mptStoreKey").(*sdktypes.KVStoreKey)).(*mpt.MptStore).CommitterCommit(nil)
+	_, err = InitGenesis(ctx, keeper, importState, handler)
 	require.NoError(t, err)
+	//	ctx.MultiStore().GetKVStore(ctx.Value("mptStoreKey").(*sdktypes.KVStoreKey)).(*mpt.MptStore).CommitterCommit(nil)
 
 	// verify code stored
 	gotWasmCode, err := keeper.GetByteCode(ctx, 1)
