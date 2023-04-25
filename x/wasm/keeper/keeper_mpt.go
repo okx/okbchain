@@ -15,29 +15,12 @@ import (
 
 func (k Keeper) getStorageStore(ctx sdk.Context, acc sdk.WasmAddress) sdk.KVStore {
 	account := k.accountKeeper.GetAccount(ctx, sdk.WasmToAccAddress(acc))
+	if account == nil && watcher.Enable() {
+		account = getAccount(acc)
+	}
 	ethAcc := common.BytesToAddress(acc.Bytes())
 
 	return k.ada.NewStore(ctx.GasMeter(), ctx.KVStore(k.storageStoreKey), mpt.AddressStoragePrefixMpt(ethAcc, account.GetStateRoot()))
-}
-
-// getStorageStoreWithWatch only for write watch db
-func (k Keeper) getStorageStoreWithWatch(ctx sdk.Context, acc sdk.WasmAddress) sdk.KVStore {
-	account := k.accountKeeper.GetAccount(ctx, sdk.WasmToAccAddress(acc))
-	ethAcc := common.BytesToAddress(acc.Bytes())
-
-	store := k.ada.NewStore(ctx.GasMeter(), ctx.KVStore(k.storageStoreKey), nil)
-	return prefix.NewStore(store, mpt.AddressStoragePrefixMpt(ethAcc, account.GetStateRoot()))
-}
-
-func (k Keeper) getStorageStoreW(ctx sdk.Context, acc sdk.WasmAddress) sdk.KVStore {
-	if watcher.Enable() {
-		account := getAccount(acc)
-		ethAcc := common.BytesToAddress(acc.Bytes())
-
-		store := k.ada.NewStore(ctx.GasMeter(), ctx.KVStore(k.storageStoreKey), nil)
-		return prefix.NewStore(store, mpt.AddressStoragePrefixMpt(ethAcc, account.GetStateRoot()))
-	}
-	return k.getStorageStore(ctx, acc)
 }
 
 func (k Keeper) GetStorageStore4Query(ctx sdk.Context, acc sdk.WasmAddress) sdk.KVStore {
@@ -48,12 +31,7 @@ func (k Keeper) GetStorageStore4Query(ctx sdk.Context, acc sdk.WasmAddress) sdk.
 		return prefix.NewStore(store, mpt.AddressStorageWithoutStorageRootPrefixMpt(ethAcc))
 	}
 
-	account := k.accountKeeper.GetAccount(ctx, sdk.WasmToAccAddress(acc))
-	ethAcc := common.BytesToAddress(acc.Bytes())
-
-	pre := mpt.AddressStoragePrefixMpt(ethAcc, account.GetStateRoot())
-
-	return prefix.NewStore(ctx.KVStore(k.storageStoreKey), pre)
+	return k.getStorageStore(ctx, acc)
 }
 
 var clientCtx clientcontext.CLIContext
