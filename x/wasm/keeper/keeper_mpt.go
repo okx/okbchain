@@ -3,6 +3,7 @@ package keeper
 import (
 	"fmt"
 	"github.com/ethereum/go-ethereum/common"
+	ethtypes "github.com/ethereum/go-ethereum/core/types"
 	apptypes "github.com/okx/okbchain/app/types"
 	clientcontext "github.com/okx/okbchain/libs/cosmos-sdk/client/context"
 	"github.com/okx/okbchain/libs/cosmos-sdk/store/mpt"
@@ -20,7 +21,14 @@ func (k Keeper) getStorageStore(ctx sdk.Context, acc sdk.WasmAddress) sdk.KVStor
 	}
 	ethAcc := common.BytesToAddress(acc.Bytes())
 
-	return k.ada.NewStore(ctx.GasMeter(), ctx.KVStore(k.storageStoreKey), mpt.AddressStoragePrefixMpt(ethAcc, account.GetStateRoot()))
+	// in case of query panic
+	var stateRoot common.Hash
+	if account == nil {
+		stateRoot = ethtypes.EmptyRootHash
+	} else {
+		stateRoot = account.GetStateRoot()
+	}
+	return k.ada.NewStore(ctx.GasMeter(), ctx.KVStore(k.storageStoreKey), mpt.AddressStoragePrefixMpt(ethAcc, stateRoot))
 }
 
 func (k Keeper) GetStorageStore4Query(ctx sdk.Context, acc sdk.WasmAddress) sdk.KVStore {
