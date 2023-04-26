@@ -3,6 +3,7 @@ package mpt
 import (
 	"bytes"
 	"fmt"
+	"github.com/ethereum/go-ethereum/common"
 	"testing"
 
 	"github.com/ethereum/go-ethereum/core/rawdb"
@@ -61,8 +62,42 @@ func TestStoreIterate(t *testing.T) {
 	}
 }
 
-func TestStoreReiterate(t *testing.T) {
-	// TODO for reiterate
+func TestMptStorageIterate(t *testing.T) {
+	for i, c := range cases {
+		t.Run(fmt.Sprintf("test-%d", i), func(t *testing.T) {
+
+			pre := AddressStoragePrefixMpt(common.HexToAddress("0xbbe4733d85bc2b90682147779da49cab38c0aa1f"), common.HexToHash("0xb4a40e844ee4c012d4a6d9e16d4ee8dcf52ef5042da491dbc73574f6764e17d1"))
+
+			start := cloneAppend(pre, []byte(fmt.Sprintf(keyFormat, 0)))
+			end := cloneAppend(pre, []byte(fmt.Sprintf(keyFormat, c.num)))
+
+			trie, realKvs := fullFillStore(c.num)
+			iter := newMptIterator(trie, start, end, c.ascending)
+			defer iter.Close()
+			count := 0
+			iKvs := make(map[string]string, c.num)
+			var beforeKey []byte
+			for ; iter.Valid(); iter.Next() {
+				require.NotNil(t, iter.Key())
+				_, _, curKey := decodeAddressStorageInfo(iter.Key())
+				iKvs[string(curKey)] = string(iter.Value())
+
+				count++
+				if len(beforeKey) > 0 {
+					if c.ascending {
+						require.Equal(t, bytes.Compare(beforeKey, curKey), -1)
+					} else {
+						require.Equal(t, bytes.Compare(beforeKey, curKey), 1)
+					}
+				}
+				beforeKey = curKey
+			}
+
+			require.EqualValues(t, realKvs, iKvs)
+			require.Equal(t, c.num, len(iKvs))
+			require.Equal(t, c.num, count)
+		})
+	}
 }
 
 func fullFillStore(num int) (ethstate.Trie, map[string]string) {

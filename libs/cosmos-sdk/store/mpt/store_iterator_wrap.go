@@ -70,7 +70,7 @@ func newWrapIteratorStorage(t ethstate.Trie, startIn, endIn []byte, ascending bo
 			//end is not included
 			continue
 		}
-		keys = append(keys, append(startIn[:minWasmStorageKeySize], key...))
+		keys = append(keys, cloneAppend(startIn[:minWasmStorageKeySize], key))
 	}
 	sort.Slice(keys, func(i, j int) bool {
 		if ascending {
@@ -86,6 +86,13 @@ func newWrapIteratorStorage(t ethstate.Trie, startIn, endIn []byte, ascending bo
 		cacheKeys:   keys,
 		isStorage:   true,
 	}
+}
+
+func cloneAppend(bz []byte, tail []byte) (res []byte) {
+	res = make([]byte, len(bz)+len(tail))
+	copy(res, bz)
+	copy(res[len(bz):], tail)
+	return
 }
 
 func (it *wrapIterator) Domain() ([]byte, []byte) {
