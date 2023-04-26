@@ -100,24 +100,16 @@ func TestMptStorageIterate(t *testing.T) {
 
 	for i, c := range testCases {
 		t.Run(fmt.Sprintf("test-%d", i), func(t *testing.T) {
-
 			pre := AddressStoragePrefixMpt(common.HexToAddress("0xbbe4733d85bc2b90682147779da49cab38c0aa1f"), common.HexToHash("0xb4a40e844ee4c012d4a6d9e16d4ee8dcf52ef5042da491dbc73574f6764e17d1"))
-
-			start := cloneAppend(pre, []byte(fmt.Sprintf(keyFormat, c.start)))
-			end := cloneAppend(pre, []byte(fmt.Sprintf(keyFormat, c.end)))
-
 			trie, _ := fullFillStore(c.num)
-			iter := newMptIterator(trie, start, end, c.ascending)
+			iter := newMptIterator(trie, cloneAppend(pre, []byte(fmt.Sprintf(keyFormat, c.start))),
+				cloneAppend(pre, []byte(fmt.Sprintf(keyFormat, c.end))), c.ascending)
 			defer iter.Close()
-			count := 0
 			iKvs := make(map[string]string, c.num)
 			var beforeKey []byte
 			for ; iter.Valid(); iter.Next() {
-				require.NotNil(t, iter.Key())
 				_, _, curKey := decodeAddressStorageInfo(iter.Key())
 				iKvs[string(curKey)] = string(iter.Value())
-
-				count++
 				if len(beforeKey) > 0 {
 					if c.ascending {
 						require.Equal(t, bytes.Compare(beforeKey, curKey), -1)
@@ -127,7 +119,6 @@ func TestMptStorageIterate(t *testing.T) {
 				}
 				beforeKey = curKey
 			}
-
 			require.Equal(t, c.resultCount, len(iKvs))
 		})
 	}
