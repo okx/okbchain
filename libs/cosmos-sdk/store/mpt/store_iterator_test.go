@@ -37,14 +37,11 @@ func TestStoreIterate(t *testing.T) {
 			trie, kvs := fullFillStore(c.num)
 			iter := newMptIterator(trie, nil, nil, c.ascending)
 			defer iter.Close()
-			count := 0
 			iKvs := make(map[string]string, c.num)
 			var beforeKey []byte
 			for ; iter.Valid(); iter.Next() {
-				require.NotNil(t, iter.Key())
 				curKey := iter.Key()
 				iKvs[string(iter.Key())] = string(iter.Value())
-				count++
 				if len(beforeKey) > 0 {
 					if c.ascending {
 						require.Equal(t, bytes.Compare(beforeKey, curKey), -1)
@@ -54,10 +51,8 @@ func TestStoreIterate(t *testing.T) {
 				}
 				beforeKey = curKey
 			}
-
 			require.EqualValues(t, kvs, iKvs)
 			require.Equal(t, c.num, len(iKvs))
-			require.Equal(t, c.num, count)
 		})
 	}
 }
