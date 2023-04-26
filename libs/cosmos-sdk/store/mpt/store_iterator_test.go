@@ -11,27 +11,27 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-var cases = []struct {
-	num       int
-	ascending bool
-}{
-	{0, true},
-	{1, true},
-	{2, true},
-	{100, true},
-	{1000, true},
-	{10000, true},
-	{0, false},
-	{1, false},
-	{2, false},
-	{100, false},
-	{1000, false},
-	{10000, false},
-}
-
 var keyFormat = "key-%08d"
 
 func TestStoreIterate(t *testing.T) {
+	cases := []struct {
+		num       int
+		ascending bool
+	}{
+		{0, true},
+		{1, true},
+		{2, true},
+		{100, true},
+		{1000, true},
+		{10000, true},
+		{0, false},
+		{1, false},
+		{2, false},
+		{100, false},
+		{1000, false},
+		{10000, false},
+	}
+
 	for i, c := range cases {
 		t.Run(fmt.Sprintf("test-%d", i), func(t *testing.T) {
 			trie, kvs := fullFillStore(c.num)
