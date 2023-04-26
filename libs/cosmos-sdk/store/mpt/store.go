@@ -861,3 +861,15 @@ func IsStorageKey(key []byte) bool {
 	}
 	return key[0] == keyPrefixStorageMpt && len(key) >= minWasmStorageKeySize
 }
+
+func IsNewStorageKey(key []byte) (ethcmn.Address, []byte, bool) {
+	if !IsStorageKey(key) {
+		return ethcmn.Address{}, nil, false
+	}
+	addr, stateRoot, realKey := decodeAddressStorageInfo(key)
+	if stateRoot == ethtypes.EmptyRootHash {
+		return addr, realKey, true
+	}
+
+	return ethcmn.Address{}, nil, false
+}
