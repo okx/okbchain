@@ -68,20 +68,34 @@ func TestMptStorageIterate(t *testing.T) {
 		start       int
 		end         int
 		resultCount int
+		ascending   bool
 	}{
-		{0, 0, 0, 0},
-		{1, 0, 0, 0},
-		{1, 1, 0, 0},
-		{2, 0, 0, 0},
-		{2, 1, 1, 0},
-		{2, 2, 1, 0},
-		{2, 3, 1, 0},
-		{100, 0, 0, 0},
-		{100, 0, 100, 100},
-		{100, 1, 100, 99},
-		{100, 50, 60, 10},
-		{100, 50, 50, 0},
-		{100, 51, 50, 0},
+		{0, 0, 0, 0, true},
+		{1, 0, 0, 0, true},
+		{1, 1, 0, 0, true},
+		{2, 0, 0, 0, true},
+		{2, 1, 1, 0, true},
+		{2, 2, 1, 0, true},
+		{2, 3, 1, 0, true},
+		{100, 0, 0, 0, true},
+		{100, 0, 100, 100, true},
+		{100, 1, 100, 99, true},
+		{100, 50, 60, 10, true},
+		{100, 50, 50, 0, true},
+		{100, 51, 50, 0, true},
+		{0, 0, 0, 0, false},
+		{1, 0, 0, 0, false},
+		{1, 1, 0, 0, false},
+		{2, 0, 0, 0, false},
+		{2, 1, 1, 0, false},
+		{2, 2, 1, 0, false},
+		{2, 3, 1, 0, false},
+		{100, 0, 0, 0, false},
+		{100, 0, 100, 100, false},
+		{100, 1, 100, 99, false},
+		{100, 50, 60, 10, false},
+		{100, 50, 50, 0, false},
+		{100, 51, 50, 0, false},
 	}
 
 	for i, c := range testCases {
@@ -93,7 +107,7 @@ func TestMptStorageIterate(t *testing.T) {
 			end := cloneAppend(pre, []byte(fmt.Sprintf(keyFormat, c.end)))
 
 			trie, _ := fullFillStore(c.num)
-			iter := newMptIterator(trie, start, end, false)
+			iter := newMptIterator(trie, start, end, c.ascending)
 			defer iter.Close()
 			count := 0
 			iKvs := make(map[string]string, c.num)
@@ -105,7 +119,11 @@ func TestMptStorageIterate(t *testing.T) {
 
 				count++
 				if len(beforeKey) > 0 {
-					require.Equal(t, bytes.Compare(beforeKey, curKey), 1)
+					if c.ascending {
+						require.Equal(t, bytes.Compare(beforeKey, curKey), -1)
+					} else {
+						require.Equal(t, bytes.Compare(beforeKey, curKey), 1)
+					}
 				}
 				beforeKey = curKey
 			}
