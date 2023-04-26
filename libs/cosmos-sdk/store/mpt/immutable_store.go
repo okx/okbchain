@@ -104,9 +104,9 @@ func (ms *ImmutableMptStore) Iterator(start, end []byte) types.Iterator {
 		addr, stateRoot, _ := decodeAddressStorageInfo(start)
 		t := ms.getStorageTrie(addr, stateRoot)
 
-		return newMptIterator(t, start, end)
+		return newMptIterator(t, start, end, true)
 	}
-	return newMptIterator(ms.db.CopyTrie(ms.trie), start, end)
+	return newMptIterator(ms.db.CopyTrie(ms.trie), start, end, true)
 }
 
 func (ms *ImmutableMptStore) ReverseIterator(start, end []byte) types.Iterator {
@@ -114,9 +114,9 @@ func (ms *ImmutableMptStore) ReverseIterator(start, end []byte) types.Iterator {
 		addr, stateRoot, _ := decodeAddressStorageInfo(start)
 		t := ms.getStorageTrie(addr, stateRoot)
 
-		return newMptIterator(t, start, end)
+		return newMptIterator(t, start, end, false)
 	}
-	return newMptIterator(ms.db.CopyTrie(ms.trie), start, end)
+	return newMptIterator(ms.db.CopyTrie(ms.trie), start, end, false)
 }
 
 func (ms *ImmutableMptStore) GetStoreType() types.StoreType {

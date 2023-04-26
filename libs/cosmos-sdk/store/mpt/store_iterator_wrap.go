@@ -18,14 +18,14 @@ type wrapIterator struct {
 	isStorage bool
 }
 
-func newWrapIterator(t ethstate.Trie, start, end []byte) *wrapIterator {
+func newWrapIterator(t ethstate.Trie, start, end []byte, ascending bool) *wrapIterator {
 	if IsStorageKey(start) {
-		return newWrapIteratorStorage(t, start, end)
+		return newWrapIteratorStorage(t, start, end, ascending)
 	}
-	return newWrapIteratorAcc(t, start, end)
+	return newWrapIteratorAcc(t, start, end, ascending)
 }
 
-func newWrapIteratorAcc(t ethstate.Trie, start, end []byte) *wrapIterator {
+func newWrapIteratorAcc(t ethstate.Trie, start, end []byte, ascending bool) *wrapIterator {
 	var keys [][]byte
 	mptIter := newOriginIterator(t, nil, nil)
 	for ; mptIter.Valid(); mptIter.Next() {
@@ -41,7 +41,10 @@ func newWrapIteratorAcc(t ethstate.Trie, start, end []byte) *wrapIterator {
 		keys = append(keys, key)
 	}
 	sort.Slice(keys, func(i, j int) bool {
-		return bytes.Compare(keys[i], keys[j]) < 0
+		if ascending {
+			return bytes.Compare(keys[i], keys[j]) < 0
+		}
+		return bytes.Compare(keys[i], keys[j]) >= 0
 	})
 
 	return &wrapIterator{
@@ -52,7 +55,7 @@ func newWrapIteratorAcc(t ethstate.Trie, start, end []byte) *wrapIterator {
 	}
 }
 
-func newWrapIteratorStorage(t ethstate.Trie, startIn, endIn []byte) *wrapIterator {
+func newWrapIteratorStorage(t ethstate.Trie, startIn, endIn []byte, ascending bool) *wrapIterator {
 	var keys [][]byte
 	_, _, start := decodeAddressStorageInfo(startIn)
 	_, _, end := decodeAddressStorageInfo(endIn)
@@ -67,10 +70,13 @@ func newWrapIteratorStorage(t ethstate.Trie, startIn, endIn []byte) *wrapIterato
 			//end is not included
 			continue
 		}
-		keys = append(keys, append(startIn[:minWasmStorageKeySize], key...))
+		keys = append(keys, cloneAppend(startIn[:minWasmStorageKeySize], key))
 	}
 	sort.Slice(keys, func(i, j int) bool {
-		return bytes.Compare(keys[i], keys[j]) < 0
+		if ascending {
+			return bytes.Compare(keys[i], keys[j]) < 0
+		}
+		return bytes.Compare(keys[i], keys[j]) >= 0
 	})
 
 	return &wrapIterator{
@@ -78,9 +84,15 @@ func newWrapIteratorStorage(t ethstate.Trie, startIn, endIn []byte) *wrapIterato
 		start:       startIn,
 		end:         endIn,
 		cacheKeys:   keys,
-
-		isStorage: true,
+		isStorage:   true,
 	}
+}
+
+func cloneAppend(bz []byte, tail []byte) (res []byte) {
+	res = make([]byte, len(bz)+len(tail))
+	copy(res, bz)
+	copy(res[len(bz):], tail)
+	return
 }
 
 func (it *wrapIterator) Domain() ([]byte, []byte) {
