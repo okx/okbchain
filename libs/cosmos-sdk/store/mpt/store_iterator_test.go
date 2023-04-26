@@ -3,9 +3,9 @@ package mpt
 import (
 	"bytes"
 	"fmt"
-	"github.com/ethereum/go-ethereum/common"
 	"testing"
 
+	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/rawdb"
 	ethstate "github.com/ethereum/go-ethereum/core/state"
 	"github.com/stretchr/testify/require"
