@@ -2,7 +2,6 @@ package wasm
 
 import (
 	"encoding/json"
-	"github.com/okx/okbchain/libs/cosmos-sdk/store/mpt"
 	"testing"
 
 	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
@@ -52,8 +51,6 @@ func TestInitGenesis(t *testing.T) {
 	require.NoError(t, err)
 	contractBech32Addr := parseInitResponse(t, res.Data)
 
-	data.ctx.MultiStore().GetKVStore(data.mptKey).(*mpt.MptStore).CommitterCommit(nil)
-
 	execCmd := MsgExecuteContract{
 		Sender:   fred.String(),
 		Contract: contractBech32Addr,
@@ -88,7 +85,6 @@ func TestInitGenesis(t *testing.T) {
 	contractAccount := newData.acctKeeper.NewAccountWithAddress(newData.ctx, sdk.MustAccAddressFromBech32(contractBech32Addr))
 	newData.acctKeeper.SetAccount(newData.ctx, contractAccount)
 	InitGenesis(newData.ctx, &newData.keeper, *genState, newData.module.NewHandler())
-	newData.ctx.MultiStore().GetKVStore(newData.mptKey).(*mpt.MptStore).CommitterCommit(nil)
 
 	// run same checks again on newdata, to make sure it was reinitialized correctly
 	assertCodeList(t, q2, newData.ctx, 1)

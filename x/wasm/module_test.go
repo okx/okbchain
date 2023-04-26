@@ -16,7 +16,6 @@ import (
 	"github.com/okx/okbchain/x/wasm/keeper/testdata"
 
 	"github.com/dvsekhvalnov/jose2go/base64url"
-	sdktypes "github.com/okx/okbchain/libs/cosmos-sdk/store/types"
 	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
 	"github.com/okx/okbchain/libs/cosmos-sdk/types/module"
 	authkeeper "github.com/okx/okbchain/libs/cosmos-sdk/x/auth/keeper"
@@ -45,8 +44,6 @@ type testData struct {
 	bankKeeper    bankkeeper.Keeper
 	stakingKeeper stakingkeeper.Keeper
 	faucet        *keeper.TestFaucet
-
-	mptKey *sdk.KVStoreKey
 }
 
 func setupTest(t *testing.T) testData {
@@ -61,8 +58,6 @@ func setupTest(t *testing.T) testData {
 		bankKeeper:    keepers.BankKeeper,
 		stakingKeeper: keepers.StakingKeeper,
 		faucet:        keepers.Faucet,
-
-		mptKey: ctx.Value("mptStoreKey").(*sdktypes.KVStoreKey),
 	}
 
 	return data
@@ -200,8 +195,6 @@ func TestHandleInstantiate(t *testing.T) {
 	require.NoError(t, err)
 	contractBech32Addr := parseInitResponse(t, res.Data)
 
-	data.ctx.MultiStore().GetKVStore(data.mptKey).(*mpt.MptStore).CommitterCommit(nil)
-
 	require.Equal(t, "0x5A8D648DEE57b2fc90D98DC17fa887159b69638b", contractBech32Addr)
 	// this should be standard x/wasm init event, nothing from contract
 	require.Equal(t, 3, len(res.Events), prettyEvents(res.Events))
@@ -261,8 +254,6 @@ func TestHandleExecute(t *testing.T) {
 	res, err = h(data.ctx, &initCmd)
 	require.NoError(t, err)
 	contractBech32Addr := parseInitResponse(t, res.Data)
-
-	data.ctx.MultiStore().GetKVStore(data.mptKey).(*mpt.MptStore).CommitterCommit(nil)
 
 	require.Equal(t, "0x5A8D648DEE57b2fc90D98DC17fa887159b69638b", contractBech32Addr)
 	// this should be standard x/wasm message event,  init event, plus a bank send event (2), with no custom contract events
@@ -384,8 +375,6 @@ func TestHandleExecuteEscrow(t *testing.T) {
 	require.NoError(t, err)
 	contractBech32Addr := parseInitResponse(t, res.Data)
 	require.Equal(t, "0x5A8D648DEE57b2fc90D98DC17fa887159b69638b", contractBech32Addr)
-
-	data.ctx.MultiStore().GetKVStore(data.mptKey).(*mpt.MptStore).CommitterCommit(nil)
 
 	handleMsg := map[string]interface{}{
 		"release": map[string]interface{}{},

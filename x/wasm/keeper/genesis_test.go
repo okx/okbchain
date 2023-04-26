@@ -8,7 +8,6 @@ import (
 	"fmt"
 	chain "github.com/okx/okbchain/app/types"
 	"github.com/okx/okbchain/libs/cosmos-sdk/store/mpt"
-	sdktypes "github.com/okx/okbchain/libs/cosmos-sdk/store/types"
 	"github.com/okx/okbchain/libs/cosmos-sdk/x/auth"
 	authtypes "github.com/okx/okbchain/libs/cosmos-sdk/x/auth/types"
 	"io/ioutil"
@@ -636,13 +635,8 @@ func TestSupportedGenMsgTypes(t *testing.T) {
 	keepers.Faucet.Fund(ctx, myAddress, sdk.NewCoin(denom, sdk.NewInt(100)))
 
 	// when
-	//	contractAccount := keeper.accountKeeper.NewAccountWithAddress(ctx, sdk.MustAccAddressFromBech32(BuildContractAddress(1, 1).String()))
-	//	keeper.accountKeeper.SetAccount(ctx, contractAccount)
-	handler := TestHandler(keepers.ContractKeeper)
-	ctx.MultiStore().GetKVStore(ctx.Value("mptStoreKey").(*sdktypes.KVStoreKey)).(*mpt.MptStore).CommitterCommit(nil)
-	_, err = InitGenesis(ctx, keeper, importState, handler)
+	_, err = InitGenesis(ctx, keeper, importState, TestHandler(keepers.ContractKeeper))
 	require.NoError(t, err)
-	//	ctx.MultiStore().GetKVStore(ctx.Value("mptStoreKey").(*sdktypes.KVStoreKey)).(*mpt.MptStore).CommitterCommit(nil)
 
 	// verify code stored
 	gotWasmCode, err := keeper.GetByteCode(ctx, 1)
