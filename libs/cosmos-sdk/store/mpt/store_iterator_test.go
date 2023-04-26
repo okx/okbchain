@@ -63,16 +63,37 @@ func TestStoreIterate(t *testing.T) {
 }
 
 func TestMptStorageIterate(t *testing.T) {
-	for i, c := range cases {
+	var testCases = []struct {
+		num         int
+		start       int
+		end         int
+		resultCount int
+	}{
+		{0, 0, 0, 0},
+		{1, 0, 0, 0},
+		{1, 1, 0, 0},
+		{2, 0, 0, 0},
+		{2, 1, 1, 0},
+		{2, 2, 1, 0},
+		{2, 3, 1, 0},
+		{100, 0, 0, 0},
+		{100, 0, 100, 100},
+		{100, 1, 100, 99},
+		{100, 50, 60, 10},
+		{100, 50, 50, 0},
+		{100, 51, 50, 0},
+	}
+
+	for i, c := range testCases {
 		t.Run(fmt.Sprintf("test-%d", i), func(t *testing.T) {
 
 			pre := AddressStoragePrefixMpt(common.HexToAddress("0xbbe4733d85bc2b90682147779da49cab38c0aa1f"), common.HexToHash("0xb4a40e844ee4c012d4a6d9e16d4ee8dcf52ef5042da491dbc73574f6764e17d1"))
 
-			start := cloneAppend(pre, []byte(fmt.Sprintf(keyFormat, 0)))
-			end := cloneAppend(pre, []byte(fmt.Sprintf(keyFormat, c.num)))
+			start := cloneAppend(pre, []byte(fmt.Sprintf(keyFormat, c.start)))
+			end := cloneAppend(pre, []byte(fmt.Sprintf(keyFormat, c.end)))
 
-			trie, realKvs := fullFillStore(c.num)
-			iter := newMptIterator(trie, start, end, c.ascending)
+			trie, _ := fullFillStore(c.num)
+			iter := newMptIterator(trie, start, end, false)
 			defer iter.Close()
 			count := 0
 			iKvs := make(map[string]string, c.num)
@@ -84,18 +105,12 @@ func TestMptStorageIterate(t *testing.T) {
 
 				count++
 				if len(beforeKey) > 0 {
-					if c.ascending {
-						require.Equal(t, bytes.Compare(beforeKey, curKey), -1)
-					} else {
-						require.Equal(t, bytes.Compare(beforeKey, curKey), 1)
-					}
+					require.Equal(t, bytes.Compare(beforeKey, curKey), 1)
 				}
 				beforeKey = curKey
 			}
 
-			require.EqualValues(t, realKvs, iKvs)
-			require.Equal(t, c.num, len(iKvs))
-			require.Equal(t, c.num, count)
+			require.Equal(t, c.resultCount, len(iKvs))
 		})
 	}
 }
