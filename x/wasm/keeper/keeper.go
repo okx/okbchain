@@ -109,7 +109,7 @@ func NewKeeper(
 	paramSpace paramtypes.Subspace,
 	accountKeeper types.AccountKeeper,
 	bankKeeper types.BankKeeper,
-//distKeeper types.DistributionKeeper,
+	//distKeeper types.DistributionKeeper,
 	channelKeeper types.ChannelKeeper,
 	portKeeper types.PortKeeper,
 	capabilityKeeper types.CapabilityKeeper,
@@ -482,7 +482,7 @@ func (k Keeper) instantiate(ctx sdk.Context, codeID uint64, creator, admin sdk.W
 
 	// create prefixed data store
 	// 0x00 | BuildContractAddress (sdk.WasmAddress) | stateRoot
-	prefixStore := k.getStorageStoreWithWatch(ctx, contractAddress)
+	prefixStore := k.getStorageStore(ctx, contractAddress)
 	prefixStoreAdapter := types.NewStoreAdapter(prefixStore)
 
 	// prepare querier
@@ -899,7 +899,7 @@ func (k Keeper) QueryRaw(ctx sdk.Context, contractAddress sdk.WasmAddress, key [
 	if key == nil {
 		return nil
 	}
-	prefixStore := k.getStorageStoreW(ctx, contractAddress)
+	prefixStore := k.getStorageStore(ctx, contractAddress)
 
 	return prefixStore.Get(key)
 }
@@ -919,7 +919,7 @@ func (k Keeper) contractInstance(ctx sdk.Context, contractAddress sdk.WasmAddres
 	}
 	var codeInfo types.CodeInfo
 	k.cdc.GetProtocMarshal().MustUnmarshal(codeInfoBz, &codeInfo)
-	prefixStore := k.getStorageStoreW(ctx, contractAddress)
+	prefixStore := k.getStorageStore(ctx, contractAddress)
 
 	return contractInfo, codeInfo, types.NewStoreAdapter(prefixStore), nil
 }

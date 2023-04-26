@@ -81,5 +81,7 @@ func (w *writeKVStore) Set(key, value []byte) {
 
 func (w *writeKVStore) Delete(key []byte) {
 	w.KVStore.Delete(key)
-	txStateCache = append(txStateCache, &WatchMessage{Key: key, IsDelete: true})
+
+	newKey := rmStorageRootFromWatchKey(key)
+	txStateCache = append(txStateCache, &WatchMessage{Key: newKey, IsDelete: true})
 }
