@@ -29,6 +29,8 @@ import (
 	"github.com/okx/okbchain/libs/tendermint/version"
 )
 
+var BatchEnable = false
+
 const (
 	// MaxHeaderBytes is a maximum header size (including amino overhead).
 	MaxHeaderBytes int64 = 632

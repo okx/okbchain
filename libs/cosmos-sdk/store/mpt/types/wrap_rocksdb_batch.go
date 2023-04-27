@@ -5,7 +5,7 @@ package types
 
 import (
 	"container/list"
-	tmstate "github.com/okx/okbchain/libs/tendermint/state"
+	tmtypes "github.com/okx/okbchain/libs/tendermint/types"
 	"sync"
 	"sync/atomic"
 
@@ -101,7 +101,7 @@ func NewWrapRocksDBBatch(db *tmdb.RocksDB) *WrapRocksDBBatch {
 }
 
 func (wrsdbb *WrapRocksDBBatch) Put(key []byte, value []byte) error {
-	if tmstate.BatchEnable {
+	if tmtypes.BatchEnable {
 		panic("runTx")
 	}
 	InstanceBatchCache().MoveToBack(wrsdbb.GetID())

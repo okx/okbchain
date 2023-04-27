@@ -26,8 +26,6 @@ type (
 	DeliverTxsExecMode int
 )
 
-var BatchEnable = false
-
 const (
 	DeliverTxsExecModeSerial   DeliverTxsExecMode = iota // execute [deliverTx,...] sequentially
 	DeliverTxsExecModeParallel                    = 2    // execute [deliverTx,...] parallel
@@ -241,9 +239,9 @@ func (blockExec *BlockExecutor) ApplyBlock(
 	//wait till the last block async write be saved
 	blockExec.tryWaitLastBlockSave(block.Height - 1)
 
-	BatchEnable = true
+	types.BatchEnable = true
 	abciResponses, duration, err := blockExec.runAbci(block, deltaInfo)
-	BatchEnable = false
+	types.BatchEnable = false
 
 	// publish event
 	if types.EnableEventBlockTime {
