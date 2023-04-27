@@ -275,13 +275,17 @@ func (k Keeper) SetEthBlockByHeight(ctx sdk.Context, height uint64, block types.
 	if err != nil {
 		panic(err)
 	}
-	k.db.TrieDB().DiskDB().Put(key, value)
+	st := ctx.KVStore(k.storeKey)
+	preKey := mpt.PutStoreKey(key)
+	st.Set(preKey, value)
 }
 
 func (k Keeper) GetEthBlockBytesByHeight(ctx sdk.Context, height uint64) ([]byte, bool) {
 	key := types.AppendBlockByHeightKey(height)
-	bz, err := k.db.TrieDB().DiskDB().Get(key)
-	if err != nil || len(bz) == 0 {
+	st := ctx.KVStore(k.storeKey)
+	preKey := mpt.PutStoreKey(key)
+	bz := st.Get(preKey)
+	if bz == nil || len(bz) == 0 {
 		return nil, false
 	}
 	return bz, true
@@ -293,13 +297,17 @@ func (k Keeper) SetEthBlockByHash(ctx sdk.Context, hash []byte, block types.Bloc
 	if err != nil {
 		panic(err)
 	}
-	k.db.TrieDB().DiskDB().Put(key, value)
+	st := ctx.KVStore(k.storeKey)
+	preKey := mpt.PutStoreKey(key)
+	st.Set(preKey, value)
 }
 
 func (k Keeper) GetEthBlockBytesByHash(ctx sdk.Context, hash []byte) ([]byte, bool) {
 	key := types.AppendBlockByHashKey(hash)
-	bz, err := k.db.TrieDB().DiskDB().Get(key)
-	if err != nil || len(bz) == 0 {
+	st := ctx.KVStore(k.storeKey)
+	preKey := mpt.PutStoreKey(key)
+	bz := st.Get(preKey)
+	if bz == nil || len(bz) == 0 {
 		return nil, false
 	}
 	return bz, true

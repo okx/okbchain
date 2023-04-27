@@ -7,7 +7,6 @@ import (
 	ethermint "github.com/okx/okbchain/app/types"
 
 	ethcmn "github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/core/rawdb"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/rlp"
 	"github.com/ethereum/go-ethereum/trie"
@@ -25,7 +24,10 @@ func (csdb *CommitStateDB) CommitMpt(prefetcher *mpt.TriePrefetcher) (ethcmn.Has
 		if obj := csdb.stateObjects[addr]; !obj.deleted {
 			// Write any contract code associated with the state object
 			if obj.code != nil && obj.dirtyCode {
-				rawdb.WriteCode(codeWriter, ethcmn.BytesToHash(obj.CodeHash()), obj.code)
+				st := csdb.ctx.KVStore(csdb.storeKey)
+				preKey := mpt.CodeStoreKey(ethcmn.Hash{}, obj.CodeHash())
+				st.Set(preKey, obj.code)
+				//rawdb.WriteCode(codeWriter, ethcmn.BytesToHash(obj.CodeHash()), obj.code)
 				obj.dirtyCode = false
 			}
 
@@ -83,23 +85,26 @@ func (csdb *CommitStateDB) ForEachStorageMpt(so *stateObject, cb func(key, value
 }
 
 func (csdb *CommitStateDB) GetCodeByHashInRawDB(hash ethcmn.Hash) []byte {
-	code, err := csdb.db.ContractCode(ethcmn.Hash{}, hash)
-	if err != nil {
-		return nil
-	}
+	st := csdb.ctx.KVStore(csdb.storeKey)
+	preKey := mpt.CodeStoreKey(ethcmn.Hash{}, hash.Bytes())
+	code := st.Get(preKey)
 
 	return code
 }
 
 func (csdb *CommitStateDB) setHeightHashInRawDB(height uint64, hash ethcmn.Hash) {
 	key := AppendHeightHashKey(height)
-	csdb.db.TrieDB().DiskDB().Put(key, hash.Bytes())
+	st := csdb.ctx.KVStore(csdb.storeKey)
+	preKey := mpt.PutStoreKey(key)
+	st.Set(preKey, hash.Bytes())
 }
 
 func (csdb *CommitStateDB) getHeightHashInRawDB(height uint64) ethcmn.Hash {
 	key := AppendHeightHashKey(height)
-	bz, err := csdb.db.TrieDB().DiskDB().Get(key)
-	if err != nil {
+	st := csdb.ctx.KVStore(csdb.storeKey)
+	preKey := mpt.PutStoreKey(key)
+	bz := st.Get(preKey)
+	if bz == nil || len(bz) == 0 {
 		return ethcmn.Hash{}
 	}
 	return ethcmn.BytesToHash(bz)

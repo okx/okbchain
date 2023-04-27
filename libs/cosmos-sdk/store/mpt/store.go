@@ -3,6 +3,7 @@ package mpt
 import (
 	"encoding/hex"
 	"fmt"
+	"github.com/ethereum/go-ethereum/ethdb"
 	"github.com/okx/okbchain/libs/system/trace/persist"
 	"io"
 	"sync"
@@ -88,6 +89,8 @@ type MptStore struct {
 
 	// for time statistics
 	statisticsBeginTime time.Time
+
+	bt ethdb.Batch
 }
 
 func (ms *MptStore) CommitterCommitMap(deltaMap iavl.TreeDeltaMap) (_ types.CommitID, _ iavl.TreeDeltaMap) {
@@ -227,7 +230,19 @@ func (ms *MptStore) Get(key []byte) []byte {
 		if err != nil {
 			return nil
 		}
-
+		return value
+	case codeType:
+		addrHash, codeHash := GetCodeStoreKey(key[1:])
+		value, err := ms.db.ContractCode(addrHash, ethcmn.BytesToHash(codeHash))
+		if err != nil {
+			return nil
+		}
+		return value
+	case putType:
+		value, err := ms.db.TrieDB().DiskDB().Get(key)
+		if err != nil {
+			return nil
+		}
 		return value
 	default:
 		panic(fmt.Errorf("not support key %s for mpt get", hex.EncodeToString(key)))
@@ -277,6 +292,12 @@ func (ms *MptStore) Set(key, value []byte) {
 	case addressType:
 		ms.trie.TryUpdate(key, value)
 		ms.updateSnapAccounts(key, value)
+	case codeType:
+		//ms.bt.Put()
+		rawdb.WriteCode(ms.bt, ethcmn.BytesToHash(key[1:]), value)
+	case putType:
+		ms.db.TrieDB().DiskDB().Put(key[1:], value)
+
 	default:
 		panic(fmt.Errorf("not support key %s for mpt set", hex.EncodeToString(key)))
 	}
@@ -776,6 +797,8 @@ func (ms *MptStore) SetUpgradeVersion(i int64) {}
 var (
 	keyPrefixStorageMpt  = byte(0)
 	keyPrefixAddrMpt     = byte(1) // TODO auth.AddressStoreKeyPrefix
+	keyPrefixCodeMpt     = byte(2)
+	keyPrefixPutMpt      = byte(3)
 	prefixSizeInMpt      = 1
 	storageKeySize       = prefixSizeInMpt + len(ethcmn.Address{}) + len(ethcmn.Hash{}) + len(ethcmn.Hash{})
 	addrKeySize          = prefixSizeInMpt + sdk.AddrLen
@@ -799,9 +822,24 @@ func AddressStoreKey(addr []byte) []byte {
 	return append([]byte{keyPrefixAddrMpt}, addr...)
 }
 
+func CodeStoreKey(addrHash ethcmn.Hash, codeHash []byte) []byte {
+	k := append(addrHash[:], codeHash...)
+	return append([]byte{keyPrefixCodeMpt}, k...)
+}
+
+func PutStoreKey(key []byte) []byte {
+	return append([]byte{keyPrefixPutMpt}, key...)
+}
+
+func GetCodeStoreKey(key []byte) (ethcmn.Hash, []byte) {
+	return ethcmn.BytesToHash(key[0:32]), key[32:]
+}
+
 var (
 	storageType = 0
 	addressType = 1
+	codeType    = 2
+	putType     = 3
 )
 
 /*
@@ -822,6 +860,10 @@ func mptKeyType(key []byte) int {
 			return storageType
 		}
 		return -1
+	case keyPrefixCodeMpt:
+		return codeType
+	case keyPrefixPutMpt:
+		return putType
 	default:
 		return -1
 
