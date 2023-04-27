@@ -3,6 +3,7 @@ package types
 import (
 	"errors"
 	"fmt"
+	"github.com/ethereum/go-ethereum/core/rawdb"
 
 	ethermint "github.com/okx/okbchain/app/types"
 
@@ -24,10 +25,10 @@ func (csdb *CommitStateDB) CommitMpt(prefetcher *mpt.TriePrefetcher) (ethcmn.Has
 		if obj := csdb.stateObjects[addr]; !obj.deleted {
 			// Write any contract code associated with the state object
 			if obj.code != nil && obj.dirtyCode {
-				st := csdb.ctx.KVStore(csdb.storeKey)
-				preKey := mpt.CodeStoreKey(ethcmn.Hash{}, obj.CodeHash())
-				st.Set(preKey, obj.code)
-				//rawdb.WriteCode(codeWriter, ethcmn.BytesToHash(obj.CodeHash()), obj.code)
+				//st := csdb.ctx.KVStore(csdb.storeKey)
+				//preKey := mpt.CodeStoreKey(ethcmn.Hash{}, obj.CodeHash())
+				//st.Set(preKey, obj.code)
+				rawdb.WriteCode(codeWriter, ethcmn.BytesToHash(obj.CodeHash()), obj.code)
 				obj.dirtyCode = false
 			}
 
