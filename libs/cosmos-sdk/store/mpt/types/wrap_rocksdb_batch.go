@@ -100,6 +100,9 @@ func NewWrapRocksDBBatch(db *tmdb.RocksDB) *WrapRocksDBBatch {
 }
 
 func (wrsdbb *WrapRocksDBBatch) Put(key []byte, value []byte) error {
+	if BatchEnable {
+		panic("runTx")
+	}
 	InstanceBatchCache().MoveToBack(wrsdbb.GetID())
 
 	wrsdbb.Set(key, value)
