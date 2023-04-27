@@ -85,10 +85,16 @@ func (so *stateObject) CodeInRawDB(db ethstate.Database) []byte {
 	if bytes.Equal(so.CodeHash(), emptyCodeHash) {
 		return nil
 	}
-	st := so.stateDB.ctx.KVStore(so.stateDB.storeKey)
-	preKey := mpt.CodeStoreKey(so.addrHash, so.CodeHash())
-	code := st.Get(preKey)
-	so.code = code
+	//st := so.stateDB.ctx.KVStore(so.stateDB.storeKey)
+	//preKey := mpt.CodeStoreKey(so.addrHash, so.CodeHash())
+	//code := st.Get(preKey)
+	//so.code = code
+	code, err := db.ContractCode(so.addrHash, ethcmn.BytesToHash(so.CodeHash()))
+	if err != nil {
+		so.setError(fmt.Errorf("can't load code hash %x: %v", so.CodeHash(), err))
+	} else {
+		so.code = code
+	}
 
 	return code
 }
@@ -224,10 +230,14 @@ func (so *stateObject) CodeSize(db ethstate.Database) int {
 	if bytes.Equal(so.CodeHash(), emptyCodeHash) {
 		return 0
 	}
-	st := so.stateDB.ctx.KVStore(so.stateDB.storeKey)
-	preKey := mpt.CodeStoreKey(so.addrHash, so.CodeHash())
-	code := st.Get(preKey)
-	size := len(code)
+	//st := so.stateDB.ctx.KVStore(so.stateDB.storeKey)
+	//preKey := mpt.CodeStoreKey(so.addrHash, so.CodeHash())
+	//code := st.Get(preKey)
+	//size := len(code)
+	size, err := db.ContractCodeSize(so.addrHash, ethcmn.BytesToHash(so.CodeHash()))
+	if err != nil {
+		so.setError(fmt.Errorf("can't load code size %x: %v", so.CodeHash(), err))
+	}
 	return size
 }
 

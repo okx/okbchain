@@ -239,7 +239,7 @@ func (ms *MptStore) Get(key []byte) []byte {
 		}
 		return value
 	case putType:
-		value, err := ms.db.TrieDB().DiskDB().Get(key)
+		value, err := ms.db.TrieDB().DiskDB().Get(key[1:])
 		if err != nil {
 			return nil
 		}
