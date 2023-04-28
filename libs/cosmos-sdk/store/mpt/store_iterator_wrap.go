@@ -2,6 +2,7 @@ package mpt
 
 import (
 	"bytes"
+	"fmt"
 	"sort"
 
 	ethstate "github.com/ethereum/go-ethereum/core/state"
@@ -55,12 +56,12 @@ func newWrapIteratorAcc(t ethstate.Trie, start, end []byte, ascending bool) *wra
 	}
 }
 
-// modifyStorageIteratorEnd prefix store traverse the storage
+// tryDecodeStorageIteratorEnd when prefix store traverse the storage with (nil,nil) we should modify the end
 // prefix.Store may give (nil,nil) as the iterator input.
 // prefix.Store may instead (nil, nil) to (prefix, prefix[:len(len(prefix)-1])
 // see prefix.Store.Iterator and prefix.cpIter for details
-func modifyStorageIteratorEnd(endIn []byte) []byte {
-	if len(endIn) == minWasmStorageKeySize-1 {
+func tryDecodeStorageIteratorEnd(endIn []byte) []byte {
+	if len(endIn) < minWasmStorageKeySize {
 		return nil
 	}
 	_, _, end := decodeAddressStorageInfo(endIn)
@@ -68,10 +69,23 @@ func modifyStorageIteratorEnd(endIn []byte) []byte {
 	return end
 }
 
-func newWrapIteratorStorage(t ethstate.Trie, startIn, endIn []byte, ascending bool) *wrapIterator {
-	var keys [][]byte
+// tryDecodeStorageIteratorStart check the start should great or equal to minWasmStorageKeySize
+func tryDecodeStorageIteratorStart(startIn []byte) []byte {
+	if len(startIn) < minWasmStorageKeySize {
+		panic(fmt.Sprintf("mpt storage iterator start len should at least %v", minWasmStorageKeySize))
+	}
 	_, _, start := decodeAddressStorageInfo(startIn)
-	end := modifyStorageIteratorEnd(endIn)
+
+	return start
+}
+
+func newWrapIteratorStorage(t ethstate.Trie, startIn, endIn []byte, ascending bool) *wrapIterator {
+	if len(startIn) == 0 || len(endIn) == 0 {
+		panic("mpt storage iterator start or end should not be nil")
+	}
+	var keys [][]byte
+	start := tryDecodeStorageIteratorStart(startIn)
+	end := tryDecodeStorageIteratorEnd(endIn)
 	mptIter := newOriginIterator(t, nil, nil)
 	for ; mptIter.Valid(); mptIter.Next() {
 		key := mptIter.Key()
