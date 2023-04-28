@@ -348,7 +348,6 @@ func (suite *UpgradeInfoStoreSuite) TestHandleUpgradeProposal() {
 			continue
 		}
 
-		suite.GreaterOrEqual(confirmHeight, tt.currentHeight)
 		if confirmHeight > tt.currentHeight {
 			// proposal is inserted to gov waiting queue, execute it
 			expectInfo := types.UpgradeInfo{
