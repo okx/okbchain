@@ -55,10 +55,23 @@ func newWrapIteratorAcc(t ethstate.Trie, start, end []byte, ascending bool) *wra
 	}
 }
 
+// modifyStorageIteratorEnd prefix store traverse the storage
+// prefix.Store may give (nil,nil) as the iterator input.
+// prefix.Store may instead (nil, nil) to (prefix, prefix[:len(len(prefix)-1])
+// see prefix.Store.Iterator and prefix.cpIter for details
+func modifyStorageIteratorEnd(endIn []byte) []byte {
+	if len(endIn) == minWasmStorageKeySize-1 {
+		return nil
+	}
+	_, _, end := decodeAddressStorageInfo(endIn)
+
+	return end
+}
+
 func newWrapIteratorStorage(t ethstate.Trie, startIn, endIn []byte, ascending bool) *wrapIterator {
 	var keys [][]byte
 	_, _, start := decodeAddressStorageInfo(startIn)
-	_, _, end := decodeAddressStorageInfo(endIn)
+	end := modifyStorageIteratorEnd(endIn)
 	mptIter := newOriginIterator(t, nil, nil)
 	for ; mptIter.Valid(); mptIter.Next() {
 		key := mptIter.Key()
