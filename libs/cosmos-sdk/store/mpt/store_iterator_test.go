@@ -157,5 +157,64 @@ func TestWrapIterator(t *testing.T) {
 		count2++
 	}
 	require.Equal(t, total-startIndex, count2)
+}
 
+// if prefix.Store's with (nil,nil) and prefix is end with 0xFF, then the end will be modified
+// eg. prefix.Store's prefix: [0x01,0x02,0x03,0x04,0x05,0xFF], we will iterate (nil,nil) then
+// the start and end will passed to it's parent as below:
+// start: [0x01,0x02,0x03,0x04,0x05,0xFF] end: [0x01,0x02,0x03,0x04,0x06]
+func TestPreIteratorEndIs0xFF(t *testing.T) {
+	var testCases = []struct {
+		num       int
+		ascending bool
+	}{
+		{100, true},
+		{100, false},
+	}
+
+	for _, c := range testCases {
+		start := AddressStoragePrefixMpt(common.HexToAddress("0xbbe4733d85bc2b90682147779da49cab38c0aa1f"), common.HexToHash("0xb4a40e844ee4c012d4a6d9e16d4ee8dcf52ef5042da491dbc73574f6764e17ff"))
+		end := AddressStoragePrefixMpt(common.HexToAddress("0xbbe4733d85bc2b90682147779da49cab38c0aa1f"), common.HexToHash("0xb4a40e844ee4c012d4a6d9e16d4ee8dcf52ef5042da491dbc73574f6764e17"))
+		end = end[:len(end)-1]
+		end[len(end)-1] = end[len(end)-1] + 1
+
+		trie, expect := fullFillStore(c.num)
+		iter := newMptIterator(trie, start, end, c.ascending)
+		defer iter.Close()
+		iKvs := make(map[string]string, c.num)
+		var beforeKey []byte
+		for ; iter.Valid(); iter.Next() {
+			_, _, curKey := decodeAddressStorageInfo(iter.Key())
+			iKvs[string(curKey)] = string(iter.Value())
+			if len(beforeKey) > 0 {
+				if c.ascending {
+					require.Equal(t, bytes.Compare(beforeKey, curKey), -1)
+				} else {
+					require.Equal(t, bytes.Compare(beforeKey, curKey), 1)
+				}
+			}
+			beforeKey = curKey
+		}
+		require.Equal(t, len(expect), len(iKvs))
+		require.EqualValues(t, expect, iKvs)
+	}
+}
+
+func TestNewWrapIteratorPanic(t *testing.T) {
+	pre := AddressStoragePrefixMpt(common.HexToAddress("0xbbe4733d85bc2b90682147779da49cab38c0aa1f"), common.HexToHash("0xb4a40e844ee4c012d4a6d9e16d4ee8dcf52ef5042da491dbc73574f6764e17ff"))
+	var testCases = []struct {
+		start       []byte
+		end         []byte
+		shouldPanic bool
+	}{
+		{pre, nil, true},
+		{nil, pre, true},
+		{pre[:len(pre)-1], pre, true},
+	}
+
+	for _, c := range testCases {
+		if c.shouldPanic {
+			require.Panics(t, func() { newWrapIteratorStorage(nil, c.start, c.end, true) })
+		}
+	}
 }
