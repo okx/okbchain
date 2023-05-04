@@ -158,9 +158,6 @@ run() {
     --chain-id ${CHAIN_ID} \
     --upload-delta=false \
     --enable-gid \
-    --mempool.max_gas_used_per_block=100000000 \
-    --mempool.enable-pgu=true \
-    --active-view-change=true \
     --consensus.timeout_commit 3800ms \
     --enable-blockpart-ack=false \
     --append-pid=true \
