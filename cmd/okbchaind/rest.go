@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/okx/okbchain/app"
 	"github.com/okx/okbchain/libs/cosmos-sdk/types/tx"
+	"github.com/okx/okbchain/x/wasm/keeper"
 	"github.com/okx/okbchain/x/wasm/proxy"
 
 	mintclient "github.com/okx/okbchain/libs/cosmos-sdk/x/mint/client"
@@ -41,6 +42,7 @@ func registerRoutes(rs *lcd.RestServer) {
 	registerRoutesV1(rs)
 	registerRoutesV2(rs)
 	proxy.SetCliContext(rs.CliCtx)
+	keeper.SetCliContext(rs.CliCtx)
 }
 
 func registerGrpc(rs *lcd.RestServer) {

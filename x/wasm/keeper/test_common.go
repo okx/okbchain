@@ -241,9 +241,14 @@ func createTestInput(
 		types.StoreKey,
 	)
 	ms := store.NewCommitMultiStore(db)
-	for _, v := range keys {
-		ms.MountStoreWithDB(v, sdk.StoreTypeIAVL, db)
+	for k, v := range keys {
+		if k == auth.StoreKey {
+			ms.MountStoreWithDB(v, sdk.StoreTypeMPT, db)
+		} else {
+			ms.MountStoreWithDB(v, sdk.StoreTypeIAVL, db)
+		}
 	}
+
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
 	for _, v := range tkeys {
 		ms.MountStoreWithDB(v, sdk.StoreTypeTransient, db)
@@ -256,7 +261,8 @@ func createTestInput(
 
 	require.NoError(t, ms.LoadLatestVersion())
 
-	ctx := sdk.NewContext(ms, tmproto.Header{
+	cacheMultiStore := ms.CacheMultiStore()
+	ctx := sdk.NewContext(cacheMultiStore, tmproto.Header{
 		Height: 1234567,
 		Time:   time.Date(2020, time.April, 22, 12, 0, 0, 0, time.UTC),
 	}, isCheckTx, log.NewNopLogger())
@@ -391,6 +397,7 @@ func createTestInput(
 	keeper := NewKeeper(
 		&appCodec,
 		keys[types.StoreKey],
+		keys[mpt.StoreKey],
 		subspace(types.ModuleName),
 		&accountKeeper,
 		bank.NewBankKeeperAdapter(bankKeeper),
@@ -419,7 +426,7 @@ func createTestInput(
 	configurator := module.NewConfigurator(legacyAmino, msgRouter, querier)
 	am.RegisterServices(configurator)
 	types.RegisterMsgServer(msgRouter, NewMsgServerImpl(NewDefaultPermissionKeeper(keeper)))
-	types.RegisterQueryServer(querier, NewGrpcQuerier(appCodec, keys[types.ModuleName], keeper, keeper.queryGasLimit))
+	types.RegisterQueryServer(querier, NewGrpcQuerier(appCodec, keys[types.ModuleName], keys[mpt.StoreKey], keeper, keeper.queryGasLimit))
 
 	govRouter := gov.NewRouter().
 		AddRoute(govtypes.RouterKey, govtypes.ProposalHandler).

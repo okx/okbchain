@@ -20,15 +20,16 @@ import (
 var _ types.QueryServer = &grpcQuerier{}
 
 type grpcQuerier struct {
-	cdc           codec.CodecProxy
-	storeKey      sdk.StoreKey
-	keeper        types.ViewKeeper
-	queryGasLimit sdk.Gas
+	cdc             codec.CodecProxy
+	storeKey        sdk.StoreKey
+	storageStoreKey sdk.StoreKey
+	keeper          types.ViewKeeper
+	queryGasLimit   sdk.Gas
 }
 
 // NewGrpcQuerier constructor
-func NewGrpcQuerier(cdc codec.CodecProxy, storeKey sdk.StoreKey, keeper types.ViewKeeper, queryGasLimit sdk.Gas) *grpcQuerier { //nolint:revive
-	return &grpcQuerier{cdc: cdc, storeKey: storeKey, keeper: keeper, queryGasLimit: queryGasLimit}
+func NewGrpcQuerier(cdc codec.CodecProxy, storeKey sdk.StoreKey, storageStoreKey sdk.StoreKey, keeper types.ViewKeeper, queryGasLimit sdk.Gas) *grpcQuerier { //nolint:revive
+	return &grpcQuerier{cdc: cdc, storeKey: storeKey, storageStoreKey: storageStoreKey, keeper: keeper, queryGasLimit: queryGasLimit}
 }
 
 func (q grpcQuerier) ContractInfo(c context.Context, req *types.QueryContractInfoRequest) (*types.QueryContractInfoResponse, error) {
@@ -130,7 +131,7 @@ func (q grpcQuerier) AllContractState(c context.Context, req *types.QueryAllCont
 	}
 
 	r := make([]types.Model, 0)
-	prefixStore := q.PrefixStore(c, types.GetContractStorePrefix(contractAddr))
+	prefixStore := q.keeper.GetStorageStore4Query(ctx, contractAddr)
 
 	pageRes, err := query.FilteredPaginate(prefixStore, req.Pagination, func(key []byte, value []byte, accumulate bool) (bool, error) {
 		if accumulate {
@@ -332,7 +333,7 @@ func (q grpcQuerier) PinnedCodes(c context.Context, req *types.QueryPinnedCodesR
 
 func (q grpcQuerier) UnwrapSDKContext(c context.Context) sdk.Context {
 	if watcher.Enable() {
-		return proxy.MakeContext(q.storeKey)
+		return proxy.MakeContext(q.storeKey, q.storageStoreKey)
 	}
 	return sdk.UnwrapSDKContext(c)
 }

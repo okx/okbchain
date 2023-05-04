@@ -95,7 +95,7 @@ killbyname() {
 init() {
   killbyname ${BIN_NAME}
 
-  (cd ${OKCHAIN_TOP} && make install VenusHeight=1)
+  (cd ${OKCHAIN_TOP} && make install EarthHeight=1)
 
   rm -rf cache
 
@@ -109,7 +109,7 @@ init() {
 }
 recover() {
   killbyname ${BIN_NAME}
-  (cd ${OKCHAIN_TOP} && make install VenusHeight=1)
+  (cd ${OKCHAIN_TOP} && make install EarthHeight=1)
   rm -rf cache
   cp -rf nodecache cache
 }
@@ -158,6 +158,9 @@ run() {
     --chain-id ${CHAIN_ID} \
     --upload-delta=false \
     --enable-gid \
+    --mempool.max_gas_used_per_block=100000000 \
+    --mempool.enable-pgu=true \
+    --active-view-change=true \
     --consensus.timeout_commit 3800ms \
     --enable-blockpart-ack=false \
     --append-pid=true \

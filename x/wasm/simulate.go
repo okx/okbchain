@@ -5,6 +5,7 @@ import (
 	"github.com/okx/okbchain/libs/cosmos-sdk/baseapp"
 	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
 	types2 "github.com/okx/okbchain/libs/cosmos-sdk/codec/types"
+	"github.com/okx/okbchain/libs/cosmos-sdk/store/mpt"
 	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
 	"github.com/okx/okbchain/libs/cosmos-sdk/x/bank"
 	"github.com/okx/okbchain/x/wasm/keeper"
@@ -23,7 +24,7 @@ type Simulator struct {
 func NewWasmSimulator() simulator.Simulator {
 	k := NewProxyKeeper()
 	h := NewHandler(keeper.NewDefaultPermissionKeeper(k))
-	ctx := proxy.MakeContext(k.GetStoreKey())
+	ctx := proxy.MakeContext(k.GetStoreKey(), k.GetStorageStoreKey())
 	return &Simulator{
 		handler: h,
 		k:       &k,
@@ -82,7 +83,7 @@ func NewProxyKeeper() keeper.Keeper {
 	queryRouter := baseapp.NewGRPCQueryRouter()
 	queryRouter.SetInterfaceRegistry(interfaceReg)
 
-	k := keeper.NewSimulateKeeper(codec.NewCodecProxy(protoCdc, cdc), getStoreKey(), ss, akp, bkp, nil, pkp, ckp, nil, msgRouter, queryRouter, WasmDir(), WasmConfig(), SupportedFeatures)
+	k := keeper.NewSimulateKeeper(codec.NewCodecProxy(protoCdc, cdc), getStoreKey(), getStorageStoreKey(), ss, akp, bkp, nil, pkp, ckp, nil, msgRouter, queryRouter, WasmDir(), WasmConfig(), SupportedFeatures)
 	types.RegisterMsgServer(msgRouter, keeper.NewMsgServerImpl(keeper.NewDefaultPermissionKeeper(k)))
 	types.RegisterQueryServer(queryRouter, NewQuerier(&k))
 	bank.RegisterBankMsgServer(msgRouter, bank.NewMsgServerImpl(bkp))
@@ -103,4 +104,19 @@ func getStoreKey() sdk.StoreKey {
 	)
 
 	return gStoreKey
+}
+
+var (
+	storageStoreKeyOnce sync.Once
+	gStorageStoreKey    sdk.StoreKey
+)
+
+func getStorageStoreKey() sdk.StoreKey {
+	storageStoreKeyOnce.Do(
+		func() {
+			gStorageStoreKey = sdk.NewKVStoreKey(mpt.StoreKey)
+		},
+	)
+
+	return gStorageStoreKey
 }
