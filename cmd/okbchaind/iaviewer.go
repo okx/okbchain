@@ -728,7 +728,7 @@ func printTree(ctx *iaviewerContext, tree *iavl.MutableTree) {
 		contractAddr := ethcmn.BytesToAddress(key[1:21])
 		contractKey := ethcmn.Bytes2Hex(hashKey(key[21:]))
 		finKey := contractAddr.String() + "_" + contractKey
-		fmt.Printf("%s,%s\n", finKey, ethcmn.Bytes2Hex(value))
+		fmt.Printf("%s,%s,-%s\n", finKey, ethcmn.Bytes2Hex(value), ethcmn.Bytes2Hex(key[21:]))
 		return false
 	})
 

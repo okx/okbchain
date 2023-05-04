@@ -69,7 +69,7 @@ func dumpStorage(height uint64) {
 
 		cItr := trie.NewIterator(contractTrie.NodeIterator(nil))
 		for cItr.Next() {
-			fmt.Printf("%s_%s,%s\n", addr, ethcmn.Bytes2Hex(cItr.Key), ethcmn.Bytes2Hex(cItr.Value))
+			fmt.Printf("%s_%s,%s,-%s\n", addr, ethcmn.Bytes2Hex(cItr.Key), ethcmn.Bytes2Hex(cItr.Value), ethcmn.Bytes2Hex(contractTrie.GetKey(cItr.Key)))
 		}
 	}
 }
