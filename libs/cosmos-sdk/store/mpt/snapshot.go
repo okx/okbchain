@@ -11,6 +11,8 @@ import (
 var (
 	gDisableSnapshot = false
 	gSnapshotRebuild = false
+
+	errSnapUnavaliable = fmt.Errorf("snap is unavaliable")
 )
 
 const (
@@ -135,7 +137,7 @@ func (ms *MptStore) updateSnapStorages(addr common.Address, key, bz []byte) {
 
 func (ms *MptStore) getSnapAccount(addr []byte) ([]byte, error) {
 	if ms.snap == nil {
-		return nil, fmt.Errorf("snap is unavaliable")
+		return nil, errSnapUnavaliable
 	}
 
 	addrHash := mpttypes.Keccak256HashWithSyncPool(addr)
@@ -162,7 +164,7 @@ func (ms *MptStore) getSnapAccount(addr []byte) ([]byte, error) {
 
 func (ms *MptStore) getSnapStorage(addr common.Address, key []byte) ([]byte, error) {
 	if ms.snap == nil {
-		return nil, fmt.Errorf("snap is unavaliable")
+		return nil, errSnapUnavaliable
 	}
 	addrHash := mpttypes.Keccak256HashWithSyncPool(AddressStoreKey(addr.Bytes()))
 	storageHash := mpttypes.Keccak256HashWithSyncPool(key[:])
@@ -188,7 +190,7 @@ func (ms *MptStore) getSnapStorage(addr common.Address, key []byte) ([]byte, err
 
 func (ms *MptStore) flattenPersistSnapshot() error {
 	if ms.snap == nil {
-		return fmt.Errorf("snap is unavaliable")
+		return errSnapUnavaliable
 	}
 	ms.snapRWLock.RLock()
 	defer ms.snapRWLock.RUnlock()
