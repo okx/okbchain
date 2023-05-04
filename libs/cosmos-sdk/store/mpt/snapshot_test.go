@@ -6,6 +6,7 @@ import (
 	"github.com/ethereum/go-ethereum/core/rawdb"
 	"github.com/ethereum/go-ethereum/core/state"
 	"github.com/ethereum/go-ethereum/ethdb/memorydb"
+	mpttypes "github.com/okx/okbchain/libs/cosmos-sdk/store/mpt/types"
 	tmlog "github.com/okx/okbchain/libs/tendermint/libs/log"
 	"github.com/stretchr/testify/require"
 	"testing"
@@ -43,4 +44,10 @@ func TestMptStoreSnapshotDeleteAccount(t *testing.T) {
 	mptStore.CommitterCommit(nil)
 	v := mptStore.Get(addr)
 	require.Nil(t, v)
+}
+
+func TestHash(t *testing.T) {
+	addr := common.FromHex("00126d656d626572735f5f6368616e67656c6f67002a30786262453437333364383562633262393036383231343737373944413439636142333843306141314600000000000001d0")
+	addrHash := mpttypes.Keccak256HashWithSyncPool(addr[:])
+	t.Log(addrHash)
 }

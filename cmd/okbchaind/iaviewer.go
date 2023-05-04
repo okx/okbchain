@@ -7,7 +7,6 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
-	mpttypes "github.com/okx/okbchain/libs/cosmos-sdk/store/mpt/types"
 	"os"
 	"sort"
 	"strconv"
@@ -727,7 +726,7 @@ func printTree(ctx *iaviewerContext, tree *iavl.MutableTree) {
 		// printKV(ctx.Codec, ctx.Prefix, key, value)
 
 		contractAddr := ethcmn.BytesToAddress(key[1:21])
-		contractKey := ethcmn.Bytes2Hex(mpttypes.Keccak256HashWithSyncPool(key[21:]).Bytes())
+		contractKey := ethcmn.Bytes2Hex(hashKey(key[21:]))
 		finKey := contractAddr.String() + "_" + contractKey
 		fmt.Printf("%s,%s\n", finKey, ethcmn.Bytes2Hex(value))
 		return false
