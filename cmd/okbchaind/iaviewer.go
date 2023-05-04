@@ -7,6 +7,7 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	mpttypes "github.com/okx/okbchain/libs/cosmos-sdk/store/mpt/types"
 	"os"
 	"sort"
 	"strconv"
@@ -214,6 +215,10 @@ func iaviewerReadCmd(ctx *iaviewerContext) *cobra.Command {
 	cmd.PersistentFlags().String(flagKey, "", "print only the value for this key, key must be in hex format.\n"+
 		"if specified, keyprefix, start and limit flags would be ignored")
 	cmd.PersistentFlags().String(flagKeyPrefix, "", "print values for keys with specified prefix, prefix must be in hex format.")
+	viper.BindPFlag(flagKeyPrefix, cmd.PersistentFlags().Lookup(flagKeyPrefix))
+	viper.BindPFlag(flagHex, cmd.PersistentFlags().Lookup(flagHex))
+	viper.BindPFlag(flagKey, cmd.PersistentFlags().Lookup(flagKey))
+
 	return cmd
 }
 
@@ -399,7 +404,7 @@ func iaviewerReadData(ctx *iaviewerContext) error {
 	if err != nil {
 		return fmt.Errorf("error reading data: %w", err)
 	}
-	fmt.Printf("module: %s, prefix key: %s\n\n", ctx.Module, ctx.Prefix)
+	// fmt.Printf("module: %s, prefix key: %s\n\n", ctx.Module, ctx.Prefix)
 
 	if key := viper.GetString(flagKey); key != "" {
 		keyByte, err := hex.DecodeString(key)
@@ -700,18 +705,18 @@ func printTree(ctx *iaviewerContext, tree *iavl.MutableTree) {
 	if tree.Size() <= int64(ctx.Start) {
 		return
 	}
-	printed := ctx.Limit
+	// printed := ctx.Limit
 	if ctx.Start != 0 {
 		startKey, _ = tree.GetByIndex(int64(ctx.Start))
 	}
 	if ctx.Limit != 0 && int64(ctx.Start+ctx.Limit) < tree.Size() {
 		endKey, _ = tree.GetByIndex(int64(ctx.Start + ctx.Limit))
 	} else {
-		printed = int(tree.Size()) - ctx.Start
+		// printed = int(tree.Size()) - ctx.Start
 	}
 
-	fmt.Printf("total: %d\n", total)
-	fmt.Printf("printed: %d\n\n", printed)
+	//fmt.Printf("total: %d\n", total)
+	//fmt.Printf("printed: %d\n\n", printed)
 
 	tree.IterateRange(startKey, endKey, true, func(key []byte, value []byte) bool {
 		if len(keyPrefix) != 0 {
@@ -719,7 +724,12 @@ func printTree(ctx *iaviewerContext, tree *iavl.MutableTree) {
 				return true
 			}
 		}
-		printKV(ctx.Codec, ctx.Prefix, key, value)
+		// printKV(ctx.Codec, ctx.Prefix, key, value)
+
+		contractAddr := ethcmn.BytesToAddress(key[1:21])
+		contractKey := ethcmn.Bytes2Hex(mpttypes.Keccak256HashWithSyncPool(key[21:]).Bytes())
+		finKey := contractAddr.String() + "_" + contractKey
+		fmt.Printf("%s,%s\n", finKey, ethcmn.Bytes2Hex(value))
 		return false
 	})
 
