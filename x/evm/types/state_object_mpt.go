@@ -165,14 +165,16 @@ func (so *stateObject) updateTrie(db ethstate.Database) (updated bool) {
 				}
 			}
 		}
+
+		delete(so.pendingStorage, key)
 	}
 	//if so.stateDB.prefetcher != nil {
 	//	so.stateDB.prefetcher.Used(so.account.StateRoot, usedStorage)
 	//}
 
-	if len(so.pendingStorage) > 0 {
-		so.pendingStorage = make(ethstate.Storage)
-	}
+	//if len(so.pendingStorage) > 0 {
+	//	so.pendingStorage = make(ethstate.Storage)
+	//}
 	return
 }
 
@@ -208,13 +210,13 @@ func (so *stateObject) finalise(prefetch bool) {
 	} else {
 		for key, value := range so.dirtyStorage {
 			so.pendingStorage[key] = value
-
+			delete(so.dirtyStorage, key)
 		}
 	}
 
-	if len(so.dirtyStorage) > 0 {
-		so.dirtyStorage = make(ethstate.Storage)
-	}
+	//if len(so.dirtyStorage) > 0 {
+	//	so.dirtyStorage = make(ethstate.Storage)
+	//}
 }
 
 // CodeSize returns the size of the contract code associated with this object,

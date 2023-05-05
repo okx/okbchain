@@ -37,13 +37,14 @@ func (csdb *CommitStateDB) CommitMpt(prefetcher *mpt.TriePrefetcher) (ethcmn.Has
 			//	csdb.accountKeeper.SetAccount(csdb.ctx, ethermintAccount)
 			//}
 
+			delete(csdb.stateObjectsDirty, addr)
 		}
 		//usedAddrs = append(usedAddrs, ethcmn.CopyBytes(addr[:])) // Copy needed for closure
 	}
 
-	if len(csdb.stateObjectsDirty) > 0 {
-		csdb.stateObjectsDirty = make(map[ethcmn.Address]struct{})
-	}
+	//if len(csdb.stateObjectsDirty) > 0 {
+	//	csdb.stateObjectsDirty = make(map[ethcmn.Address]struct{})
+	//}
 
 	if codeWriter.ValueSize() > 0 {
 		if err := codeWriter.Write(); err != nil {
