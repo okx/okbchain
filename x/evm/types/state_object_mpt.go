@@ -138,7 +138,7 @@ func (so *stateObject) updateTrie(db ethstate.Database) (updated bool) {
 	// Insert all the pending updates into the trie
 	ctx := &so.stateDB.ctx
 	store := so.stateDB.dbAdapter.NewStore(ctx.KVStore(so.stateDB.storeKey), mpt.AddressStoragePrefixMpt(so.address, so.account.StateRoot))
-	usedStorage := make([][]byte, 0, len(so.pendingStorage))
+	//	usedStorage := make([][]byte, 0, len(so.pendingStorage))
 	for key, value := range so.pendingStorage {
 		// Skip noop changes, persist actual changes
 		if value == so.originStorage[key] {
@@ -147,7 +147,7 @@ func (so *stateObject) updateTrie(db ethstate.Database) (updated bool) {
 		updated = true
 		so.originStorage[key] = value
 		copyKey := ethcmn.CopyBytes(key[:])
-		usedStorage = append(usedStorage) // Copy needed for closure
+		//		usedStorage = append(usedStorage) // Copy needed for closure
 		if (value == ethcmn.Hash{}) {
 			store.Delete(key[:])
 			if !so.stateDB.ctx.IsCheckTx() {
@@ -166,9 +166,9 @@ func (so *stateObject) updateTrie(db ethstate.Database) (updated bool) {
 			}
 		}
 	}
-	if so.stateDB.prefetcher != nil {
-		so.stateDB.prefetcher.Used(so.account.StateRoot, usedStorage)
-	}
+	//if so.stateDB.prefetcher != nil {
+	//	so.stateDB.prefetcher.Used(so.account.StateRoot, usedStorage)
+	//}
 
 	if len(so.pendingStorage) > 0 {
 		so.pendingStorage = make(ethstate.Storage)
@@ -208,6 +208,7 @@ func (so *stateObject) finalise(prefetch bool) {
 	} else {
 		for key, value := range so.dirtyStorage {
 			so.pendingStorage[key] = value
+
 		}
 	}
 

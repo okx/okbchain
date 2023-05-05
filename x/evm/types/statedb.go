@@ -879,7 +879,7 @@ func (csdb *CommitStateDB) Commit(deleteEmptyObjects bool) (ethcmn.Hash, error) 
 // removing the csdb destructed objects and clearing the journal as well as the
 // refunds.
 func (csdb *CommitStateDB) Finalise(deleteEmptyObjects bool) {
-	addressesToPrefetch := make([][]byte, 0, len(csdb.journal.dirties))
+	//	addressesToPrefetch := make([][]byte, 0, len(csdb.journal.dirties))
 	for addr := range csdb.journal.dirties {
 		obj, exist := csdb.stateObjects[addr]
 		if !exist {
@@ -902,7 +902,7 @@ func (csdb *CommitStateDB) Finalise(deleteEmptyObjects bool) {
 		// At this point, also ship the address off to the precacher. The precacher
 		// will start loading tries, and when the change is eventually committed,
 		// the commit-phase will be a lot faster
-		addressesToPrefetch = append(addressesToPrefetch, ethcmn.CopyBytes(addr[:])) // Copy needed for closure
+		//		addressesToPrefetch = append(addressesToPrefetch, ethcmn.CopyBytes(addr[:])) // Copy needed for closure
 	}
 	//TODO need to prefecth to acc trie
 
