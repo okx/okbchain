@@ -1,6 +1,7 @@
 package types
 
 import (
+	"encoding/hex"
 	"errors"
 	"fmt"
 
@@ -97,11 +98,14 @@ func (csdb *CommitStateDB) setHeightHashInRawDB(height uint64, hash ethcmn.Hash)
 }
 
 func (csdb *CommitStateDB) getHeightHashInRawDB(height uint64) ethcmn.Hash {
+
+	fmt.Println("getHeightHashInRawDB-start", height)
 	key := AppendHeightHashKey(height)
 	bz, err := csdb.db.TrieDB().DiskDB().Get(key)
 	if err != nil {
 		return ethcmn.Hash{}
 	}
+	fmt.Println("getHeightHashInRawDB-end", hex.EncodeToString(bz))
 	return ethcmn.BytesToHash(bz)
 }
 
