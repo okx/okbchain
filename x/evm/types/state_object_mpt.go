@@ -140,6 +140,7 @@ func (so *stateObject) updateTrie(db ethstate.Database) (updated bool) {
 	store := so.stateDB.dbAdapter.NewStore(ctx.KVStore(so.stateDB.storeKey), mpt.AddressStoragePrefixMpt(so.address, so.account.StateRoot))
 	usedStorage := make([][]byte, 0, len(so.pendingStorage))
 	for key, value := range so.pendingStorage {
+		fmt.Println("update-true", key.String(), value.String())
 		// Skip noop changes, persist actual changes
 		if value == so.originStorage[key] {
 			continue
