@@ -299,6 +299,7 @@ func (cs *State) scheduleRound0(rs *cstypes.RoundState) {
 	if GetActiveVC() && cs.privValidator != nil {
 		select {
 		case cs.preBlockTaskChan <- &preBlockTask{cs.Height, sleepDuration}:
+			cs.Logger.Debug("set preBlockTask chan")
 		default:
 		}
 
