@@ -253,11 +253,15 @@ func (st *Store) Has(key []byte) (exists bool) {
 }
 
 var myOnce sync.Once
+var myOnce1 sync.Once
 
 // Implements types.KVStore.
 func (st *Store) Delete(key []byte) {
-	k := ethcmn.Bytes2Hex(key)
-	if strings.Contains(k, "0f32B7Ec2448588C75AC45edF63256AE6F6A073C") {
+	k := strings.ToLower(ethcmn.Bytes2Hex(key))
+	myOnce1.Do(func() {
+		log.Printf("del %s\n", k)
+	})
+	if strings.Contains(k, "0f32b7ec2448588c75ac45edf63256ae6f6a073c") {
 		myOnce.Do(func() {
 			debug.PrintStack()
 			log.Printf("del %s\n", k)
