@@ -239,10 +239,12 @@ func (cs *State) finalizeCommit(height int64) {
 
 	cs.trc.Pin("%s", trace.ApplyBlock)
 
+	cs.Logger.Debug("begin iavl-ac")
 	if iavl.EnableAsyncCommit {
 		cs.handleCommitGapOffset(height)
 	}
 
+	cs.Logger.Debug("begin applyblock")
 	stateCopy, retainHeight, err = cs.blockExec.ApplyBlock(
 		stateCopy,
 		types.BlockID{Hash: block.Hash(), PartsHeader: blockParts.Header()},
@@ -256,6 +258,7 @@ func (cs *State) finalizeCommit(height int64) {
 		return
 	}
 
+	cs.Logger.Debug("begin iavl-gap")
 	//reset offset after commitGap
 	if iavl.EnableAsyncCommit &&
 		height%iavlcfg.DynamicConfig.GetCommitGapHeight() == iavl.GetFinalCommitGapOffset() {
@@ -279,6 +282,7 @@ func (cs *State) finalizeCommit(height int64) {
 	// must be called before we update state
 	cs.recordMetrics(height, block)
 
+	cs.Logger.Debug("begin updateToState")
 	// NewHeightStep!
 	cs.stateMtx.Lock()
 	cs.updateToState(stateCopy)
@@ -298,6 +302,7 @@ func (cs *State) finalizeCommit(height int64) {
 
 	cs.trc.Pin("%s", trace.Waiting)
 
+	cs.Logger.Debug("begin scheduleRound0")
 	// cs.StartTime is already set.
 	// Schedule Round0 to start soon.
 	cs.scheduleRound0(&cs.RoundState)
