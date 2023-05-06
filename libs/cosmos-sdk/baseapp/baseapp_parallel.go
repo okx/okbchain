@@ -173,13 +173,17 @@ func (app *BaseApp) ParallelTxs(txs [][]byte, onlyCalSender bool) []*abci.Respon
 		return make([]*abci.ResponseDeliverTx, 0)
 	}
 
+	app.logger.Error("ParallelTxs-base init")
 	pm := app.parallelTxManage
 	pm.init(txs, app.deliverState.ctx.BlockHeight(), app.deliverState.ms)
 
+	app.logger.Error("ParallelTxs-base getExtraDataByTxs")
 	app.getExtraDataByTxs(txs)
 
+	app.logger.Error("ParallelTxs-base calGroup")
 	app.calGroup()
 
+	app.logger.Error("ParallelTxs-base runTxs")
 	return app.runTxs()
 }
 
@@ -205,6 +209,7 @@ func (app *BaseApp) runTxs() []*abci.ResponseDeliverTx {
 		}
 		return false
 	}
+	app.logger.Error("runTxs prepare")
 	signal := make(chan int, 1)
 	rerunIdx := 0
 
@@ -265,6 +270,7 @@ func (app *BaseApp) runTxs() []*abci.ResponseDeliverTx {
 		}
 	}
 
+	app.logger.Error("runTxs startResultHandle")
 	pm.resultCb = asyncCb
 	pm.StartResultHandle()
 	for index := 0; index < len(pm.groupList); index++ {
@@ -275,6 +281,7 @@ func (app *BaseApp) runTxs() []*abci.ResponseDeliverTx {
 		pm.resultCh <- 0
 	}
 
+	app.logger.Error("runTxs wait cb")
 	//waiting for call back
 	<-signal
 
@@ -284,6 +291,7 @@ func (app *BaseApp) runTxs() []*abci.ResponseDeliverTx {
 	pm.alreadyEnd = true
 	pm.stop <- struct{}{}
 
+	app.logger.Error("runTxs fix logs")
 	// fix logs
 	app.feeChanged = true
 	app.feeCollector = app.parallelTxManage.currTxFee
@@ -334,8 +342,8 @@ func (app *BaseApp) endParallelTxs(txSize int) [][]byte {
 	return app.logFix(txs, logIndex, hasEnterEvmTx, errs, resp)
 }
 
-//we reuse the nonce that changed by the last async call
-//if last ante handler has been failed, we need rerun it ? or not?
+// we reuse the nonce that changed by the last async call
+// if last ante handler has been failed, we need rerun it ? or not?
 func (app *BaseApp) deliverTxWithCache(txIndex int) *executeResult {
 	app.parallelTxManage.currentRerunIndex = txIndex
 	defer func() {

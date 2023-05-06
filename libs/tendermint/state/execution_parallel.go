@@ -19,10 +19,12 @@ func execBlockOnProxyAppAsync(
 ) (*ABCIResponses, error) {
 	var validTxs, invalidTxs = 0, 0
 
+	logger.Error("execBlock prepare")
 	abciResponses := NewABCIResponses(block)
 
 	commitInfo, byzVals := getBeginBlockValidatorInfo(block, stateDB)
 
+	logger.Error("execBlock beginBlock")
 	// Begin block
 	var err error
 	abciResponses.BeginBlock, err = proxyAppConn.BeginBlockSync(abci.RequestBeginBlock{
@@ -36,6 +38,7 @@ func execBlockOnProxyAppAsync(
 		return nil, err
 	}
 
+	logger.Error("execBlock ParallelTxs")
 	abciResponses.DeliverTxs = proxyAppConn.ParallelTxs(transTxsToBytes(block.Txs), false)
 	for _, v := range abciResponses.DeliverTxs {
 		if v.Code == abci.CodeTypeOK {
@@ -45,6 +48,7 @@ func execBlockOnProxyAppAsync(
 		}
 	}
 
+	logger.Error("execBlock endBlock")
 	// End block.
 	abciResponses.EndBlock, err = proxyAppConn.EndBlockSync(abci.RequestEndBlock{
 		Height:     block.Height,

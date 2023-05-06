@@ -178,8 +178,10 @@ func (app *localClient) EndBlockAsync(req types.RequestEndBlock) *ReqRes {
 }
 
 func (app *localClient) ParallelTxs(txs [][]byte, onlyCalSender bool) []*types.ResponseDeliverTx {
+	app.Logger.Error("ParallelTxs before lock")
 	app.mtx.Lock()
 	defer app.mtx.Unlock()
+	app.Logger.Error("ParallelTxs after lock")
 	return app.Application.ParallelTxs(txs, onlyCalSender)
 }
 

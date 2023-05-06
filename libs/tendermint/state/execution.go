@@ -360,12 +360,14 @@ func (blockExec *BlockExecutor) runAbci(block *types.Block, deltaInfo *DeltaInfo
 		abciResponses = deltaInfo.abciResponses
 		duration = time.Now().Sub(t0)
 	} else {
+		blockExec.logger.Error("runAbci preRun")
 		pc := blockExec.prerunCtx
 		if pc.prerunTx {
 			abciResponses, duration, err = pc.getPrerunResult(block)
 		}
 
 		if abciResponses == nil {
+			blockExec.logger.Error("runAbci execBlock")
 			t0 := time.Now()
 			ctx := &executionTask{
 				logger:   blockExec.logger,
