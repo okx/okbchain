@@ -204,6 +204,7 @@ func (blockExec *BlockExecutor) ValidateBlock(state State, block *types.Block) e
 // It takes a blockID to avoid recomputing the parts hash.
 func (blockExec *BlockExecutor) ApplyBlock(
 	state State, blockID types.BlockID, block *types.Block) (State, int64, error) {
+	blockExec.logger.Error("ApplyBlock prepare")
 	if ApplyBlockPprofTime >= 0 {
 		f, t := PprofStart()
 		defer PprofEnd(int(block.Height), f, t)
@@ -226,19 +227,23 @@ func (blockExec *BlockExecutor) ApplyBlock(
 		blockExec.metrics.lastBlockTime = now
 	}()
 
+	blockExec.logger.Error("ApplyBlock ValidateBlock")
 	if err := blockExec.ValidateBlock(state, block); err != nil {
 		return state, 0, ErrInvalidBlock(err)
 	}
 
+	blockExec.logger.Error("ApplyBlock dds")
 	deltaInfo := dc.prepareStateDelta(block.Height)
 
 	trc.Pin(trace.Abci)
 
 	startTime := time.Now().UnixNano()
 
+	blockExec.logger.Error("ApplyBlock waitBlockSave")
 	//wait till the last block async write be saved
 	blockExec.tryWaitLastBlockSave(block.Height - 1)
 
+	blockExec.logger.Error("ApplyBlock abci")
 	abciResponses, duration, err := blockExec.runAbci(block, deltaInfo)
 
 	// publish event
@@ -261,6 +266,7 @@ func (blockExec *BlockExecutor) ApplyBlock(
 
 	fail.Fail() // XXX
 
+	blockExec.logger.Error("ApplyBlock saveABCIRsp")
 	// Save the results before we commit.
 	blockExec.trySaveABCIResponsesAsync(block.Height, abciResponses)
 
@@ -283,6 +289,7 @@ func (blockExec *BlockExecutor) ApplyBlock(
 		blockExec.logger.Info("Updates to validators", "updates", types.ValidatorListString(validatorUpdates))
 	}
 
+	blockExec.logger.Error("ApplyBlock updateState")
 	// Update the state with the block and responses.
 	state, err = updateState(state, blockID, &block.Header, abciResponses, validatorUpdates)
 	if err != nil {
@@ -292,6 +299,7 @@ func (blockExec *BlockExecutor) ApplyBlock(
 	trc.Pin(trace.Persist)
 	startTime = time.Now().UnixNano()
 
+	blockExec.logger.Error("ApplyBlock commit")
 	// Lock mempool, commit app state, update mempoool.
 	commitResp, retainHeight, err := blockExec.commit(state, block, deltaInfo, abciResponses.DeliverTxs, trc)
 	endTime = time.Now().UnixNano()
@@ -306,6 +314,7 @@ func (blockExec *BlockExecutor) ApplyBlock(
 
 	fail.Fail() // XXX
 
+	blockExec.logger.Error("ApplyBlock saveState")
 	trc.Pin("SaveState")
 	// Update the app hash and save the state.
 	state.AppHash = commitResp.Data
@@ -314,8 +323,10 @@ func (blockExec *BlockExecutor) ApplyBlock(
 	blockExec.logger.Debug("SaveState", "state", &state)
 	fail.Fail() // XXX
 
+	blockExec.logger.Error("ApplyBlock postAB")
 	dc.postApplyBlock(block.Height, deltaInfo, abciResponses, commitResp.DeltaMap, blockExec.isFastSync)
 
+	blockExec.logger.Error("ApplyBlock txIndex")
 	// Events are fired after everything else.
 	// NOTE: if we crash between Commit and Save, events wont be fired during replay
 	if !types.EnableEventBlockTime {
