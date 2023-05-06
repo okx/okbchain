@@ -1,10 +1,8 @@
 package baseapp
 
 import (
-	"encoding/hex"
 	"encoding/json"
 	"fmt"
-	cosmost "github.com/okx/okbchain/libs/cosmos-sdk/store/types"
 	"os"
 	"sort"
 	"strconv"
@@ -227,12 +225,12 @@ func (app *BaseApp) EndBlock(req abci.RequestEndBlock) (res abci.ResponseEndBloc
 		res = app.endBlocker(app.deliverState.ctx, req)
 	}
 
-	if app.deliverState.ms != nil && app.deliverState.ctx.BlockHeader().Height == 1100209 {
-		app.deliverState.ms.IteratorCache(true, func(key string, value []byte, isDirty bool, isDelete bool, storeKey cosmost.StoreKey) bool {
-			fmt.Println("dirty", hex.EncodeToString([]byte(key)), hex.EncodeToString(value))
-			return true
-		}, nil)
-	}
+	//if app.deliverState.ms != nil && app.deliverState.ctx.BlockHeader().Height == 1100209 {
+	//	app.deliverState.ms.IteratorCache(true, func(key string, value []byte, isDirty bool, isDelete bool, storeKey cosmost.StoreKey) bool {
+	//		fmt.Println("dirty", hex.EncodeToString([]byte(key)), hex.EncodeToString(value))
+	//		return true
+	//	}, nil)
+	//}
 	return
 }
 
