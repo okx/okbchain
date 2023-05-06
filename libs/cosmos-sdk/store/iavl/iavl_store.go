@@ -3,6 +3,7 @@ package iavl
 import (
 	"errors"
 	"fmt"
+	ethcmn "github.com/ethereum/go-ethereum/common"
 	"github.com/okx/okbchain/libs/cosmos-sdk/store/cachekv"
 	"github.com/okx/okbchain/libs/cosmos-sdk/store/flatkv"
 	"github.com/okx/okbchain/libs/cosmos-sdk/store/tracekv"
@@ -13,6 +14,9 @@ import (
 	tmkv "github.com/okx/okbchain/libs/tendermint/libs/kv"
 	dbm "github.com/okx/okbchain/libs/tm-db"
 	"io"
+	"log"
+	"runtime/debug"
+	"strings"
 	"sync"
 )
 
@@ -248,8 +252,18 @@ func (st *Store) Has(key []byte) (exists bool) {
 	return st.tree.Has(key)
 }
 
+var myOnce sync.Once
+
 // Implements types.KVStore.
 func (st *Store) Delete(key []byte) {
+	k := ethcmn.Bytes2Hex(key)
+	if strings.Contains(k, "0f32B7Ec2448588C75AC45edF63256AE6F6A073C") {
+		myOnce.Do(func() {
+			debug.PrintStack()
+			log.Printf("del %s\n", k)
+			panic("here")
+		})
+	}
 	st.tree.Remove(key)
 	st.deleteFlatKV(key)
 }
