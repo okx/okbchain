@@ -191,6 +191,7 @@ func (so *stateObject) SetState(db ethstate.Database, key, value ethcmn.Hash) {
 
 // setState sets a state with a prefixed key and value to the dirty storage.
 func (so *stateObject) setState(key, value ethcmn.Hash) {
+	fmt.Println("set Stat", key.String(), value.String())
 	so.dirtyStorage[key] = value
 }
 
