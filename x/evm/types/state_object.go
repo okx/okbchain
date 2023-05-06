@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io"
 	"math/big"
-	"runtime/debug"
 	"sync"
 
 	"github.com/VictoriaMetrics/fastcache"
@@ -194,7 +193,7 @@ func (so *stateObject) SetState(db ethstate.Database, key, value ethcmn.Hash) {
 func (so *stateObject) setState(key, value ethcmn.Hash) {
 	fmt.Println("set Stat", key.String(), value.String())
 	if key.String() == "0x964b2048765572bb96a7cffffc3596533d47bfcb2d0275eead9c46e3b61bb3a9" {
-		debug.PrintStack()
+		//debug.PrintStack()
 	}
 	so.dirtyStorage[key] = value
 }
