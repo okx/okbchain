@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"sort"
 
+	"github.com/ethereum/go-ethereum/common"
 	ethstate "github.com/ethereum/go-ethereum/core/state"
 )
 
@@ -69,7 +70,7 @@ func (it *wrapIterator) Value() []byte {
 	if !it.Valid() {
 		return nil
 	}
-	value, err := it.trie.TryGet(it.Key())
+	value, err := it.trie.GetStorage(common.Address{}, it.Key())
 	if err != nil {
 		return nil
 	}

@@ -145,7 +145,7 @@ func (st StateTransition) TransitionDb(ctx sdk.Context, config ChainConfig) (exe
 		}
 	}()
 
-	cost, err := core.IntrinsicGas(st.Payload, []ethtypes.AccessTuple{}, contractCreation, config.IsHomestead(), config.IsIstanbul())
+	cost, err := core.IntrinsicGas(st.Payload, []ethtypes.AccessTuple{}, contractCreation, config.IsHomestead(), config.IsIstanbul(), false)
 	if err != nil {
 		return exeRes, resData, sdkerrors.Wrap(err, "invalid intrinsic gas for transaction"), innerTxs, erc20Contracts
 	}
@@ -194,10 +194,10 @@ func (st StateTransition) TransitionDb(ctx sdk.Context, config ChainConfig) (exe
 	}
 	tracer := newTracer(ctx, st.TxHash)
 	vmConfig := vm.Config{
-		ExtraEips:               params.ExtraEIPs,
-		Debug:                   st.TraceTxLog,
-		Tracer:                  tracer,
-		ContractVerifier:        NewContractVerifier(params),
+		ExtraEips: params.ExtraEIPs,
+		//Debug:                   st.TraceTxLog,
+		Tracer: tracer,
+		//ContractVerifier:        NewContractVerifier(params),
 		EnablePreimageRecording: st.TraceTxLog,
 	}
 

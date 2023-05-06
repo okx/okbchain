@@ -3,6 +3,7 @@ package mpt
 import (
 	"encoding/hex"
 	"fmt"
+	"github.com/ethereum/go-ethereum/trie/trienode"
 	"github.com/okx/okbchain/libs/system/trace/persist"
 	"io"
 	"sync"
@@ -66,7 +67,7 @@ type MptStore struct {
 	trie                ethstate.Trie
 	storageTrieForWrite map[ethcmn.Address]ethstate.Trie
 	db                  ethstate.Database
-	triegc              *prque.Prque
+	triegc              *prque.Prque[int64, ethcmn.Hash]
 	logger              tmlog.Logger
 
 	prefetcher   *TriePrefetcher
@@ -116,7 +117,7 @@ func NewMptStore(logger tmlog.Logger, id types.CommitID) (*MptStore, error) {
 }
 
 func generateMptStore(logger tmlog.Logger, id types.CommitID, db ethstate.Database, retriever StateRootRetriever) (*MptStore, error) {
-	triegc := prque.New(nil)
+	triegc := prque.New[int64, ethcmn.Hash](nil)
 	mptStore := &MptStore{
 		storageTrieForWrite: make(map[ethcmn.Address]ethstate.Trie, 0),
 		db:                  db,
@@ -213,7 +214,7 @@ func (ms *MptStore) Get(key []byte) []byte {
 			return value
 		}
 		t := ms.tryGetStorageTrie(addr, stateRoot, false)
-		value, err = t.TryGet(realKey)
+		value, err = t.GetStorage(addr, realKey)
 		if err != nil {
 			return nil
 		}
@@ -223,7 +224,7 @@ func (ms *MptStore) Get(key []byte) []byte {
 		if err == nil {
 			return v
 		}
-		value, err := ms.db.CopyTrie(ms.trie).TryGet(key)
+		value, err := ms.db.CopyTrie(ms.trie).GetStorage(ethcmn.Address{}, key)
 		if err != nil {
 			return nil
 		}
@@ -244,9 +245,9 @@ func (ms *MptStore) tryGetStorageTrie(addr ethcmn.Address, stateRoot ethcmn.Hash
 	addrHash := mpttype.Keccak256HashWithSyncPool(addr[:])
 	var t ethstate.Trie
 	var err error
-	t, err = ms.db.OpenStorageTrie(addrHash, stateRoot)
+	t, err = ms.db.OpenStorageTrie(ms.originalRoot, addrHash, stateRoot)
 	if err != nil {
-		t, err = ms.db.OpenStorageTrie(addrHash, ethcmn.Hash{})
+		t, err = ms.db.OpenStorageTrie(ms.originalRoot, addrHash, ethcmn.Hash{})
 		if err != nil {
 			panic("unexcepted err")
 		}
@@ -272,10 +273,10 @@ func (ms *MptStore) Set(key, value []byte) {
 	case storageType:
 		addr, stateRoot, realKey := decodeAddressStorageInfo(key)
 		t := ms.tryGetStorageTrie(addr, stateRoot, true)
-		t.TryUpdate(realKey, value)
+		t.UpdateStorage(addr, realKey, value)
 		ms.updateSnapStorages(addr, realKey, value)
 	case addressType:
-		ms.trie.TryUpdate(key, value)
+		ms.trie.UpdateStorage(ethcmn.Address{}, key, value)
 		ms.updateSnapAccounts(key, value)
 	default:
 		panic(fmt.Errorf("not support key %s for mpt set", hex.EncodeToString(key)))
@@ -292,10 +293,10 @@ func (ms *MptStore) Delete(key []byte) {
 	case storageType:
 		addr, stateRoot, realKey := decodeAddressStorageInfo(key)
 		t := ms.tryGetStorageTrie(addr, stateRoot, true)
-		t.TryDelete(realKey)
+		t.DeleteStorage(addr, realKey)
 		ms.updateSnapStorages(addr, realKey, nil)
 	case addressType:
-		ms.trie.TryDelete(key)
+		ms.trie.DeleteStorage(ethcmn.Address{}, key)
 		ms.updateDestructs(key)
 	default:
 		panic(fmt.Errorf("not support key %s for mpt delete", hex.EncodeToString(key)))
@@ -314,67 +315,66 @@ func (ms *MptStore) ReverseIterator(start, end []byte) types.Iterator {
 /*
 *  implement CommitStore, CommitKVStore
  */
-func (ms *MptStore) commitStorageWithDelta(storageDelta []*trie.StorageDelta, nodeSets *trie.MergedNodeSet) {
-	if storageDelta == nil || len(storageDelta) == 0 {
-		return
-	}
-	for _, storage := range storageDelta {
-		addr := storage.Addr
-		addrHash := mpttype.Keccak256HashWithSyncPool(addr[:])
-		stateRoot := ms.retriever.GetAccStateRoot(storage.PreAcc)
-		t, err := ms.db.OpenStorageTrie(addrHash, stateRoot)
-		if err != nil {
-			panic(err)
-		}
-		_, set, err := t.CommitWithDelta(storage.NodeDelta, false)
-		if set != nil {
-			if err := nodeSets.Merge(set); err != nil {
-				panic("fail to commit trie data(storage nodeSets merge): " + err.Error())
-			}
-		}
-	}
+func (ms *MptStore) commitStorageWithDelta(storageDelta []*trie.StorageDelta, nodeSets *trienode.MergedNodeSet) {
+	//if storageDelta == nil || len(storageDelta) == 0 {
+	//	return
+	//}
+	//for _, storage := range storageDelta {
+	//	addr := storage.Addr
+	//	addrHash := mpttype.Keccak256HashWithSyncPool(addr[:])
+	//	stateRoot := ms.retriever.GetAccStateRoot(storage.PreAcc)
+	//	t, err := ms.db.OpenStorageTrie(addrHash, stateRoot)
+	//	if err != nil {
+	//		panic(err)
+	//	}
+	//	_, set, err := t.CommitWithDelta(storage.NodeDelta, false)
+	//	if set != nil {
+	//		if err := nodeSets.Merge(set); err != nil {
+	//			panic("fail to commit trie data(storage nodeSets merge): " + err.Error())
+	//		}
+	//	}
+	//}
+	panic("unsupport commitStorageWithDelta")
 }
 
-func (ms *MptStore) commitStorageForDelta(nodeSets *trie.MergedNodeSet) []*trie.StorageDelta {
-	storageDelta := make([]*trie.StorageDelta, 0, len(ms.storageTrieForWrite))
-	for addr, v := range ms.storageTrieForWrite {
-		stateR, set, outStorageDelta, err := v.CommitForDelta(false)
-		if err != nil {
-			panic(fmt.Errorf("unexcepted err:%v while commit storage tire ", err))
-		}
-		key := AddressStoreKey(addr.Bytes())
-		preValue, err := ms.trie.TryGet(key)
-		if err == nil { // maybe acc already been deleted
-			newValue := ms.retriever.ModifyAccStateRoot(preValue, stateR)
-			if err := ms.trie.TryUpdate(key, newValue); err != nil {
-				panic(fmt.Errorf("unexcepted err:%v while update acc %s ", err, addr.String()))
-			}
-			ms.updateSnapAccounts(key, newValue)
-		} else {
-			panic(fmt.Errorf("unexcepted err:%v while update get acc %s ", err, addr.String()))
-		}
-		if set != nil {
-			if err := nodeSets.Merge(set); err != nil {
-				panic("fail to commit trie data(storage nodeSets merge): " + err.Error())
-			}
-		}
-		storageDelta = append(storageDelta, &trie.StorageDelta{Addr: addr, PreAcc: preValue, NodeDelta: outStorageDelta})
-		delete(ms.storageTrieForWrite, addr)
-	}
-	return storageDelta
+func (ms *MptStore) commitStorageForDelta(nodeSets *trienode.MergedNodeSet) []*trie.StorageDelta {
+	//storageDelta := make([]*trie.StorageDelta, 0, len(ms.storageTrieForWrite))
+	//for addr, v := range ms.storageTrieForWrite {
+	//	stateR, set, outStorageDelta, err := v.CommitForDelta(false)
+	//	if err != nil {
+	//		panic(fmt.Errorf("unexcepted err:%v while commit storage tire ", err))
+	//	}
+	//	key := AddressStoreKey(addr.Bytes())
+	//	preValue, err := ms.trie.TryGet(key)
+	//	if err == nil { // maybe acc already been deleted
+	//		newValue := ms.retriever.ModifyAccStateRoot(preValue, stateR)
+	//		if err := ms.trie.TryUpdate(key, newValue); err != nil {
+	//			panic(fmt.Errorf("unexcepted err:%v while update acc %s ", err, addr.String()))
+	//		}
+	//		ms.updateSnapAccounts(key, newValue)
+	//	} else {
+	//		panic(fmt.Errorf("unexcepted err:%v while update get acc %s ", err, addr.String()))
+	//	}
+	//	if set != nil {
+	//		if err := nodeSets.Merge(set); err != nil {
+	//			panic("fail to commit trie data(storage nodeSets merge): " + err.Error())
+	//		}
+	//	}
+	//	storageDelta = append(storageDelta, &trie.StorageDelta{Addr: addr, PreAcc: preValue, NodeDelta: outStorageDelta})
+	//	delete(ms.storageTrieForWrite, addr)
+	//}
+	//return storageDelta
+	panic("unsupport commitStorageForDelta")
 }
 
-func (ms *MptStore) commitStorage(nodeSets *trie.MergedNodeSet) {
+func (ms *MptStore) commitStorage(nodeSets *trienode.MergedNodeSet) {
 	for addr, v := range ms.storageTrieForWrite {
-		stateR, set, err := v.Commit(false)
-		if err != nil {
-			panic(fmt.Errorf("unexcepted err:%v while commit storage tire ", err))
-		}
+		stateR, set := v.Commit(false)
 		key := AddressStoreKey(addr.Bytes())
-		preValue, err := ms.trie.TryGet(key)
+		preValue, err := ms.trie.GetStorage(ethcmn.Address{}, key)
 		if err == nil { // maybe acc already been deleted
 			newValue := ms.retriever.ModifyAccStateRoot(preValue, stateR)
-			if err := ms.trie.TryUpdate(key, newValue); err != nil {
+			if err := ms.trie.UpdateStorage(ethcmn.Address{}, key, newValue); err != nil {
 				panic(fmt.Errorf("unexcepted err:%v while update acc %s ", err, addr.String()))
 			}
 			ms.updateSnapAccounts(key, newValue)
@@ -395,30 +395,30 @@ func (ms *MptStore) CommitterCommit(inputDelta interface{}) (rootHash types.Comm
 
 	// stop pre round prefetch
 	ms.StopPrefetcher()
-	nodeSets := trie.NewMergedNodeSet()
+	nodeSets := trienode.NewMergedNodeSet()
 
 	var root ethcmn.Hash
-	var set *trie.NodeSet
-	var err error
-	if applyDelta && inputDelta != nil {
-		delta, ok := inputDelta.(*trie.MptDelta)
-		if !ok {
-			panic(fmt.Sprintf("wrong input delta of mpt. delta: %v", inputDelta))
-		}
-		ms.commitStorageWithDelta(delta.Storage, nodeSets)
-		root, set, err = ms.trie.CommitWithDelta(delta.NodeDelta, true)
-	} else if produceDelta {
-		var outputNodeDelta []*trie.NodeDelta
-		outStorage := ms.commitStorageForDelta(nodeSets)
-		root, set, outputNodeDelta, err = ms.trie.CommitForDelta(true)
-		outputDelta = &trie.MptDelta{NodeDelta: outputNodeDelta, Storage: outStorage}
-	} else {
-		ms.commitStorage(nodeSets)
-		root, set, err = ms.trie.Commit(true)
-	}
-	if err != nil {
-		panic("fail to commit trie data(acc_trie.Commit): " + err.Error())
-	}
+	var set *trienode.NodeSet
+	//var err error
+	//if applyDelta && inputDelta != nil {
+	//	delta, ok := inputDelta.(*trie.MptDelta)
+	//	if !ok {
+	//		panic(fmt.Sprintf("wrong input delta of mpt. delta: %v", inputDelta))
+	//	}
+	//	ms.commitStorageWithDelta(delta.Storage, nodeSets)
+	//	root, set, err = ms.trie.CommitWithDelta(delta.NodeDelta, true)
+	//} else if produceDelta {
+	//	var outputNodeDelta []*trie.NodeDelta
+	//	outStorage := ms.commitStorageForDelta(nodeSets)
+	//	root, set, outputNodeDelta, err = ms.trie.CommitForDelta(true)
+	//	outputDelta = &trie.MptDelta{NodeDelta: outputNodeDelta, Storage: outStorage}
+	//} else {
+	ms.commitStorage(nodeSets)
+	root, set = ms.trie.Commit(true)
+	//}
+	//if err != nil {
+	//	panic("fail to commit trie data(acc_trie.Commit): " + err.Error())
+	//}
 
 	if set != nil {
 		if err := nodeSets.Merge(set); err != nil {
@@ -426,7 +426,7 @@ func (ms *MptStore) CommitterCommit(inputDelta interface{}) (rootHash types.Comm
 		}
 	}
 
-	if err := ms.db.TrieDB().UpdateForOK(nodeSets, AccountStateRootRetriever.RetrieveStateRoot); err != nil {
+	if err := ms.db.TrieDB().UpdateForOK(root, ethcmn.Hash{}, nodeSets, AccountStateRootRetriever.RetrieveStateRoot); err != nil {
 		panic("fail to commit trie data (UpdateForOK): " + err.Error())
 	}
 	ms.SetMptRootHash(uint64(ms.version), root)
@@ -471,16 +471,18 @@ func (ms *MptStore) GetDBReadCount() int {
 }
 
 func (ms *MptStore) GetNodeReadCount() int {
-	return ms.db.TrieDB().GetNodeReadCount()
+	//return ms.db.TrieDB().GetNodeReadCount()
+	return 0
 }
 
 func (ms *MptStore) GetCacheReadCount() int {
-	return ms.db.TrieDB().GetCacheReadCount()
+	//return ms.db.TrieDB().GetCacheReadCount()
+	return 0
 }
 
 func (ms *MptStore) ResetCount() {
 	gStatic.resetCount()
-	ms.db.TrieDB().ResetCount()
+	//ms.db.TrieDB().ResetCount()
 }
 
 func (ms *MptStore) GetDBReadTime() int {
@@ -514,7 +516,7 @@ func (ms *MptStore) fullNodePersist(curMptRoot ethcmn.Hash, curHeight int64) {
 	if curMptRoot == (ethcmn.Hash{}) || curMptRoot == ethtypes.EmptyRootHash {
 		curMptRoot = ethcmn.Hash{}
 	} else {
-		if err := ms.db.TrieDB().Commit(curMptRoot, false, nil); err != nil {
+		if err := ms.db.TrieDB().Commit(curMptRoot, false); err != nil {
 			panic("fail to commit mpt data: " + err.Error())
 		}
 		ms.commitSnap(curMptRoot)
@@ -551,7 +553,7 @@ func (ms *MptStore) otherNodePersist(curMptRoot ethcmn.Hash, curHeight int64) {
 		} else {
 			// Flush an entire trie and restart the counters, it's not a thread safe process,
 			// cannot use a go thread to run, or it will lead 'fatal error: concurrent map read and map write' error
-			if err := triedb.Commit(chRoot, true, nil); err != nil {
+			if err := triedb.Commit(chRoot, true); err != nil {
 				panic("fail to commit mpt data: " + err.Error())
 			}
 			ms.commitSnap(chRoot)
@@ -569,7 +571,7 @@ func (ms *MptStore) otherNodePersist(curMptRoot ethcmn.Hash, curHeight int64) {
 				ms.triegc.Push(root, number)
 				break
 			}
-			triedb.Dereference(root.(ethcmn.Hash))
+			triedb.Dereference(root)
 		}
 	}
 }
@@ -607,7 +609,7 @@ func (ms *MptStore) StopWithVersion(targetVersion int64) error {
 			if recentMptRoot == (ethcmn.Hash{}) || recentMptRoot == ethtypes.EmptyRootHash {
 				recentMptRoot = ethcmn.Hash{}
 			} else {
-				if err := triedb.Commit(recentMptRoot, true, nil); err != nil {
+				if err := triedb.Commit(recentMptRoot, true); err != nil {
 					ms.logger.Error("Failed to commit recent state trie", "err", err)
 					break
 				}
@@ -617,7 +619,7 @@ func (ms *MptStore) StopWithVersion(targetVersion int64) error {
 		}
 
 		for !ms.triegc.Empty() {
-			ms.db.TrieDB().Dereference(ms.triegc.PopItem().(ethcmn.Hash))
+			ms.db.TrieDB().Dereference(ms.triegc.PopItem())
 		}
 	}
 
@@ -686,7 +688,7 @@ func (ms *MptStore) Query(req abci.RequestQuery) (res abci.ResponseQuery) {
 				res.Proof = &merkle.Proof{Ops: []merkle.ProofOp{newProofOpMptAbsence(key, proof)}}
 			}
 		} else {
-			res.Value, err = trie.TryGet(key)
+			res.Value, err = trie.GetStorage(ethcmn.Address{}, key)
 			if err != nil {
 				return sdkerrors.QueryResult(sdkerrors.Wrapf(sdkerrors.ErrKeyNotFound, "failed to query in trie: %s", err.Error()))
 			}
@@ -720,7 +722,7 @@ func (ms *MptStore) getTrieByHeight(height uint64) (ethstate.Trie, error) {
 
 // getVersionedWithProof returns the Merkle proof for given storage slot.
 func getVersionedWithProof(trie ethstate.Trie, key []byte) ([]byte, [][]byte, error) {
-	value, err := trie.TryGet(key)
+	value, err := trie.GetStorage(ethcmn.Address{}, key)
 	if err != nil {
 		return nil, nil, err
 	}

@@ -48,20 +48,20 @@ func (ms *ImmutableMptStore) Get(key []byte) []byte {
 
 	switch mptKeyType(key) {
 	case storageType:
-		_, stateRoot, realKey := decodeAddressStorageInfo(key)
+		addr, stateRoot, realKey := decodeAddressStorageInfo(key)
 
-		t, err := ms.db.OpenStorageTrie(ethcmn.Hash{}, stateRoot)
+		t, err := ms.db.OpenStorageTrie(ms.root, ethcmn.Hash{}, stateRoot)
 		if err != nil {
 			return nil
 		}
 
-		value, err := t.TryGet(realKey)
+		value, err := t.GetStorage(addr, realKey)
 		if err != nil {
 			return nil
 		}
 		return value
 	case addressType:
-		value, err := ms.trie.TryGet(key)
+		value, err := ms.trie.GetStorage(ethcmn.Address{}, key)
 		if err != nil {
 			return nil
 		}

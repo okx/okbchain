@@ -1,7 +1,7 @@
 #!/bin/bash
 
 KEY="captain"
-CHAINID="okbchain-67"
+CHAINID="okbchain-8"
 MONIKER="okb"
 CURDIR=`dirname $0`
 HOME_SERVER=$CURDIR/"_cache_evm"
@@ -39,7 +39,7 @@ run() {
       --trie.dirty-disabled=true \
       --trace --home $HOME_SERVER --chain-id $CHAINID \
       --elapsed Round=1,CommitRound=1,Produce=1 \
-      --rest.laddr "tcp://localhost:8545" > okb.txt 2>&1 &
+      --rest.laddr "tcp://localhost:8545"
 
 # --iavl-commit-interval-height \
 # --iavl-enable-async-commit \
@@ -52,7 +52,7 @@ run() {
 #      --iavl-max-committed-height-num int                Max committed version to cache in memory (default 8)
 #      --iavl-min-commit-item-count int                   Min nodes num to triggle node cache commit (default 500000)
 #      --iavl-output-modules
-    exit
+#    exit
 }
 
 

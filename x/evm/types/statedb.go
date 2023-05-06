@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/hex"
 	"fmt"
+	"github.com/ethereum/go-ethereum/params"
 	"math/big"
 	"sort"
 	"sync"
@@ -1144,7 +1145,7 @@ func (csdb *CommitStateDB) clearJournalAndRefund() {
 
 // Prepare sets the current transaction hash and index and block hash which is
 // used when the EVM emits new state logs.
-func (csdb *CommitStateDB) Prepare(thash, bhash ethcmn.Hash, txi int) {
+func (csdb *CommitStateDB) Prepare_old(thash, bhash ethcmn.Hash, txi int) {
 	csdb.thash = thash
 	csdb.bhash = bhash
 	csdb.txIndex = txi
@@ -1609,4 +1610,16 @@ func (csdb *CommitStateDB) getInitContractCodeHash(addr sdk.AccAddress) []byte {
 	store := csdb.paramSpace.CustomKVStore(csdb.ctx)
 	key := GetInitContractCodeHashKey(addr)
 	return store.Get(key)
+}
+
+func (csdb *CommitStateDB) Prepare(rules params.Rules, sender, coinbase ethcmn.Address, dest *ethcmn.Address, precompiles []ethcmn.Address, txAccesses ethtypes.AccessList) {
+	panic("not support 'Prepare'")
+}
+
+func (csdb *CommitStateDB) GetTransientState(addr ethcmn.Address, key ethcmn.Hash) ethcmn.Hash {
+	panic("not support 'GetTransientState'")
+}
+
+func (csdb *CommitStateDB) SetTransientState(addr ethcmn.Address, key, value ethcmn.Hash) {
+	panic("not support 'SetTransientState'")
 }

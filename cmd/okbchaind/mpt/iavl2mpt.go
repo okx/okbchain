@@ -3,12 +3,12 @@ package mpt
 import (
 	"bytes"
 	"fmt"
+	"github.com/ethereum/go-ethereum/trie/trienode"
 	"log"
 
 	ethcmn "github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/rawdb"
 	ethtypes "github.com/ethereum/go-ethereum/core/types"
-	"github.com/ethereum/go-ethereum/trie"
 	apptypes "github.com/okx/okbchain/app/types"
 	"github.com/okx/okbchain/libs/cosmos-sdk/server"
 	"github.com/okx/okbchain/libs/cosmos-sdk/store/mpt"
@@ -56,11 +56,11 @@ func migrateAccFromIavlToMpt(ctx *server.Context) {
 
 	// 1.1 update GlobalNumber to mpt
 	accountNumber := migrationApp.AccountKeeper.GetNextAccountNumber(cmCtx)
-	err = accTrie.TryUpdate(authtypes.GlobalAccountNumberKey, migrationApp.Codec().MustMarshalBinaryLengthPrefixed(accountNumber))
+	err = accTrie.UpdateStorage(ethcmn.Address{}, authtypes.GlobalAccountNumberKey, migrationApp.Codec().MustMarshalBinaryLengthPrefixed(accountNumber))
 	panicError(err)
 	fmt.Println("GlobalNumber", accountNumber)
 	//TODO need re-build migrateAccFromIavlToMpt cmd
-	nodes := trie.NewMergedNodeSet()
+	nodes := trienode.NewMergedNodeSet()
 	// 1.2 update every account to mpt
 	count, contractCount := 0, 0
 	batch := evmMptDb.TrieDB().DiskDB().NewBatch()
@@ -71,7 +71,7 @@ func migrateAccFromIavlToMpt(ctx *server.Context) {
 		}
 
 		// update acc mpt for every account
-		panicError(accTrie.TryUpdate(key, value))
+		panicError(accTrie.UpdateStorage(ethcmn.Address{}, key, value))
 		if count%100 == 0 {
 			pushData2Database(accMptDb, accTrie, committedHeight, false, nodes)
 			log.Println(count)
@@ -82,7 +82,7 @@ func migrateAccFromIavlToMpt(ctx *server.Context) {
 			if !bytes.Equal(ethAcc.CodeHash, mpt.EmptyCodeHashBytes) {
 				contractCount++
 				// update evm mpt. Key is the address of the contract; Value is the empty root hash
-				panicError(evmTrie.TryUpdate(ethAcc.EthAddress().Bytes(), ethtypes.EmptyRootHash.Bytes()))
+				panicError(evmTrie.UpdateStorage(ethcmn.Address{}, ethAcc.EthAddress().Bytes(), ethtypes.EmptyRootHash.Bytes()))
 				if contractCount%100 == 0 {
 					pushData2Database(evmMptDb, evmTrie, committedHeight, true, nodes)
 				}

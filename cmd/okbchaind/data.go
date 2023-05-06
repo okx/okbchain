@@ -1,11 +1,7 @@
 package main
 
 import (
-	"encoding/binary"
 	"fmt"
-	ethcmn "github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/core/state/pruner"
-	"github.com/okx/okbchain/cmd/okbchaind/base"
 	"github.com/okx/okbchain/libs/cosmos-sdk/store/mpt"
 	"io/ioutil"
 	"log"
@@ -588,18 +584,18 @@ func init() {
 func pruneMpt() {
 	defer wg.Done()
 
-	accMptDb := mpt.InstanceOfMptStore()
-	heightBytes, err := accMptDb.TrieDB().DiskDB().Get(mpt.KeyPrefixAccLatestStoredHeight)
-	panicError(err)
-	latestHeight := binary.BigEndian.Uint64(heightBytes)
-	hhash := sdk.Uint64ToBigEndian(latestHeight)
-	rootHashValue, err := accMptDb.TrieDB().DiskDB().Get(append(mpt.KeyPrefixAccRootMptHash, hhash...))
-	rootHash := ethcmn.BytesToHash(rootHashValue)
-	p, err := pruner.NewPrunerCustom(mpt.GetEthDB(), "", "", 256, rootHash, base.AccountStateRootRetriever{})
-	panicError(err)
-	log.Printf("Prune mpt %v...\n", rootHash.String())
-	err = p.Prune(rootHash)
-	panicError(err)
+	//accMptDb := mpt.InstanceOfMptStore()
+	//heightBytes, err := accMptDb.TrieDB().DiskDB().Get(mpt.KeyPrefixAccLatestStoredHeight)
+	//panicError(err)
+	//latestHeight := binary.BigEndian.Uint64(heightBytes)
+	//hhash := sdk.Uint64ToBigEndian(latestHeight)
+	//rootHashValue, err := accMptDb.TrieDB().DiskDB().Get(append(mpt.KeyPrefixAccRootMptHash, hhash...))
+	//rootHash := ethcmn.BytesToHash(rootHashValue)
+	//p, err := pruner.NewPrunerCustom(mpt.GetEthDB(), "", "", 256, rootHash, base.AccountStateRootRetriever{})
+	//panicError(err)
+	//log.Printf("Prune mpt %v...\n", rootHash.String())
+	//err = p.Prune(rootHash)
+	//panicError(err)
 }
 
 func compactMpt() {

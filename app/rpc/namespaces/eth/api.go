@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/ethereum/go-ethereum/common/math"
 	"math/big"
 	"strconv"
 	"sync"
@@ -1611,7 +1612,7 @@ func (api *PublicEthereumAPI) saveZeroAccount(address common.Address) {
 	api.watcherBackend.CommitAccountToRpcDb(zeroAccount)
 }
 
-func (api *PublicEthereumAPI) FeeHistory(blockCount rpc.DecimalOrHex, lastBlock rpc.BlockNumber, rewardPercentiles []float64) (*rpctypes.FeeHistoryResult, error) {
+func (api *PublicEthereumAPI) FeeHistory(blockCount math.HexOrDecimal64, lastBlock rpc.BlockNumber, rewardPercentiles []float64) (*rpctypes.FeeHistoryResult, error) {
 	api.logger.Debug("eth_feeHistory")
 	return nil, fmt.Errorf("unsupported rpc function: eth_FeeHistory")
 }
