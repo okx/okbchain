@@ -805,10 +805,6 @@ func AddressStoragePrefixMpt(address ethcmn.Address, stateRoot ethcmn.Hash) []by
 	return append(t1, stateRoot.Bytes()...)
 }
 
-func AddressStorageWithoutStorageRootPrefixMpt(address ethcmn.Address) []byte {
-	return append([]byte{keyPrefixStorageMpt}, address.Bytes()...)
-}
-
 func decodeAddressStorageInfo(key []byte) (ethcmn.Address, ethcmn.Hash, []byte) {
 	addr := ethcmn.BytesToAddress(key[prefixSizeInMpt : prefixSizeInMpt+20])
 	storageRoot := ethcmn.BytesToHash(key[prefixSizeInMpt+20 : prefixSizeInMpt+20+32])
