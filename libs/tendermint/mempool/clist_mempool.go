@@ -988,7 +988,6 @@ func (mem *CListMempool) Update(
 		txCode := deliverTxResponses[i].Code
 		addr := ""
 		nonce := uint64(0)
-		txhash := tx.Hash()
 		gasUsedPerTx := deliverTxResponses[i].GasUsed
 		gasPricePerTx := big.NewInt(0)
 		if ele := mem.cleanTx(height, tx, txCode); ele != nil {
@@ -1006,7 +1005,7 @@ func (mem *CListMempool) Update(
 			}
 
 			// remove tx signature cache
-			types.SignatureCache().Remove(txhash)
+			//types.SignatureCache().Remove(txhash)
 		}
 
 		if txCode == abci.CodeTypeOK || txCode > abci.CodeTypeNonceInc {
@@ -1023,11 +1022,14 @@ func (mem *CListMempool) Update(
 			addressNonce[addr] = nonce
 		}
 
-		if mem.pendingPool != nil {
-			mem.pendingPool.removeTxByHash(amino.HexEncodeToStringUpper(txhash))
-		}
-		if mem.config.PendingRemoveEvent {
-			mem.rmPendingTxChan <- types.EventDataRmPendingTx{txhash, addr, nonce, types.Confirmed}
+		if mem.pendingPool != nil || mem.config.PendingRemoveEvent {
+			txhash := tx.Hash()
+			if mem.pendingPool != nil {
+				mem.pendingPool.removeTxByHash(amino.HexEncodeToStringUpper(txhash))
+			}
+			if mem.config.PendingRemoveEvent {
+				mem.rmPendingTxChan <- types.EventDataRmPendingTx{txhash, addr, nonce, types.Confirmed}
+			}
 		}
 	}
 
