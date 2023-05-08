@@ -51,7 +51,6 @@ func setupTest(t *testing.T) testData {
 		stakingKeeper: keepers.StakingKeeper,
 		faucet:        keepers.Faucet,
 	}
-
 	return data
 }
 

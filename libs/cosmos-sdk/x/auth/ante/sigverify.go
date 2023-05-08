@@ -89,6 +89,7 @@ func (spkd SetPubKeyDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate b
 					"pubKey does not match signer address %s with signer index: %d", signers[i], i)
 			}
 		}
+
 		acc, err := GetSignerAcc(ctx, spkd.ak, signers[i])
 		if err != nil {
 			return ctx, err
@@ -231,18 +232,15 @@ func (svd SigVerificationDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simul
 	if len(sigs) != len(signerAddrs) {
 		return ctx, sdkerrors.Wrapf(sdkerrors.ErrUnauthorized, "invalid number of signer;  expected: %d, got %d", len(signerAddrs), len(sigs))
 	}
-
 	var txNonce uint64
 	if len(sigs) == 1 && tx.GetNonce() != 0 {
 		txNonce = tx.GetNonce()
 	}
-
 	for i, sig := range sigs {
 		signerAccs[i], err = GetSignerAcc(ctx, svd.ak, signerAddrs[i])
 		if err != nil {
 			return ctx, err
 		}
-
 		if ctx.IsCheckTx() {
 			if txNonce != 0 { // txNonce first
 				err := nonceVerification(ctx, signerAccs[i].GetSequence(), txNonce, signerAddrs[i].String(), simulate)
@@ -328,7 +326,6 @@ func (isd IncrementSequenceDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, sim
 	// increment sequence of all signers
 	for index, addr := range sigTx.GetSigners() {
 		acc := isd.ak.GetAccount(ctx, addr)
-
 		// for adaptive pending tx in mempool just in checkTx but not deliverTx
 		if ctx.IsCheckTx() && !ctx.IsReCheckTx() {
 			pendingNonce := getCheckTxNonceFromMempool(addr.String())
@@ -336,7 +333,6 @@ func (isd IncrementSequenceDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, sim
 				acc.SetSequence(pendingNonce)
 			}
 		}
-
 		if ctx.IsCheckTx() && index == 0 { // context with the nonce of fee payer
 			ctx.SetAccountNonce(acc.GetSequence())
 		}

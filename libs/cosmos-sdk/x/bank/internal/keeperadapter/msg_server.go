@@ -40,7 +40,6 @@ func (k msgServer) Send(goCtx context.Context, msg *typesadapter.MsgSend) (*type
 	if k.BlacklistedAddr(to) {
 		return nil, sdkerrors.Wrapf(sdkerrors.ErrUnauthorized, "%s is not allowed to receive funds", msg.ToAddress)
 	}
-
 	amt := sdk.CoinAdaptersToCoins(msg.Amount)
 	err = k.SendCoins(ctx, from, to, amt)
 	if err != nil {
