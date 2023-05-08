@@ -193,6 +193,7 @@ func ethGasConsume(ek EVMKeeper, ak accountKeeperInterface, sk types.SupplyKeepe
 }
 
 func shouldIntrinsicGas(ek EVMKeeper, ctx *sdk.Context, msgEthTx *evmtypes.MsgEthereumTx) bool {
+	// e2c tx no need ethcore check gas
 	return !IsE2CTx(ek, ctx, msgEthTx)
 }
 
@@ -295,7 +296,9 @@ func (avd AccountAnteDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate 
 		msgEthTx.SetFrom(ctx.From())
 		address = msgEthTx.AccountAddress()
 	}
-
+	if ctx.IsCheckTx() && !address.Empty() && msgEthTx.From == "" {
+		msgEthTx.SetFrom(common.BytesToAddress(address.Bytes()).String())
+	}
 	if !simulate {
 		if address.Empty() {
 			panic("sender address cannot be empty")
