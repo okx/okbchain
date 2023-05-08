@@ -7,7 +7,6 @@ import (
 	apptypes "github.com/okx/okbchain/app/types"
 	clientcontext "github.com/okx/okbchain/libs/cosmos-sdk/client/context"
 	"github.com/okx/okbchain/libs/cosmos-sdk/store/mpt"
-	"github.com/okx/okbchain/libs/cosmos-sdk/store/prefix"
 	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
 	"github.com/okx/okbchain/libs/cosmos-sdk/x/auth"
 	"github.com/okx/okbchain/x/wasm/watcher"
@@ -32,13 +31,6 @@ func (k Keeper) getStorageStore(ctx sdk.Context, acc sdk.WasmAddress) sdk.KVStor
 }
 
 func (k Keeper) GetStorageStore4Query(ctx sdk.Context, acc sdk.WasmAddress) sdk.KVStore {
-	if watcher.Enable() {
-		ethAcc := common.BytesToAddress(acc.Bytes())
-		store := k.ada.NewStore(ctx.GasMeter(), ctx.KVStore(k.storageStoreKey), nil)
-
-		return prefix.NewStore(store, mpt.AddressStorageWithoutStorageRootPrefixMpt(ethAcc))
-	}
-
 	return k.getStorageStore(ctx, acc)
 }
 
