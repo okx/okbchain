@@ -108,7 +108,8 @@ func NewReadStore(pre []byte) sdk.KVStore {
 		Store: dbadapter.Store{DB: db},
 	}
 	if len(pre) != 0 {
-		return prefix.NewStore(rs, pre)
+		newPre := rmStorageRootFromWatchKey(pre)
+		return prefix.NewStore(rs, newPre)
 	}
 	return rs
 }
@@ -123,10 +124,5 @@ type readStore struct {
 	dbadapter.Store
 }
 
-func (r *readStore) Get(key []byte) []byte {
-	newKey := rmStorageRootFromWatchKey(key)
-
-	return r.Store.Get(newKey)
-}
 func (r *readStore) Set(key, value []byte) {}
 func (r *readStore) Delete(key []byte)     {}
