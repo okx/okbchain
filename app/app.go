@@ -2,6 +2,7 @@ package app
 
 import (
 	"fmt"
+	paramstypes "github.com/okx/okbchain/x/params/types"
 	"io"
 	"os"
 	"sync"
@@ -711,10 +712,7 @@ func NewOKBChainApp(
 		if err := app.WasmKeeper.InitializePinnedCodes(ctx); err != nil {
 			tmos.Exit(fmt.Sprintf("failed initialize pinned codes %s", err))
 		}
-
-		if err := app.ParamsKeeper.ApplyEffectiveUpgrade(ctx); err != nil {
-			tmos.Exit(fmt.Sprintf("failed apply effective upgrade height info: %s", err))
-		}
+		app.initUpgrade(ctx)
 
 		app.WasmKeeper.UpdateGasRegister(ctx)
 	}
@@ -730,6 +728,17 @@ func NewOKBChainApp(
 	trace.EnableAnalyzer(enableAnalyzer)
 
 	return app
+}
+
+func (app *OKBChainApp) initUpgrade(ctx sdk.Context) {
+	// Claim before ApplyEffectiveUpgrade
+	app.ParamsKeeper.ClaimReadyForUpgrade(tmtypes.MILESTONE_EARTH, func(info paramstypes.UpgradeInfo) {
+		tmtypes.InitMilestoneEarthHeight(int64(info.EffectiveHeight))
+	})
+
+	if err := app.ParamsKeeper.ApplyEffectiveUpgrade(ctx); err != nil {
+		tmos.Exit(fmt.Sprintf("failed apply effective upgrade height info: %s", err))
+	}
 }
 
 func (app *OKBChainApp) SetOption(req abci.RequestSetOption) (res abci.ResponseSetOption) {

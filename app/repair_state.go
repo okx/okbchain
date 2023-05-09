@@ -2,6 +2,7 @@ package app
 
 import (
 	"fmt"
+	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
 	"io"
 	"log"
 	"path/filepath"
@@ -146,6 +147,8 @@ func RepairState(ctx *server.Context, onStart bool) {
 
 	err = repairApp.LoadStartVersion(startVersion)
 	panicError(err)
+
+	repairApp.initUpgrade(repairApp.BaseApp.NewContext(true, abci.Header{}))
 
 	rawTrieDirtyDisabledFlag := viper.GetBool(mpttypes.FlagTrieDirtyDisabled)
 	mpttypes.TrieDirtyDisabled = true
