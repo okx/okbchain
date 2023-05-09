@@ -663,13 +663,16 @@ func (w *Watcher) saveStdTxResponse(result *ctypes.ResultTx) {
 	}
 }
 
-func (w *Watcher) UpdateReceiptsBlockHash(ethBlockHash string) {
+func (w *Watcher) UpdateReceiptsBlockHash(ethBlockHash common.Hash) {
 	if !w.enable {
 		return
 	}
 	for _, msg := range w.batch {
 		if receipt, ok := msg.(*MsgTransactionReceipt); ok {
-			receipt.BlockHash = ethBlockHash
+			receipt.BlockHash = ethBlockHash.String()
+			for _, log := range receipt.Logs {
+				log.BlockHash = ethBlockHash
+			}
 		}
 	}
 }
