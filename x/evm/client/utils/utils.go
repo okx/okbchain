@@ -117,6 +117,14 @@ func ParseManageContractMethodBlockedListProposalJSON(cdc *codec.Codec, proposal
 		return
 	}
 
+	defer func() {
+		if r := recover(); r != nil {
+			err = errors.New(fmt.Sprintf("Please check the file:%s\nFailed to parse the proposal json:%s",
+				string(contents), r))
+			return
+		}
+	}()
+
 	cdc.MustUnmarshalJSON(contents, &proposal)
 	return
 }
