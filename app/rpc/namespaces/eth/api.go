@@ -1273,6 +1273,7 @@ func (api *PublicEthereumAPI) GetTransactionReceipt(hash common.Hash) (*watcher.
 	if err != nil {
 		return nil, err
 	}
+	blockHash := common.BytesToHash(block.Block.Hash())
 
 	// Convert tx bytes to eth transaction
 	ethTx, err := rpctypes.RawTxToEthTx(api.clientCtx, tx.Tx, tx.Height)
@@ -1305,11 +1306,6 @@ func (api *PublicEthereumAPI) GetTransactionReceipt(hash common.Hash) (*watcher.
 		status = 0 // transaction failed
 	}
 
-	ethBlock, err := api.backend.GetBlockByNumber(rpctypes.BlockNumber(tx.Height), false)
-	if err != nil {
-		return nil, err
-	}
-
 	if len(data.Logs) == 0 || status == 0 {
 		data.Logs = []*ethtypes.Log{}
 		data.Bloom = ethtypes.BytesToBloom(make([]byte, 256))
@@ -1318,7 +1314,6 @@ func (api *PublicEthereumAPI) GetTransactionReceipt(hash common.Hash) (*watcher.
 		if len(log.Topics) == 0 {
 			data.Logs[k].Topics = make([]common.Hash, 0)
 		}
-		log.BlockHash = ethBlock.Hash
 	}
 
 	contractAddr := &data.ContractAddress
@@ -1340,7 +1335,7 @@ func (api *PublicEthereumAPI) GetTransactionReceipt(hash common.Hash) (*watcher.
 		TransactionHash:   hash.String(),
 		ContractAddress:   contractAddr,
 		GasUsed:           hexutil.Uint64(gasUsed),
-		BlockHash:         ethBlock.Hash.String(),
+		BlockHash:         blockHash.String(),
 		BlockNumber:       hexutil.Uint64(tx.Height),
 		TransactionIndex:  hexutil.Uint64(tx.Index),
 		From:              ethTx.GetFrom(),
