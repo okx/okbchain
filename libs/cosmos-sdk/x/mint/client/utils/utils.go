@@ -28,16 +28,17 @@ func ParseManageTreasuresProposalJSON(cdc *codec.Codec, proposalFilePath string)
 		return
 	}
 
-	defer func() {
-		if r := recover(); r != nil {
-			err = errors.New(fmt.Sprintf("Please check the file:%s\nFailed to parse the proposal json:%s",
-				string(contents), r))
-			return
-		}
-	}()
+	defer parseRecover(contents, &err)
 
 	cdc.MustUnmarshalJSON(contents, &proposal)
 	return
+}
+
+func parseRecover(contents []byte, err *error) {
+	if r := recover(); r != nil {
+		*err = errors.New(fmt.Sprintf("Please check the file:%s\nFailed to parse the proposal json:%s",
+			string(contents), r))
+	}
 }
 
 // ExtraProposalJSON defines a ExtraProposal with a deposit used to parse

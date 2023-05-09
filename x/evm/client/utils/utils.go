@@ -77,16 +77,17 @@ func ParseManageContractDeploymentWhitelistProposalJSON(cdc *codec.Codec, propos
 		return
 	}
 
-	defer func() {
-		if r := recover(); r != nil {
-			err = errors.New(fmt.Sprintf("Please check the file:%s\nFailed to parse the proposal json:%s",
-				string(contents), r))
-			return
-		}
-	}()
+	defer parseRecover(contents, &err)
 
 	cdc.MustUnmarshalJSON(contents, &proposal)
 	return
+}
+
+func parseRecover(contents []byte, err *error) {
+	if r := recover(); r != nil {
+		*err = errors.New(fmt.Sprintf("Please check the file:%s\nFailed to parse the proposal json:%s",
+			string(contents), r))
+	}
 }
 
 // ParseManageContractBlockedListProposalJSON parses json from proposal file to ManageContractBlockedListProposalJSON struct
@@ -97,13 +98,7 @@ func ParseManageContractBlockedListProposalJSON(cdc *codec.Codec, proposalFilePa
 		return
 	}
 
-	defer func() {
-		if r := recover(); r != nil {
-			err = errors.New(fmt.Sprintf("Please check the file:%s\nFailed to parse the proposal json:%s",
-				string(contents), r))
-			return
-		}
-	}()
+	defer parseRecover(contents, &err)
 
 	cdc.MustUnmarshalJSON(contents, &proposal)
 	return
@@ -117,13 +112,7 @@ func ParseManageContractMethodBlockedListProposalJSON(cdc *codec.Codec, proposal
 		return
 	}
 
-	defer func() {
-		if r := recover(); r != nil {
-			err = errors.New(fmt.Sprintf("Please check the file:%s\nFailed to parse the proposal json:%s",
-				string(contents), r))
-			return
-		}
-	}()
+	defer parseRecover(contents, &err)
 
 	cdc.MustUnmarshalJSON(contents, &proposal)
 	return
