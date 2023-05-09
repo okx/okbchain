@@ -220,7 +220,7 @@ func (b *EthermintBackend) GetBlockByHash(hash common.Hash, fullTx bool) (*evmty
 	if err != nil {
 		return nil, err
 	}
-	block, err := rpctypes.RpcBlockFromTendermint(b.clientCtx, resBlock.Block, fullTx)
+	block, err := b.GetBlockByNumber(rpctypes.BlockNumber(resBlock.Block.Height), fullTx)
 	if err != nil {
 		return nil, err
 	}
