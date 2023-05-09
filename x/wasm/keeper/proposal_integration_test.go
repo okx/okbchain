@@ -925,7 +925,7 @@ func (suite *ProposalTestSuite) TestModifyNextBlockUpdateProposal() {
 			govProposal.Content = &proposal
 
 			err := suite.wasmHandler(suite.ctx, &govProposal)
-			suite.app.BeginBlock(abci.RequestBeginBlock{Header: abci.Header{ChainID: "exchain-67", Height: 1, Time: time.Now()}})
+			suite.app.BeginBlock(abci.RequestBeginBlock{Header: abci.Header{ChainID: "okbchain-67", Height: 1, Time: time.Now()}})
 			suite.Require().Equal(tc.expectError, err)
 
 			gasFactor := suite.app.WasmKeeper.GetGasFactor(suite.ctx)
