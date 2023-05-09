@@ -1,11 +1,13 @@
 package utils
 
 import (
-	"github.com/okx/okbchain/x/evm/types"
+	"fmt"
 	"io/ioutil"
 
 	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
 	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
+	"github.com/okx/okbchain/x/evm/types"
+	"github.com/pkg/errors"
 )
 
 type (
@@ -74,6 +76,14 @@ func ParseManageContractDeploymentWhitelistProposalJSON(cdc *codec.Codec, propos
 	if err != nil {
 		return
 	}
+
+	defer func() {
+		if r := recover(); r != nil {
+			err = errors.New(fmt.Sprintf("Please check the file:\n%s\nFailed to parse the proposal json:%s",
+				string(contents), r))
+			return
+		}
+	}()
 
 	cdc.MustUnmarshalJSON(contents, &proposal)
 	return
