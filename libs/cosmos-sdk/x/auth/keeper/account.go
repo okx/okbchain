@@ -3,7 +3,6 @@ package keeper
 import (
 	"sync"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/store/mpt"
 	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
 	"github.com/okx/okbchain/libs/cosmos-sdk/x/auth/exported"
 	"github.com/okx/okbchain/libs/cosmos-sdk/x/auth/types"
@@ -78,7 +77,7 @@ func (ak AccountKeeper) SetAccount(ctx sdk.Context, acc exported.Account) {
 	store.Set(storeAccKey, bz)
 
 	if ctx.IsDeliver() {
-		mpt.GAccToPrefetchChannel <- [][]byte{storeAccKey}
+		//mpt.GAccToPrefetchChannel <- [][]byte{storeAccKey}
 	}
 
 	if !ctx.IsCheckTx() && !ctx.IsReCheckTx() {
@@ -120,7 +119,7 @@ func (ak AccountKeeper) RemoveAccount(ctx sdk.Context, acc exported.Account) {
 	store.Delete(storeAccKey)
 
 	if ctx.IsDeliver() {
-		mpt.GAccToPrefetchChannel <- [][]byte{storeAccKey}
+		//mpt.GAccToPrefetchChannel <- [][]byte{storeAccKey}
 	}
 }
 
@@ -141,7 +140,8 @@ func (ak AccountKeeper) IterateAccounts(ctx sdk.Context, cb func(account exporte
 }
 
 // IterateAccounts iterates over all the stored accounts and performs a callback function
-// 	TODO by yxq: deprecated
+//
+//	TODO by yxq: deprecated
 func (ak AccountKeeper) MigrateAccounts(ctx sdk.Context, cb func(account exported.Account, key, value []byte) (stop bool)) {
 
 	store := ctx.KVStore(ak.mptKey)

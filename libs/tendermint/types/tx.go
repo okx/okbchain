@@ -2,8 +2,10 @@ package types
 
 import (
 	"bytes"
+	"encoding/binary"
 	"errors"
 	"fmt"
+	"google.golang.org/protobuf/encoding/protowire"
 	"math/big"
 
 	"github.com/ethereum/go-ethereum/rlp"
@@ -47,19 +49,27 @@ type ethTxData struct {
 
 // Hash computes the TMHASH hash of the wire encoded transaction.
 func (tx Tx) Hash() []byte {
-	//// if we can't get length-prefixed bytes, this tx should not be an amino-encoded tx
-	//if _, err := amino.GetBinaryBareFromBinaryLengthPrefixed(tx); err != nil {
-	//	// if we can't get proto tag, this tx should not be a proto-encoded tx
-	//	_, _, length := protowire.ConsumeTag(tx)
-	//	if length < 0 {
-	//		return etherhash.Sum(tx)
-	//	}
-	//}
+	// if we can't get length-prefixed bytes, this tx should not be an amino-encoded tx
+	if _, n := binary.Uvarint(tx); n <= 0 {
+		// if we can't get proto tag, this tx should not be a proto-encoded tx
+		_, _, length := protowire.ConsumeTag(tx)
+		if length < 0 {
+			return etherhash.Sum(tx)
+		}
+	}
 	var msg ethTxData
 	if err := rlp.DecodeBytes(tx, &msg); err != nil {
 		return tmhash.Sum(tx)
 	}
 	return etherhash.Sum(tx)
+}
+
+func (tx Tx) EvmHash() []byte {
+	return etherhash.Sum(tx)
+}
+
+func (tx Tx) TmHash() []byte {
+	return tmhash.Sum(tx)
 }
 
 // String returns the hex-encoded transaction as a string.
