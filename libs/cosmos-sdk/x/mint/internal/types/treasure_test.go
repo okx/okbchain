@@ -67,7 +67,7 @@ func TestValidateBasic(t *testing.T) {
 	require.Error(t, err)
 	require.Contains(t, err.Error(), "the sum of treasure proportion should non-negative and less than one")
 
-	//failed treasures
+	// err treasures has empty address
 	treasures = []Treasure{*treasure1, *treasure2, *treasure3, *treasure4}
 	err = ValidateTreasures(treasures)
 	require.Error(t, err)
