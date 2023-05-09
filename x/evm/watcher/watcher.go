@@ -662,3 +662,14 @@ func (w *Watcher) saveStdTxResponse(result *ctypes.ResultTx) {
 		w.batch = append(w.batch, wMsg)
 	}
 }
+
+func (w *Watcher) UpdateReceiptsBlockHash(ethBlockHash string) {
+	if !w.enable {
+		return
+	}
+	for _, msg := range w.batch {
+		if receipt, ok := msg.(*MsgTransactionReceipt); ok {
+			receipt.BlockHash = ethBlockHash
+		}
+	}
+}

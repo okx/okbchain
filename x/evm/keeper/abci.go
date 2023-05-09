@@ -131,6 +131,7 @@ func (k *Keeper) EndBlock(ctx sdk.Context, req abci.RequestEndBlock) []abci.Vali
 			k.Watcher.SaveBlock(block, ethBlockHash)
 
 			k.Watcher.SaveBlockStdTxHash(ethBlockHash)
+			k.Watcher.UpdateReceiptsBlockHash(ethBlockHash.String())
 		}
 	}
 

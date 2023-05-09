@@ -1274,8 +1274,6 @@ func (api *PublicEthereumAPI) GetTransactionReceipt(hash common.Hash) (*watcher.
 		return nil, err
 	}
 
-	blockHash := common.BytesToHash(block.Block.Hash())
-
 	// Convert tx bytes to eth transaction
 	ethTx, err := rpctypes.RawTxToEthTx(api.clientCtx, tx.Tx, tx.Height)
 	if err != nil {
@@ -1328,6 +1326,10 @@ func (api *PublicEthereumAPI) GetTransactionReceipt(hash common.Hash) (*watcher.
 		gasUsed = 0
 	}
 
+	ethBlock, err := api.backend.GetBlockByNumber(rpctypes.BlockNumber(tx.Height), false)
+	if err != nil {
+		return nil, err
+	}
 	receipt := &watcher.TransactionReceipt{
 		Status:            status,
 		CumulativeGasUsed: hexutil.Uint64(cumulativeGasUsed),
@@ -1336,7 +1338,7 @@ func (api *PublicEthereumAPI) GetTransactionReceipt(hash common.Hash) (*watcher.
 		TransactionHash:   hash.String(),
 		ContractAddress:   contractAddr,
 		GasUsed:           hexutil.Uint64(gasUsed),
-		BlockHash:         blockHash.String(),
+		BlockHash:         ethBlock.Hash.String(),
 		BlockNumber:       hexutil.Uint64(tx.Height),
 		TransactionIndex:  hexutil.Uint64(tx.Index),
 		From:              ethTx.GetFrom(),
