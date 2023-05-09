@@ -244,6 +244,10 @@ func (mp ManageContractBlockedListProposal) ValidateBasic() sdk.Error {
 		return ErrDuplicatedAddr
 	}
 
+	if isEmptyAddr(mp.ContractAddrs) {
+		return ErrEmptyAddr
+	}
+
 	return nil
 }
 

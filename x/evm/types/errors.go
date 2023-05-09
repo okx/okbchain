@@ -67,7 +67,7 @@ var (
 	ErrGUFactor = sdkerrors.Register(ModuleName, 24, "gu_factor should non-negative")
 
 	// ErrEmptyAddr returns an error if the address is empty in address list
-	ErrEmptyAddr = sdkerrors.Register(ModuleName, 25, "Empty address in address list")
+	ErrEmptyAddr = sdkerrors.Register(ModuleName, 25, "Empty address in list")
 )
 
 const (

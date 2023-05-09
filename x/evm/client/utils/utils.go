@@ -79,7 +79,7 @@ func ParseManageContractDeploymentWhitelistProposalJSON(cdc *codec.Codec, propos
 
 	defer func() {
 		if r := recover(); r != nil {
-			err = errors.New(fmt.Sprintf("Please check the file:\n%s\nFailed to parse the proposal json:%s",
+			err = errors.New(fmt.Sprintf("Please check the file:%s\nFailed to parse the proposal json:%s",
 				string(contents), r))
 			return
 		}
@@ -96,6 +96,14 @@ func ParseManageContractBlockedListProposalJSON(cdc *codec.Codec, proposalFilePa
 	if err != nil {
 		return
 	}
+
+	defer func() {
+		if r := recover(); r != nil {
+			err = errors.New(fmt.Sprintf("Please check the file:%s\nFailed to parse the proposal json:%s",
+				string(contents), r))
+			return
+		}
+	}()
 
 	cdc.MustUnmarshalJSON(contents, &proposal)
 	return

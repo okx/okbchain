@@ -30,7 +30,7 @@ func ParseManageTreasuresProposalJSON(cdc *codec.Codec, proposalFilePath string)
 
 	defer func() {
 		if r := recover(); r != nil {
-			err = errors.New(fmt.Sprintf("Please check the file:\n%s\nFailed to parse the proposal json:%s",
+			err = errors.New(fmt.Sprintf("Please check the file:%s\nFailed to parse the proposal json:%s",
 				string(contents), r))
 			return
 		}
