@@ -2,7 +2,7 @@ package mpt
 
 import (
 	"fmt"
-	"github.com/ethereum/go-ethereum/trie/trienode"
+	"github.com/ethereum/go-ethereum/trie"
 	"path/filepath"
 
 	ethcmn "github.com/ethereum/go-ethereum/common"
@@ -83,7 +83,7 @@ func getStorageTrie(db ethstate.Database, addrHash, stateRoot ethcmn.Hash) ethst
 }
 
 // pushData2Database commit the data to the database
-func pushData2Database(db ethstate.Database, tree ethstate.Trie, height int64, isEvm bool, nodes *trienode.MergedNodeSet) {
+func pushData2Database(db ethstate.Database, tree ethstate.Trie, height int64, isEvm bool, nodes *trie.MergedNodeSet) {
 
 	root, set := tree.Commit(true)
 	//panicError(err)
@@ -91,7 +91,7 @@ func pushData2Database(db ethstate.Database, tree ethstate.Trie, height int64, i
 	err := nodes.Merge(set)
 	panicError(err)
 
-	err = db.TrieDB().UpdateForOK(root, ethcmn.Hash{}, nodes, mpt.AccountStateRootRetriever.RetrieveStateRoot)
+	err = db.TrieDB().UpdateForOK(root, ethcmn.Hash{}, nodes)
 	panicError(err)
 	err = db.TrieDB().Commit(root, false)
 	panicError(err)

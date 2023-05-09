@@ -3,7 +3,7 @@ package mpt
 import (
 	"bytes"
 	"fmt"
-	"github.com/ethereum/go-ethereum/trie/trienode"
+	"github.com/ethereum/go-ethereum/trie"
 	"log"
 
 	ethcmn "github.com/ethereum/go-ethereum/common"
@@ -60,7 +60,7 @@ func migrateAccFromIavlToMpt(ctx *server.Context) {
 	panicError(err)
 	fmt.Println("GlobalNumber", accountNumber)
 	//TODO need re-build migrateAccFromIavlToMpt cmd
-	nodes := trienode.NewMergedNodeSet()
+	nodes := trie.NewMergedNodeSet()
 	// 1.2 update every account to mpt
 	count, contractCount := 0, 0
 	batch := evmMptDb.TrieDB().DiskDB().NewBatch()

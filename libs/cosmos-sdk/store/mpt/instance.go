@@ -3,6 +3,7 @@ package mpt
 import (
 	"encoding/binary"
 	"github.com/ethereum/go-ethereum/ethdb"
+	"github.com/ethereum/go-ethereum/trie/snap"
 	"path/filepath"
 	"sync"
 
@@ -59,6 +60,7 @@ func InstanceOfMptStore() ethstate.Database {
 			Cache:     int(TrieCacheSize),
 			Journal:   "",
 			Preimages: true,
+			Snap:      snap.Defaults,
 		})
 	})
 

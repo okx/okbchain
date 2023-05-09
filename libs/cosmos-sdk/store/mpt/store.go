@@ -3,7 +3,6 @@ package mpt
 import (
 	"encoding/hex"
 	"fmt"
-	"github.com/ethereum/go-ethereum/trie/trienode"
 	"github.com/okx/okbchain/libs/system/trace/persist"
 	"io"
 	"sync"
@@ -315,7 +314,7 @@ func (ms *MptStore) ReverseIterator(start, end []byte) types.Iterator {
 /*
 *  implement CommitStore, CommitKVStore
  */
-func (ms *MptStore) commitStorageWithDelta(storageDelta []*trie.StorageDelta, nodeSets *trienode.MergedNodeSet) {
+func (ms *MptStore) commitStorageWithDelta(storageDelta []*trie.StorageDelta, nodeSets *trie.MergedNodeSet) {
 	//if storageDelta == nil || len(storageDelta) == 0 {
 	//	return
 	//}
@@ -337,7 +336,7 @@ func (ms *MptStore) commitStorageWithDelta(storageDelta []*trie.StorageDelta, no
 	panic("unsupport commitStorageWithDelta")
 }
 
-func (ms *MptStore) commitStorageForDelta(nodeSets *trienode.MergedNodeSet) []*trie.StorageDelta {
+func (ms *MptStore) commitStorageForDelta(nodeSets *trie.MergedNodeSet) []*trie.StorageDelta {
 	//storageDelta := make([]*trie.StorageDelta, 0, len(ms.storageTrieForWrite))
 	//for addr, v := range ms.storageTrieForWrite {
 	//	stateR, set, outStorageDelta, err := v.CommitForDelta(false)
@@ -367,7 +366,7 @@ func (ms *MptStore) commitStorageForDelta(nodeSets *trienode.MergedNodeSet) []*t
 	panic("unsupport commitStorageForDelta")
 }
 
-func (ms *MptStore) commitStorage(nodeSets *trienode.MergedNodeSet) {
+func (ms *MptStore) commitStorage(nodeSets *trie.MergedNodeSet) {
 	for addr, v := range ms.storageTrieForWrite {
 		stateR, set := v.Commit(false)
 		key := AddressStoreKey(addr.Bytes())
@@ -392,13 +391,13 @@ func (ms *MptStore) commitStorage(nodeSets *trienode.MergedNodeSet) {
 
 func (ms *MptStore) CommitterCommit(inputDelta interface{}) (rootHash types.CommitID, outputDelta interface{}) {
 	ms.version++
-
+	fmt.Println("-------CommitterCommit", ms.version)
 	// stop pre round prefetch
 	ms.StopPrefetcher()
-	nodeSets := trienode.NewMergedNodeSet()
+	nodeSets := trie.NewMergedNodeSet()
 
 	var root ethcmn.Hash
-	var set *trienode.NodeSet
+	var set *trie.NodeSet
 	//var err error
 	//if applyDelta && inputDelta != nil {
 	//	delta, ok := inputDelta.(*trie.MptDelta)
@@ -415,6 +414,10 @@ func (ms *MptStore) CommitterCommit(inputDelta interface{}) (rootHash types.Comm
 	//} else {
 	ms.commitStorage(nodeSets)
 	root, set = ms.trie.Commit(true)
+	if root == (ethcmn.Hash{}) {
+		root = ethtypes.EmptyRootHash
+	}
+	fmt.Printf("-------root hash:%s\n", root.String())
 	//}
 	//if err != nil {
 	//	panic("fail to commit trie data(acc_trie.Commit): " + err.Error())
@@ -425,16 +428,23 @@ func (ms *MptStore) CommitterCommit(inputDelta interface{}) (rootHash types.Comm
 			panic("fail to commit trie data(acc nodeSets merge): " + err.Error())
 		}
 	}
-
-	if err := ms.db.TrieDB().UpdateForOK(root, ethcmn.Hash{}, nodeSets, AccountStateRootRetriever.RetrieveStateRoot); err != nil {
-		panic("fail to commit trie data (UpdateForOK): " + err.Error())
+	origin := ms.originalRoot
+	if origin == (ethcmn.Hash{}) {
+		origin = ethtypes.EmptyRootHash
 	}
+	if root != origin {
+		if err := ms.db.TrieDB().UpdateForOK(root, origin, nodeSets); err != nil {
+			panic("fail to commit trie data (UpdateForOK): " + err.Error())
+		}
+		ms.originalRoot = root
+	}
+
 	ms.SetMptRootHash(uint64(ms.version), root)
-	ms.originalRoot = root
+	//ms.originalRoot = root
 
 	// TODO: use a thread to push data to database
 	// push data to database
-	ms.PushData2Database(ms.version)
+	ms.PushData2Database(ms.version, root)
 
 	ms.sprintDebugLog(ms.version)
 
@@ -498,25 +508,28 @@ func (ms *MptStore) EndTiming(tag string) {
 }
 
 // PushData2Database writes all associated state in cache to the database
-func (ms *MptStore) PushData2Database(curHeight int64) {
+func (ms *MptStore) PushData2Database(curHeight int64, root ethcmn.Hash) {
 	ms.cmLock.Lock()
 	defer ms.cmLock.Unlock()
 
 	curMptRoot := ms.GetMptRootHash(uint64(curHeight))
 	if TrieDirtyDisabled {
 		// If we're running an archive node, always flush
-		ms.fullNodePersist(curMptRoot, curHeight)
+		ms.fullNodePersist(curMptRoot, root, curHeight)
 	} else {
 		ms.otherNodePersist(curMptRoot, curHeight)
 	}
 }
 
 // fullNodePersist persist data without pruning
-func (ms *MptStore) fullNodePersist(curMptRoot ethcmn.Hash, curHeight int64) {
+func (ms *MptStore) fullNodePersist(curMptRoot, root ethcmn.Hash, curHeight int64) {
 	if curMptRoot == (ethcmn.Hash{}) || curMptRoot == ethtypes.EmptyRootHash {
 		curMptRoot = ethcmn.Hash{}
 	} else {
-		if err := ms.db.TrieDB().Commit(curMptRoot, false); err != nil {
+		if ms.db.TrieDB().Scheme() == rawdb.PathScheme {
+			return
+		}
+		if err := ms.db.TrieDB().Commit(root, false); err != nil {
 			panic("fail to commit mpt data: " + err.Error())
 		}
 		ms.commitSnap(curMptRoot)
