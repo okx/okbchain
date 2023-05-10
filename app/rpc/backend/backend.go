@@ -158,7 +158,7 @@ func (b *EthermintBackend) GetBlockByNumber(blockNum rpctypes.BlockNumber, fullT
 	}
 	resBlock, err := b.Block(&height)
 	if err != nil {
-		return nil, nil
+		return nil, fmt.Errorf("not found block by height(%d)", blockNum)
 	}
 
 	block, err = rpctypes.RpcBlockFromTendermint(b.clientCtx, resBlock.Block, fullTx)
