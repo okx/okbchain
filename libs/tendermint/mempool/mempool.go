@@ -25,7 +25,7 @@ type Mempool interface {
 	// If both maxes are negative, there is no cap on the size of all returned
 	// transactions (~ all available transactions).
 	ReapMaxBytesMaxGas(maxBytes, maxGas int64) []types.Tx
-	ReapEssentialTx(tx types.Tx) abci.TxEssentials
+	ReapEssentialTx(tx abci.TxWithMetaI) abci.TxEssentials
 
 	// ReapMaxTxs reaps up to max transactions from the mempool.
 	// If max is negative, there is no cap on the size of all returned
@@ -51,7 +51,7 @@ type Mempool interface {
 	// NOTE: Lock/Unlock must be managed by caller
 	Update(
 		blockHeight int64,
-		blockTxs types.Txs,
+		blockTxs types.TxWithMetas,
 		deliverTxResponses []*abci.ResponseDeliverTx,
 		newPreFn PreCheckFunc,
 		newPostFn PostCheckFunc,

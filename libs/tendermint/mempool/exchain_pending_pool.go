@@ -57,7 +57,7 @@ func (p *PendingPool) getTx(address string, nonce uint64) *mempoolTx {
 	return nil
 }
 
-func (p *PendingPool) hasTx(tx types.Tx) bool {
+func (p *PendingPool) hasTx(tx types.TxWithMeta) bool {
 	p.mtx.RLock()
 	defer p.mtx.RUnlock()
 	_, exist := p.txsMap[txID(tx)]
@@ -154,7 +154,7 @@ func (p *PendingPool) handlePeriodCounter() {
 	}
 }
 
-func (p *PendingPool) validate(address string, tx types.Tx) error {
+func (p *PendingPool) validate(address string, tx types.TxWithMeta) error {
 	// tx already in pending pool
 	if p.hasTx(tx) {
 		return ErrTxAlreadyInPendingPool{

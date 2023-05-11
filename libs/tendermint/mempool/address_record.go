@@ -188,7 +188,7 @@ func (ar *AddressRecord) GetAddressTxs(address string, max int) types.Txs {
 		if len(txs) == max {
 			break
 		}
-		txs = append(txs, e.Value.(*mempoolTx).tx)
+		txs = append(txs, e.Value.(*mempoolTx).tx.GetTx())
 	}
 	return txs
 }

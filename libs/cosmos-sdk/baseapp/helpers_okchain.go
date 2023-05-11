@@ -15,11 +15,11 @@ func (app *BaseApp) GetDeliverStateCtx() sdk.Context {
 	return app.deliverState.ctx
 }
 
-//TraceTx returns the trace log for the target tx
-//To trace the target tx, the context must be set to the specific block at first,
-//and the predesessors in the same block must be run before tracing the tx.
-//The runtx procedure for TraceTx is nearly same with that for DeliverTx,  but the
-//state was saved in different Cache in app.
+// TraceTx returns the trace log for the target tx
+// To trace the target tx, the context must be set to the specific block at first,
+// and the predesessors in the same block must be run before tracing the tx.
+// The runtx procedure for TraceTx is nearly same with that for DeliverTx,  but the
+// state was saved in different Cache in app.
 func (app *BaseApp) TraceTx(queryTraceTx sdk.QueryTraceTx, targetTx sdk.Tx, txIndex uint32, block *tmtypes.Block) (*sdk.Result, error) {
 
 	//get first tx
@@ -41,7 +41,7 @@ func (app *BaseApp) TraceTx(queryTraceTx sdk.QueryTraceTx, targetTx sdk.Tx, txIn
 	traceState.ctx.SetIsTraceTxLog(false)
 	//pre deliver prodesessor tx to get the right state
 	for _, predesessor := range block.Txs[:txIndex] {
-		tx, err := app.txDecoder(predesessor, block.Height)
+		tx, err := app.txDecoder(predesessor, nil, block.Height)
 		if err != nil {
 			return nil, sdkerrors.Wrap(err, "invalid prodesessor")
 		}

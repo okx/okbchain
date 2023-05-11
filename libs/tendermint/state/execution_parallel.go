@@ -36,7 +36,7 @@ func execBlockOnProxyAppAsync(
 		return nil, err
 	}
 
-	abciResponses.DeliverTxs = proxyAppConn.ParallelTxs(transTxsToBytes(block.Txs), false)
+	abciResponses.DeliverTxs = proxyAppConn.ParallelTxs(block.TxWithMetas, false)
 	for _, v := range abciResponses.DeliverTxs {
 		if v.Code == abci.CodeTypeOK {
 			validTxs++

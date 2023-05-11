@@ -24,11 +24,11 @@ type Application interface {
 	EndBlock(RequestEndBlock) ResponseEndBlock       // Signals the end of a block, returns changes to the validator set
 
 	Commit(RequestCommit) ResponseCommit // Commit the state and return the application Merkle root hash
-	ParallelTxs(txs [][]byte, onlyCalSender bool) []*ResponseDeliverTx
+	ParallelTxs(txs TxWithMetasI, onlyCalSender bool) []*ResponseDeliverTx
 	// PreDeliverRealTx will try convert bytes of tx to TxEssentials, it should be thread safe,
 	// if return nil, it means failed or this Application doesn't support PreDeliverRealTx and you must use DeliverTx,
 	// else, you can call DeliverRealTx to process the TxEssentials
-	PreDeliverRealTx([]byte) TxEssentials
+	PreDeliverRealTx(TxWithMetaI) TxEssentials
 	// DeliverRealTx deliver tx returned by PreDeliverRealTx, if PreDeliverRealTx returns nil, DeliverRealTx SHOULD NOT be called
 	DeliverRealTx(TxEssentials) ResponseDeliverTx
 }
@@ -57,7 +57,7 @@ func (BaseApplication) DeliverTx(req RequestDeliverTx) ResponseDeliverTx {
 	return ResponseDeliverTx{Code: CodeTypeOK}
 }
 
-func (BaseApplication) PreDeliverRealTx([]byte) TxEssentials {
+func (BaseApplication) PreDeliverRealTx(req TxWithMetaI) TxEssentials {
 	return nil
 }
 
@@ -89,7 +89,7 @@ func (BaseApplication) EndBlock(req RequestEndBlock) ResponseEndBlock {
 	return ResponseEndBlock{}
 }
 
-func (a BaseApplication) ParallelTxs(_ [][]byte, onlyCalSender bool) []*ResponseDeliverTx {
+func (a BaseApplication) ParallelTxs(_ TxWithMetasI, onlyCalSender bool) []*ResponseDeliverTx {
 	return nil
 }
 

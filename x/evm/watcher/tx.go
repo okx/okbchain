@@ -82,7 +82,7 @@ func (w *Watcher) getRealTx(tx tm.TxEssentials, txDecoder sdk.TxDecoder) (sdk.Tx
 	var err error
 	realTx, _ := tx.(sdk.Tx)
 	if realTx == nil {
-		realTx, err = txDecoder(tx.GetRaw())
+		realTx, err = txDecoder(tx.GetRaw(), tx.TxHash())
 		if err != nil {
 			return nil, err
 		}

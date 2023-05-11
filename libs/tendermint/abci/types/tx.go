@@ -1,6 +1,8 @@
 package types
 
-import "math/big"
+import (
+	"math/big"
+)
 
 type TxEssentials interface {
 	GetRaw() []byte
@@ -36,4 +38,13 @@ func (tx MockTx) GetNonce() uint64 {
 
 func (tx MockTx) GetGasPrice() *big.Int {
 	return tx.GasPrice
+}
+
+type TxWithMetaI interface {
+	GetTx() []byte
+	Hash() []byte
+}
+
+type TxWithMetasI interface {
+	GetTxWithMetas() interface{}
 }

@@ -1629,6 +1629,8 @@ type Data struct {
 	// This means that block.AppHash does not include these txs.
 	Txs Txs `json:"txs"`
 
+	TxWithMetas TxWithMetas // TxWithMetas is no need participat calculate
+
 	// Volatile
 	hash tmbytes.HexBytes
 }
@@ -1693,7 +1695,11 @@ func (data *Data) Hash(height int64) tmbytes.HexBytes {
 		return (Txs{}).Hash()
 	}
 	if data.hash == nil {
-		data.hash = data.Txs.Hash() // NOTE: leaves of merkle tree are TxIDs
+		if len(data.TxWithMetas) > 0 {
+			return data.TxWithMetas.Hash() // NOTE: leaves of merkle tree are TxIDs
+		}
+		data.TxWithMetas = TxsToTxWithMetas(data.Txs)
+		data.hash = data.TxWithMetas.Hash() // NOTE: leaves of merkle tree are TxIDs
 	}
 	return data.hash
 }

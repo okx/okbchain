@@ -4,10 +4,9 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"math/big"
-
 	"github.com/ethereum/go-ethereum/rlp"
 	"github.com/okx/okbchain/libs/tendermint/crypto/tmhash"
+	"math/big"
 
 	ethcmn "github.com/ethereum/go-ethereum/common"
 

@@ -32,7 +32,7 @@ const IGNORE_HEIGHT_CHECKING = -1
 
 func TxDecoder(cdc codec.CdcAbstraction) sdk.TxDecoder {
 
-	return func(txBytes []byte, heights ...int64) (sdk.Tx, error) {
+	return func(txBytes, txhash []byte, heights ...int64) (sdk.Tx, error) {
 		if len(heights) > 1 {
 			return nil, fmt.Errorf("to many height parameters")
 		}
@@ -56,7 +56,11 @@ func TxDecoder(cdc codec.CdcAbstraction) sdk.TxDecoder {
 		} {
 			if tx, err = f(cdc, txBytes); err == nil {
 				tx.SetRaw(txBytes)
-				tx.SetTxHash(types.Tx(txBytes).Hash())
+				txhsh := txhash
+				if len(txhsh) == 0 {
+					txhsh = types.Tx(txBytes).Hash()
+				}
+				tx.SetTxHash(txhsh)
 				// index=0 means it is a evmtx(evmDecoder) ,we wont verify again
 				// height > IGNORE_HEIGHT_CHECKING means it is a query request
 				if index > 0 && height > IGNORE_HEIGHT_CHECKING {

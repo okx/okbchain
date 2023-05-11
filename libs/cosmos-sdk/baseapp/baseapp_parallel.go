@@ -12,6 +12,7 @@ import (
 	sdkerrors "github.com/okx/okbchain/libs/cosmos-sdk/types/errors"
 	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
 	sm "github.com/okx/okbchain/libs/tendermint/state"
+	ttypes "github.com/okx/okbchain/libs/tendermint/types"
 )
 
 var (
@@ -31,11 +32,11 @@ type extraDataForTx struct {
 
 type txWithIndex struct {
 	index   int
-	txBytes []byte
+	txBytes *ttypes.TxWithMeta
 }
 
 // getExtraDataByTxs preprocessing tx : verify tx, get sender, get toAddress, get txFee
-func (app *BaseApp) getExtraDataByTxs(txs [][]byte) {
+func (app *BaseApp) getExtraDataByTxs(txs ttypes.TxWithMetas) {
 	para := app.parallelTxManage
 
 	var wg sync.WaitGroup
@@ -53,7 +54,7 @@ func (app *BaseApp) getExtraDataByTxs(txs [][]byte) {
 					tx, _ = mem.ReapEssentialTx(txBytes).(sdk.Tx)
 				}
 				if tx == nil {
-					tx, err = app.txDecoder(txBytes)
+					tx, err = app.txDecoder(txBytes.GetTx(), txBytes.Hash())
 					if err != nil {
 						para.extraTxsInfo[index] = &extraDataForTx{
 							decodeErr: err,
@@ -63,10 +64,10 @@ func (app *BaseApp) getExtraDataByTxs(txs [][]byte) {
 					}
 				}
 				if tx != nil {
-					app.blockDataCache.SetTx(txBytes, tx)
+					app.blockDataCache.SetTx(txBytes.GetTx(), tx)
 				}
 
-				coin, isEvm, s, toAddr, _ := app.getTxFeeAndFromHandler(app.getContextForTx(runTxModeDeliver, txBytes), tx)
+				coin, isEvm, s, toAddr, _ := app.getTxFeeAndFromHandler(app.getContextForTx(runTxModeDeliver, txBytes.GetTx()), tx)
 				para.extraTxsInfo[index] = &extraDataForTx{
 					fee:   coin,
 					isEvm: isEvm,
@@ -166,17 +167,18 @@ func (app *BaseApp) calGroup() {
 }
 
 // ParallelTxs run txs
-func (app *BaseApp) ParallelTxs(txs [][]byte, onlyCalSender bool) []*abci.ResponseDeliverTx {
-	txSize := len(txs)
+func (app *BaseApp) ParallelTxs(txs abci.TxWithMetasI, onlyCalSender bool) []*abci.ResponseDeliverTx {
+	txMetas := txs.GetTxWithMetas().(ttypes.TxWithMetas)
+	txSize := len(txMetas)
 
 	if txSize == 0 {
 		return make([]*abci.ResponseDeliverTx, 0)
 	}
 
 	pm := app.parallelTxManage
-	pm.init(txs, app.deliverState.ctx.BlockHeight(), app.deliverState.ms)
+	pm.init(txMetas, app.deliverState.ctx.BlockHeight(), app.deliverState.ms)
 
-	app.getExtraDataByTxs(txs)
+	app.getExtraDataByTxs(txMetas)
 
 	app.calGroup()
 
@@ -334,8 +336,8 @@ func (app *BaseApp) endParallelTxs(txSize int) [][]byte {
 	return app.logFix(txs, logIndex, hasEnterEvmTx, errs, resp)
 }
 
-//we reuse the nonce that changed by the last async call
-//if last ante handler has been failed, we need rerun it ? or not?
+// we reuse the nonce that changed by the last async call
+// if last ante handler has been failed, we need rerun it ? or not?
 func (app *BaseApp) deliverTxWithCache(txIndex int) *executeResult {
 	app.parallelTxManage.currentRerunIndex = txIndex
 	defer func() {
@@ -353,7 +355,7 @@ func (app *BaseApp) deliverTxWithCache(txIndex int) *executeResult {
 		mode runTxMode
 	)
 	mode = runTxModeDeliverInAsync
-	info, errM := app.runTxWithIndex(txIndex, mode, app.parallelTxManage.txs[txIndex], txStatus.stdTx, LatestSimulateTxHeight)
+	info, errM := app.runTxWithIndex(txIndex, mode, app.parallelTxManage.txs[txIndex].GetTx(), txStatus.stdTx, LatestSimulateTxHeight)
 	if errM != nil {
 		resp = sdkerrors.ResponseDeliverTx(errM, info.gInfo.GasWanted, info.gInfo.GasUsed, app.trace)
 	} else {
@@ -423,7 +425,7 @@ type parallelTxManager struct {
 	blockGasMeterMu     sync.Mutex
 	haveCosmosTxInBlock bool
 	isAsyncDeliverTx    bool
-	txs                 [][]byte
+	txs                 ttypes.TxWithMetas
 	txSize              int
 	alreadyEnd          bool
 
@@ -710,7 +712,7 @@ func (pm *parallelTxManager) clear() {
 	}
 }
 
-func (pm *parallelTxManager) init(txs [][]byte, blockHeight int64, deliverStateMs sdk.CacheMultiStore) {
+func (pm *parallelTxManager) init(txs ttypes.TxWithMetas, blockHeight int64, deliverStateMs sdk.CacheMultiStore) {
 
 	txSize := len(txs)
 	pm.blockHeight = blockHeight

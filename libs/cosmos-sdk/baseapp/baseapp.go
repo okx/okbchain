@@ -969,11 +969,11 @@ func (app *BaseApp) GetTxInfo(ctx sdk.Context, tx sdk.Tx) mempool.ExTxInfo {
 	return exTxInfo
 }
 
-func (app *BaseApp) GetRawTxInfo(rawTx tmtypes.Tx) mempool.ExTxInfo {
+func (app *BaseApp) GetRawTxInfo(rawTx tmtypes.TxWithMeta) mempool.ExTxInfo {
 	var err error
-	tx, ok := app.blockDataCache.GetTx(rawTx)
+	tx, ok := app.blockDataCache.GetTx(rawTx.GetTx())
 	if !ok {
-		tx, err = app.txDecoder(rawTx)
+		tx, err = app.txDecoder(rawTx.GetTx(), rawTx.Hash())
 		if err != nil {
 			return mempool.ExTxInfo{}
 		}
@@ -982,19 +982,19 @@ func (app *BaseApp) GetRawTxInfo(rawTx tmtypes.Tx) mempool.ExTxInfo {
 	if tx.GetType() == sdk.EvmTxType && app.preDeliverTxHandler != nil {
 		app.preDeliverTxHandler(ctx, tx, true)
 	}
-	ctx.SetTxBytes(rawTx)
+	ctx.SetTxBytes(rawTx.GetTx())
 	return app.GetTxInfo(ctx, tx)
 }
 
-func (app *BaseApp) GetRealTxFromRawTx(rawTx tmtypes.Tx) abci.TxEssentials {
-	if tx, ok := app.blockDataCache.GetTx(rawTx); ok {
+func (app *BaseApp) GetRealTxFromRawTx(rawTx tmtypes.TxWithMeta) abci.TxEssentials {
+	if tx, ok := app.blockDataCache.GetTx(rawTx.GetTx()); ok {
 		return tx
 	}
 	return nil
 }
 
-func (app *BaseApp) GetTxHistoryGasUsed(rawTx tmtypes.Tx) int64 {
-	tx, err := app.txDecoder(rawTx)
+func (app *BaseApp) GetTxHistoryGasUsed(rawTx tmtypes.TxWithMeta) int64 {
+	tx, err := app.txDecoder(rawTx.GetTx(), rawTx.Hash())
 	if err != nil {
 		return -1
 	}

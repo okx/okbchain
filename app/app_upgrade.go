@@ -18,7 +18,7 @@ func (app *OKBChainApp) RegisterTxService(clientCtx cliContext.CLIContext) {
 	utils.RegisterTxService(app.BaseApp.GRPCQueryRouter(), clientCtx, app.grpcSimulate, clientCtx.InterfaceRegistry)
 }
 func (app *OKBChainApp) grpcSimulate(txBytes []byte) (sdk.GasInfo, *sdk.Result, error) {
-	tx, err := app.GetTxDecoder()(txBytes)
+	tx, err := app.GetTxDecoder()(txBytes, nil)
 	if err != nil {
 		return sdk.GasInfo{}, nil, sdkerrors.Wrap(err, "failed to decode tx")
 	}

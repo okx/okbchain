@@ -80,7 +80,7 @@ func (app *PersistentKVStoreApplication) DeliverTx(req types.RequestDeliverTx) t
 	return app.app.DeliverTx(req)
 }
 
-func (app *PersistentKVStoreApplication) PreDeliverRealTx([]byte) types.TxEssentials {
+func (app *PersistentKVStoreApplication) PreDeliverRealTx(types.TxWithMetaI) types.TxEssentials {
 	return nil
 }
 
@@ -152,7 +152,7 @@ func (app *PersistentKVStoreApplication) EndBlock(req types.RequestEndBlock) typ
 	return types.ResponseEndBlock{ValidatorUpdates: app.ValUpdates}
 }
 
-func (app *PersistentKVStoreApplication) ParallelTxs(_ [][]byte, _ bool) []*types.ResponseDeliverTx {
+func (app *PersistentKVStoreApplication) ParallelTxs(_ types.TxWithMetasI, _ bool) []*types.ResponseDeliverTx {
 	return nil
 }
 

@@ -339,21 +339,21 @@ func (memR *Reactor) broadcastTxRoutine(peer p2p.Peer) {
 			if memTx.nodeKey != nil && memTx.signature != nil {
 				msg = &WtxMessage{
 					Wtx: &WrappedTx{
-						Payload:   memTx.tx,
+						Payload:   memTx.tx.GetTx(),
 						From:      memTx.from,
 						Signature: memTx.signature,
 						NodeKey:   memTx.nodeKey,
 					},
 				}
 			} else if memR.enableWtx {
-				if wtx, err := memR.wrapTx(memTx.tx, memTx.from); err == nil {
+				if wtx, err := memR.wrapTx(memTx.tx.GetTx(), memTx.from); err == nil {
 					msg = &WtxMessage{
 						Wtx: wtx,
 					}
 				}
 			} else {
 				txMsg := txMessageDeocdePool.Get().(*TxMessage)
-				txMsg.Tx = memTx.tx
+				txMsg.Tx = memTx.tx.GetTx()
 				if isInWhiteList {
 					txMsg.From = memTx.from
 				} else {

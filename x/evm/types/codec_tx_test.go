@@ -1,6 +1,7 @@
 package types
 
 import (
+	"fmt"
 	"github.com/okx/okbchain/libs/system"
 	"math/big"
 	"strings"
@@ -187,5 +188,23 @@ func benchmarkDecodeTx(b *testing.B, enc encoder) {
 		evmMsg := new(MsgEthereumTx)
 		b.StartTimer()
 		enc.decodeTx(data, evmMsg)
+	}
+}
+
+func BenchmarkTxHash(b *testing.B) {
+	tx := generateTestTx(30)
+
+	enc := newTestEncoder(rlpEnc)
+	data, _ := enc.encodeTx(tx)
+
+	b.ResetTimer()
+
+	for i := 0; i < b.N; i++ {
+		b.StartTimer()
+		var tx types.Tx
+		tx = data
+		hsh := tx.Hash()
+		b.StopTimer()
+		fmt.Println("hash", len(hsh))
 	}
 }

@@ -11,6 +11,7 @@ import (
 	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
 	sdkerrors "github.com/okx/okbchain/libs/cosmos-sdk/types/errors"
 	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
+	ttypes "github.com/okx/okbchain/libs/tendermint/types"
 )
 
 type runTxInfo struct {
@@ -281,10 +282,10 @@ func (app *BaseApp) DeliverTx(req abci.RequestDeliverTx) abci.ResponseDeliverTx 
 	var realTx sdk.Tx
 	var err error
 	if mem := GetGlobalMempool(); mem != nil {
-		realTx, _ = mem.ReapEssentialTx(req.Tx).(sdk.Tx)
+		realTx, _ = mem.ReapEssentialTx(&ttypes.TxWithMeta{req.GetTx(), req.GetTxHash()}).(sdk.Tx)
 	}
 	if realTx == nil {
-		realTx, err = app.txDecoder(req.Tx)
+		realTx, err = app.txDecoder(req.Tx, req.Txhash)
 		if err != nil {
 			return sdkerrors.ResponseDeliverTx(err, 0, 0, app.trace)
 		}
@@ -307,19 +308,19 @@ func (app *BaseApp) DeliverTx(req abci.RequestDeliverTx) abci.ResponseDeliverTx 
 	return deliverTx
 }
 
-func (app *BaseApp) PreDeliverRealTx(tx []byte) abci.TxEssentials {
+func (app *BaseApp) PreDeliverRealTx(tx abci.TxWithMetaI) abci.TxEssentials {
 	var realTx sdk.Tx
 	var err error
 	if mem := GetGlobalMempool(); mem != nil {
 		realTx, _ = mem.ReapEssentialTx(tx).(sdk.Tx)
 	}
 	if realTx == nil {
-		realTx, err = app.txDecoder(tx)
+		realTx, err = app.txDecoder(tx.GetTx(), tx.Hash())
 		if err != nil || realTx == nil {
 			return nil
 		}
 	}
-	app.blockDataCache.SetTx(tx, realTx)
+	app.blockDataCache.SetTx(tx.GetTx(), realTx)
 
 	if realTx.GetType() == sdk.EvmTxType && app.preDeliverTxHandler != nil {
 		ctx := app.deliverState.ctx
@@ -336,7 +337,7 @@ func (app *BaseApp) DeliverRealTx(txes abci.TxEssentials) abci.ResponseDeliverTx
 	var err error
 	realTx, _ := txes.(sdk.Tx)
 	if realTx == nil {
-		realTx, err = app.txDecoder(txes.GetRaw())
+		realTx, err = app.txDecoder(txes.GetRaw(), txes.TxHash())
 		if err != nil {
 			return sdkerrors.ResponseDeliverTx(err, 0, 0, app.trace)
 		}
@@ -411,7 +412,7 @@ func (app *BaseApp) asyncDeliverTx(txIndex int) *executeResult {
 	}
 
 	var resp abci.ResponseDeliverTx
-	info, errM := app.runTxWithIndex(txIndex, runTxModeDeliverInAsync, pm.txs[txIndex], txStatus.stdTx, LatestSimulateTxHeight)
+	info, errM := app.runTxWithIndex(txIndex, runTxModeDeliverInAsync, pm.txs[txIndex].GetTx(), txStatus.stdTx, LatestSimulateTxHeight)
 	if errM != nil {
 		resp = sdkerrors.ResponseDeliverTx(errM, info.gInfo.GasWanted, info.gInfo.GasUsed, app.trace)
 	} else {

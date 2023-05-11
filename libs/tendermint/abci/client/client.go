@@ -28,7 +28,7 @@ type Client interface {
 	InfoAsync(types.RequestInfo) *ReqRes
 	SetOptionAsync(types.RequestSetOption) *ReqRes
 	DeliverTxAsync(types.RequestDeliverTx) *ReqRes
-	PreDeliverRealTxAsync([]byte) types.TxEssentials
+	PreDeliverRealTxAsync(req types.TxWithMetaI) types.TxEssentials
 	DeliverRealTxAsync(types.TxEssentials) *ReqRes
 	CheckTxAsync(types.RequestCheckTx) *ReqRes
 	QueryAsync(types.RequestQuery) *ReqRes
@@ -48,7 +48,7 @@ type Client interface {
 	InitChainSync(types.RequestInitChain) (*types.ResponseInitChain, error)
 	BeginBlockSync(types.RequestBeginBlock) (*types.ResponseBeginBlock, error)
 	EndBlockSync(types.RequestEndBlock) (*types.ResponseEndBlock, error)
-	ParallelTxs([][]byte, bool) []*types.ResponseDeliverTx
+	ParallelTxs(types.TxWithMetasI, bool) []*types.ResponseDeliverTx
 }
 
 //----------------------------------------

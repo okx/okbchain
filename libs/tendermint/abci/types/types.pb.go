@@ -760,6 +760,7 @@ func (m *RequestCheckTx) GetFrom() string {
 
 type RequestDeliverTx struct {
 	Tx                   []byte   `protobuf:"bytes,1,opt,name=tx,proto3" json:"tx,omitempty"`
+	Txhash               []byte   `protobuf:"bytes,1,opt,name=tx,proto3" json:"txhash,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -801,6 +802,13 @@ var xxx_messageInfo_RequestDeliverTx proto.InternalMessageInfo
 func (m *RequestDeliverTx) GetTx() []byte {
 	if m != nil {
 		return m.Tx
+	}
+	return nil
+}
+
+func (m *RequestDeliverTx) GetTxHash() []byte {
+	if m != nil {
+		return m.Txhash
 	}
 	return nil
 }

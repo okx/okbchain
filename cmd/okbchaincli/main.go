@@ -180,7 +180,7 @@ func parseMsgEthereumTx(cdc *sdkcodec.CodecProxy, txBytes []byte) (sdk.Tx, error
 }
 
 func parseProtobufTx(cdc *sdkcodec.CodecProxy, txBytes []byte) (sdk.Tx, error) {
-	tx, err := evmtypes.TxDecoder(cdc)(txBytes, evmtypes.IGNORE_HEIGHT_CHECKING)
+	tx, err := evmtypes.TxDecoder(cdc)(txBytes, nil, evmtypes.IGNORE_HEIGHT_CHECKING)
 	if nil != err {
 		return nil, err
 	}

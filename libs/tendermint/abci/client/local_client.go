@@ -93,7 +93,7 @@ func (app *localClient) DeliverTxAsync(params types.RequestDeliverTx) *ReqRes {
 	)
 }
 
-func (app *localClient) PreDeliverRealTxAsync(params []byte) types.TxEssentials {
+func (app *localClient) PreDeliverRealTxAsync(params types.TxWithMetaI) types.TxEssentials {
 	return app.Application.PreDeliverRealTx(params)
 }
 
@@ -177,7 +177,7 @@ func (app *localClient) EndBlockAsync(req types.RequestEndBlock) *ReqRes {
 	)
 }
 
-func (app *localClient) ParallelTxs(txs [][]byte, onlyCalSender bool) []*types.ResponseDeliverTx {
+func (app *localClient) ParallelTxs(txs types.TxWithMetasI, onlyCalSender bool) []*types.ResponseDeliverTx {
 	app.mtx.Lock()
 	defer app.mtx.Unlock()
 	return app.Application.ParallelTxs(txs, onlyCalSender)

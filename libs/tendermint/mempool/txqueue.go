@@ -58,7 +58,8 @@ func (q *BaseTxQueue) Insert(tx *mempoolTx) error {
 	ele := q.txs.PushBack(tx)
 
 	q.AddressRecord.AddItem(ele.Address, ele)
-	q.txsMap.Store(txKey(ele.Value.(*mempoolTx).tx), ele)
+	etx := ele.Value.(*mempoolTx).tx
+	q.txsMap.Store(txOrTxHashToKey(etx.GetTx(), etx.Hash()), ele)
 	return nil
 }
 
@@ -108,7 +109,7 @@ func (q *BaseTxQueue) removeElement(element *clist.CElement) {
 	element.DetachPrev()
 
 	tx := element.Value.(*mempoolTx).tx
-	txHash := txKey(tx)
+	txHash := txOrTxHashToKey(tx.GetTx(), tx.Hash())
 	q.txsMap.Delete(txHash)
 }
 

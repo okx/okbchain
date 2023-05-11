@@ -16,12 +16,12 @@ type AppConnConsensus interface {
 
 	BeginBlockSync(types.RequestBeginBlock) (*types.ResponseBeginBlock, error)
 	DeliverTxAsync(types.RequestDeliverTx) *abcicli.ReqRes
-	PreDeliverRealTxAsync(req []byte) types.TxEssentials
+	PreDeliverRealTxAsync(req types.TxWithMetaI) types.TxEssentials
 	DeliverRealTxAsync(essentials types.TxEssentials) *abcicli.ReqRes
 	EndBlockSync(types.RequestEndBlock) (*types.ResponseEndBlock, error)
 	CommitSync(types.RequestCommit) (*types.ResponseCommit, error)
 	SetOptionAsync(req types.RequestSetOption) *abcicli.ReqRes
-	ParallelTxs([][]byte, bool) []*types.ResponseDeliverTx
+	ParallelTxs(types.TxWithMetasI, bool) []*types.ResponseDeliverTx
 	SetOptionSync(req types.RequestSetOption) (*types.ResponseSetOption, error)
 }
 
@@ -82,7 +82,7 @@ func (app *appConnConsensus) DeliverTxAsync(req types.RequestDeliverTx) *abcicli
 	return app.appConn.DeliverTxAsync(req)
 }
 
-func (app *appConnConsensus) PreDeliverRealTxAsync(req []byte) types.TxEssentials {
+func (app *appConnConsensus) PreDeliverRealTxAsync(req types.TxWithMetaI) types.TxEssentials {
 	return app.appConn.PreDeliverRealTxAsync(req)
 }
 
@@ -147,7 +147,7 @@ func (app *appConnMempool) QuerySync(req types.RequestQuery) (*types.ResponseQue
 	return app.appConn.QuerySync(req)
 }
 
-func (app *appConnConsensus) ParallelTxs(txs [][]byte, onlyCalSender bool) []*types.ResponseDeliverTx {
+func (app *appConnConsensus) ParallelTxs(txs types.TxWithMetasI, onlyCalSender bool) []*types.ResponseDeliverTx {
 	return app.appConn.ParallelTxs(txs, onlyCalSender)
 }
 

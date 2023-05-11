@@ -435,7 +435,7 @@ func (blockExec *BlockExecutor) commit(
 	// Update mempool.
 	err = blockExec.mempool.Update(
 		block.Height,
-		block.Txs,
+		block.TxWithMetas,
 		deliverTxResponses,
 		TxPreCheck(state),
 		TxPostCheck(state),
@@ -517,7 +517,7 @@ func execBlockOnProxyApp(context *executionTask) (*ABCIResponses, error) {
 	realTxCh := make(chan abci.TxEssentials, len(block.Txs))
 	stopedCh := make(chan struct{}, 1)
 
-	go preDeliverRoutine(proxyAppConn, block.Txs, realTxCh, stopedCh)
+	go preDeliverRoutine(proxyAppConn, block.TxWithMetas, realTxCh, stopedCh)
 
 	count := 0
 	for realTx := range realTxCh {
@@ -556,7 +556,7 @@ func execBlockOnProxyApp(context *executionTask) (*ABCIResponses, error) {
 	return abciResponses, nil
 }
 
-func preDeliverRoutine(proxyAppConn proxy.AppConnConsensus, txs types.Txs, realTxCh chan<- abci.TxEssentials, stopedCh <-chan struct{}) {
+func preDeliverRoutine(proxyAppConn proxy.AppConnConsensus, txs types.TxWithMetas, realTxCh chan<- abci.TxEssentials, stopedCh <-chan struct{}) {
 	for _, tx := range txs {
 		realTx := proxyAppConn.PreDeliverRealTxAsync(tx)
 		select {

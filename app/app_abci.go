@@ -26,7 +26,7 @@ func (app *OKBChainApp) DeliverTx(req abci.RequestDeliverTx) (res abci.ResponseD
 	return resp
 }
 
-func (app *OKBChainApp) PreDeliverRealTx(req []byte) (res abci.TxEssentials) {
+func (app *OKBChainApp) PreDeliverRealTx(req abci.TxWithMetaI) (res abci.TxEssentials) {
 	return app.BaseApp.PreDeliverRealTx(req)
 }
 

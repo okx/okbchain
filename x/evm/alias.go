@@ -23,7 +23,7 @@ var (
 	NewMultiEvmHooks     = keeper.NewMultiEvmHooks
 )
 
-//nolint
+// nolint
 type (
 	Keeper        = keeper.Keeper
 	GenesisState  = types.GenesisState
@@ -31,8 +31,8 @@ type (
 )
 
 func WithMoreDeocder(cdc *codec.Codec, cc sdk.TxDecoder) sdk.TxDecoder {
-	return func(txBytes []byte, height ...int64) (sdk.Tx, error) {
-		ret, err := cc(txBytes, height...)
+	return func(txBytes, txhash []byte, height ...int64) (sdk.Tx, error) {
+		ret, err := cc(txBytes, txhash, height...)
 		if nil == err {
 			return ret, nil
 		}

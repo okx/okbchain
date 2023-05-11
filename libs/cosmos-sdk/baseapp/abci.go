@@ -401,6 +401,8 @@ func (app *BaseApp) Query(req abci.RequestQuery) abci.ResponseQuery {
 		return sdkerrors.QueryResult(sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, "unknown query path"))
 	}
 }
+
+// TODO handleSimulate may used txhash as the input param
 func handleSimulate(app *BaseApp, path []string, height int64, txBytes []byte, overrideBytes []byte) abci.ResponseQuery {
 	// if path contains address, it means 'eth_estimateGas' the sender
 	hasExtraPaths := len(path) > 2
@@ -416,10 +418,10 @@ func handleSimulate(app *BaseApp, path []string, height int64, txBytes []byte, o
 	var tx sdk.Tx
 	var err error
 	if mem := GetGlobalMempool(); mem != nil {
-		tx, _ = mem.ReapEssentialTx(txBytes).(sdk.Tx)
+		tx, _ = mem.ReapEssentialTx(&tmtypes.TxWithMeta{Tx: txBytes}).(sdk.Tx)
 	}
 	if tx == nil {
-		tx, err = app.txDecoder(txBytes)
+		tx, err = app.txDecoder(txBytes, nil)
 		if err != nil {
 			return sdkerrors.QueryResult(sdkerrors.Wrap(err, "failed to decode tx"))
 		}
@@ -503,7 +505,7 @@ func handleQueryApp(app *BaseApp, path []string, req abci.RequestQuery) abci.Res
 			if err != nil {
 				return sdkerrors.QueryResult(sdkerrors.Wrap(err, "invalid trace tx bytes"))
 			}
-			tx, err := app.txDecoder(tmtx.Tx, tmtx.Height)
+			tx, err := app.txDecoder(tmtx.Tx, nil, tmtx.Height)
 			if err != nil {
 				return sdkerrors.QueryResult(sdkerrors.Wrap(err, "failed to decode tx"))
 			}

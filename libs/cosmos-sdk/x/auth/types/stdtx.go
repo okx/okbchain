@@ -428,7 +428,7 @@ type StdSignature struct {
 
 // DefaultTxDecoder logic for standard transaction decoding
 func DefaultTxDecoder(cdc *codec.Codec) sdk.TxDecoder {
-	return func(txBytes []byte, heights ...int64) (sdk.Tx, error) {
+	return func(txBytes, txhash []byte, heights ...int64) (sdk.Tx, error) {
 		if len(heights) > 0 {
 			return nil, fmt.Errorf("too many height parameters")
 		}
