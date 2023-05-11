@@ -47,6 +47,18 @@ const (
 	maxPruneHeightsLength = 100
 )
 
+var (
+	repairing bool
+)
+
+func SetRepair() {
+	repairing = true
+}
+
+func getRepair() bool {
+	return repairing
+}
+
 // Store is composed of many CommitStores. Name contrasts with
 // cacheMultiStore which is for cache-wrapping other MultiStores. It implements
 // the CommitMultiStore interface.
@@ -390,6 +402,13 @@ func (rs *Store) loadVersion(ver int64, upgrades *types.StoreUpgrades) error {
 				for key, param := range rs.storesParams {
 					if key.Name() == name {
 						param.upgradeVersion = uint64(version)
+						// when we upgrade by proposal way and repair data across the milestone,
+						// we can not get the upgrade version before the expect height,
+						// and we should not use the original 0 too, because 0 means the latest height,
+						// so when we repair data before the milestone. we open a empty tree by cur version.
+						if getRepair() && version == 0 {
+							param.upgradeVersion = uint64(ver)
+						}
 						rs.storesParams[key] = param
 					}
 				}
