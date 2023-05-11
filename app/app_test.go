@@ -32,6 +32,7 @@ import (
 	authtypes "github.com/okx/okbchain/libs/cosmos-sdk/x/auth/types"
 	abcitypes "github.com/okx/okbchain/libs/tendermint/abci/types"
 	"github.com/okx/okbchain/libs/tendermint/crypto"
+	ttypes "github.com/okx/okbchain/libs/tendermint/types"
 	"github.com/okx/okbchain/x/gov"
 )
 
@@ -308,7 +309,7 @@ func (suite *FakeBlockTxTestSuite) TestFakeBlockTx() {
 	totalGas := int64(0)
 	for _, tc := range testCases {
 		suite.Run(tc.title, func() {
-			txReal := suite.app.PreDeliverRealTx(tc.buildTx())
+			txReal := suite.app.PreDeliverRealTx(ttypes.NewTxWithMeta(tc.buildTx()))
 			suite.Require().NotNil(txReal)
 			resp := suite.app.DeliverRealTx(txReal)
 			totalGas += resp.GasUsed

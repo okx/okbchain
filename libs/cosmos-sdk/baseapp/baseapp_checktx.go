@@ -18,7 +18,7 @@ import (
 // will contain releveant error information. Regardless of tx execution outcome,
 // the ResponseCheckTx will contain relevant gas execution context.
 func (app *BaseApp) CheckTx(req abci.RequestCheckTx) abci.ResponseCheckTx {
-	tx, err := app.txDecoder(req.Tx, nil, global.GetGlobalHeight()) // TODO check tx not import types.TxWithMeta
+	tx, err := app.txDecoder(req.Tx, req.TxHash, global.GetGlobalHeight()) // TODO check tx not import types.TxWithMeta
 	if err != nil {
 		return sdkerrors.ResponseCheckTx(err, 0, 0, app.trace)
 	}
