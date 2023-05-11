@@ -18,7 +18,6 @@ import (
 	"github.com/ethereum/go-ethereum/trie"
 	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
 	"github.com/okx/okbchain/libs/cosmos-sdk/store/cachekv"
-	mpttype "github.com/okx/okbchain/libs/cosmos-sdk/store/mpt/types"
 	"github.com/okx/okbchain/libs/cosmos-sdk/store/tracekv"
 	"github.com/okx/okbchain/libs/cosmos-sdk/store/types"
 	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
@@ -182,7 +181,6 @@ func (ms *MptStore) openTrie(id types.CommitID) error {
 
 func (ms *MptStore) GetImmutable(height int64) (*ImmutableMptStore, error) {
 	rootHash := ms.GetMptRootHash(uint64(height))
-
 	return NewImmutableMptStore(ms.db, rootHash)
 }
 
@@ -241,7 +239,8 @@ func (ms *MptStore) tryGetStorageTrie(addr ethcmn.Address, stateRoot ethcmn.Hash
 			return t
 		}
 	}
-	addrHash := mpttype.Keccak256HashWithSyncPool(addr[:])
+	//addrHash := mpttype.Keccak256HashWithSyncPool(addr[:])
+	addrHash := addr.Hash()
 	var t ethstate.Trie
 	var err error
 	t, err = ms.db.OpenStorageTrie(ms.originalRoot, addrHash, stateRoot)
@@ -369,8 +368,8 @@ func (ms *MptStore) commitStorageForDelta(nodeSets *trie.MergedNodeSet) []*trie.
 }
 
 func (ms *MptStore) commitStorage(nodeSets *trie.MergedNodeSet) {
-	for addr, v := range ms.storageTrieForWrite {
-		stateR, set := v.Commit(false)
+	for addr, t := range ms.storageTrieForWrite {
+		stateR, set := t.Commit(false)
 		key := AddressStoreKey(addr.Bytes())
 		preValue, err := ms.trie.GetStorage(ethcmn.Address{}, key)
 		if err == nil { // maybe acc already been deleted
@@ -378,7 +377,7 @@ func (ms *MptStore) commitStorage(nodeSets *trie.MergedNodeSet) {
 			if err := ms.trie.UpdateStorage(ethcmn.Address{}, key, newValue); err != nil {
 				panic(fmt.Errorf("unexcepted err:%v while update acc %s ", err, addr.String()))
 			}
-			ms.updateSnapAccounts(key, newValue)
+			//ms.updateSnapAccounts(key, newValue)
 		} else {
 			panic(fmt.Errorf("unexcepted err:%v while update get acc %s ", err, addr.String()))
 		}
@@ -599,12 +598,12 @@ func (ms *MptStore) CurrentVersion() int64 {
 }
 
 func (ms *MptStore) OnStop() error {
-	return ms.StopWithVersion(ms.version)
+	return ms.StopWithVersion(ms.version, ms.originalRoot)
 }
 
 // Stop stops the blockchain service. If any imports are currently in progress
 // it will abort them using the procInterrupt.
-func (ms *MptStore) StopWithVersion(targetVersion int64) error {
+func (ms *MptStore) StopWithVersion(targetVersion int64, root ethcmn.Hash) error {
 	curVersion := uint64(targetVersion)
 	ms.exitSignal <- struct{}{}
 	ms.StopPrefetcher()
@@ -612,35 +611,43 @@ func (ms *MptStore) StopWithVersion(targetVersion int64) error {
 	ms.cmLock.Lock()
 	defer ms.cmLock.Unlock()
 
-	// Ensure the state of a recent block is also stored to disk before exiting.
-	if !TrieDirtyDisabled {
-		triedb := ms.db.TrieDB()
-		okbcStartHeight := uint64(tmtypes.GetStartBlockHeight()) // start height of okbc
-
-		latestStoreVersion := ms.GetLatestStoredBlockHeight()
-
-		for version := latestStoreVersion; version <= curVersion; version++ {
-			if version <= okbcStartHeight || version <= uint64(ms.startVersion) {
-				continue
-			}
-
-			recentMptRoot := ms.GetMptRootHash(version)
-			if recentMptRoot == (ethcmn.Hash{}) || recentMptRoot == ethtypes.EmptyRootHash {
-				recentMptRoot = ethcmn.Hash{}
-			} else {
-				if err := triedb.Commit(recentMptRoot, true); err != nil {
-					ms.logger.Error("Failed to commit recent state trie", "err", err)
-					break
-				}
-			}
-			ms.SetLatestStoredBlockHeight(version)
-			ms.logger.Info("Writing acc cached state to disk", "block", version, "trieHash", recentMptRoot)
+	if ms.db.TrieDB().Scheme() == rawdb.PathScheme {
+		// Ensure that the in-memory trie nodes are journaled to disk properly.
+		if err := ms.db.TrieDB().Journal(root); err != nil {
+			panic(fmt.Sprintf("Failed to journal in-memory trie nodes: %s", err))
 		}
+	} else {
+		// Ensure the state of a recent block is also stored to disk before exiting.
+		if !TrieDirtyDisabled {
+			triedb := ms.db.TrieDB()
+			okbcStartHeight := uint64(tmtypes.GetStartBlockHeight()) // start height of okbc
 
-		for !ms.triegc.Empty() {
-			ms.db.TrieDB().Dereference(ms.triegc.PopItem())
+			latestStoreVersion := ms.GetLatestStoredBlockHeight()
+
+			for version := latestStoreVersion; version <= curVersion; version++ {
+				if version <= okbcStartHeight || version <= uint64(ms.startVersion) {
+					continue
+				}
+
+				recentMptRoot := ms.GetMptRootHash(version)
+				if recentMptRoot == (ethcmn.Hash{}) || recentMptRoot == ethtypes.EmptyRootHash {
+					recentMptRoot = ethcmn.Hash{}
+				} else {
+					if err := triedb.Commit(recentMptRoot, true); err != nil {
+						ms.logger.Error("Failed to commit recent state trie", "err", err)
+						break
+					}
+				}
+				ms.SetLatestStoredBlockHeight(version)
+				ms.logger.Info("Writing acc cached state to disk", "block", version, "trieHash", recentMptRoot)
+			}
+
+			for !ms.triegc.Empty() {
+				ms.db.TrieDB().Dereference(ms.triegc.PopItem())
+			}
 		}
 	}
+	ms.db.TrieDB().Close()
 
 	ts := time.Now()
 	if err := ms.flattenPersistSnapshot(); err != nil {

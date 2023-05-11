@@ -46,7 +46,7 @@ func initCommitMultiStore(storeKey *sdk.KVStoreKey) (sdk.CommitMultiStore, *sdk.
 	cms.MountStoreWithDB(paramsKey, sdk.StoreTypeIAVL, db)
 	cms.MountStoreWithDB(storeKey, sdk.StoreTypeMPT, db)
 	cms.MountStoreWithDB(paramsTKey, sdk.StoreTypeTransient, db)
-	cms.LoadLatestVersion()
+	//cms.LoadLatestVersion() // for node restart panic: missing trie node
 	return cms, paramsKey, paramsTKey
 }
 
