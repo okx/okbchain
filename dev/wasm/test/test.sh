@@ -80,6 +80,6 @@ echo "6-----------------------"
 echo "## Clear contract admin"
 echo "### Query old admin: $(okbchaincli q wasm contract "$CONTRACT" -o json | jq -r '.contract_info.admin')"
 echo "### Update contract"
-okbchaincli tx wasm clear-contract-admin "$CONTRACT" --fees 0.001okb \
+okbchaincli tx wasm set-contract-admin "$CONTRACT" "0x0000000000000000000000000000000000000000" --fees 0.001okb \
   --from fred -y -b block -o json | jq
 echo "### Query new admin: $(okbchaincli q wasm contract "$CONTRACT" -o json | jq -r '.contract_info.admin')"
