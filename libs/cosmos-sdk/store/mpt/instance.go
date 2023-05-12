@@ -45,6 +45,7 @@ func InstanceOfMptStore() ethstate.Database {
 			panic("fail to open database: " + e.Error())
 		}
 		nkvstore := NewStatKeyValueStore(kvstore, gStatic)
+		TrieDirtyDisabled = viper.GetBool(FlagTrieDirtyDisabled)
 		if EnableAsyncCommit && TrieAsyncDB && !TrieDirtyDisabled {
 			gAsyncDB = NewAsyncKeyValueStoreWithOptions(nkvstore, AsyncKeyValueStoreOptions{
 				DisableAutoPrune: TrieAsyncDBAutoPruningOff,

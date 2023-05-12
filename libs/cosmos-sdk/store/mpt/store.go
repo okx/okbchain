@@ -4,6 +4,7 @@ import (
 	"encoding/hex"
 	"fmt"
 	"github.com/okx/okbchain/libs/system/trace/persist"
+	"github.com/spf13/viper"
 	"io"
 	"sync"
 	"time"
@@ -518,6 +519,7 @@ func (ms *MptStore) PushData2Database(curHeight int64, root ethcmn.Hash) {
 	defer ms.cmLock.Unlock()
 
 	curMptRoot := ms.GetMptRootHash(uint64(curHeight))
+	TrieDirtyDisabled = viper.GetBool(FlagTrieDirtyDisabled)
 	if TrieDirtyDisabled {
 		// If we're running an archive node, always flush
 		ms.fullNodePersist(curMptRoot, root, curHeight)
@@ -618,6 +620,7 @@ func (ms *MptStore) StopWithVersion(targetVersion int64, root ethcmn.Hash) error
 		}
 	} else {
 		// Ensure the state of a recent block is also stored to disk before exiting.
+		TrieDirtyDisabled = viper.GetBool(FlagTrieDirtyDisabled)
 		if !TrieDirtyDisabled {
 			triedb := ms.db.TrieDB()
 			okbcStartHeight := uint64(tmtypes.GetStartBlockHeight()) // start height of okbc
