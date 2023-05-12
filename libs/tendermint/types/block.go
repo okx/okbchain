@@ -278,12 +278,16 @@ func (b *Block) MakePartSetByExInfo(exInfo *BlockExInfo) *PartSet {
 	b.mtx.Lock()
 	defer b.mtx.Unlock()
 
+	// just for adaptive the BlockID check between no updata and updata code
+	tmp := b.Data.TxWithMetas
+	b.Data.TxWithMetas = nil
 	// We prefix the byte length, so that unmarshaling
 	// can easily happen via a reader.
 	bz, err := cdc.MarshalBinaryLengthPrefixed(b)
 	if err != nil {
 		panic(err)
 	}
+	b.Data.TxWithMetas = tmp
 
 	payload := compressBlock(bz, exInfo.BlockCompressType, exInfo.BlockCompressFlag)
 
