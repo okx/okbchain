@@ -52,7 +52,7 @@ func RawTxResultToStdResponse(clientCtx clientcontext.CLIContext,
 
 	var err error
 	if tx == nil {
-		tx, err = evmtypes.TxDecoder(clientCtx.CodecProy)(tr.Tx, tx.TxHash(), tr.Height)
+		tx, err = evmtypes.TxDecoderWithHash(clientCtx.CodecProy)(tr.Tx, tx.TxHash(), tr.Height)
 		if err != nil {
 			return nil, sdkerrors.Wrap(sdkerrors.ErrJSONUnmarshal, err.Error())
 		}

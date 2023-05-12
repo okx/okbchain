@@ -1,6 +1,7 @@
 package simapp
 
 import (
+	"github.com/okx/okbchain/x/evm"
 	"io"
 	"os"
 
@@ -143,6 +144,7 @@ func NewSimApp(
 	bApp := bam.NewBaseApp(appName, logger, db, auth.DefaultTxDecoder(cdc), baseAppOptions...)
 	bApp.SetCommitMultiStoreTracer(traceStore)
 	bApp.SetAppVersion(version.Version)
+	bApp.SetTxDecoderWithHash(evm.TxDecoderWithHash(cdc))
 
 	keys := sdk.NewKVStoreKeys(
 		bam.MainStoreKey, staking.StoreKey,

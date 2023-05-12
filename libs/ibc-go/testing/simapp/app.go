@@ -305,6 +305,7 @@ func NewSimApp(
 
 	bApp.SetCommitMultiStoreTracer(traceStore)
 	bApp.SetAppVersion(version.Version)
+	bApp.SetTxDecoderWithHash(evm.TxDecoderWithHash(codecProxy))
 	bApp.SetStartLogHandler(trace.StartTxLog)
 	bApp.SetEndLogHandler(trace.StopTxLog)
 

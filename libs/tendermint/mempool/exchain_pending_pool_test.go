@@ -2,6 +2,7 @@ package mempool
 
 import (
 	"fmt"
+	"github.com/okx/okbchain/libs/tendermint/types"
 	"math/big"
 	"math/rand"
 	"strconv"
@@ -17,18 +18,18 @@ func TestAddtx(t *testing.T) {
 	testCases := []struct {
 		Tx *mempoolTx
 	}{
-		{&mempoolTx{height: 1, gasWanted: 1, tx: []byte("1"), from: "1", realTx: abci.MockTx{GasPrice: big.NewInt(3780)}}},
-		{&mempoolTx{height: 1, gasWanted: 1, tx: []byte("2"), from: "2", realTx: abci.MockTx{GasPrice: big.NewInt(5853)}}},
-		{&mempoolTx{height: 1, gasWanted: 1, tx: []byte("3"), from: "3", realTx: abci.MockTx{GasPrice: big.NewInt(8315)}}},
-		{&mempoolTx{height: 1, gasWanted: 1, tx: []byte("4"), from: "4", realTx: abci.MockTx{GasPrice: big.NewInt(9526)}}},
-		{&mempoolTx{height: 1, gasWanted: 1, tx: []byte("5"), from: "5", realTx: abci.MockTx{GasPrice: big.NewInt(9140)}}},
-		{&mempoolTx{height: 1, gasWanted: 1, tx: []byte("6"), from: "6", realTx: abci.MockTx{GasPrice: big.NewInt(9227)}}},
-		{&mempoolTx{height: 1, gasWanted: 1, tx: []byte("13"), from: "12", realTx: abci.MockTx{GasPrice: big.NewInt(2791), Nonce: 1}}},
-		{&mempoolTx{height: 1, gasWanted: 1, tx: []byte("14"), from: "12", realTx: abci.MockTx{GasPrice: big.NewInt(2698), Nonce: 100}}},
-		{&mempoolTx{height: 1, gasWanted: 1, tx: []byte("15"), from: "12", realTx: abci.MockTx{GasPrice: big.NewInt(2698), Nonce: 18446744073709551615}}},
-		{&mempoolTx{height: 1, gasWanted: 1, tx: []byte("16"), from: "14", realTx: abci.MockTx{GasPrice: big.NewInt(6925), Nonce: 100}}},
-		{&mempoolTx{height: 1, gasWanted: 1, tx: []byte("17"), from: "14", realTx: abci.MockTx{GasPrice: big.NewInt(2965), Nonce: 99}}},
-		{&mempoolTx{height: 1, gasWanted: 1, tx: []byte("18"), from: "14", realTx: abci.MockTx{GasPrice: big.NewInt(2791), Nonce: 98}}},
+		{&mempoolTx{height: 1, gasWanted: 1, tx: *types.NewTxWithMeta([]byte("1")), from: "1", realTx: abci.MockTx{GasPrice: big.NewInt(3780)}}},
+		{&mempoolTx{height: 1, gasWanted: 1, tx: *types.NewTxWithMeta([]byte("2")), from: "2", realTx: abci.MockTx{GasPrice: big.NewInt(5853)}}},
+		{&mempoolTx{height: 1, gasWanted: 1, tx: *types.NewTxWithMeta([]byte("3")), from: "3", realTx: abci.MockTx{GasPrice: big.NewInt(8315)}}},
+		{&mempoolTx{height: 1, gasWanted: 1, tx: *types.NewTxWithMeta([]byte("4")), from: "4", realTx: abci.MockTx{GasPrice: big.NewInt(9526)}}},
+		{&mempoolTx{height: 1, gasWanted: 1, tx: *types.NewTxWithMeta([]byte("5")), from: "5", realTx: abci.MockTx{GasPrice: big.NewInt(9140)}}},
+		{&mempoolTx{height: 1, gasWanted: 1, tx: *types.NewTxWithMeta([]byte("6")), from: "6", realTx: abci.MockTx{GasPrice: big.NewInt(9227)}}},
+		{&mempoolTx{height: 1, gasWanted: 1, tx: *types.NewTxWithMeta([]byte("13")), from: "12", realTx: abci.MockTx{GasPrice: big.NewInt(2791), Nonce: 1}}},
+		{&mempoolTx{height: 1, gasWanted: 1, tx: *types.NewTxWithMeta([]byte("14")), from: "12", realTx: abci.MockTx{GasPrice: big.NewInt(2698), Nonce: 100}}},
+		{&mempoolTx{height: 1, gasWanted: 1, tx: *types.NewTxWithMeta([]byte("15")), from: "12", realTx: abci.MockTx{GasPrice: big.NewInt(2698), Nonce: 18446744073709551615}}},
+		{&mempoolTx{height: 1, gasWanted: 1, tx: *types.NewTxWithMeta([]byte("16")), from: "14", realTx: abci.MockTx{GasPrice: big.NewInt(6925), Nonce: 100}}},
+		{&mempoolTx{height: 1, gasWanted: 1, tx: *types.NewTxWithMeta([]byte("17")), from: "14", realTx: abci.MockTx{GasPrice: big.NewInt(2965), Nonce: 99}}},
+		{&mempoolTx{height: 1, gasWanted: 1, tx: *types.NewTxWithMeta([]byte("18")), from: "14", realTx: abci.MockTx{GasPrice: big.NewInt(2791), Nonce: 98}}},
 	}
 
 	for _, exInfo := range testCases {
@@ -55,7 +56,7 @@ func TestAddtxRandom(t *testing.T) {
 	for i := 0; i < txCount; i++ {
 		nonce := rand.Intn(txCount)
 		addrIndex := nonce % len(addrMap)
-		tx := &mempoolTx{height: 1, gasWanted: 1, tx: []byte(strconv.Itoa(i)), from: addrMap[addrIndex], realTx: abci.MockTx{Nonce: uint64(nonce)}}
+		tx := &mempoolTx{height: 1, gasWanted: 1, tx: *types.NewTxWithMeta([]byte(strconv.Itoa(i))), from: addrMap[addrIndex], realTx: abci.MockTx{Nonce: uint64(nonce)}}
 		pool.addTx(tx)
 		txRes := pool.addressTxsMap[tx.from][tx.realTx.GetNonce()]
 		assert.Equal(t, tx, txRes)
@@ -68,12 +69,12 @@ func TestRemovetx(t *testing.T) {
 	txs := []struct {
 		Tx *mempoolTx
 	}{
-		{&mempoolTx{height: 1, gasWanted: 1, tx: []byte("13"), from: "18", realTx: abci.MockTx{GasPrice: big.NewInt(2791), Nonce: 1}}},
-		{&mempoolTx{height: 1, gasWanted: 1, tx: []byte("14"), from: "18", realTx: abci.MockTx{GasPrice: big.NewInt(2698), Nonce: 100}}},
-		{&mempoolTx{height: 1, gasWanted: 1, tx: []byte("15"), from: "18", realTx: abci.MockTx{GasPrice: big.NewInt(2698), Nonce: 18446744073709551615}}},
-		{&mempoolTx{height: 1, gasWanted: 1, tx: []byte("16"), from: "14", realTx: abci.MockTx{GasPrice: big.NewInt(6925), Nonce: 100}}},
-		{&mempoolTx{height: 1, gasWanted: 1, tx: []byte("17"), from: "14", realTx: abci.MockTx{GasPrice: big.NewInt(2965), Nonce: 99}}},
-		{&mempoolTx{height: 1, gasWanted: 1, tx: []byte("18"), from: "14", realTx: abci.MockTx{GasPrice: big.NewInt(2791), Nonce: 98}}},
+		{&mempoolTx{height: 1, gasWanted: 1, tx: *types.NewTxWithMeta([]byte("13")), from: "18", realTx: abci.MockTx{GasPrice: big.NewInt(2791), Nonce: 1}}},
+		{&mempoolTx{height: 1, gasWanted: 1, tx: *types.NewTxWithMeta([]byte("14")), from: "18", realTx: abci.MockTx{GasPrice: big.NewInt(2698), Nonce: 100}}},
+		{&mempoolTx{height: 1, gasWanted: 1, tx: *types.NewTxWithMeta([]byte("15")), from: "18", realTx: abci.MockTx{GasPrice: big.NewInt(2698), Nonce: 18446744073709551615}}},
+		{&mempoolTx{height: 1, gasWanted: 1, tx: *types.NewTxWithMeta([]byte("16")), from: "14", realTx: abci.MockTx{GasPrice: big.NewInt(6925), Nonce: 100}}},
+		{&mempoolTx{height: 1, gasWanted: 1, tx: *types.NewTxWithMeta([]byte("17")), from: "14", realTx: abci.MockTx{GasPrice: big.NewInt(2965), Nonce: 99}}},
+		{&mempoolTx{height: 1, gasWanted: 1, tx: *types.NewTxWithMeta([]byte("18")), from: "14", realTx: abci.MockTx{GasPrice: big.NewInt(2791), Nonce: 98}}},
 	}
 	testCases := []struct {
 		address string
@@ -102,12 +103,12 @@ func TestRemoveTxByHash(t *testing.T) {
 	txs := []struct {
 		Tx *mempoolTx
 	}{
-		{&mempoolTx{height: 1, gasWanted: 1, tx: []byte("13"), from: "18", realTx: abci.MockTx{GasPrice: big.NewInt(2791), Nonce: 1}}},
-		{&mempoolTx{height: 1, gasWanted: 1, tx: []byte("14"), from: "18", realTx: abci.MockTx{GasPrice: big.NewInt(2698), Nonce: 100}}},
-		{&mempoolTx{height: 1, gasWanted: 1, tx: []byte("15"), from: "18", realTx: abci.MockTx{GasPrice: big.NewInt(2698), Nonce: 18446744073709551615}}},
-		{&mempoolTx{height: 1, gasWanted: 1, tx: []byte("16"), from: "14", realTx: abci.MockTx{GasPrice: big.NewInt(6925), Nonce: 100}}},
-		{&mempoolTx{height: 1, gasWanted: 1, tx: []byte("17"), from: "14", realTx: abci.MockTx{GasPrice: big.NewInt(2965), Nonce: 99}}},
-		{&mempoolTx{height: 1, gasWanted: 1, tx: []byte("18"), from: "14", realTx: abci.MockTx{GasPrice: big.NewInt(2791), Nonce: 98}}},
+		{&mempoolTx{height: 1, gasWanted: 1, tx: *types.NewTxWithMeta([]byte("13")), from: "18", realTx: abci.MockTx{GasPrice: big.NewInt(2791), Nonce: 1}}},
+		{&mempoolTx{height: 1, gasWanted: 1, tx: *types.NewTxWithMeta([]byte("14")), from: "18", realTx: abci.MockTx{GasPrice: big.NewInt(2698), Nonce: 100}}},
+		{&mempoolTx{height: 1, gasWanted: 1, tx: *types.NewTxWithMeta([]byte("15")), from: "18", realTx: abci.MockTx{GasPrice: big.NewInt(2698), Nonce: 18446744073709551615}}},
+		{&mempoolTx{height: 1, gasWanted: 1, tx: *types.NewTxWithMeta([]byte("16")), from: "14", realTx: abci.MockTx{GasPrice: big.NewInt(6925), Nonce: 100}}},
+		{&mempoolTx{height: 1, gasWanted: 1, tx: *types.NewTxWithMeta([]byte("17")), from: "14", realTx: abci.MockTx{GasPrice: big.NewInt(2965), Nonce: 99}}},
+		{&mempoolTx{height: 1, gasWanted: 1, tx: *types.NewTxWithMeta([]byte("18")), from: "14", realTx: abci.MockTx{GasPrice: big.NewInt(2791), Nonce: 98}}},
 	}
 
 	for _, exInfo := range txs {
@@ -128,21 +129,21 @@ func TestHandlePendingTx(t *testing.T) {
 	txs := []struct {
 		Tx *mempoolTx
 	}{
-		{&mempoolTx{height: 1, gasWanted: 1, tx: []byte("2"), from: "1", realTx: abci.MockTx{GasPrice: big.NewInt(3780), Nonce: 1}}},
-		{&mempoolTx{height: 1, gasWanted: 1, tx: []byte("3"), from: "1", realTx: abci.MockTx{GasPrice: big.NewInt(5315), Nonce: 2}}},
-		{&mempoolTx{height: 1, gasWanted: 1, tx: []byte("4"), from: "1", realTx: abci.MockTx{GasPrice: big.NewInt(4526), Nonce: 3}}},
-		{&mempoolTx{height: 1, gasWanted: 1, tx: []byte("5"), from: "1", realTx: abci.MockTx{GasPrice: big.NewInt(2140), Nonce: 4}}},
-		{&mempoolTx{height: 1, gasWanted: 1, tx: []byte("6"), from: "1", realTx: abci.MockTx{GasPrice: big.NewInt(4227), Nonce: 5}}},
-		{&mempoolTx{height: 1, gasWanted: 1, tx: []byte("7"), from: "2", realTx: abci.MockTx{GasPrice: big.NewInt(5315), Nonce: 2}}},
-		{&mempoolTx{height: 1, gasWanted: 1, tx: []byte("8"), from: "2", realTx: abci.MockTx{GasPrice: big.NewInt(4526), Nonce: 3}}},
-		{&mempoolTx{height: 1, gasWanted: 1, tx: []byte("9"), from: "2", realTx: abci.MockTx{GasPrice: big.NewInt(2140), Nonce: 5}}},
-		{&mempoolTx{height: 1, gasWanted: 1, tx: []byte("10"), from: "2", realTx: abci.MockTx{GasPrice: big.NewInt(4227), Nonce: 6}}},
-		{&mempoolTx{height: 1, gasWanted: 1, tx: []byte("11"), from: "3", realTx: abci.MockTx{GasPrice: big.NewInt(4526), Nonce: 3}}},
-		{&mempoolTx{height: 1, gasWanted: 1, tx: []byte("12"), from: "3", realTx: abci.MockTx{GasPrice: big.NewInt(2140), Nonce: 4}}},
-		{&mempoolTx{height: 1, gasWanted: 1, tx: []byte("13"), from: "3", realTx: abci.MockTx{GasPrice: big.NewInt(4227), Nonce: 5}}},
-		{&mempoolTx{height: 1, gasWanted: 1, tx: []byte("14"), from: "4", realTx: abci.MockTx{GasPrice: big.NewInt(3780), Nonce: 1}}},
-		{&mempoolTx{height: 1, gasWanted: 1, tx: []byte("15"), from: "4", realTx: abci.MockTx{GasPrice: big.NewInt(5315), Nonce: 2}}},
-		{&mempoolTx{height: 1, gasWanted: 1, tx: []byte("16"), from: "4", realTx: abci.MockTx{GasPrice: big.NewInt(4526), Nonce: 3}}},
+		{&mempoolTx{height: 1, gasWanted: 1, tx: *types.NewTxWithMeta([]byte("2")), from: "1", realTx: abci.MockTx{GasPrice: big.NewInt(3780), Nonce: 1}}},
+		{&mempoolTx{height: 1, gasWanted: 1, tx: *types.NewTxWithMeta([]byte("3")), from: "1", realTx: abci.MockTx{GasPrice: big.NewInt(5315), Nonce: 2}}},
+		{&mempoolTx{height: 1, gasWanted: 1, tx: *types.NewTxWithMeta([]byte("4")), from: "1", realTx: abci.MockTx{GasPrice: big.NewInt(4526), Nonce: 3}}},
+		{&mempoolTx{height: 1, gasWanted: 1, tx: *types.NewTxWithMeta([]byte("5")), from: "1", realTx: abci.MockTx{GasPrice: big.NewInt(2140), Nonce: 4}}},
+		{&mempoolTx{height: 1, gasWanted: 1, tx: *types.NewTxWithMeta([]byte("6")), from: "1", realTx: abci.MockTx{GasPrice: big.NewInt(4227), Nonce: 5}}},
+		{&mempoolTx{height: 1, gasWanted: 1, tx: *types.NewTxWithMeta([]byte("7")), from: "2", realTx: abci.MockTx{GasPrice: big.NewInt(5315), Nonce: 2}}},
+		{&mempoolTx{height: 1, gasWanted: 1, tx: *types.NewTxWithMeta([]byte("8")), from: "2", realTx: abci.MockTx{GasPrice: big.NewInt(4526), Nonce: 3}}},
+		{&mempoolTx{height: 1, gasWanted: 1, tx: *types.NewTxWithMeta([]byte("9")), from: "2", realTx: abci.MockTx{GasPrice: big.NewInt(2140), Nonce: 5}}},
+		{&mempoolTx{height: 1, gasWanted: 1, tx: *types.NewTxWithMeta([]byte("10")), from: "2", realTx: abci.MockTx{GasPrice: big.NewInt(4227), Nonce: 6}}},
+		{&mempoolTx{height: 1, gasWanted: 1, tx: *types.NewTxWithMeta([]byte("11")), from: "3", realTx: abci.MockTx{GasPrice: big.NewInt(4526), Nonce: 3}}},
+		{&mempoolTx{height: 1, gasWanted: 1, tx: *types.NewTxWithMeta([]byte("12")), from: "3", realTx: abci.MockTx{GasPrice: big.NewInt(2140), Nonce: 4}}},
+		{&mempoolTx{height: 1, gasWanted: 1, tx: *types.NewTxWithMeta([]byte("13")), from: "3", realTx: abci.MockTx{GasPrice: big.NewInt(4227), Nonce: 5}}},
+		{&mempoolTx{height: 1, gasWanted: 1, tx: *types.NewTxWithMeta([]byte("14")), from: "4", realTx: abci.MockTx{GasPrice: big.NewInt(3780), Nonce: 1}}},
+		{&mempoolTx{height: 1, gasWanted: 1, tx: *types.NewTxWithMeta([]byte("15")), from: "4", realTx: abci.MockTx{GasPrice: big.NewInt(5315), Nonce: 2}}},
+		{&mempoolTx{height: 1, gasWanted: 1, tx: *types.NewTxWithMeta([]byte("16")), from: "4", realTx: abci.MockTx{GasPrice: big.NewInt(4526), Nonce: 3}}},
 	}
 	addressNonceTestCase := map[string]uint64{
 		"1":         0,
@@ -178,21 +179,21 @@ func TestHandlePeriodCounter(t *testing.T) {
 	txs := []struct {
 		Tx *mempoolTx
 	}{
-		{&mempoolTx{height: 1, gasWanted: 1, tx: []byte("1"), from: "1", realTx: abci.MockTx{GasPrice: big.NewInt(3780), Nonce: 1}}},
-		{&mempoolTx{height: 1, gasWanted: 1, tx: []byte("2"), from: "1", realTx: abci.MockTx{GasPrice: big.NewInt(5315), Nonce: 2}}},
-		{&mempoolTx{height: 1, gasWanted: 1, tx: []byte("3"), from: "1", realTx: abci.MockTx{GasPrice: big.NewInt(4526), Nonce: 3}}},
-		{&mempoolTx{height: 1, gasWanted: 1, tx: []byte("4"), from: "1", realTx: abci.MockTx{GasPrice: big.NewInt(2140), Nonce: 4}}},
-		{&mempoolTx{height: 1, gasWanted: 1, tx: []byte("5"), from: "1", realTx: abci.MockTx{GasPrice: big.NewInt(4227), Nonce: 5}}},
-		{&mempoolTx{height: 1, gasWanted: 1, tx: []byte("6"), from: "2", realTx: abci.MockTx{GasPrice: big.NewInt(5315), Nonce: 2}}},
-		{&mempoolTx{height: 1, gasWanted: 1, tx: []byte("7"), from: "2", realTx: abci.MockTx{GasPrice: big.NewInt(4526), Nonce: 3}}},
-		{&mempoolTx{height: 1, gasWanted: 1, tx: []byte("8"), from: "2", realTx: abci.MockTx{GasPrice: big.NewInt(2140), Nonce: 5}}},
-		{&mempoolTx{height: 1, gasWanted: 1, tx: []byte("9"), from: "2", realTx: abci.MockTx{GasPrice: big.NewInt(4227), Nonce: 6}}},
-		{&mempoolTx{height: 1, gasWanted: 1, tx: []byte("10"), from: "3", realTx: abci.MockTx{GasPrice: big.NewInt(4526), Nonce: 3}}},
-		{&mempoolTx{height: 1, gasWanted: 1, tx: []byte("11"), from: "3", realTx: abci.MockTx{GasPrice: big.NewInt(2140), Nonce: 4}}},
-		{&mempoolTx{height: 1, gasWanted: 1, tx: []byte("12"), from: "3", realTx: abci.MockTx{GasPrice: big.NewInt(4227), Nonce: 5}}},
-		{&mempoolTx{height: 1, gasWanted: 1, tx: []byte("13"), from: "4", realTx: abci.MockTx{GasPrice: big.NewInt(3780), Nonce: 1}}},
-		{&mempoolTx{height: 1, gasWanted: 1, tx: []byte("14"), from: "4", realTx: abci.MockTx{GasPrice: big.NewInt(5315), Nonce: 2}}},
-		{&mempoolTx{height: 1, gasWanted: 1, tx: []byte("15"), from: "4", realTx: abci.MockTx{GasPrice: big.NewInt(4526), Nonce: 3}}},
+		{&mempoolTx{height: 1, gasWanted: 1, tx: *types.NewTxWithMeta([]byte("1")), from: "1", realTx: abci.MockTx{GasPrice: big.NewInt(3780), Nonce: 1}}},
+		{&mempoolTx{height: 1, gasWanted: 1, tx: *types.NewTxWithMeta([]byte("2")), from: "1", realTx: abci.MockTx{GasPrice: big.NewInt(5315), Nonce: 2}}},
+		{&mempoolTx{height: 1, gasWanted: 1, tx: *types.NewTxWithMeta([]byte("3")), from: "1", realTx: abci.MockTx{GasPrice: big.NewInt(4526), Nonce: 3}}},
+		{&mempoolTx{height: 1, gasWanted: 1, tx: *types.NewTxWithMeta([]byte("4")), from: "1", realTx: abci.MockTx{GasPrice: big.NewInt(2140), Nonce: 4}}},
+		{&mempoolTx{height: 1, gasWanted: 1, tx: *types.NewTxWithMeta([]byte("5")), from: "1", realTx: abci.MockTx{GasPrice: big.NewInt(4227), Nonce: 5}}},
+		{&mempoolTx{height: 1, gasWanted: 1, tx: *types.NewTxWithMeta([]byte("6")), from: "2", realTx: abci.MockTx{GasPrice: big.NewInt(5315), Nonce: 2}}},
+		{&mempoolTx{height: 1, gasWanted: 1, tx: *types.NewTxWithMeta([]byte("7")), from: "2", realTx: abci.MockTx{GasPrice: big.NewInt(4526), Nonce: 3}}},
+		{&mempoolTx{height: 1, gasWanted: 1, tx: *types.NewTxWithMeta([]byte("8")), from: "2", realTx: abci.MockTx{GasPrice: big.NewInt(2140), Nonce: 5}}},
+		{&mempoolTx{height: 1, gasWanted: 1, tx: *types.NewTxWithMeta([]byte("9")), from: "2", realTx: abci.MockTx{GasPrice: big.NewInt(4227), Nonce: 6}}},
+		{&mempoolTx{height: 1, gasWanted: 1, tx: *types.NewTxWithMeta([]byte("10")), from: "3", realTx: abci.MockTx{GasPrice: big.NewInt(4526), Nonce: 3}}},
+		{&mempoolTx{height: 1, gasWanted: 1, tx: *types.NewTxWithMeta([]byte("11")), from: "3", realTx: abci.MockTx{GasPrice: big.NewInt(2140), Nonce: 4}}},
+		{&mempoolTx{height: 1, gasWanted: 1, tx: *types.NewTxWithMeta([]byte("12")), from: "3", realTx: abci.MockTx{GasPrice: big.NewInt(4227), Nonce: 5}}},
+		{&mempoolTx{height: 1, gasWanted: 1, tx: *types.NewTxWithMeta([]byte("13")), from: "4", realTx: abci.MockTx{GasPrice: big.NewInt(3780), Nonce: 1}}},
+		{&mempoolTx{height: 1, gasWanted: 1, tx: *types.NewTxWithMeta([]byte("14")), from: "4", realTx: abci.MockTx{GasPrice: big.NewInt(5315), Nonce: 2}}},
+		{&mempoolTx{height: 1, gasWanted: 1, tx: *types.NewTxWithMeta([]byte("15")), from: "4", realTx: abci.MockTx{GasPrice: big.NewInt(4526), Nonce: 3}}},
 	}
 	for _, exInfo := range txs {
 		pool.addTx(exInfo.Tx)

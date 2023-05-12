@@ -18,7 +18,7 @@ type WatchTx interface {
 	GetIndex() uint64
 }
 
-func (w *Watcher) RecordTxAndFailedReceipt(tx tm.TxEssentials, resp *tm.ResponseDeliverTx, txDecoder sdk.TxDecoder) {
+func (w *Watcher) RecordTxAndFailedReceipt(tx tm.TxEssentials, resp *tm.ResponseDeliverTx, txDecoder sdk.TxDecoderWithHash) {
 	if !w.Enabled() {
 		return
 	}
@@ -78,7 +78,7 @@ func (w *Watcher) IsRealEvmTx(resp *tm.ResponseDeliverTx) bool {
 	return false
 }
 
-func (w *Watcher) getRealTx(tx tm.TxEssentials, txDecoder sdk.TxDecoder) (sdk.Tx, error) {
+func (w *Watcher) getRealTx(tx tm.TxEssentials, txDecoder sdk.TxDecoderWithHash) (sdk.Tx, error) {
 	var err error
 	realTx, _ := tx.(sdk.Tx)
 	if realTx == nil {

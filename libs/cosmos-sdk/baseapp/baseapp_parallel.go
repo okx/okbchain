@@ -54,7 +54,7 @@ func (app *BaseApp) getExtraDataByTxs(txs ttypes.TxWithMetas) {
 					tx, _ = mem.ReapEssentialTx(txBytes).(sdk.Tx)
 				}
 				if tx == nil {
-					tx, err = app.txDecoder(txBytes.GetTx(), txBytes.Hash())
+					tx, err = app.txDecoderWithHash(txBytes.GetTx(), txBytes.Hash())
 					if err != nil {
 						para.extraTxsInfo[index] = &extraDataForTx{
 							decodeErr: err,

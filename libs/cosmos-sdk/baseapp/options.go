@@ -208,3 +208,10 @@ func (app *BaseApp) SetGetTxFeeHandler(handler sdk.GetTxFeeHandler) {
 func (app *BaseApp) SetTmClient(client client.Client) {
 	app.tmClient = client
 }
+
+func (app *BaseApp) SetTxDecoderWithHash(decoder sdk.TxDecoderWithHash) {
+	if app.sealed {
+		panic("SetTxDecoderWithHash() on sealed BaseApp")
+	}
+	app.txDecoderWithHash = decoder
+}

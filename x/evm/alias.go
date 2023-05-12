@@ -18,6 +18,7 @@ const (
 var (
 	NewKeeper            = keeper.NewKeeper
 	TxDecoder            = types.TxDecoder
+	TxDecoderWithHash    = types.TxDecoderWithHash
 	NewSimulateKeeper    = keeper.NewSimulateKeeper
 	NewLogProcessEvmHook = keeper.NewLogProcessEvmHook
 	NewMultiEvmHooks     = keeper.NewMultiEvmHooks
@@ -31,8 +32,8 @@ type (
 )
 
 func WithMoreDeocder(cdc *codec.Codec, cc sdk.TxDecoder) sdk.TxDecoder {
-	return func(txBytes, txhash []byte, height ...int64) (sdk.Tx, error) {
-		ret, err := cc(txBytes, txhash, height...)
+	return func(txBytes []byte, height ...int64) (sdk.Tx, error) {
+		ret, err := cc(txBytes, height...)
 		if nil == err {
 			return ret, nil
 		}

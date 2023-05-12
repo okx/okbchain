@@ -285,7 +285,7 @@ func (app *BaseApp) DeliverTx(req abci.RequestDeliverTx) abci.ResponseDeliverTx 
 		realTx, _ = mem.ReapEssentialTx(&ttypes.TxWithMeta{req.GetTx(), req.GetTxHash()}).(sdk.Tx)
 	}
 	if realTx == nil {
-		realTx, err = app.txDecoder(req.Tx, req.Txhash)
+		realTx, err = app.txDecoderWithHash(req.Tx, req.Txhash)
 		if err != nil {
 			return sdkerrors.ResponseDeliverTx(err, 0, 0, app.trace)
 		}
@@ -315,7 +315,7 @@ func (app *BaseApp) PreDeliverRealTx(tx abci.TxWithMetaI) abci.TxEssentials {
 		realTx, _ = mem.ReapEssentialTx(tx).(sdk.Tx)
 	}
 	if realTx == nil {
-		realTx, err = app.txDecoder(tx.GetTx(), tx.Hash())
+		realTx, err = app.txDecoderWithHash(tx.GetTx(), tx.Hash())
 		if err != nil || realTx == nil {
 			return nil
 		}
@@ -337,7 +337,7 @@ func (app *BaseApp) DeliverRealTx(txes abci.TxEssentials) abci.ResponseDeliverTx
 	var err error
 	realTx, _ := txes.(sdk.Tx)
 	if realTx == nil {
-		realTx, err = app.txDecoder(txes.GetRaw(), txes.TxHash())
+		realTx, err = app.txDecoderWithHash(txes.GetRaw(), txes.TxHash())
 		if err != nil {
 			return sdkerrors.ResponseDeliverTx(err, 0, 0, app.trace)
 		}

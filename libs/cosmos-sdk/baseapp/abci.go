@@ -421,7 +421,7 @@ func handleSimulate(app *BaseApp, path []string, height int64, txBytes []byte, o
 		tx, _ = mem.ReapEssentialTx(&tmtypes.TxWithMeta{Tx: txBytes}).(sdk.Tx)
 	}
 	if tx == nil {
-		tx, err = app.txDecoder(txBytes, nil)
+		tx, err = app.txDecoder(txBytes)
 		if err != nil {
 			return sdkerrors.QueryResult(sdkerrors.Wrap(err, "failed to decode tx"))
 		}
@@ -505,7 +505,7 @@ func handleQueryApp(app *BaseApp, path []string, req abci.RequestQuery) abci.Res
 			if err != nil {
 				return sdkerrors.QueryResult(sdkerrors.Wrap(err, "invalid trace tx bytes"))
 			}
-			tx, err := app.txDecoder(tmtx.Tx, nil, tmtx.Height)
+			tx, err := app.txDecoder(tmtx.Tx, tmtx.Height)
 			if err != nil {
 				return sdkerrors.QueryResult(sdkerrors.Wrap(err, "failed to decode tx"))
 			}

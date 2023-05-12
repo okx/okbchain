@@ -62,9 +62,9 @@ func TestCacheAfterUpdate(t *testing.T) {
 			require.NoError(t, err)
 		}
 
-		updateTxs := []types.Tx{}
+		var updateTxs types.TxWithMetas
 		for _, v := range tc.updateIndices {
-			tx := types.Tx{byte(v)}
+			tx := types.NewTxWithMeta(types.Tx{byte(v)})
 			updateTxs = append(updateTxs, tx)
 		}
 		mempool.Update(int64(tcIndex), updateTxs, abciResponses(len(updateTxs), abci.CodeTypeOK), nil, nil)

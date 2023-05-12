@@ -466,7 +466,7 @@ func TestDeliverRealTx(t *testing.T) {
 	err := tx.Sign(big.NewInt(3), privKey.ToECDSA())
 	require.NoError(t, err)
 	codecProxy, _ := chaincodec.MakeCodecSuit(module.NewBasicManager())
-	w.app.EvmKeeper.Watcher.RecordTxAndFailedReceipt(tx, nil, evm.TxDecoder(codecProxy))
+	w.app.EvmKeeper.Watcher.RecordTxAndFailedReceipt(tx, nil, evm.TxDecoderWithHash(codecProxy))
 }
 
 func TestBaiscDBOpt(t *testing.T) {

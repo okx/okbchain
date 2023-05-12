@@ -33,7 +33,7 @@ func (app *OKBChainApp) PreDeliverRealTx(req abci.TxWithMetaI) (res abci.TxEssen
 func (app *OKBChainApp) DeliverRealTx(req abci.TxEssentials) (res abci.ResponseDeliverTx) {
 	trace.OnAppDeliverTxEnter()
 	resp := app.BaseApp.DeliverRealTx(req)
-	app.EvmKeeper.Watcher.RecordTxAndFailedReceipt(req, &resp, app.GetTxDecoder())
+	app.EvmKeeper.Watcher.RecordTxAndFailedReceipt(req, &resp, app.GetTxDecoderWithHash())
 
 	return resp
 }

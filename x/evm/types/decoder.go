@@ -31,52 +31,61 @@ const IGNORE_HEIGHT_CHECKING = -1
 // | ------------| --------------------|
 
 func TxDecoder(cdc codec.CdcAbstraction) sdk.TxDecoder {
+	return func(txBytes []byte, heights ...int64) (sdk.Tx, error) {
+		return txDecoder(cdc, txBytes, nil, heights...)
+	}
+}
 
+func TxDecoderWithHash(cdc codec.CdcAbstraction) sdk.TxDecoderWithHash {
 	return func(txBytes, txhash []byte, heights ...int64) (sdk.Tx, error) {
-		if len(heights) > 1 {
-			return nil, fmt.Errorf("to many height parameters")
-		}
-		var tx sdk.Tx
-		var err error
-		if len(txBytes) == 0 {
-			return nil, sdkerrors.Wrap(sdkerrors.ErrTxDecode, "tx bytes are empty")
-		}
+		return txDecoder(cdc, txBytes, txhash, heights...)
+	}
+}
 
-		var height int64
-		if len(heights) == 1 {
-			height = heights[0]
-		} else {
-			height = global.GetGlobalHeight()
-		}
+func txDecoder(cdc codec.CdcAbstraction, txBytes, txhash []byte, heights ...int64) (sdk.Tx, error) {
+	if len(heights) > 1 {
+		return nil, fmt.Errorf("to many height parameters")
+	}
+	var tx sdk.Tx
+	var err error
+	if len(txBytes) == 0 {
+		return nil, sdkerrors.Wrap(sdkerrors.ErrTxDecode, "tx bytes are empty")
+	}
 
-		for index, f := range []decodeFunc{
-			evmDecoder,
-			aminoDecoder,
-			ibcDecoder,
-		} {
-			if tx, err = f(cdc, txBytes); err == nil {
-				tx.SetRaw(txBytes)
-				txhsh := txhash
-				if len(txhsh) == 0 {
-					txhsh = types.Tx(txBytes).Hash()
-				}
-				tx.SetTxHash(txhsh)
-				// index=0 means it is a evmtx(evmDecoder) ,we wont verify again
-				// height > IGNORE_HEIGHT_CHECKING means it is a query request
-				if index > 0 && height > IGNORE_HEIGHT_CHECKING {
-					if sensitive, ok := tx.(sdk.HeightSensitive); ok {
-						if err := sensitive.ValidWithHeight(height); err != nil {
-							return nil, sdkerrors.Wrap(sdkerrors.ErrTxDecode, err.Error())
-						}
+	var height int64
+	if len(heights) == 1 {
+		height = heights[0]
+	} else {
+		height = global.GetGlobalHeight()
+	}
+
+	for index, f := range []decodeFunc{
+		evmDecoder,
+		aminoDecoder,
+		ibcDecoder,
+	} {
+		if tx, err = f(cdc, txBytes); err == nil {
+			tx.SetRaw(txBytes)
+			txhsh := txhash
+			if len(txhsh) == 0 {
+				txhsh = types.Tx(txBytes).Hash()
+			}
+			tx.SetTxHash(txhsh)
+			// index=0 means it is a evmtx(evmDecoder) ,we wont verify again
+			// height > IGNORE_HEIGHT_CHECKING means it is a query request
+			if index > 0 && height > IGNORE_HEIGHT_CHECKING {
+				if sensitive, ok := tx.(sdk.HeightSensitive); ok {
+					if err := sensitive.ValidWithHeight(height); err != nil {
+						return nil, sdkerrors.Wrap(sdkerrors.ErrTxDecode, err.Error())
 					}
 				}
-
-				return tx, nil
 			}
-		}
 
-		return nil, sdkerrors.Wrap(sdkerrors.ErrTxDecode, err.Error())
+			return tx, nil
+		}
 	}
+
+	return nil, sdkerrors.Wrap(sdkerrors.ErrTxDecode, err.Error())
 }
 
 // Unmarshaler is a generic type for Unmarshal functions

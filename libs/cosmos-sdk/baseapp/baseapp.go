@@ -129,6 +129,8 @@ type BaseApp struct { // nolint: maligned
 	// txDecoder returns a cosmos-sdk/types.Tx interface that definitely is an StdTx or a MsgEthereumTx
 	txDecoder sdk.TxDecoder
 
+	txDecoderWithHash sdk.TxDecoderWithHash
+
 	// set upon LoadVersion or LoadLatestVersion.
 	baseKey *sdk.KVStoreKey // Main KVStore in cms
 
@@ -973,7 +975,7 @@ func (app *BaseApp) GetRawTxInfo(rawTx tmtypes.TxWithMeta) mempool.ExTxInfo {
 	var err error
 	tx, ok := app.blockDataCache.GetTx(rawTx.GetTx())
 	if !ok {
-		tx, err = app.txDecoder(rawTx.GetTx(), rawTx.Hash())
+		tx, err = app.txDecoderWithHash(rawTx.GetTx(), rawTx.Hash())
 		if err != nil {
 			return mempool.ExTxInfo{}
 		}
@@ -994,7 +996,7 @@ func (app *BaseApp) GetRealTxFromRawTx(rawTx tmtypes.TxWithMeta) abci.TxEssentia
 }
 
 func (app *BaseApp) GetTxHistoryGasUsed(rawTx tmtypes.TxWithMeta) int64 {
-	tx, err := app.txDecoder(rawTx.GetTx(), rawTx.Hash())
+	tx, err := app.txDecoderWithHash(rawTx.GetTx(), rawTx.Hash())
 	if err != nil {
 		return -1
 	}
@@ -1022,4 +1024,8 @@ func (app *BaseApp) GetCMS() sdk.CommitMultiStore {
 
 func (app *BaseApp) GetTxDecoder() sdk.TxDecoder {
 	return app.txDecoder
+}
+
+func (app *BaseApp) GetTxDecoderWithHash() sdk.TxDecoderWithHash {
+	return app.txDecoderWithHash
 }

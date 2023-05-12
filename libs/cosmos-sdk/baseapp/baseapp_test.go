@@ -36,7 +36,9 @@ func newBaseApp(name string, options ...func(*BaseApp)) *BaseApp {
 	db := dbm.NewMemDB()
 	codec := codec.New()
 	registerTestCodec(codec)
-	return NewBaseApp(name, logger, db, testTxDecoder(codec), options...)
+	bApp := NewBaseApp(name, logger, db, testTxDecoder(codec), options...)
+	bApp.SetTxDecoderWithHash(testTxDecoderWithHash(codec))
+	return bApp
 }
 
 func registerTestCodec(cdc *codec.Codec) {
@@ -678,6 +680,22 @@ func (msg msgCounter2) ValidateBasic() error {
 // amino decode
 func testTxDecoder(cdc *codec.Codec) sdk.TxDecoder {
 	return func(txBytes []byte, _ ...int64) (sdk.Tx, error) {
+		var tx txTest
+		if len(txBytes) == 0 {
+			return nil, sdkerrors.Wrap(sdkerrors.ErrTxDecode, "tx bytes are empty")
+		}
+
+		err := cdc.UnmarshalBinaryLengthPrefixed(txBytes, &tx)
+		if err != nil {
+			return nil, sdkerrors.ErrTxDecode
+		}
+
+		return &tx, nil
+	}
+}
+
+func testTxDecoderWithHash(cdc *codec.Codec) sdk.TxDecoderWithHash {
+	return func(txBytes, txHash []byte, _ ...int64) (sdk.Tx, error) {
 		var tx txTest
 		if len(txBytes) == 0 {
 			return nil, sdkerrors.Wrap(sdkerrors.ErrTxDecode, "tx bytes are empty")

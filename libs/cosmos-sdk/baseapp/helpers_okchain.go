@@ -41,7 +41,7 @@ func (app *BaseApp) TraceTx(queryTraceTx sdk.QueryTraceTx, targetTx sdk.Tx, txIn
 	traceState.ctx.SetIsTraceTxLog(false)
 	//pre deliver prodesessor tx to get the right state
 	for _, predesessor := range block.Txs[:txIndex] {
-		tx, err := app.txDecoder(predesessor, nil, block.Height)
+		tx, err := app.txDecoder(predesessor, block.Height)
 		if err != nil {
 			return nil, sdkerrors.Wrap(err, "invalid prodesessor")
 		}

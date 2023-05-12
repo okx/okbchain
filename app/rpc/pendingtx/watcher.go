@@ -61,7 +61,7 @@ func (w *Watcher) Start() {
 				txHash := common.BytesToHash(data.Tx.Hash())
 				w.logger.Debug("receive pending tx", "txHash=", txHash.String())
 
-				tx, err := evmtypes.TxDecoder(w.clientCtx.Codec)(data.Tx, nil, data.Height)
+				tx, err := evmtypes.TxDecoder(w.clientCtx.Codec)(data.Tx, data.Height)
 				if err != nil {
 					w.logger.Error("failed to decode raw tx", "hash", txHash.String(), "error", err)
 					continue

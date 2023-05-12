@@ -105,3 +105,7 @@ func decodeTx(txBytes []byte, _ ...int64) (sdk.Tx, error) {
 
 	return tx, nil
 }
+
+func decodeTxWithHash(txBytes, txHash []byte, _ ...int64) (sdk.Tx, error) {
+	return decodeTx(txBytes)
+}
