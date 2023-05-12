@@ -95,7 +95,6 @@ func (k *Keeper) ScopeToModule(moduleName string) ScopedKeeper {
 		storeKey: k.storeKey,
 		memKey:   k.memKey,
 		capMap:   k.capMap,
-		rwLock:   k.rwLock,
 		module:   moduleName,
 	}
 }
@@ -225,12 +224,7 @@ func (sk ScopedKeeper) NewCapability(ctx sdk.Context, name string) (*types.Capab
 	if _, ok := sk.GetCapability(ctx, name); ok {
 		return nil, sdkerrors.Wrapf(types.ErrCapabilityTaken, fmt.Sprintf("module: %s, name: %s", sk.module, name))
 	}
-	// NOTE, FwdCapabilityKey use the pointer address to build key
-	// which means, when simulate and deliver tx concurrently execute ,the capMap maybe override by simulate which will fail
-	// to create the channel
-	sk.rwLock.Lock()
-	defer sk.rwLock.Unlock()
-	// create new capability with the current global index
+
 	index := types.IndexFromKey(store.Get(types.KeyIndex))
 	cap := types.NewCapability(index)
 
