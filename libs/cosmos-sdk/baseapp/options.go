@@ -209,6 +209,13 @@ func (app *BaseApp) SetTmClient(client client.Client) {
 	app.tmClient = client
 }
 
+func (app *BaseApp) SetUpdateCMTxNonceHandler(handler sdk.UpdateCMTxNonceHandler) {
+	if app.sealed {
+		panic("SetUpdateCMTxNonceHandler() on sealed BaseApp")
+	}
+	app.updateCMTxNonceHandler = handler
+}
+
 func (app *BaseApp) SetTxDecoderWithHash(decoder sdk.TxDecoderWithHash) {
 	if app.sealed {
 		panic("SetTxDecoderWithHash() on sealed BaseApp")

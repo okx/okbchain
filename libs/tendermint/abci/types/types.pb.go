@@ -699,6 +699,7 @@ type RequestCheckTx struct {
 	Tx                   []byte      `protobuf:"bytes,1,opt,name=tx,proto3" json:"tx,omitempty"`
 	Type                 CheckTxType `protobuf:"varint,2,opt,name=type,proto3,enum=tendermint.abci.types.CheckTxType" json:"type,omitempty"`
 	From                 string      `protobuf:"bytes,1,opt,name=from,proto3" json:"from,omitempty"`
+	Nonce                uint64      `protobuf:"uint64,1,opt,name=nonce,proto3" json:"nonce,omitempty"`
 	TxHash               []byte      `protobuf:"bytes,1,opt,name=txHash,proto3" json:"txHash,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}    `json:"-"`
 	XXX_unrecognized     []byte      `json:"-"`
@@ -757,6 +758,13 @@ func (m *RequestCheckTx) GetFrom() string {
 		return m.From
 	}
 	return ""
+}
+
+func (m *RequestCheckTx) GetNonce() uint64 {
+	if m != nil {
+		return m.Nonce
+	}
+	return 0
 }
 
 func (m *RequestCheckTx) GetTxHash() []byte {

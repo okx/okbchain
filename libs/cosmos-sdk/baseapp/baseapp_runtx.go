@@ -33,6 +33,7 @@ type runTxInfo struct {
 
 	reusableCacheMultiStore sdk.CacheMultiStore
 	overridesBytes          []byte
+	outOfGas                bool
 }
 
 func (info *runTxInfo) GetCacheMultiStore() (sdk.CacheMultiStore, bool) {
@@ -114,9 +115,13 @@ func (app *BaseApp) runtxWithInfo(info *runTxInfo, mode runTxMode, txBytes []byt
 	// There is no need to update BlockGasMeter.GasConsumed and info.gInfo using ctx.GasMeter
 	// as gas is not consumed actually when ante failed.
 	isAnteSucceed := false
+	recoverd := false
 	defer func() {
 		if r := recover(); r != nil {
 			err = app.runTx_defer_recover(r, info)
+			recoverd = true
+		}
+		if recoverd {
 			info.msCache = nil //TODO msCache not write
 			info.result = nil
 		}
@@ -139,9 +144,16 @@ func (app *BaseApp) runtxWithInfo(info *runTxInfo, mode runTxMode, txBytes []byt
 	}()
 
 	defer func() {
+		if r := recover(); r != nil {
+			err = app.runTx_defer_recover(r, info)
+			recoverd = true
+		}
 		app.pin(trace.Refund, true, mode)
 		defer app.pin(trace.Refund, false, mode)
-		handler.handleDeferRefund(info)
+		if (tx.GetType() == sdk.StdTxType && isAnteSucceed && err == nil) ||
+			tx.GetType() == sdk.EvmTxType {
+			handler.handleDeferRefund(info)
+		}
 	}()
 
 	if err := validateBasicTxMsgs(info.tx.GetMsgs()); err != nil {
@@ -371,6 +383,7 @@ func (app *BaseApp) runTx_defer_recover(r interface{}, info *runTxInfo) error {
 	// TODO: Use ErrOutOfGas instead of ErrorOutOfGas which would allow us
 	// to keep the stracktrace.
 	case sdk.ErrorOutOfGas:
+		info.outOfGas = true
 		err = sdkerrors.Wrap(
 			sdkerrors.ErrOutOfGas, fmt.Sprintf(
 				"out of gas in location: %v; gasWanted: %d, gasUsed: %d",

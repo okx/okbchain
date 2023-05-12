@@ -82,6 +82,8 @@ func TestInitGenesis(t *testing.T) {
 	q2 := newData.module.NewQuerierHandler()
 
 	// initialize new app with genstate
+	contractAccount := newData.acctKeeper.NewAccountWithAddress(newData.ctx, sdk.MustAccAddressFromBech32(contractBech32Addr))
+	newData.acctKeeper.SetAccount(newData.ctx, contractAccount)
 	InitGenesis(newData.ctx, &newData.keeper, *genState, newData.module.NewHandler())
 
 	// run same checks again on newdata, to make sure it was reinitialized correctly

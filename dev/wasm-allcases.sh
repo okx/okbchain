@@ -59,7 +59,7 @@ OKBCHAIN_DEVNET_VAL_ADMIN_MNEMONIC=(
 
 VAL_NODE_NUM=${#OKBCHAIN_DEVNET_VAL_ADMIN_MNEMONIC[@]}
 
-CHAIN_ID="okbchain-197"
+CHAIN_ID="okbchain-67"
 NODE="http://localhost:26657"
 while getopts "c:i:" opt; do
   case $opt in
@@ -83,9 +83,9 @@ okbchaincli keys add --recover captain -m "puzzle glide follow cruel say burst d
 okbchaincli keys add --recover admin17 -m "antique onion adult slot sad dizzy sure among cement demise submit scare" -y
 okbchaincli keys add --recover admin18 -m "lazy cause kite fence gravity regret visa fuel tone clerk motor rent" -y
 
-captain=$(okbchaincli keys show captain -a)
-admin18=$(okbchaincli keys show admin18 -a)
-admin17=$(okbchaincli keys show admin17 -a)
+captain=$(okbchaincli keys show captain | jq -r '.eth_address')
+admin18=$(okbchaincli keys show admin18 | jq -r '.eth_address')
+admin17=$(okbchaincli keys show admin17 | jq -r '.eth_address')
 proposal_deposit="100okb"
 
 if [[ $CHAIN_ID == "okbchain-194" ]];
@@ -104,7 +104,7 @@ fi;
 # usage:
 #   proposal_vote {proposal_id}
 proposal_vote() {
-  if [[ $CHAIN_ID == "okbchain-197" ]];
+  if [[ $CHAIN_ID == "okbchain-67" ]];
   then
     res=$(okbchaincli tx gov vote "$proposal_id" yes --from captain $TX_EXTRA)
   else
@@ -127,9 +127,17 @@ proposal_vote() {
   fi;
 }
 
+res=$(okbchaincli tx gov submit-proposal update-wasm-deployment-whitelist nobody --deposit ${proposal_deposit} --title "test title" --description "test description" --from captain $TX_EXTRA)
+proposal_id=$(echo "$res" | jq '.logs[0].events[1].attributes[1].value' | sed 's/\"//g')
+echo "proposal_id: $proposal_id"
+proposal_vote "$proposal_id"
+
 res=$(okbchaincli tx wasm store ./wasm/cw20-base/artifacts/cw20_base.wasm --instantiate-everybody=true --from captain $TX_EXTRA)
 raw_log=$(echo "$res" | jq '.raw_log' | sed 's/\"//g')
 failed_log="unauthorized: can not create code: failed to execute message; message index: 0"
+
+raw_log=$(echo "$res" | jq '.raw_log' | sed 's/\"//g')
+failed_log="unauthorized: Failed to create code, nobody allowed to upload contract: failed to execute message; message index: 0"
 if [[ "${raw_log}" != "${failed_log}" ]];
 then
   echo "expect fail when update-wasm-deployment-whitelist is nobody"
@@ -155,7 +163,7 @@ echo "store cw20 contract succeed"
 cw20_code_id1=$(echo "$res" | jq '.logs[0].events[1].attributes[0].value' | sed 's/\"//g')
 
 echo "## store cw20 contract...nobody"
-res=$(okbchaincli tx wasm store ./wasm/cw20-base/artifacts/cw20_base.wasm --instantiate-nobody=true --from captain $TX_EXTRA)
+res=$(okbchaincli tx wasm store ./wasm/cw20-base/artifacts/cw20_base.wasm --from captain $TX_EXTRA)
 echo "store cw20 contract succeed"
 cw20_code_id2=$(echo "$res" | jq '.logs[0].events[1].attributes[0].value' | sed 's/\"//g')
 

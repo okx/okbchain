@@ -13,7 +13,7 @@ const (
 	// DefaultGasMultiplier is how many CosmWasm gas points = 1 Cosmos SDK gas point.
 	//
 	// CosmWasm gas strategy is documented in https://github.com/CosmWasm/cosmwasm/blob/v1.0.0-beta/docs/GAS.md.
-	// Cosmos SDK reference costs can be found here: https://github.com/okx/exchain/libs/cosmos-sdk/blob/v0.42.10/store/types/gas.go#L198-L209.
+	// Cosmos SDK reference costs can be found here: https://github.com/okx/okbchain/blob/v0.1.0/libs/cosmos-sdk/store/types/gas.go#L171-L181.
 	//
 	// The original multiplier of 100 up to CosmWasm 0.16 was based on
 	//     "A write at ~3000 gas and ~200us = 10 gas per us (microsecond) cpu/io
@@ -22,20 +22,17 @@ const (
 	// in the 0.16 -> 1.0 upgrade (https://github.com/CosmWasm/cosmwasm/pull/1120).
 	//
 	// The multiplier deserves more reproducible benchmarking and a strategy that allows easy adjustments.
-	// This is tracked in https://github.com/okx/exchain/issues/566 and https://github.com/okx/exchain/issues/631.
 	// Gas adjustments are consensus breaking but may happen in any release marked as consensus breaking.
 	// Do not make assumptions on how much gas an operation will consume in places that are hard to adjust,
 	// such as hardcoding them in contracts.
 	//
 	// Please note that all gas prices returned to wasmvm should have this multiplied.
-	// Benchmarks and numbers were discussed in: https://github.com/okx/exchain/pull/634#issuecomment-938055852
-	DefaultGasMultiplier uint64 = 140_000_000
+	DefaultGasMultiplier uint64 = 38_000_000
+	BaseGasMultiplier    uint64 = 1_000_000
 	// DefaultInstanceCost is how much SDK gas we charge each time we load a WASM instance.
 	// Creating a new instance is costly, and this helps put a recursion limit to contracts calling contracts.
-	// Benchmarks and numbers were discussed in: https://github.com/okx/exchain/pull/634#issuecomment-938056803
 	DefaultInstanceCost uint64 = 60_000
 	// DefaultCompileCost is how much SDK gas is charged *per byte* for compiling WASM code.
-	// Benchmarks and numbers were discussed in: https://github.com/okx/exchain/pull/634#issuecomment-938056803
 	DefaultCompileCost uint64 = 3
 	// DefaultEventAttributeDataCost is how much SDK gas is charged *per byte* for attribute data in events.
 	// This is used with len(key) + len(value)
@@ -70,6 +67,12 @@ type GasRegister interface {
 	ToWasmVMGas(source sdk.Gas) uint64
 	// FromWasmVMGas converts from wasmvm gas to sdk gas
 	FromWasmVMGas(source uint64) sdk.Gas
+
+	// GetGasMultiplier
+	GetGasMultiplier() uint64
+
+	// UpdateGasMultiplier
+	UpdateGasMultiplier(gasMultiplier uint64) bool
 }
 
 // WasmGasRegisterConfig config type
@@ -79,7 +82,7 @@ type WasmGasRegisterConfig struct {
 	// CompileCosts costs to persist and "compile" a new wasm contract
 	CompileCost sdk.Gas
 	// GasMultiplier is how many cosmwasm gas points = 1 sdk gas point
-	// SDK reference costs can be found here: https://github.com/okx/exchain/libs/cosmos-sdk/blob/02c6c9fafd58da88550ab4d7d494724a477c8a68/store/types/gas.go#L153-L164
+	// SDK reference costs can be found here: https://github.com/okx/okbchain/blob/v0.1.0/libs/cosmos-sdk/store/types/gas.go#L171-L181
 	GasMultiplier sdk.Gas
 	// EventPerAttributeCost is how much SDK gas is charged *per byte* for attribute data in events.
 	// This is used with len(key) + len(value)
@@ -116,16 +119,16 @@ type WasmGasRegister struct {
 }
 
 // NewDefaultWasmGasRegister creates instance with default values
-func NewDefaultWasmGasRegister() WasmGasRegister {
+func NewDefaultWasmGasRegister() *WasmGasRegister {
 	return NewWasmGasRegister(DefaultGasRegisterConfig())
 }
 
 // NewWasmGasRegister constructor
-func NewWasmGasRegister(c WasmGasRegisterConfig) WasmGasRegister {
+func NewWasmGasRegister(c WasmGasRegisterConfig) *WasmGasRegister {
 	if c.GasMultiplier == 0 {
-		panic(sdkerrors.Wrap(sdkerrors.ErrLogic, "GasMultiplier can not be 0"))
+		panic(sdkerrors.Wrap(sdkerrors.ErrLogic, "GasFactor can not be 0"))
 	}
-	return WasmGasRegister{
+	return &WasmGasRegister{
 		c: c,
 	}
 }
@@ -224,4 +227,15 @@ func (g WasmGasRegister) ToWasmVMGas(source storetypes.Gas) uint64 {
 // FromWasmVMGas converts to SDK gas unit
 func (g WasmGasRegister) FromWasmVMGas(source uint64) sdk.Gas {
 	return source / g.c.GasMultiplier
+}
+
+// GetGasMultiplier
+func (g WasmGasRegister) GetGasMultiplier() uint64 {
+	return g.c.GasMultiplier
+}
+
+// UpdateGasMultiplier
+func (g *WasmGasRegister) UpdateGasMultiplier(gasMultiplier uint64) bool {
+	g.c.GasMultiplier = gasMultiplier
+	return true
 }
