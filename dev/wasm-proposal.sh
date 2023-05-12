@@ -501,10 +501,10 @@ then
   exit 1
 fi
 
-echo "## clear admin..."
-res=$(okbchaincli tx wasm clear-contract-admin "$cw4contractAddr" --from admin17 $TX_EXTRA)
+echo "## set admin nil"
+res=$(okbchaincli tx wasm set-contract-admin "$cw4contractAddr" "0x0000000000000000000000000000000000000000" --from admin17 $TX_EXTRA)
 actionName=$(echo "$res" | jq '.logs[0].events[0].attributes[0].value' | sed 's/\"//g')
-if [[ "${actionName}" != "clear-contract-admin" ]];
+if [[ "${actionName}" != "update-contract-admin" ]];
 then
   echo "invalid action name: ${actionName}"
   exit 1
@@ -577,7 +577,7 @@ then
   exit 1
 fi;
 
-res=$(okbchaincli tx wasm clear-contract-admin "$cw20contractAddr" --from captain $TX_EXTRA)
+res=$(okbchaincli tx wasm set-contract-admin "$cw20contractAddr" "0x0000000000000000000000000000000000000000" --from captain $TX_EXTRA)
 res=$(okbchaincli tx wasm migrate "$cw20contractAddr" "$burner_code_id" '{"payout": "'$captain'"}' --from captain $TX_EXTRA)
 raw_log=$(echo "$res" | jq '.raw_log' | sed 's/\"//g')
 failed_log="unauthorized: can not migrate: failed to execute message; message index: 0"
@@ -867,15 +867,15 @@ then
 fi
 
 echo "## gov clear cw20 admin"
-res=$(okbchaincli tx gov submit-proposal clear-contract-admin $cw20contractAddr --deposit ${proposal_deposit} --title "test title" --description "test description" --from captain $TX_EXTRA)
+res=$(okbchaincli tx gov submit-proposal set-contract-admin $cw20contractAddr "0x0000000000000000000000000000000000000000" --deposit ${proposal_deposit} --title "test title" --description "test description" --from captain $TX_EXTRA)
 proposal_id=$(echo "$res" | jq '.logs[0].events[1].attributes[1].value' | sed 's/\"//g')
 echo "proposal_id: $proposal_id"
 proposal_vote "$proposal_id"
 
 cw20admin=$(okbchaincli query wasm contract "$cw20contractAddr" "$QUERY_EXTRA" | jq '.contract_info.admin' | sed 's/\"//g')
-if [[ $cw20admin != "" ]];
+if [[ $cw20admin != "0x0000000000000000000000000000000000000000" ]];
 then
-  echo "cw20 admin expected to be nobody"
+  echo "cw20 admin expected to 0x0000000000000000000000000000000000000000"
   exit 1
 fi
 
