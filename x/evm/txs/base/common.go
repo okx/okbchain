@@ -39,7 +39,10 @@ func msg2st(ctx *sdk.Context, k *Keeper, msg *types.MsgEthereumTx, st *types.Sta
 		return
 	}
 
-	txHash := tmtypes.Tx(ctx.TxBytes()).Hash()
+	var txHash = msg.Hash
+	if len(txHash) == 0 {
+		txHash = tmtypes.Tx(ctx.TxBytes()).Hash()
+	}
 	ethHash := common.BytesToHash(txHash)
 
 	st.AccountNonce = msg.Data.AccountNonce
