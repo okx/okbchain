@@ -9,11 +9,22 @@ okbchaincli keys add --recover val3 -m "lazy cause kite fence gravity regret vis
 
 sleep 4
 
-okbchaincli tx gov submit-proposal upgrade ../proposals/wasm.proposal --from val0 --fees 1okb  -y -b block
-okbchaincli tx gov vote 1 yes --from val0 --fees 0.01okb  -y -b block
-okbchaincli tx gov vote 1 yes --from val1 --fees 0.01okb  -y -b block
-okbchaincli tx gov vote 1 yes --from val2 --fees 0.01okb  -y -b block
-okbchaincli tx gov vote 1 yes --from val3 --fees 0.01okb  -y -b block
+echo "upgrade earth proposal..."
+res=$(okbchaincli tx gov submit-proposal upgrade ../proposals/wasm.proposal --from val0 --fees 1okb  -y -b block)
+res=$(okbchaincli tx gov vote 1 yes --from val0 --fees 0.01okb  -y -b block)
+res=$(okbchaincli tx gov vote 1 yes --from val1 --fees 0.01okb  -y -b block)
+res=$(okbchaincli tx gov vote 1 yes --from val2 --fees 0.01okb  -y -b block)
+
+res=$(okbchaincli query gov proposal 1)
+result=$(echo "$res" | jq '.proposal_status' | sed 's/\"//g')
+
+if [[ "${result}" != "Passed" ]];
+then
+  echo "proposal result: ${Passed}"
+  exit 1
+fi;
+
+echo "run4v1r succeed~"
 
 #sleep 5
 #
