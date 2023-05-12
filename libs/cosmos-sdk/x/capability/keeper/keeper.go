@@ -40,8 +40,7 @@ type (
 		cdc           *codec.Codec
 		storeKey      sdk.StoreKey
 		memKey        sdk.StoreKey
-		capMap        map[uint64]*types.Capability
-		rwLock        *sync.RWMutex
+		capMap        *sync.Map
 		scopedModules map[string]struct{}
 		sealed        bool
 	}
@@ -56,8 +55,7 @@ type (
 		cdc      *codec.Codec
 		storeKey sdk.StoreKey
 		memKey   sdk.StoreKey
-		capMap   map[uint64]*types.Capability
-		rwLock   *sync.RWMutex
+		capMap   *sync.Map
 		module   string
 	}
 )
@@ -69,8 +67,7 @@ func NewKeeper(cdc *codec.CodecProxy, storeKey, memKey sdk.StoreKey) *Keeper {
 		cdc:           cdc.GetCdc(),
 		storeKey:      storeKey,
 		memKey:        memKey,
-		capMap:        make(map[uint64]*types.Capability),
-		rwLock:        &sync.RWMutex{},
+		capMap:        &sync.Map{},
 		scopedModules: make(map[string]struct{}),
 		sealed:        false,
 	}
@@ -205,7 +202,7 @@ func (k Keeper) InitializeCapability(ctx sdk.Context, index uint64, owners types
 		memStore.Set(types.RevCapabilityKey(owner.Module, owner.Name), sdk.Uint64ToBigEndian(index))
 
 		// Set the mapping from index from index to in-memory capability in the go map
-		k.capMap[index] = cap
+		k.capMap.Store(index, cap)
 	}
 
 }
@@ -258,7 +255,7 @@ func (sk ScopedKeeper) NewCapability(ctx sdk.Context, name string) (*types.Capab
 	memStore.Set(types.RevCapabilityKey(sk.module, name), sdk.Uint64ToBigEndian(index))
 
 	// Set the mapping from index from index to in-memory capability in the go map
-	sk.capMap[index] = cap
+	sk.capMap.Store(index, cap)
 
 	logger(ctx).Info("created new capability", "module", sk.module, "name", name)
 
@@ -349,7 +346,7 @@ func (sk ScopedKeeper) ReleaseCapability(ctx sdk.Context, cap *types.Capability)
 		// remove capability owner set
 		prefixStore.Delete(indexKey)
 		// since no one owns capability, we can delete capability from map
-		delete(sk.capMap, cap.GetIndex())
+		sk.capMap.Delete(cap.GetIndex())
 	} else {
 		// update capability owner set
 		prefixStore.Set(indexKey, sk.cdc.MustMarshalBinaryBare(capOwners))
@@ -404,8 +401,6 @@ func (sk ScopedKeeper) GetCapability(ctx sdk.Context, name string) (*types.Capab
 	//}
 	//
 	//return cap, true
-	sk.rwLock.RLock()
-	defer sk.rwLock.RUnlock()
 
 	if strings.TrimSpace(name) == "" {
 		return nil, false
@@ -427,12 +422,12 @@ func (sk ScopedKeeper) GetCapability(ctx sdk.Context, name string) (*types.Capab
 		return nil, false
 	}
 
-	cap := sk.capMap[index]
-	if cap == nil {
+	cap, ok := sk.capMap.Load(index)
+	if !ok {
 		panic("capability found in memstore is missing from map")
 	}
 
-	return cap, true
+	return cap.(*types.Capability), true
 }
 
 // GetCapabilityName allows a module to retrieve the name under which it stored a given
