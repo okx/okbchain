@@ -357,7 +357,7 @@ func (memR *Reactor) broadcastTxRoutine(peer p2p.Peer) {
 					}
 				}
 			} else if memTx.isWrapCMTx {
-				wmsg := &WrapCMTxMessage{Wtx: &types.WrapCMTx{Tx: memTx.tx, Nonce: memTx.wrapCMNonce}}
+				wmsg := &WrapCMTxMessage{Wtx: &types.WrapCMTx{Tx: memTx.tx.GetTx(), Nonce: memTx.wrapCMNonce}}
 				if isInWhiteList {
 					wmsg.From = memTx.from
 				} else {
