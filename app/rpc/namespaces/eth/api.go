@@ -51,9 +51,11 @@ import (
 	"github.com/okx/okbchain/libs/tendermint/global"
 	"github.com/okx/okbchain/libs/tendermint/libs/log"
 	tmtypes "github.com/okx/okbchain/libs/tendermint/types"
+	"github.com/okx/okbchain/x/erc20"
 	"github.com/okx/okbchain/x/evm"
 	evmtypes "github.com/okx/okbchain/x/evm/types"
 	"github.com/okx/okbchain/x/evm/watcher"
+	"github.com/okx/okbchain/x/vmbridge"
 )
 
 const (
@@ -71,23 +73,26 @@ const (
 
 // PublicEthereumAPI is the eth_ prefixed set of APIs in the Web3 JSON-RPC spec.
 type PublicEthereumAPI struct {
-	ctx                context.Context
-	clientCtx          clientcontext.CLIContext
-	chainIDEpoch       *big.Int
-	logger             log.Logger
-	backend            backend.Backend
-	keys               []ethsecp256k1.PrivKey // unlocked keys
-	nonceLock          *rpctypes.AddrLocker
-	keyringLock        sync.Mutex
-	gasPrice           *hexutil.Big
-	wrappedBackend     *watcher.Querier
-	watcherBackend     *watcher.Watcher
-	evmFactory         simulation.EvmFactory
-	txPool             *TxPool
-	Metrics            *monitor.RpcMetrics
-	callCache          *lru.Cache
-	cdc                *codec.Codec
-	fastQueryThreshold uint64
+	ctx                  context.Context
+	clientCtx            clientcontext.CLIContext
+	chainIDEpoch         *big.Int
+	logger               log.Logger
+	backend              backend.Backend
+	keys                 []ethsecp256k1.PrivKey // unlocked keys
+	nonceLock            *rpctypes.AddrLocker
+	keyringLock          sync.Mutex
+	gasPrice             *hexutil.Big
+	wrappedBackend       *watcher.Querier
+	watcherBackend       *watcher.Watcher
+	evmFactory           simulation.EvmFactory
+	txPool               *TxPool
+	Metrics              *monitor.RpcMetrics
+	callCache            *lru.Cache
+	cdc                  *codec.Codec
+	fastQueryThreshold   uint64
+	systemContract       []byte
+	e2cWasmCodeLimit     uint64
+	e2cWasmMsgHelperAddr string
 }
 
 // NewAPI creates an instance of the public ETH Web3 API.
@@ -102,17 +107,19 @@ func NewAPI(
 	}
 
 	api := &PublicEthereumAPI{
-		ctx:                context.Background(),
-		clientCtx:          clientCtx,
-		chainIDEpoch:       epoch,
-		logger:             log.With("module", "json-rpc", "namespace", NameSpace),
-		backend:            backend,
-		keys:               keys,
-		nonceLock:          nonceLock,
-		gasPrice:           ParseGasPrice(),
-		wrappedBackend:     watcher.NewQuerier(),
-		watcherBackend:     watcher.NewWatcher(log),
-		fastQueryThreshold: viper.GetUint64(FlagFastQueryThreshold),
+		ctx:                  context.Background(),
+		clientCtx:            clientCtx,
+		chainIDEpoch:         epoch,
+		logger:               log.With("module", "json-rpc", "namespace", NameSpace),
+		backend:              backend,
+		keys:                 keys,
+		nonceLock:            nonceLock,
+		gasPrice:             ParseGasPrice(),
+		wrappedBackend:       watcher.NewQuerier(),
+		watcherBackend:       watcher.NewWatcher(log),
+		fastQueryThreshold:   viper.GetUint64(FlagFastQueryThreshold),
+		systemContract:       getSystemContractAddr(clientCtx),
+		e2cWasmMsgHelperAddr: viper.GetString(FlagE2cWasmMsgHelperAddr),
 	}
 	api.evmFactory = simulation.NewEvmFactory(clientCtx.ChainID, api.wrappedBackend)
 	module := evm.AppModuleBasic{}
@@ -857,6 +864,20 @@ func (api *PublicEthereumAPI) Call(args rpctypes.CallArgs, blockNrOrHash rpctype
 	if err != nil {
 		return nil, err
 	}
+
+	wasmCode, newParam, isWasmMsgStoreCode := api.isLargeWasmMsgStoreCode(args)
+	if isWasmMsgStoreCode {
+		*args.Data = newParam
+		wasmCode, err = judgeWasmCode(wasmCode)
+		if err != nil {
+			return []byte{}, TransformDataError(err, "eth_call judgeWasmCode")
+		}
+	}
+
+	// eth_call for wasm
+	if api.isWasmCall(args) {
+		return api.wasmCall(args, blockNr)
+	}
 	simRes, err := api.doCall(args, blockNr, big.NewInt(ethermint.DefaultRPCGasLimit), false, overrides)
 	if err != nil {
 		return []byte{}, TransformDataError(err, "eth_call")
@@ -866,6 +887,15 @@ func (api *PublicEthereumAPI) Call(args rpctypes.CallArgs, blockNrOrHash rpctype
 	if err != nil {
 		return []byte{}, TransformDataError(err, "eth_call")
 	}
+
+	if isWasmMsgStoreCode {
+		ret, err := replaceToRealWasmCode(data.Ret, wasmCode)
+		if err != nil {
+			return []byte{}, TransformDataError(err, "eth_call replaceToRealWasmCode")
+		}
+		data.Ret = ret
+	}
+
 	if overrides == nil {
 		api.addCallCache(key, data.Ret)
 	}
@@ -948,7 +978,23 @@ func (api *PublicEthereumAPI) doCall(
 
 	//only worked when fast-query has been enabled
 	if sim != nil && useWatch {
-		return sim.DoCall(msg, addr.String(), overridesBytes, api.evmFactory.PutBackStorePool)
+		simRes, err := sim.DoCall(msg, addr.String(), overridesBytes, api.evmFactory.PutBackStorePool)
+		if err != nil {
+			return simRes, err
+		}
+		data, err := evmtypes.DecodeResultData(simRes.Result.Data)
+		if err != nil {
+			return simRes, err
+		}
+		tempHooks := evm.NewLogProcessEvmHook(
+			erc20.NewSendToIbcEventHandler(erc20.Keeper{}),
+			erc20.NewSendNative20ToIbcEventHandler(erc20.Keeper{}),
+			vmbridge.NewSendToWasmEventHandler(vmbridge.Keeper{}),
+			vmbridge.NewCallToWasmEventHandler(vmbridge.Keeper{}),
+		)
+		if ok := tempHooks.IsCanHooked(data.Logs); !ok {
+			return simRes, nil
+		}
 	}
 
 	//Generate tx to be used to simulate (signature isn't needed)
@@ -1258,7 +1304,8 @@ func (api *PublicEthereumAPI) GetTransactionReceipt(hash common.Hash) (*watcher.
 	monitor := monitor.GetMonitor("eth_getTransactionReceipt", api.logger, api.Metrics).OnBegin()
 	defer monitor.OnEnd("hash", hash)
 	res, e := api.wrappedBackend.GetTransactionReceipt(hash)
-	if e == nil {
+	// do not use watchdb when it`s a evm2cm tx
+	if e == nil && !api.isEvm2CmTx(res.To) {
 		return res, nil
 	}
 
@@ -1320,6 +1367,18 @@ func (api *PublicEthereumAPI) GetTransactionReceipt(hash common.Hash) (*watcher.
 	contractAddr := &data.ContractAddress
 	if data.ContractAddress == common.HexToAddress("0x00000000000000000000") {
 		contractAddr = nil
+	}
+
+	// evm2cm tx logs
+	if api.isEvm2CmTx(ethTx.To()) {
+		data.Logs = append(data.Logs, &ethtypes.Log{
+			Address:     *ethTx.To(),
+			Topics:      []common.Hash{hash},
+			Data:        []byte(tx.TxResult.Log),
+			BlockNumber: uint64(tx.Height),
+			TxHash:      hash,
+			BlockHash:   blockHash,
+		})
 	}
 
 	// fix gasUsed when deliverTx ante handler check sequence invalid

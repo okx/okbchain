@@ -19,8 +19,8 @@ import (
 //
 // Examples:
 //
-// 	- "portidone/channelidone/uatom" => DenomTrace{Path: "portidone/channelidone", BaseDenom: "uatom"}
-// 	- "uatom" => DenomTrace{Path: "", BaseDenom: "uatom"}
+//   - "portidone/channelidone/okb" => DenomTrace{Path: "portidone/channelidone", BaseDenom: "okb"}
+//   - "okb" => DenomTrace{Path: "", BaseDenom: "okb"}
 func ParseDenomTrace(rawDenom string) DenomTrace {
 	denomSplit := strings.Split(rawDenom, "/")
 
@@ -142,8 +142,8 @@ func (t Traces) Sort() Traces {
 // ValidatePrefixedDenom checks that the denomination for an IBC fungible token packet denom is correctly prefixed.
 // The function will return no error if the given string follows one of the two formats:
 //
-//  - Prefixed denomination: '{portIDN}/{channelIDN}/.../{portID0}/{channelID0}/baseDenom'
-//  - Unprefixed denomination: 'baseDenom'
+//   - Prefixed denomination: '{portIDN}/{channelIDN}/.../{portID0}/{channelID0}/baseDenom'
+//   - Unprefixed denomination: 'baseDenom'
 func ValidatePrefixedDenom(denom string) error {
 	denomSplit := strings.Split(denom, "/")
 	if denomSplit[0] == denom && strings.TrimSpace(denom) != "" {
@@ -161,8 +161,8 @@ func ValidatePrefixedDenom(denom string) error {
 
 // ValidateIBCDenom validates that the given denomination is either:
 //
-//  - A valid base denomination (eg: 'uatom')
-//  - A valid fungible token representation (i.e 'ibc/{hash}') per ADR 001 https://github.com/cosmos/cosmos-sdk/blob/master/docs/architecture/adr-001-coin-source-tracing.md
+//   - A valid base denomination (eg: 'okb')
+//   - A valid fungible token representation (i.e 'ibc/{hash}') per ADR 001 https://github.com/cosmos/cosmos-sdk/blob/master/docs/architecture/adr-001-coin-source-tracing.md
 func ValidateIBCDenom(denom string) error {
 	if err := sdk.ValidateDenom(denom); err != nil {
 		return err
