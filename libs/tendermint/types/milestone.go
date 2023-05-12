@@ -2,8 +2,6 @@ package types
 
 import (
 	"github.com/okx/okbchain/libs/system"
-	"strconv"
-	"sync"
 )
 
 // Disable followings after milestoneMercuryHeight
@@ -13,14 +11,11 @@ import (
 // 4. ibc
 
 var (
-	MILESTONE_EARTH_HEIGHT string
-	milestoneEarthHeight   int64
-	milestoneVenus4Height  int64
+	milestoneEarthHeight  int64
+	milestoneVenus4Height int64
 
 	// note: it stores the earlies height of the node,and it is used by cli
 	nodePruneHeight int64
-
-	once sync.Once
 )
 
 const (
@@ -30,23 +25,6 @@ const (
 	MILESTONE_EARTH  = "earth"
 	MILESTONE_Venus4 = "venus4"
 )
-
-func init() {
-	once.Do(func() {
-		milestoneEarthHeight = string2number(MILESTONE_EARTH_HEIGHT)
-	})
-}
-
-func string2number(input string) int64 {
-	if len(input) == 0 {
-		input = "0"
-	}
-	res, err := strconv.ParseInt(input, 10, 64)
-	if err != nil {
-		panic(err)
-	}
-	return res
-}
 
 func SetupMainNetEnvironment(pruneH int64) {
 	nodePruneHeight = pruneH
@@ -99,6 +77,10 @@ func HigherThanEarth(h int64) bool {
 
 func GetEarthHeight() int64 {
 	return milestoneEarthHeight
+}
+
+func InitMilestoneEarthHeight(h int64) {
+	milestoneEarthHeight = h
 }
 
 // =========== Earth ===============

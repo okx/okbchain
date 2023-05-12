@@ -2,6 +2,7 @@ package app
 
 import (
 	"fmt"
+	paramstypes "github.com/okx/okbchain/x/params/types"
 	"io"
 	"os"
 	"sync"
@@ -729,6 +730,10 @@ func NewOKBChainApp(
 }
 
 func (app *OKBChainApp) InitUpgrade(ctx sdk.Context) {
+	// Claim before ApplyEffectiveUpgrade
+	app.ParamsKeeper.ClaimReadyForUpgrade(tmtypes.MILESTONE_EARTH, func(info paramstypes.UpgradeInfo) {
+		tmtypes.InitMilestoneEarthHeight(int64(info.EffectiveHeight))
+	})
 	if err := app.ParamsKeeper.ApplyEffectiveUpgrade(ctx); err != nil {
 		tmos.Exit(fmt.Sprintf("failed apply effective upgrade height info: %s", err))
 	}
