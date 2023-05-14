@@ -278,16 +278,12 @@ func (b *Block) MakePartSetByExInfo(exInfo *BlockExInfo) *PartSet {
 	b.mtx.Lock()
 	defer b.mtx.Unlock()
 
-	// just for adaptive the BlockID check between no updata and updata code
-	tmp := b.Data.TxWithMetas
-	b.Data.TxWithMetas = nil
 	// We prefix the byte length, so that unmarshaling
 	// can easily happen via a reader.
 	bz, err := cdc.MarshalBinaryLengthPrefixed(b)
 	if err != nil {
 		panic(err)
 	}
-	b.Data.TxWithMetas = tmp
 
 	payload := compressBlock(bz, exInfo.BlockCompressType, exInfo.BlockCompressFlag)
 
@@ -1633,7 +1629,7 @@ type Data struct {
 	// This means that block.AppHash does not include these txs.
 	Txs Txs `json:"txs"`
 
-	TxWithMetas TxWithMetas // TxWithMetas is no need participat calculate
+	txWithMetas TxWithMetas // TxWithMetas is no need participat calculate
 
 	// Volatile
 	hash tmbytes.HexBytes
@@ -1699,11 +1695,11 @@ func (data *Data) Hash(height int64) tmbytes.HexBytes {
 		return (Txs{}).Hash()
 	}
 	if data.hash == nil {
-		if len(data.TxWithMetas) > 0 {
-			return data.TxWithMetas.Hash() // NOTE: leaves of merkle tree are TxIDs
+		if len(data.txWithMetas) > 0 {
+			return data.txWithMetas.Hash() // NOTE: leaves of merkle tree are TxIDs
 		}
-		data.TxWithMetas = TxsToTxWithMetas(data.Txs)
-		data.hash = data.TxWithMetas.Hash() // NOTE: leaves of merkle tree are TxIDs
+		data.txWithMetas = TxsToTxWithMetas(data.Txs)
+		data.hash = data.txWithMetas.Hash() // NOTE: leaves of merkle tree are TxIDs
 	}
 	return data.hash
 }
@@ -1726,6 +1722,10 @@ func (data *Data) StringIndented(indent string) string {
 %s}#%v`,
 		indent, strings.Join(txStrings, "\n"+indent+"  "),
 		indent, data.hash)
+}
+
+func (data *Data) GetTxWithMetas() TxWithMetas {
+	return data.txWithMetas
 }
 
 //-----------------------------------------------------------------------------
