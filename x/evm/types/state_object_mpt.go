@@ -209,8 +209,11 @@ func (so *stateObject) finalise(prefetch bool) {
 	} else {
 		for key, value := range so.dirtyStorage {
 			so.pendingStorage[key] = value
-			delete(so.dirtyStorage, key)
 		}
+	}
+
+	for key, _ := range so.dirtyStorage {
+		delete(so.dirtyStorage, key)
 	}
 }
 
