@@ -94,14 +94,18 @@ ifeq ($(DEBUG),true)
 	BUILD_FLAGS += -gcflags "all=-N -l"
 endif
 
+ifeq ($(PGO),true)
+	PGO_AUTO = -pgo=auto
+endif
+
 all: install
 
 install: okbchain
 
 
 okbchain: check_version
-	$(cgo_flags) go install -v $(BUILD_FLAGS) -tags "$(build_tags)" ./cmd/okbchaind
-	$(cgo_flags) go install -v $(BUILD_FLAGS) -tags "$(build_tags)" ./cmd/okbchaincli
+	$(cgo_flags) go install $(PGO_AUTO) -v $(BUILD_FLAGS) -tags "$(build_tags)" ./cmd/okbchaind
+	$(cgo_flags) go install $(PGO_AUTO) -v $(BUILD_FLAGS) -tags "$(build_tags)" ./cmd/okbchaincli
 
 check_version:
 	@sh $(shell pwd)/libs/check/check-version.sh $(GO_VERSION) $(ROCKSDB_VERSION)
@@ -152,11 +156,11 @@ format:
 
 build:
 ifeq ($(OS),Windows_NT)
-	go build $(BUILD_FLAGS) -tags "$(build_tags)" -o build/okbchaind.exe ./cmd/okbchaind
-	go build $(BUILD_FLAGS) -tags "$(build_tags)" -o build/okbchaincli.exe ./cmd/okbchaincli
+	go build $(PGO_AUTO) $(BUILD_FLAGS) -tags "$(build_tags)" -o build/okbchaind.exe ./cmd/okbchaind
+	go build $(PGO_AUTO) $(BUILD_FLAGS) -tags "$(build_tags)" -o build/okbchaincli.exe ./cmd/okbchaincli
 else
-	go build $(BUILD_FLAGS) -tags "$(build_tags)" -o build/okbchaind ./cmd/okbchaind
-	go build $(BUILD_FLAGS) -tags "$(build_tags)" -o build/okbchaincli ./cmd/okbchaincli
+	go build $(PGO_AUTO) $(BUILD_FLAGS) -tags "$(build_tags)" -o build/okbchaind ./cmd/okbchaind
+	go build $(PGO_AUTO) $(BUILD_FLAGS) -tags "$(build_tags)" -o build/okbchaincli ./cmd/okbchaincli
 endif
 
 
