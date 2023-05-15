@@ -11,9 +11,11 @@ import (
 	"github.com/pkg/errors"
 )
 
-//------------------------------------------
+// ------------------------------------------
+//
 //	Register go-ethereum gorocksdb
-//------------------------------------------
+//
+// ------------------------------------------
 func init() {
 	dbCreator := func(name string, dir string) (ethdb.KeyValueStore, error) {
 		return NewWrapRocksDB(name, dir)
@@ -58,7 +60,7 @@ func (db *WrapRocksDB) Compact(start []byte, limit []byte) error {
 }
 
 func (db *WrapRocksDB) NewBatchWithSize(size int) ethdb.Batch {
-	panic(fmt.Errorf("not support NewBatchWithSize"))
+	NewWrapRocksDBBatch(db.RocksDB)
 	return nil
 }
 
