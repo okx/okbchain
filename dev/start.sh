@@ -133,7 +133,17 @@ run
 
 sleep 4
 
-okbchaincli tx gov submit-proposal upgrade $CURDIR/proposals/wasm.proposal --from captain --fees 1okb  -y -b block
-okbchaincli tx gov vote 1 yes --from captain --fees 0.01okb  -y -b block
+echo "upgrade earth proposal..."
+res=$(okbchaincli tx gov submit-proposal upgrade $CURDIR/proposals/wasm.proposal --from captain --fees 1okb  -y -b block)
+res=$(okbchaincli tx gov vote 1 yes --from captain --fees 0.01okb  -y -b block)
 
-# okbchaincli tx send captain 0x83D83497431C2D3FEab296a9fba4e5FaDD2f7eD0 1okb --fees 1okb -b block -y
+res=$(okbchaincli query gov proposal 1)
+result=$(echo "$res" | jq '.proposal_status' | sed 's/\"//g')
+
+if [[ "${result}" != "Passed" ]];
+then
+  echo "proposal result: ${Passed}"
+  exit 1
+fi;
+
+echo "start node succeed~"
