@@ -61,21 +61,24 @@ func (tx *Tx) Transition(config types.ChainConfig) (result Result, err error) {
 	}
 
 	// call evm hooks
-	if !tx.Ctx.IsCheckTx() {
-		receipt := &ethtypes.Receipt{
-			Status:           ethtypes.ReceiptStatusSuccessful,
-			Bloom:            result.ResultData.Bloom,
-			Logs:             result.ResultData.Logs,
-			TxHash:           result.ResultData.TxHash,
-			ContractAddress:  result.ResultData.ContractAddress,
-			GasUsed:          result.ExecResult.GasInfo.GasConsumed,
-			BlockNumber:      big.NewInt(tx.Ctx.BlockHeight()),
-			TransactionIndex: uint(tx.Keeper.TxCount),
-		}
-		err = tx.Keeper.CallEvmHooks(tx.Ctx, &tx.StateTransition, receipt)
-		if err != nil {
-			tx.Keeper.Logger().Error("tx call evm hooks failed", "error", err)
-		}
+	// After TransitionDb, some account balance may be changed, hooks logic may use this account.
+	// So if have not fllow code to make account to account cachedb, the hook may be got a wrong result when simluate tx.
+	if tx.Ctx.IsCheckTx() {
+		tx.StateTransition.Csdb.IntermediateRoot(true)
+	}
+	receipt := &ethtypes.Receipt{
+		Status:           ethtypes.ReceiptStatusSuccessful,
+		Bloom:            result.ResultData.Bloom,
+		Logs:             result.ResultData.Logs,
+		TxHash:           result.ResultData.TxHash,
+		ContractAddress:  result.ResultData.ContractAddress,
+		GasUsed:          result.ExecResult.GasInfo.GasConsumed,
+		BlockNumber:      big.NewInt(tx.Ctx.BlockHeight()),
+		TransactionIndex: uint(tx.Keeper.TxCount),
+	}
+	err = tx.Keeper.CallEvmHooks(tx.Ctx, &tx.StateTransition, receipt)
+	if err != nil {
+		tx.Keeper.Logger().Error("tx call evm hooks failed", "error", err)
 	}
 
 	return
@@ -132,7 +135,9 @@ func (tx *Tx) AnalyzeStop(tag string) {
 }
 
 // SaveTx check Tx do not transition state db
-func (tx *Tx) SaveTx(msg *types.MsgEthereumTx) {}
+func (tx *Tx) SaveTx(msg *types.MsgEthereumTx) {
+	tx.StateTransition.Csdb.SetTransactionHash(*tx.StateTransition.TxHash)
+}
 
 // GetSenderAccount check Tx do not need this
 func (tx *Tx) GetSenderAccount() authexported.Account { return nil }

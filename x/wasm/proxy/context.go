@@ -1,6 +1,8 @@
 package proxy
 
 import (
+	"github.com/okx/okbchain/libs/cosmos-sdk/baseapp"
+	"github.com/okx/okbchain/libs/cosmos-sdk/store/types"
 	"sync"
 	"time"
 
@@ -8,16 +10,11 @@ import (
 	clientcontext "github.com/okx/okbchain/libs/cosmos-sdk/client/context"
 	"github.com/okx/okbchain/libs/cosmos-sdk/store"
 	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/auth"
 	"github.com/okx/okbchain/libs/cosmos-sdk/x/params"
 	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
 	tmlog "github.com/okx/okbchain/libs/tendermint/libs/log"
 	dbm "github.com/okx/okbchain/libs/tm-db"
 	evmwatcher "github.com/okx/okbchain/x/evm/watcher"
-)
-
-const (
-	simulationGasLimit = 3000000
 )
 
 var clientCtx clientcontext.CLIContext
@@ -26,26 +23,13 @@ func SetCliContext(ctx clientcontext.CLIContext) {
 	clientCtx = ctx
 }
 
-func MakeContext(storeKey sdk.StoreKey) sdk.Context {
-	db := dbm.NewMemDB()
-	cms := store.NewCommitMultiStore(db)
-	authKey := sdk.NewKVStoreKey(auth.StoreKey)
-	paramsKey := sdk.NewKVStoreKey(params.StoreKey)
-	paramsTKey := sdk.NewTransientStoreKey(params.TStoreKey)
-	cms.MountStoreWithDB(authKey, sdk.StoreTypeIAVL, db)
-	cms.MountStoreWithDB(paramsKey, sdk.StoreTypeIAVL, db)
-	cms.MountStoreWithDB(storeKey, sdk.StoreTypeIAVL, db)
-	cms.MountStoreWithDB(paramsTKey, sdk.StoreTypeTransient, db)
-
-	err := cms.LoadLatestVersion()
-	if err != nil {
-		panic(err)
-	}
-
+func MakeContext(storeKey, storageStoreKey sdk.StoreKey) sdk.Context {
+	initCommitMultiStore(storeKey, storageStoreKey)
 	header := getHeader()
+	cms := getCommitMultiStore()
 
 	ctx := sdk.NewContext(cms, header, true, tmlog.NewNopLogger())
-	ctx.SetGasMeter(sdk.NewGasMeter(simulationGasLimit))
+	ctx.SetGasMeter(sdk.NewGasMeter(baseapp.SimulationGasLimit))
 	return ctx
 }
 
@@ -78,4 +62,49 @@ func getHeader() abci.Header {
 		Time:   timestamp,
 	}
 	return header
+}
+
+var (
+	cmsOnce           sync.Once
+	gCommitMultiStore types.CommitMultiStore
+)
+
+func initCommitMultiStore(storeKey, storageStoreKey sdk.StoreKey) sdk.CommitMultiStore {
+	cmsOnce.Do(func() {
+		db := dbm.NewMemDB()
+		cms := store.NewCommitMultiStore(db)
+		// authKey := sdk.NewKVStoreKey(auth.StoreKey)
+		paramsKey := sdk.NewKVStoreKey(params.StoreKey)
+		paramsTKey := sdk.NewTransientStoreKey(params.TStoreKey)
+		cms.MountStoreWithDB(storageStoreKey, sdk.StoreTypeMPT, db)
+		cms.MountStoreWithDB(paramsKey, sdk.StoreTypeIAVL, db)
+		cms.MountStoreWithDB(storeKey, sdk.StoreTypeIAVL, db)
+		cms.MountStoreWithDB(paramsTKey, sdk.StoreTypeTransient, db)
+
+		err := cms.LoadLatestVersion()
+		if err != nil {
+			panic(err)
+		}
+		gCommitMultiStore = cms
+	})
+
+	return gCommitMultiStore
+}
+
+var storePool = &sync.Pool{
+	New: func() interface{} {
+		return gCommitMultiStore.CacheMultiStore()
+	},
+}
+
+func getCommitMultiStore() sdk.CacheMultiStore {
+	multiStore := storePool.Get().(sdk.CacheMultiStore)
+	multiStore.Clear()
+
+	return multiStore
+}
+
+func PutBackStorePool(cms sdk.CacheMultiStore) {
+	cms.Clear()
+	storePool.Put(cms)
 }

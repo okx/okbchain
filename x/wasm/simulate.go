@@ -5,11 +5,14 @@ import (
 	"github.com/okx/okbchain/libs/cosmos-sdk/baseapp"
 	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
 	types2 "github.com/okx/okbchain/libs/cosmos-sdk/codec/types"
+	"github.com/okx/okbchain/libs/cosmos-sdk/store/mpt"
 	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
 	"github.com/okx/okbchain/libs/cosmos-sdk/x/bank"
 	"github.com/okx/okbchain/x/wasm/keeper"
 	"github.com/okx/okbchain/x/wasm/proxy"
 	"github.com/okx/okbchain/x/wasm/types"
+	"github.com/okx/okbchain/x/wasm/watcher"
+	"sync"
 )
 
 type Simulator struct {
@@ -21,7 +24,7 @@ type Simulator struct {
 func NewWasmSimulator() simulator.Simulator {
 	k := NewProxyKeeper()
 	h := NewHandler(keeper.NewDefaultPermissionKeeper(k))
-	ctx := proxy.MakeContext(k.GetStoreKey())
+	ctx := proxy.MakeContext(k.GetStoreKey(), k.GetStorageStoreKey())
 	return &Simulator{
 		handler: h,
 		k:       &k,
@@ -52,6 +55,14 @@ func (w *Simulator) Context() *sdk.Context {
 	return &w.ctx
 }
 
+func (w *Simulator) Release() {
+	if !watcher.Enable() {
+		return
+	}
+	proxy.PutBackStorePool(w.ctx.MultiStore().(sdk.CacheMultiStore))
+	w.k.Cleanup()
+}
+
 func NewProxyKeeper() keeper.Keeper {
 	cdc := codec.New()
 	RegisterCodec(cdc)
@@ -64,7 +75,6 @@ func NewProxyKeeper() keeper.Keeper {
 	ss := proxy.SubspaceProxy{}
 	akp := proxy.NewAccountKeeperProxy()
 	bkp := proxy.NewBankKeeperProxy(akp)
-	paramKP := proxy.ParamsKeeperProxy{}
 	pkp := proxy.PortKeeperProxy{}
 	ckp := proxy.CapabilityKeeperProxy{}
 	skp := proxy.SupplyKeeperProxy{}
@@ -73,10 +83,40 @@ func NewProxyKeeper() keeper.Keeper {
 	queryRouter := baseapp.NewGRPCQueryRouter()
 	queryRouter.SetInterfaceRegistry(interfaceReg)
 
-	k := keeper.NewSimulateKeeper(codec.NewCodecProxy(protoCdc, cdc), sdk.NewKVStoreKey(StoreKey), ss, akp, bkp, paramKP, nil, pkp, ckp, nil, msgRouter, queryRouter, WasmDir(), WasmConfig(), SupportedFeatures)
+	k := keeper.NewSimulateKeeper(codec.NewCodecProxy(protoCdc, cdc), getStoreKey(), getStorageStoreKey(), ss, akp, bkp, nil, pkp, ckp, nil, msgRouter, queryRouter, WasmDir(), WasmConfig(), SupportedFeatures)
 	types.RegisterMsgServer(msgRouter, keeper.NewMsgServerImpl(keeper.NewDefaultPermissionKeeper(k)))
 	types.RegisterQueryServer(queryRouter, NewQuerier(&k))
 	bank.RegisterBankMsgServer(msgRouter, bank.NewMsgServerImpl(bkp))
 	bank.RegisterQueryServer(queryRouter, bank.NewBankQueryServer(bkp, skp))
 	return k
+}
+
+var (
+	storeKeyOnce sync.Once
+	gStoreKey    sdk.StoreKey
+)
+
+func getStoreKey() sdk.StoreKey {
+	storeKeyOnce.Do(
+		func() {
+			gStoreKey = sdk.NewKVStoreKey(StoreKey)
+		},
+	)
+
+	return gStoreKey
+}
+
+var (
+	storageStoreKeyOnce sync.Once
+	gStorageStoreKey    sdk.StoreKey
+)
+
+func getStorageStoreKey() sdk.StoreKey {
+	storageStoreKeyOnce.Do(
+		func() {
+			gStorageStoreKey = sdk.NewKVStoreKey(mpt.StoreKey)
+		},
+	)
+
+	return gStorageStoreKey
 }
