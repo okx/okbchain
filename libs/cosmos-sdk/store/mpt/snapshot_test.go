@@ -20,13 +20,15 @@ func TestMptStoreSnapshotDeleteAccount(t *testing.T) {
 	require.NoError(t, err)
 
 	mptStore := &MptStore{
-		trie:         trie,
-		db:           stateDb,
-		logger:       tmlog.NewNopLogger(),
-		originalRoot: trie.Hash(),
-		retriever:    EmptyStateRootRetriever{},
-		triegc:       prque.New(nil),
+		trie:             trie,
+		db:               stateDb,
+		logger:           tmlog.NewNopLogger(),
+		originalRoot:     trie.Hash(),
+		retriever:        EmptyStateRootRetriever{},
+		triegc:           prque.New(nil),
+		pushDBHeightChan: make(chan int64, 10),
 	}
+	go mptStore.threadPushData2DB()
 	SetSnapshotRebuild(true)
 	err = mptStore.openSnapshot()
 	require.NoError(t, err)
