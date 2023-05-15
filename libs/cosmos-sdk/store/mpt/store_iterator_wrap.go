@@ -3,8 +3,6 @@ package mpt
 import (
 	"bytes"
 	"fmt"
-	"sort"
-
 	ethstate "github.com/ethereum/go-ethereum/core/state"
 )
 
@@ -41,12 +39,12 @@ func newWrapIteratorAcc(t ethstate.Trie, start, end []byte, ascending bool) *wra
 		}
 		keys = append(keys, key)
 	}
-	sort.Slice(keys, func(i, j int) bool {
-		if ascending {
-			return bytes.Compare(keys[i], keys[j]) < 0
-		}
-		return bytes.Compare(keys[i], keys[j]) >= 0
-	})
+	//sort.Slice(keys, func(i, j int) bool {
+	//	if ascending {
+	//		return bytes.Compare(keys[i], keys[j]) < 0
+	//	}
+	//	return bytes.Compare(keys[i], keys[j]) >= 0
+	//})
 
 	return &wrapIterator{
 		mptIterator: mptIter,
@@ -99,12 +97,12 @@ func newWrapIteratorStorage(t ethstate.Trie, startIn, endIn []byte, ascending bo
 		}
 		keys = append(keys, cloneAppend(startIn[:minWasmStorageKeySize], key))
 	}
-	sort.Slice(keys, func(i, j int) bool {
-		if ascending {
-			return bytes.Compare(keys[i], keys[j]) < 0
-		}
-		return bytes.Compare(keys[i], keys[j]) >= 0
-	})
+	//sort.Slice(keys, func(i, j int) bool {
+	//	if ascending {
+	//		return bytes.Compare(keys[i], keys[j]) < 0
+	//	}
+	//	return bytes.Compare(keys[i], keys[j]) >= 0
+	//})
 
 	return &wrapIterator{
 		mptIterator: mptIter,
