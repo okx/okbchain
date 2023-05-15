@@ -926,14 +926,20 @@ func (csdb *CommitStateDB) IntermediateRoot(deleteEmptyObjects bool) ethcmn.Hash
 		}
 	}
 
+	//usedAddrs := make([][]byte, 0, len(csdb.stateObjectsPending))
 	for addr := range csdb.stateObjectsPending {
 		if obj := csdb.stateObjects[addr]; obj.deleted {
 			csdb.deleteStateObject(obj)
 		} else {
 			csdb.updateStateObject(obj)
 		}
+		//usedAddrs = append(usedAddrs, ethcmn.CopyBytes(addr[:])) // Copy needed for closure
 		delete(csdb.stateObjectsPending, addr)
 	}
+
+	//if csdb.prefetcher != nil {
+	//	csdb.prefetcher.used(csdb.originalRoot, usedAddrs)
+	//}
 
 	return ethcmn.Hash{}
 }
