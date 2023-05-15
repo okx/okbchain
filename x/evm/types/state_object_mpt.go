@@ -170,7 +170,7 @@ func (so *stateObject) updateTrie(db ethstate.Database) (updated bool) {
 	//if so.stateDB.prefetcher != nil {
 	//	so.stateDB.prefetcher.Used(so.account.StateRoot, usedStorage)
 	//}
-	for key, _ := range so.pendingStorage {
+	for key := range so.pendingStorage {
 		delete(so.pendingStorage, key)
 	}
 
@@ -212,7 +212,7 @@ func (so *stateObject) finalise(prefetch bool) {
 		}
 	}
 
-	for key, _ := range so.dirtyStorage {
+	for key := range so.dirtyStorage {
 		delete(so.dirtyStorage, key)
 	}
 }
