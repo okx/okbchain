@@ -4,8 +4,6 @@ import (
 	"errors"
 	"fmt"
 
-	ethermint "github.com/okx/okbchain/app/types"
-
 	ethcmn "github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/rawdb"
 	"github.com/ethereum/go-ethereum/crypto"
@@ -19,7 +17,6 @@ import (
 func (csdb *CommitStateDB) CommitMpt(prefetcher *mpt.TriePrefetcher) (ethcmn.Hash, error) {
 	// Commit objects to the trie, measuring the elapsed time
 	codeWriter := csdb.db.TrieDB().DiskDB().NewBatch()
-	usedAddrs := make([][]byte, 0, len(csdb.stateObjectsPending))
 
 	for addr := range csdb.stateObjectsDirty {
 		if obj := csdb.stateObjects[addr]; !obj.deleted {
@@ -28,24 +25,8 @@ func (csdb *CommitStateDB) CommitMpt(prefetcher *mpt.TriePrefetcher) (ethcmn.Has
 				rawdb.WriteCode(codeWriter, ethcmn.BytesToHash(obj.CodeHash()), obj.code)
 				obj.dirtyCode = false
 			}
-
-			// Write any storage changes in the state object to its storage trie
-			if err := obj.CommitTrie(csdb.db); err != nil {
-				return ethcmn.Hash{}, err
-			}
-
-			accProto := csdb.accountKeeper.GetAccount(csdb.ctx, obj.account.Address)
-			if ethermintAccount, ok := accProto.(*ethermint.EthAccount); ok {
-				ethermintAccount.StateRoot = obj.account.StateRoot
-				csdb.accountKeeper.SetAccount(csdb.ctx, ethermintAccount)
-			}
 		}
-
-		usedAddrs = append(usedAddrs, ethcmn.CopyBytes(addr[:])) // Copy needed for closure
-	}
-
-	if len(csdb.stateObjectsDirty) > 0 {
-		csdb.stateObjectsDirty = make(map[ethcmn.Address]struct{})
+		delete(csdb.stateObjectsDirty, addr)
 	}
 
 	if codeWriter.ValueSize() > 0 {
