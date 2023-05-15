@@ -152,11 +152,11 @@ format:
 
 build:
 ifeq ($(OS),Windows_NT)
-	go build $(BUILD_FLAGS) -tags "$(build_tags)" -o build/okbchaind.exe ./cmd/okbchaind
-	go build $(BUILD_FLAGS) -tags "$(build_tags)" -o build/okbchaincli.exe ./cmd/okbchaincli
+	go build -pgo=auto $(BUILD_FLAGS) -tags "$(build_tags)" -o build/okbchaind.exe ./cmd/okbchaind
+	go build -pgo=auto $(BUILD_FLAGS) -tags "$(build_tags)" -o build/okbchaincli.exe ./cmd/okbchaincli
 else
-	go build $(BUILD_FLAGS) -tags "$(build_tags)" -o build/okbchaind ./cmd/okbchaind
-	go build $(BUILD_FLAGS) -tags "$(build_tags)" -o build/okbchaincli ./cmd/okbchaincli
+	go build -pgo=auto $(BUILD_FLAGS) -tags "$(build_tags)" -o build/okbchaind ./cmd/okbchaind
+	go build -pgo=auto $(BUILD_FLAGS) -tags "$(build_tags)" -o build/okbchaincli ./cmd/okbchaincli
 endif
 
 
