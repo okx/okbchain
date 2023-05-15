@@ -38,6 +38,9 @@ func (csdb *CommitStateDB) CommitMpt(prefetcher *mpt.TriePrefetcher) (ethcmn.Has
 				csdb.accountKeeper.SetAccount(csdb.ctx, ethermintAccount)
 			}
 		}
+	}
+
+	for addr := range csdb.stateObjectsDirty {
 		delete(csdb.stateObjectsDirty, addr)
 	}
 

@@ -934,12 +934,15 @@ func (csdb *CommitStateDB) IntermediateRoot(deleteEmptyObjects bool) ethcmn.Hash
 			csdb.updateStateObject(obj)
 		}
 		//usedAddrs = append(usedAddrs, ethcmn.CopyBytes(addr[:])) // Copy needed for closure
-		delete(csdb.stateObjectsPending, addr)
 	}
 
 	//if csdb.prefetcher != nil {
 	//	csdb.prefetcher.used(csdb.originalRoot, usedAddrs)
 	//}
+
+	for addr := range csdb.stateObjectsPending {
+		delete(csdb.stateObjectsPending, addr)
+	}
 
 	return ethcmn.Hash{}
 }
