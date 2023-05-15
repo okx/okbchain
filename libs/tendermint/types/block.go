@@ -1725,6 +1725,9 @@ func (data *Data) StringIndented(indent string) string {
 }
 
 func (data *Data) GetTxWithMetas() TxWithMetas {
+	if len(data.Txs) != len(data.txWithMetas) {
+		data.txWithMetas = TxsToTxWithMetas(data.Txs)
+	}
 	return data.txWithMetas
 }
 
