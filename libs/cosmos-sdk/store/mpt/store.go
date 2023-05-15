@@ -90,6 +90,8 @@ type MptStore struct {
 
 	// for time statistics
 	statisticsBeginTime time.Time
+
+	pushDBHeightChan chan int64
 }
 
 func (ms *MptStore) CommitterCommitMap(deltaMap iavl.TreeDeltaMap) (_ types.CommitID, _ iavl.TreeDeltaMap) {
@@ -126,6 +128,7 @@ func generateMptStore(logger tmlog.Logger, id types.CommitID, db ethstate.Databa
 		logger:              logger,
 		retriever:           retriever,
 		exitSignal:          make(chan struct{}),
+		pushDBHeightChan:    make(chan int64, 10),
 	}
 	if mptStore.logger == nil {
 		mptStore.logger = tmlog.NewNopLogger()
@@ -142,6 +145,8 @@ func generateMptStore(logger tmlog.Logger, id types.CommitID, db ethstate.Databa
 	} else {
 		mptStore.logger.Info("open snapshot successfully", "snapshot", "ok")
 	}
+
+	go mptStore.threadPushData2DB()
 
 	return mptStore, err
 }
@@ -446,9 +451,8 @@ func (ms *MptStore) CommitterCommit(inputDelta interface{}) (rootHash types.Comm
 	ms.SetMptRootHash(uint64(ms.version), root)
 	ms.originalRoot = root
 
-	// TODO: use a thread to push data to database
 	// push data to database
-	ms.PushData2Database(ms.version)
+	ms.pushDBHeightChan <- ms.version
 
 	ms.sprintDebugLog(ms.version)
 
@@ -459,6 +463,12 @@ func (ms *MptStore) CommitterCommit(inputDelta interface{}) (rootHash types.Comm
 		Version: ms.version,
 		Hash:    root.Bytes(),
 	}, outputDelta
+}
+
+func (ms *MptStore) threadPushData2DB() {
+	for h := range ms.pushDBHeightChan {
+		ms.PushData2Database(h)
+	}
 }
 
 func (ms *MptStore) LastCommitID() types.CommitID {
