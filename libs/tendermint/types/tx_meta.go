@@ -17,7 +17,9 @@ func NewTxWithMeta(tx Tx) *TxWithMeta {
 
 func (tx *TxWithMeta) Hash() []byte {
 	if len(tx.TxHash) == 0 {
-		tx.TxHash = tx.Tx.Hash()
+		hash := tx.Tx.Hash()
+		tx.TxHash = make([]byte, len(hash))
+		copy(tx.TxHash, hash)
 		return tx.TxHash
 	}
 	return tx.TxHash
