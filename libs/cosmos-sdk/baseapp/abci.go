@@ -463,7 +463,7 @@ func handleSimulate(app *BaseApp, path []string, height int64, txBytes []byte, o
 
 	msgs := tx.GetMsgs()
 
-	if enableFastQuery() {
+	if enableWasmFastQuery() {
 		isPureWasm := true
 		for _, msg := range msgs {
 			if msg.Route() != "wasm" {
@@ -720,9 +720,9 @@ var (
 	fqOnce    sync.Once
 )
 
-func enableFastQuery() bool {
+func enableWasmFastQuery() bool {
 	fqOnce.Do(func() {
-		fastQuery = viper.GetBool("fast-query")
+		fastQuery = viper.GetBool("wasm-fast-query")
 	})
 	return fastQuery
 }
