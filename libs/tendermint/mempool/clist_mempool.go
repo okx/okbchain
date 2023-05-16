@@ -843,7 +843,11 @@ func (mem *CListMempool) GetTxSimulateGas(txHash string) int64 {
 }
 
 func (mem *CListMempool) ReapEssentialTx(tx abci.TxWithMetaI) abci.TxEssentials {
-	mem.logger.Error("ReapEssentialTx", "tx", tx)
+	defer func() {
+		if r := recover(); r != nil {
+			mem.logger.Error("ReapEssentialTx", "txall", tx, "tx", tx.GetTx(), "hash", tx.Hash())
+		}
+	}()
 	if tx == nil || len(tx.GetTx()) == 0 {
 		mem.logger.Error("ReapEssentialTx", "tx", tx, "len", len(tx.GetTx()))
 		fmt.Println("ReapEssentialTx", "tx", tx, len(tx.GetTx()))
