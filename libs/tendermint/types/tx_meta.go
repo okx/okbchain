@@ -38,7 +38,8 @@ func (txs TxWithMetas) Hash() []byte {
 	// ref #2603. This is because golang does not allow type casting slices without unsafe
 	txBzs := make([][]byte, len(txs))
 	for i := 0; i < len(txs); i++ {
-		txBzs[i] = txs[i].Hash()
+		//txBzs[i] = txs[i].Hash()
+		txBzs[i] = Tx(txs[i].GetTx()).Hash()
 	}
 	return merkle.SimpleHashFromByteSlices(txBzs)
 }
