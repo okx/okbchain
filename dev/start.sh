@@ -29,11 +29,7 @@ run() {
       --log_level $LOG_LEVEL \
       --log_file json \
       --dynamic-gp-mode=2 \
-      --consensus.timeout_commit 1000ms \
-      --mempool.max_gas_used_per_block=100000000 \
-      --mempool.enable-pgu=true \
-      --active-view-change=true \
-      --enable-preruntx=1 \
+      --consensus.timeout_commit 2000ms \
       --tree-enable-async-commit=false \
       --enable-gid \
       --fast-query=true \
@@ -73,7 +69,7 @@ set -x # activate debugging
 rm -rf ~/.okbchain*
 rm -rf $HOME_SERVER
 
-(cd .. && make install DEBUG=true)
+(cd .. && make install)
 
 # Set up config for CLI
 okbchaincli config chain-id $CHAINID
@@ -138,14 +134,5 @@ sleep 4
 
 okbchaincli tx gov submit-proposal upgrade $CURDIR/proposals/wasm.proposal --from captain --fees 1okb  -y -b block
 okbchaincli tx gov vote 1 yes --from captain --fees 0.01okb  -y -b block
-
-sleep 5
-
-okbchaincli tx wasm store /Users/oker/workspace/github/wasm-test/contract/iterator-press/artifacts/iterator_press.wasm --fees 0.01okb --from captain --gas=2000000 -b block -y
-
-okbchaincli tx wasm instantiate 1 "{}" --label test1 --admin "0x83D83497431C2D3FEab296a9fba4e5FaDD2f7eD0" --fees 0.001okb --from captain -b block -y
-
-okbchaincli tx wasm execute "0x5A8D648DEE57b2fc90D98DC17fa887159b69638b" '{"add":{"spender":["0x83D83497431C2D3FEab296a9fba4e5FaDD2f7eD0","0x4C12e733e58819A1d3520f1E7aDCc614Ca20De64","0x2Bd4AF0C1D0c2930fEE852D07bB9dE87D8C07044"]}}' --fees 0.001okb --from captain -b block -y
-
 
 # okbchaincli tx send captain 0x83D83497431C2D3FEab296a9fba4e5FaDD2f7eD0 1okb --fees 1okb -b block -y
