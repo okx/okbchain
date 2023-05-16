@@ -3,6 +3,7 @@ package watcher
 import (
 	"encoding/json"
 	cosmost "github.com/okx/okbchain/libs/cosmos-sdk/store/types"
+	"io"
 	"log"
 	"path/filepath"
 	"sync"
