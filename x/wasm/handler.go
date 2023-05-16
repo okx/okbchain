@@ -32,8 +32,6 @@ func NewHandler(k types.ContractOpsKeeper) sdk.Handler {
 			err error
 		)
 
-		beforeGC := int64(ctx.GasMeter().GasConsumed())
-
 		// update watcher
 		defer func() {
 			// update watchDB when delivering tx
@@ -42,7 +40,7 @@ func NewHandler(k types.ContractOpsKeeper) sdk.Handler {
 			}
 
 			if err == nil && !ctx.IsCheckTx() {
-				updateHGU(ctx, beforeGC, msg)
+				updateHGU(ctx, msg)
 			}
 		}()
 
@@ -69,7 +67,7 @@ func NewHandler(k types.ContractOpsKeeper) sdk.Handler {
 	}
 }
 
-func updateHGU(ctx sdk.Context, beforeGC int64, msg sdk.Msg) {
+func updateHGU(ctx sdk.Context, msg sdk.Msg) {
 	if cfg.DynamicConfig.GetMaxGasUsedPerBlock() <= 0 {
 		return
 	}
@@ -84,14 +82,7 @@ func updateHGU(ctx sdk.Context, beforeGC int64, msg sdk.Msg) {
 		return
 	}
 
-	afterGC := int64(ctx.GasMeter().GasConsumed())
-	gc := afterGC - beforeGC
-	if gc <= 0 {
-		ctx.Logger().With("module", fmt.Sprintf("x/%s", types.ModuleName)).Error(
-			fmt.Sprintf("Update hgu gc error, before :%d, after:%d", beforeGC, afterGC))
-		return
-	}
-
+	gc := int64(ctx.GasMeter().GasConsumed())
 	if deploySize > 0 {
 		// calculate average gas consume for deploy contract case
 		gc = gc / int64(deploySize)
