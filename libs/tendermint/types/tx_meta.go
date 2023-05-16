@@ -2,6 +2,7 @@ package types
 
 import (
 	"bytes"
+	ethcommon "github.com/ethereum/go-ethereum/common"
 	"github.com/okx/okbchain/libs/tendermint/crypto/merkle"
 )
 
@@ -17,12 +18,9 @@ func NewTxWithMeta(tx Tx) *TxWithMeta {
 
 func (tx *TxWithMeta) Hash() []byte {
 	if len(tx.TxHash) == 0 {
-		hash := tx.Tx.Hash()
-		tx.TxHash = make([]byte, len(hash))
-		copy(tx.TxHash, hash)
-		return tx.TxHash
+		tx.TxHash = tx.Tx.Hash()
 	}
-	return tx.TxHash
+	return ethcommon.CopyBytes(tx.TxHash)
 }
 
 func (tx *TxWithMeta) GetTx() []byte {
@@ -38,8 +36,7 @@ func (txs TxWithMetas) Hash() []byte {
 	// ref #2603. This is because golang does not allow type casting slices without unsafe
 	txBzs := make([][]byte, len(txs))
 	for i := 0; i < len(txs); i++ {
-		//txBzs[i] = txs[i].Hash()
-		txBzs[i] = Tx(txs[i].GetTx()).Hash()
+		txBzs[i] = txs[i].Hash()
 	}
 	return merkle.SimpleHashFromByteSlices(txBzs)
 }

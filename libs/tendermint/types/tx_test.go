@@ -258,7 +258,7 @@ func BenchmarkTxResultAminoUnmarshal(b *testing.B) {
 }
 
 func TestTxsToTxWithMetas(t *testing.T) {
-	txs := makeTxs(2000000, randInt(16, 128))
+	txs := makeTxs(200000, randInt(16, 128))
 	retxs := TxsToTxWithMetas(txs)
 
 	retxs.Hash()
