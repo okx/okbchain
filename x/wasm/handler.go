@@ -2,7 +2,7 @@ package wasm
 
 import (
 	"fmt"
-	
+
 	"github.com/gogo/protobuf/proto"
 	bam "github.com/okx/okbchain/libs/cosmos-sdk/baseapp"
 	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
