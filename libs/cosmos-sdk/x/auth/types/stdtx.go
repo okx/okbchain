@@ -3,10 +3,11 @@ package types
 import (
 	"encoding/json"
 	"fmt"
+	"math/big"
+
 	"github.com/ethereum/go-ethereum/rlp"
 	"github.com/tendermint/go-amino"
 	yaml "gopkg.in/yaml.v2"
-	"math/big"
 
 	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
 	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
@@ -442,7 +443,7 @@ func StdSignBytes(chainID string, accnum uint64, sequence uint64, fee StdFee, ms
 // StdSignature represents a sig
 type StdSignature struct {
 	crypto.PubKey `json:"pub_key" yaml:"pub_key"` // optional
-	Signature     []byte                          `json:"signature" yaml:"signature"`
+	Signature     []byte `json:"signature" yaml:"signature"`
 }
 
 // DefaultTxDecoder logic for standard transaction decoding
