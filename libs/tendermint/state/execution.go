@@ -517,7 +517,8 @@ func execBlockOnProxyApp(context *executionTask) (*ABCIResponses, error) {
 	realTxCh := make(chan abci.TxEssentials, len(block.Txs))
 	stopedCh := make(chan struct{}, 1)
 
-	go preDeliverRoutine(proxyAppConn, block.GetTxWithMetas(), realTxCh, stopedCh)
+	txWithMetas := block.GetTxWithMetas()
+	go preDeliverRoutine(proxyAppConn, txWithMetas, realTxCh, stopedCh)
 
 	count := 0
 	for realTx := range realTxCh {
