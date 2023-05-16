@@ -35,8 +35,6 @@ run() {
       --enable-gid \
       --fast-query=true \
       --append-pid=true \
-      --mempool.enable-pgu=true \
-      --mempool.max_gas_used_per_block=100000000 \
       --iavl-output-modules evm=0,acc=0 \
       --commit-gap-height 3 \
       --trie.dirty-disabled=true \
@@ -72,7 +70,7 @@ set -x # activate debugging
 rm -rf ~/.okbchain*
 rm -rf $HOME_SERVER
 
-(cd .. && make install DEBUG=true)
+(cd .. && make install)
 
 # Set up config for CLI
 okbchaincli config chain-id $CHAINID

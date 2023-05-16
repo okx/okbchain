@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"math/big"
+	"strings"
 
 	"github.com/ethereum/go-ethereum/rlp"
 	"github.com/tendermint/go-amino"
@@ -16,8 +17,6 @@ import (
 	"github.com/okx/okbchain/libs/tendermint/crypto"
 	cryptoamino "github.com/okx/okbchain/libs/tendermint/crypto/encoding/amino"
 	"github.com/okx/okbchain/libs/tendermint/crypto/multisig"
-
-	wasmtypes "github.com/okx/okbchain/x/wasm"
 )
 
 var (
@@ -271,28 +270,22 @@ func (tx *StdTx) GetGasPrice() *big.Int {
 }
 
 func (tx *StdTx) GetTxFnSignatureInfo() ([]byte, int) {
+	type WasmMsgVerifier interface {
+		FnSignatureInfo() (string, int, error)
+	}
+
+	var builder strings.Builder
+	var deploySize int
 	for _, msg := range tx.Msgs {
-		if v, ok := msg.(wasmtypes.MsgExecuteContract); ok {
-			v.Msg.Bytes()
+		if v, ok := msg.(WasmMsgVerifier); ok {
+			fnSign, size, err := v.FnSignatureInfo()
+			if err != nil && len(fnSign) > 0 {
+				builder.WriteString(fnSign)
+				deploySize += size
+			}
 		}
 	}
-	//
-	//// deploy contract case
-	//if msg.Data.Recipient == nil {
-	//	return DefaultDeployContractFnSignature, len(msg.Data.Payload)
-	//}
-	//
-	//// most case is transfer token
-	//if len(msg.Data.Payload) < 4 {
-	//	return DefaultSendCoinFnSignature, 0
-	//}
-	//
-	//// call contract case (some times will together with transfer token case)
-	//recipient := msg.Data.Recipient.Bytes()
-	//methodId := msg.Data.Payload[0:4]
-	//return append(recipient, methodId...), 0
-
-	return nil, 0
+	return []byte(builder.String()), deploySize
 }
 
 func (tx *StdTx) GetFrom() string {

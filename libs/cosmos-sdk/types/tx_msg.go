@@ -65,15 +65,6 @@ type HeightSensitive interface {
 	ValidWithHeight(h int64) error
 }
 
-//type
-//func (msg MsgExecuteContract) Route() string {
-//	return RouterKey
-//}
-//
-//func (msg MsgExecuteContract) Type() string {
-//	return "execute"
-//}
-
 type TxAdapter interface {
 	Tx
 	HeightSensitive
