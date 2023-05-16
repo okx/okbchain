@@ -152,6 +152,8 @@ func (app *BaseApp) runtxWithInfo(info *runTxInfo, mode runTxMode, txBytes []byt
 		if (tx.GetType() == sdk.StdTxType && isAnteSucceed && err == nil) ||
 			tx.GetType() == sdk.EvmTxType {
 			handler.handleDeferRefund(info)
+		} else {
+			info.ctx.GasMeter().SetGas(info.ctx.GasMeter().Limit())
 		}
 	}()
 
@@ -386,7 +388,7 @@ func (app *BaseApp) runTx_defer_recover(r interface{}, info *runTxInfo) error {
 		err = sdkerrors.Wrap(
 			sdkerrors.ErrOutOfGas, fmt.Sprintf(
 				"out of gas in location: %v; gasWanted: %d, gasUsed: %d",
-				rType.Descriptor, info.gasWanted, info.ctx.GasMeter().GasConsumed(),
+				rType.Descriptor, info.gasWanted, info.gasWanted,
 			),
 		)
 
