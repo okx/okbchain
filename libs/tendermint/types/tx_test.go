@@ -2,6 +2,7 @@ package types
 
 import (
 	"bytes"
+	"fmt"
 	"math"
 	"testing"
 
@@ -254,4 +255,17 @@ func BenchmarkTxResultAminoUnmarshal(b *testing.B) {
 			}
 		}
 	})
+}
+
+func TestTxsToTxWithMetas(t *testing.T) {
+	txs := makeTxs(200000, randInt(16, 128))
+	retxs := TxsToTxWithMetas(txs)
+
+	retxs.Hash()
+
+	for i := 0; i < len(txs); i++ {
+		assert.Equal(t, []byte(txs[i]), retxs[i].GetTx())
+		assert.Equal(t, txs[i].Hash(), retxs[i].Hash())
+	}
+	fmt.Println(len(retxs))
 }

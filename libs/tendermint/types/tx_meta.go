@@ -2,6 +2,7 @@ package types
 
 import (
 	"bytes"
+	ethcommon "github.com/ethereum/go-ethereum/common"
 	"github.com/okx/okbchain/libs/tendermint/crypto/merkle"
 )
 
@@ -18,9 +19,8 @@ func NewTxWithMeta(tx Tx) *TxWithMeta {
 func (tx *TxWithMeta) Hash() []byte {
 	if len(tx.TxHash) == 0 {
 		tx.TxHash = tx.Tx.Hash()
-		return tx.TxHash
 	}
-	return tx.TxHash
+	return ethcommon.CopyBytes(tx.TxHash)
 }
 
 func (tx *TxWithMeta) GetTx() []byte {
