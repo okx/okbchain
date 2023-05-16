@@ -856,7 +856,7 @@ func (mem *CListMempool) ReapEssentialTx(tx abci.TxWithMetaI) abci.TxEssentials 
 		mem.logger.Error("ReapEssentialTx", "GetTx", tx.GetTx(), "txhash", len(tx.Hash()))
 		fmt.Println("ReapEssentialTx", "GetTx", tx.GetTx(), "txhash", len(tx.Hash()))
 	}
-	if ele, ok := mem.txs.Load(txOrTxHashToKey(tx.GetTx(), nil)); ok {
+	if ele, ok := mem.txs.Load(txOrTxHashToKey(tx.GetTx(), tx.Hash())); ok {
 		return ele.Value.(*mempoolTx).realTx
 	}
 	return nil
