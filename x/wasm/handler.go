@@ -28,12 +28,11 @@ func NewHandler(k types.ContractOpsKeeper) sdk.Handler {
 		}
 
 		var (
-			res      proto.Message
-			err      error
-			beforeGC int64
+			res proto.Message
+			err error
 		)
 
-		beforeGC = int64(ctx.GasMeter().GasConsumed())
+		beforeGC := int64(ctx.GasMeter().GasConsumed())
 
 		// update watcher
 		defer func() {
@@ -88,7 +87,8 @@ func updateHGU(ctx sdk.Context, beforeGC int64, msg sdk.Msg) {
 	afterGC := int64(ctx.GasMeter().GasConsumed())
 	gc := afterGC - beforeGC
 	if gc <= 0 {
-		ctx.Logger().With("module", fmt.Sprintf("x/%s", types.ModuleName)).Error(fmt.Sprintf("Update hgu error, before gc:%d, after:%d", beforeGC, afterGC))
+		ctx.Logger().With("module", fmt.Sprintf("x/%s", types.ModuleName)).Error(
+			fmt.Sprintf("Update hgu gc error, before :%d, after:%d", beforeGC, afterGC))
 		return
 	}
 
