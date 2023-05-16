@@ -60,8 +60,7 @@ func (db *WrapRocksDB) Compact(start []byte, limit []byte) error {
 }
 
 func (db *WrapRocksDB) NewBatchWithSize(size int) ethdb.Batch {
-	NewWrapRocksDBBatch(db.RocksDB)
-	return nil
+	return NewWrapRocksDBBatch(db.RocksDB)
 }
 
 func (db *WrapRocksDB) NewSnapshot() (ethdb.Snapshot, error) {
