@@ -2,7 +2,6 @@ package watcher
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/okx/okbchain/libs/cosmos-sdk/store/prefix"
 	cosmost "github.com/okx/okbchain/libs/cosmos-sdk/store/types"
 	"io"
@@ -123,7 +122,6 @@ func (a Adapter) NewStore(ctx sdk.Context, storeKey sdk.StoreKey, pre []byte) sd
 		ans = ctx.WasmKvStoreForSimulate()
 	} else {
 		ans = NewReadStore(pre, ctx.KVStore(storeKey))
-		fmt.Println("Sssssssssss")
 		ctx.SetWasmKvStoreForSimulate(ans)
 	}
 
