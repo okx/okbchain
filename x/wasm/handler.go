@@ -31,7 +31,6 @@ func NewHandler(k types.ContractOpsKeeper) sdk.Handler {
 			res proto.Message
 			err error
 		)
-
 		// update watcher
 		defer func() {
 			// update watchDB when delivering tx
@@ -84,8 +83,8 @@ func updateHGU(ctx sdk.Context, msg sdk.Msg) {
 
 	gc := int64(ctx.GasMeter().GasConsumed())
 	if deploySize > 0 {
-		// calculate average gas consume for deploy contract case
-		gc = gc / int64(deploySize)
+		// calculate average gas consume for deploy contract case, The value is too small and need to +1
+		gc = gc/int64(deploySize) + 1
 	}
 
 	bam.InstanceOfHistoryGasUsedRecordDB().UpdateGasUsed([]byte(fnSign), gc)
