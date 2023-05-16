@@ -273,16 +273,21 @@ type WasmMsgChecker interface {
 }
 
 func (tx *StdTx) GetTxFnSignatureInfo() ([]byte, int) {
+	// hgu can't be right simulated with many Msgs.
+	if len(tx.Msgs) != 1 {
+		return nil, 0
+	}
+
 	fnSign := ""
 	deploySize := 0
 	for _, msg := range tx.Msgs {
 		v, ok := msg.(WasmMsgChecker)
 		if !ok {
-			continue
+			break
 		}
 		fn, size, err := v.FnSignatureInfo()
 		if err != nil || len(fn) <= 0 {
-			continue
+			break
 		}
 
 		deploySize = size
