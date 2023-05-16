@@ -3,12 +3,10 @@ package types
 import (
 	"encoding/json"
 	"fmt"
-	"math/big"
-	"strings"
-
 	"github.com/ethereum/go-ethereum/rlp"
 	"github.com/tendermint/go-amino"
 	yaml "gopkg.in/yaml.v2"
+	"math/big"
 
 	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
 	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
@@ -269,23 +267,28 @@ func (tx *StdTx) GetGasPrice() *big.Int {
 	return tx.Fee.GasPrices()[0].Amount.BigInt()
 }
 
-func (tx *StdTx) GetTxFnSignatureInfo() ([]byte, int) {
-	type WasmMsgVerifier interface {
-		FnSignatureInfo() (string, int, error)
-	}
+type WasmMsgChecker interface {
+	FnSignatureInfo() (string, int, error)
+}
 
-	var builder strings.Builder
-	var deploySize int
+func (tx *StdTx) GetTxFnSignatureInfo() ([]byte, int) {
+	fnSign := ""
+	deploySize := 0
 	for _, msg := range tx.Msgs {
-		if v, ok := msg.(WasmMsgVerifier); ok {
-			fnSign, size, err := v.FnSignatureInfo()
-			if err != nil && len(fnSign) > 0 {
-				builder.WriteString(fnSign)
-				deploySize += size
-			}
+		v, ok := msg.(WasmMsgChecker)
+		if !ok {
+			continue
 		}
+		fn, size, err := v.FnSignatureInfo()
+		if err != nil || len(fn) <= 0 {
+			continue
+		}
+
+		deploySize = size
+		fnSign = fn
+		break
 	}
-	return []byte(builder.String()), deploySize
+	return []byte(fnSign), deploySize
 }
 
 func (tx *StdTx) GetFrom() string {

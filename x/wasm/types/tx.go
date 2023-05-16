@@ -80,7 +80,13 @@ func (msg MsgStoreCode) GetSigners() []sdk.AccAddress {
 }
 
 func (msg MsgStoreCode) FnSignatureInfo() (string, int, error) {
-	return msg.Type(), len(msg.WASMByteCode), nil
+	codeLen := len(msg.WASMByteCode)
+	var err error
+	if codeLen <= 0 {
+		err = fmt.Errorf("wasm byte code length is 0")
+	}
+
+	return msg.Type(), codeLen, err
 }
 
 func (msg MsgInstantiateContract) Route() string {
@@ -177,13 +183,17 @@ func (msg MsgExecuteContract) FnSignatureInfo() (string, int, error) {
 	json.Unmarshal(msg.Msg, &v)
 	data := v.(map[string]interface{})
 	if len(data) != 1 {
-		return "", 0, fmt.Errorf("msg has too many keys:%s", string(msg.Msg.Bytes()))
+		return "", 0, fmt.Errorf("failed to check msg method:%s", string(msg.Msg.Bytes()))
 	}
 
 	method := ""
 	for k, _ := range data {
 		method = k
 		break
+	}
+
+	if len(method) <= 0 {
+		return "", 0, fmt.Errorf("msg has not method:%s", string(msg.Msg.Bytes()))
 	}
 
 	var builder strings.Builder

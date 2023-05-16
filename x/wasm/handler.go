@@ -2,10 +2,12 @@ package wasm
 
 import (
 	"fmt"
-
 	"github.com/gogo/protobuf/proto"
+	bam "github.com/okx/okbchain/libs/cosmos-sdk/baseapp"
 	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
 	sdkerrors "github.com/okx/okbchain/libs/cosmos-sdk/types/errors"
+	sdktypes "github.com/okx/okbchain/libs/cosmos-sdk/x/auth/types"
+	cfg "github.com/okx/okbchain/libs/tendermint/config"
 	"github.com/okx/okbchain/libs/tendermint/libs/kv"
 	types2 "github.com/okx/okbchain/libs/tendermint/types"
 	"github.com/okx/okbchain/x/wasm/keeper"
@@ -55,9 +57,37 @@ func NewHandler(k types.ContractOpsKeeper) sdk.Handler {
 			return nil, sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, errMsg)
 		}
 
+		if err == nil && !ctx.IsCheckTx() {
+			updateHGU(ctx, msg)
+		}
+
 		ctx.SetEventManager(filterMessageEvents(ctx))
 		return sdk.WrapServiceResult(ctx, res, err)
 	}
+}
+
+func updateHGU(ctx sdk.Context, msg sdk.Msg) {
+	if cfg.DynamicConfig.GetMaxGasUsedPerBlock() <= 0 {
+		return
+	}
+
+	v, ok := msg.(sdktypes.WasmMsgChecker)
+	if !ok {
+		return
+	}
+
+	fnSign, deploySize, err := v.FnSignatureInfo()
+	if err != nil || len(fnSign) <= 0 {
+		return
+	}
+
+	gc := int64(ctx.GasMeter().GasConsumed())
+	if deploySize > 0 {
+		// calculate average gas consume for deploy contract case
+		gc = gc / int64(deploySize)
+	}
+
+	bam.InstanceOfHistoryGasUsedRecordDB().UpdateGasUsed([]byte(fnSign), gc)
 }
 
 // filterMessageEvents returns the same events with all of type == EventTypeMessage removed except
