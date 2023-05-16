@@ -279,7 +279,7 @@ func TestDeployAndCallContract(t *testing.T) {
 	gasLimit = uint64(100000000000)
 	gasPrice = big.NewInt(100)
 	receiver := common.HexToAddress(resultData.ContractAddress.String())
-
+	fmt.Println("aaa")
 	storeAddr := "0xa6f9dae10000000000000000000000006a82e4a67715c8412a9114fbd2cbaefbc8181424"
 	bytecode = common.FromHex(storeAddr)
 	tx = types.NewMsgEthereumTx(2, &receiver, big.NewInt(0), gasLimit, gasPrice, bytecode)
