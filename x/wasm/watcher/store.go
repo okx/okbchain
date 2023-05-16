@@ -2,6 +2,7 @@ package watcher
 
 import (
 	"encoding/json"
+	"github.com/okx/okbchain/libs/cosmos-sdk/store/prefix"
 	cosmost "github.com/okx/okbchain/libs/cosmos-sdk/store/types"
 	"io"
 	"log"
@@ -11,7 +12,6 @@ import (
 	"github.com/okx/okbchain/app/types"
 	"github.com/okx/okbchain/libs/cosmos-sdk/client/flags"
 	"github.com/okx/okbchain/libs/cosmos-sdk/store/dbadapter"
-	"github.com/okx/okbchain/libs/cosmos-sdk/store/prefix"
 	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
 	dbm "github.com/okx/okbchain/libs/tm-db"
 	"github.com/okx/okbchain/x/evm/watcher"
@@ -111,21 +111,25 @@ func NewReadStore(pre []byte, store sdk.KVStore) sdk.KVStore {
 		mp: make(map[string][]byte, 0),
 		kv: store,
 	}
-	if len(pre) != 0 {
-		return prefix.NewStore(rs, pre)
-	}
 	return rs
 }
 
 type Adapter struct{}
 
 func (a Adapter) NewStore(ctx sdk.Context, storeKey sdk.StoreKey, pre []byte) sdk.KVStore {
+	var ans sdk.KVStore
 	if ctx.WasmKvStoreForSimulate() != nil {
-		return ctx.WasmKvStoreForSimulate()
+		ans = ctx.WasmKvStoreForSimulate()
+	} else {
+		ans = NewReadStore(pre, ctx.KVStore(storeKey))
+		ctx.SetWasmKvStoreForSimulate(ans)
 	}
-	s := NewReadStore(pre, ctx.KVStore(storeKey))
-	ctx.SetWasmKvStoreForSimulate(s)
-	return s
+
+	if len(pre) != 0 {
+		ans = prefix.NewStore(ans, pre)
+	}
+
+	return ans
 }
 
 type readStore struct {
@@ -146,10 +150,11 @@ func (r *readStore) CacheWrapWithTrace(w io.Writer, tc cosmost.TraceContext) cos
 }
 
 func (r *readStore) Get(key []byte) []byte {
-	if value, ok := r.mp[string(key)]; ok {
+	rmStateRootKey := rmStorageRootFromWatchKey(key)
+	if value, ok := r.mp[string(rmStateRootKey)]; ok {
 		return value
 	}
-	if value := watchdbForSimulate.Get(key); len(value) != 0 {
+	if value := watchdbForSimulate.Get(rmStateRootKey); len(value) != 0 {
 		return value
 	}
 	return r.kv.Get(key)
@@ -166,7 +171,8 @@ func (r *readStore) Has(key []byte) bool {
 }
 
 func (r *readStore) Set(key, value []byte) {
-	r.mp[string(key)] = value
+	rmStateRootKey := rmStorageRootFromWatchKey(key)
+	r.mp[string(rmStateRootKey)] = value
 }
 
 func (r readStore) Delete(key []byte) {
