@@ -78,7 +78,9 @@ func (ak AccountKeeper) SetAccount(ctx sdk.Context, acc exported.Account) {
 
 	storeAccKey := types.AddressStoreKey(addr)
 	store.Set(storeAccKey, bz)
-	fmt.Println("SSSSSSSSSSS", hex.EncodeToString(storeAccKey))
+	if hex.EncodeToString(storeAccKey) == "018fec96b4f7c6d21971bc9d61ed9e5a32574367c9" {
+		fmt.Println("SSSSSSSSSSS", hex.EncodeToString(storeAccKey))
+	}
 
 	if ctx.IsDeliver() {
 		mpt.GAccToPrefetchChannel <- [][]byte{storeAccKey}

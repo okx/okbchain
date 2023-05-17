@@ -282,7 +282,7 @@ func (ms *MptStore) Set(key, value []byte) {
 			fmt.Println("pppp---", sdk.TxIndex, hex.EncodeToString(value))
 			//debug.PrintStack()
 		}
-		fmt.Println("ppppppp", hex.EncodeToString(key), hex.EncodeToString(value))
+		//fmt.Println("ppppppp", hex.EncodeToString(key), hex.EncodeToString(value))
 		ms.updateSnapAccounts(key, value)
 	default:
 		panic(fmt.Errorf("not support key %s for mpt set", hex.EncodeToString(key)))
