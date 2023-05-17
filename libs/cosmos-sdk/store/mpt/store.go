@@ -405,13 +405,6 @@ func (ms *MptStore) commitStorage(nodeSets *trie.MergedNodeSet) {
 		delete(ms.storageTrieForWrite, addr)
 	}
 
-	it := trie.NewIterator(ms.trie.NodeIterator(nil))
-	cc := 0
-	for it.Next() {
-		cc++
-	}
-	fmt.Println("cc", cc)
-
 }
 
 func (ms *MptStore) CommitterCommit(inputDelta interface{}) (rootHash types.CommitID, outputDelta interface{}) {
@@ -439,6 +432,7 @@ func (ms *MptStore) CommitterCommit(inputDelta interface{}) (rootHash types.Comm
 	} else {
 		ms.commitStorage(nodeSets)
 		root, set, err = ms.trie.Commit(true)
+		fmt.Println("hhhh--root", root.String())
 	}
 	if err != nil {
 		panic("fail to commit trie data(acc_trie.Commit): " + err.Error())
