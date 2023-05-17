@@ -1,6 +1,7 @@
 package baseapp
 
 import (
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"github.com/okx/okbchain/app/rpc/simulator"
@@ -227,12 +228,15 @@ func (app *BaseApp) EndBlock(req abci.RequestEndBlock) (res abci.ResponseEndBloc
 	if app.endBlocker != nil {
 		res = app.endBlocker(app.deliverState.ctx, req)
 	}
+	cc := 0
 	if app.deliverState.ms != nil && app.deliverState.ctx.BlockHeight() == 949 {
 		app.deliverState.ms.IteratorCache(true, func(key string, value []byte, isDirty bool, isDelete bool, storeKey cosmost.StoreKey) bool {
-			//fmt.Println("dirtty", hex.EncodeToString([]byte(key)), hex.EncodeToString(value))
+			fmt.Println("dirtty", hex.EncodeToString([]byte(key)), hex.EncodeToString(value))
+			cc++
 			return true
 		}, nil)
 	}
+	fmt.Println("cc", cc)
 
 	return
 }
