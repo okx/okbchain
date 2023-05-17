@@ -379,13 +379,13 @@ func (ms *MptStore) commitStorageForDelta(nodeSets *trie.MergedNodeSet) []*trie.
 }
 
 func (ms *MptStore) commitStorage(nodeSets *trie.MergedNodeSet) {
-	fmt.Println("ccommmmm")
+	//fmt.Println("ccommmmm")
 	for addr, v := range ms.storageTrieForWrite {
 		stateR, set, err := v.Commit(false)
 		if err != nil {
 			panic(fmt.Errorf("unexcepted err:%v while commit storage tire ", err))
 		}
-		fmt.Println("dffffff", addr.String(), stateR.String())
+		//fmt.Println("dffffff", addr.String(), stateR.String())
 		key := AddressStoreKey(addr.Bytes())
 		preValue, err := ms.trie.TryGet(key)
 		if err == nil { // maybe acc already been deleted
