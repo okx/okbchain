@@ -143,7 +143,7 @@ func (so *stateObject) updateTrie(db ethstate.Database) (updated bool) {
 	// usedStorage := make([][]byte, 0, len(so.pendingStorage))
 	for key, value := range so.pendingStorage {
 		if sdk.TxIndex == 95 || sdk.TxIndex == 94 {
-			fmt.Println("vvvv", so.address.String(), hex.EncodeToString(key.Bytes()), hex.EncodeToString(value.Bytes()))
+			fmt.Println("vvvv", sdk.TxIndex, so.address.String(), hex.EncodeToString(key.Bytes()), hex.EncodeToString(value.Bytes()))
 		}
 		// Skip noop changes, persist actual changes
 		if value == so.originStorage[key] {
