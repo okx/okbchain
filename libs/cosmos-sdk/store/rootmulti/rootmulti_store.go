@@ -598,6 +598,7 @@ func (rs *Store) CommitterCommit(interface{}) (_ types.CommitID, _ interface{}) 
 
 // Implements Committer/CommitStore.
 func (rs *Store) CommitterCommitMap(inputDeltaMap *tmtypes.TreeDelta) (types.CommitID, *tmtypes.TreeDelta) {
+	tt := time.Now()
 	iavltree.IavlCommitAsyncNoBatch = cfg.DynamicConfig.GetIavlAcNoBatch()
 
 	previousHeight := rs.lastCommitInfo.Version
@@ -605,7 +606,6 @@ func (rs *Store) CommitterCommitMap(inputDeltaMap *tmtypes.TreeDelta) (types.Com
 
 	tsCommitStores := time.Now()
 	var outputDeltaMap *tmtypes.TreeDelta
-	tt := time.Now()
 	rs.lastCommitInfo, outputDeltaMap = commitStores(version, rs.stores, inputDeltaMap, rs.commitFilters)
 
 	fmt.Println("cccc-tt-1", time.Now().Sub(tt).Seconds())
