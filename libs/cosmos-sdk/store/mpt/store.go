@@ -409,7 +409,7 @@ func (ms *MptStore) CommitterCommit(inputDelta interface{}) (rootHash types.Comm
 
 	// stop pre round prefetch
 	ms.StopPrefetcher()
-	nodeSets := trie.NewMergedNodeSet()
+	nodeSets1 := trie.NewMergedNodeSet()
 
 	var root ethcmn.Hash
 	var set *trie.NodeSet
@@ -419,15 +419,15 @@ func (ms *MptStore) CommitterCommit(inputDelta interface{}) (rootHash types.Comm
 		if !ok {
 			panic(fmt.Sprintf("wrong input delta of mpt. delta: %v", inputDelta))
 		}
-		ms.commitStorageWithDelta(delta.Storage, nodeSets)
+		ms.commitStorageWithDelta(delta.Storage, nodeSets1)
 		root, set, err = ms.trie.CommitWithDelta(delta.NodeDelta, true)
 	} else if produceDelta {
 		var outputNodeDelta []*trie.NodeDelta
-		outStorage := ms.commitStorageForDelta(nodeSets)
+		outStorage := ms.commitStorageForDelta(nodeSets1)
 		root, set, outputNodeDelta, err = ms.trie.CommitForDelta(true)
 		outputDelta = &trie.MptDelta{NodeDelta: outputNodeDelta, Storage: outStorage}
 	} else {
-		ms.commitStorage(nodeSets)
+		ms.commitStorage(sdk.BB)
 		root, set, err = ms.trie.Commit(true)
 	}
 	if err != nil {
@@ -435,14 +435,14 @@ func (ms *MptStore) CommitterCommit(inputDelta interface{}) (rootHash types.Comm
 	}
 
 	if set != nil {
-		if err := nodeSets.Merge(set); err != nil {
+		if err := sdk.BB.Merge(set); err != nil {
 			panic("fail to commit trie data(acc nodeSets merge): " + err.Error())
 		}
 	}
-
-	if err := ms.db.TrieDB().UpdateForOK(nodeSets, AccountStateRootRetriever.RetrieveStateRoot); err != nil {
+	if err := ms.db.TrieDB().UpdateForOK(sdk.BB, AccountStateRootRetriever.RetrieveStateRoot); err != nil {
 		panic("fail to commit trie data (UpdateForOK): " + err.Error())
 	}
+	sdk.BB = trie.NewMergedNodeSet()
 	ms.SetMptRootHash(uint64(ms.version), root)
 	ms.originalRoot = root
 
@@ -515,6 +515,9 @@ func (ms *MptStore) PushData2Database(curHeight int64) {
 	defer ms.cmLock.Unlock()
 
 	curMptRoot := ms.GetMptRootHash(uint64(curHeight))
+	if TrieDirtyDisabled == false {
+		TrieDirtyDisabled = true
+	}
 	if TrieDirtyDisabled {
 		// If we're running an archive node, always flush
 		ms.fullNodePersist(curMptRoot, curHeight)
