@@ -1,7 +1,6 @@
 package app
 
 import (
-	"encoding/hex"
 	"sort"
 	"strings"
 
@@ -14,6 +13,7 @@ import (
 	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
 	"github.com/okx/okbchain/x/evm"
 	evmtypes "github.com/okx/okbchain/x/evm/types"
+	wasmkeeper "github.com/okx/okbchain/x/wasm/keeper"
 )
 
 // feeCollectorHandler set or get the value of feeCollectorAcc
@@ -44,6 +44,12 @@ func updateFeeCollectorHandler(bk bank.Keeper, sk supply.Keeper) sdk.UpdateFeeCo
 func fixLogForParallelTxHandler(ek *evm.Keeper) sdk.LogFix {
 	return func(tx []sdk.Tx, logIndex []int, hasEnterEvmTx []bool, anteErrs []error, resp []abci.ResponseDeliverTx) (logs [][]byte) {
 		return ek.FixLog(tx, logIndex, hasEnterEvmTx, anteErrs, resp)
+	}
+}
+
+func fixCosmosTxCountInWasmForParallelTx(storeKey sdk.StoreKey) sdk.UpdateCosmosTxCount {
+	return func(ctx sdk.Context, txCount int) {
+		wasmkeeper.UpdateTxCount(ctx, storeKey, txCount)
 	}
 }
 
@@ -81,9 +87,10 @@ func getTxFeeHandler() sdk.GetTxFeeHandler {
 
 // getTxFeeAndFromHandler get tx fee and from
 func getTxFeeAndFromHandler(ak auth.AccountKeeper) sdk.GetTxFeeAndFromHandler {
-	return func(ctx sdk.Context, tx sdk.Tx) (fee sdk.Coins, isEvm bool, from string, to string, err error) {
+	return func(ctx sdk.Context, tx sdk.Tx) (fee sdk.Coins, isEvm bool, from string, to string, err error, supportPara bool) {
 		if evmTx, ok := tx.(*evmtypes.MsgEthereumTx); ok {
 			isEvm = true
+			supportPara = true
 			err = evmTxVerifySigHandler(ctx.ChainID(), ctx.BlockHeight(), evmTx)
 			if err != nil {
 				return
@@ -98,9 +105,12 @@ func getTxFeeAndFromHandler(ak auth.AccountKeeper) sdk.GetTxFeeAndFromHandler {
 			}
 		} else if feeTx, ok := tx.(authante.FeeTx); ok {
 			fee = feeTx.GetFee()
-			feePayer := feeTx.FeePayer(ctx)
-			feePayerAcc := ak.GetAccount(ctx, feePayer)
-			from = hex.EncodeToString(feePayerAcc.GetAddress())
+			if stdTx, ok := tx.(*auth.StdTx); ok && len(stdTx.Msgs) == 1 { // only support one message
+				if msg, ok := stdTx.Msgs[0].(interface{ CalFromAndToForPara() (string, string) }); ok {
+					from, to = msg.CalFromAndToForPara()
+					supportPara = true
+				}
+			}
 		}
 
 		return

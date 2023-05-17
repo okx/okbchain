@@ -2,10 +2,11 @@ package app
 
 import (
 	"fmt"
-	paramstypes "github.com/okx/okbchain/x/params/types"
 	"io"
 	"os"
 	"sync"
+
+	paramstypes "github.com/okx/okbchain/x/params/types"
 
 	"github.com/okx/okbchain/x/vmbridge"
 
@@ -693,6 +694,7 @@ func NewOKBChainApp(
 	app.SetGasRefundHandler(refund.NewGasRefundHandler(app.AccountKeeper, app.SupplyKeeper, app.EvmKeeper))
 	app.SetAccNonceHandler(NewAccNonceHandler(app.AccountKeeper))
 
+	app.SetUpdateWasmTxCount(fixCosmosTxCountInWasmForParallelTx(app.WasmHandler.TXCounterStoreKey))
 	app.SetUpdateFeeCollectorAccHandler(updateFeeCollectorHandler(app.BankKeeper, app.SupplyKeeper))
 	app.SetParallelTxLogHandlers(fixLogForParallelTxHandler(app.EvmKeeper))
 	app.SetPreDeliverTxHandler(preDeliverTxHandler(app.AccountKeeper))
