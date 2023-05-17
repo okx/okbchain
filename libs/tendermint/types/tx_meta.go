@@ -85,7 +85,8 @@ func (txs TxWithMetas) GetTxWithMetas() interface{} {
 
 func TxsToTxWithMetas(ts Txs) TxWithMetas {
 	txs := make(TxWithMetas, len(ts))
-	for i := range ts {
+	num := len(ts)
+	for i := 0; i < num; i++ {
 		txs[i] = NewTxWithMeta(ts[i])
 	}
 	return txs

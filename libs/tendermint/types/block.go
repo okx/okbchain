@@ -198,6 +198,20 @@ func (b *Block) ValidateBasic() error {
 		)
 	}
 
+	bDataHash := ethcommon.Bytes2Hex(b.Data.GetHash())
+	bmsg := ""
+	if len(b.Data.Txs) == len(b.Data.txWithMetas) {
+		for i := 0; i < len(b.Data.Txs); i++ {
+			thash := b.Data.Txs[i].Hash()
+			tmhash := b.Data.txWithMetas[i].Hash()
+			if !bytes.Equal(thash, tmhash) {
+				bmsg += fmt.Sprintf("tx index %d is not equal, tx hash is %s, tm hash is %s \n",
+					i, ethcommon.Bytes2Hex(thash), ethcommon.Bytes2Hex(tmhash))
+			}
+		}
+	} else {
+		bmsg += fmt.Sprintf("Data.Txs %d is not equal Data.txWithMetas %d ", len(b.Data.Txs), len(b.Data.txWithMetas))
+	}
 	// NOTE: b.Data.Txs may be nil, but b.Data.Hash() still works fine.
 	if !bytes.Equal(b.DataHash, b.Data.Hash(b.Height)) {
 		msg := ""
@@ -215,7 +229,7 @@ func (b *Block) ValidateBasic() error {
 		}
 
 		return fmt.Errorf(
-			"wrong Header.DataHash. height %d, Expected %v, got %v,  original %v, txWithMetas cacl %v, direct hash %v, ProposerAddress %s, msg %s",
+			"wrong Header.DataHash. height %d, Expected %v, got %v,  original %v, txWithMetas cacl %v, direct hash %v, ProposerAddress %s, bDataHash %s, msg %s, bmsg %s",
 			b.Height,
 			b.Data.Hash(b.Height),
 			b.DataHash,
@@ -223,7 +237,9 @@ func (b *Block) ValidateBasic() error {
 			ethcommon.Bytes2Hex(b.Data.txWithMetas.Hash()),
 			ethcommon.Bytes2Hex(b.Data.hash),
 			b.ProposerAddress.String(),
+			bDataHash,
 			msg,
+			bmsg,
 		)
 	}
 
@@ -1716,12 +1732,15 @@ func (data *Data) Hash(height int64) tmbytes.HexBytes {
 		return (Txs{}).Hash()
 	}
 	if data.hash == nil {
-		if len(data.txWithMetas) > 0 {
-			return data.txWithMetas.Hash() // NOTE: leaves of merkle tree are TxIDs
+		if len(data.txWithMetas) == 0 {
+			data.txWithMetas = TxsToTxWithMetas(data.Txs)
 		}
-		data.txWithMetas = TxsToTxWithMetas(data.Txs)
 		data.hash = data.txWithMetas.Hash() // NOTE: leaves of merkle tree are TxIDs
 	}
+	return data.hash
+}
+
+func (data *Data) GetHash() tmbytes.HexBytes {
 	return data.hash
 }
 
