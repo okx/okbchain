@@ -434,6 +434,7 @@ func (ms *MptStore) CommitterCommit(inputDelta interface{}) (rootHash types.Comm
 	if err != nil {
 		panic("fail to commit trie data(acc_trie.Commit): " + err.Error())
 	}
+	fmt.Println("mpt-store-0.1", time.Now().Sub(tt))
 
 	if set != nil {
 		if err := nodeSets.Merge(set); err != nil {
@@ -446,13 +447,13 @@ func (ms *MptStore) CommitterCommit(inputDelta interface{}) (rootHash types.Comm
 	}
 	ms.SetMptRootHash(uint64(ms.version), root)
 	ms.originalRoot = root
-
+	fmt.Println("mpt-store-0.2", time.Now().Sub(tt))
 	// TODO: use a thread to push data to database
 	// push data to database
 	ms.PushData2Database(ms.version)
 
 	ms.sprintDebugLog(ms.version)
-
+	fmt.Println("mpt-store-3", time.Now().Sub(tt))
 	// start next found prefetch
 	ms.StartPrefetcher("mptStore")
 
