@@ -1750,14 +1750,20 @@ func (data *Data) HashHavelog(height int64) (tmbytes.HexBytes, string) {
 		return (Txs{}).Hash(), "data is nil"
 	}
 	str := ""
+	var hash []byte
 	if data.hash == nil {
 		data.GetTxWithMetas()
-		data.hash = data.txWithMetas.Hash() // NOTE: leaves of merkle tree are TxIDs
+		hash = data.txWithMetas.Hash() // NOTE: leaves of merkle tree are TxIDs
+		data.hash = hash
+		//chechHash := data.Txs.Hash()
+		//if !bytes.Equal(chechHash, data.hash) {
+		//	data.hash = chechHash
+		//}
 		str = fmt.Sprintln("data hash is nil")
 	} else {
 		str = fmt.Sprintln("data hash is not nil")
 	}
-	return data.hash, fmt.Sprintln(str, "data hash", ethcommon.Bytes2Hex(data.hash), "txs len", len(data.Txs), "txw", len(data.txWithMetas),
+	return data.hash, fmt.Sprintln(str, "data hash", ethcommon.Bytes2Hex(data.hash), "hash", ethcommon.Bytes2Hex(hash), "txs len", len(data.Txs), "txw", len(data.txWithMetas),
 		"txsw cacl", ethcommon.Bytes2Hex(data.txWithMetas.Hash()), "txs cacl", ethcommon.Bytes2Hex(data.Txs.Hash()))
 }
 

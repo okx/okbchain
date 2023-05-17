@@ -38,7 +38,7 @@ func (txs TxWithMetas) Hash() []byte {
 	for i := 0; i < len(txs); i++ {
 		txBzs[i] = txs[i].Hash()
 	}
-	return merkle.SimpleHashFromByteSlices(txBzs)
+	return ethcommon.CopyBytes(merkle.SimpleHashFromByteSlices(txBzs))
 }
 
 // Index returns the index of this transaction in the list, or -1 if not found

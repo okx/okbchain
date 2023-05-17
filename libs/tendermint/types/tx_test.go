@@ -269,3 +269,12 @@ func TestTxsToTxWithMetas(t *testing.T) {
 	}
 	fmt.Println(len(retxs))
 }
+
+func TestData(t *testing.T) {
+	for j := 0; j < 1000; j++ {
+		d := Data{Txs: makeTxs(20000, randInt(128, 256))}
+		hh := d.Hash(0)
+		assert.Equal(t, []byte(hh), d.txWithMetas.Hash())
+		assert.Equal(t, []byte(hh), d.Txs.Hash())
+	}
+}
