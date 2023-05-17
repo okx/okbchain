@@ -404,6 +404,12 @@ func (ms *MptStore) commitStorage(nodeSets *trie.MergedNodeSet) {
 		}
 		delete(ms.storageTrieForWrite, addr)
 	}
+
+	it := trie.NewIterator(ms.trie.NodeIterator(nil))
+	for it.Next() {
+		fmt.Println("kkk", hex.EncodeToString(it.Key), hex.EncodeToString(it.Value))
+	}
+
 }
 
 func (ms *MptStore) CommitterCommit(inputDelta interface{}) (rootHash types.CommitID, outputDelta interface{}) {
