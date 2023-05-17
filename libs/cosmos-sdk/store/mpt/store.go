@@ -405,6 +405,7 @@ func (ms *MptStore) commitStorage(nodeSets *trie.MergedNodeSet) {
 }
 
 func (ms *MptStore) CommitterCommit(inputDelta interface{}) (rootHash types.CommitID, outputDelta interface{}) {
+	tt := time.Now()
 	ms.version++
 
 	// stop pre round prefetch
@@ -455,6 +456,7 @@ func (ms *MptStore) CommitterCommit(inputDelta interface{}) (rootHash types.Comm
 	// start next found prefetch
 	ms.StartPrefetcher("mptStore")
 
+	fmt.Println("mpt-store-1", time.Now().Sub(tt))
 	return types.CommitID{
 		Version: ms.version,
 		Hash:    root.Bytes(),
