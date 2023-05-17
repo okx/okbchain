@@ -4,12 +4,14 @@ import (
 	"bytes"
 	ethcommon "github.com/ethereum/go-ethereum/common"
 	"github.com/okx/okbchain/libs/tendermint/crypto/merkle"
+	"sync"
 )
 
 // TxWithMeta contains tx hash
 type TxWithMeta struct {
 	Tx
 	TxHash []byte
+	mu     sync.Mutex
 }
 
 func NewTxWithMeta(tx Tx) *TxWithMeta {
@@ -17,6 +19,8 @@ func NewTxWithMeta(tx Tx) *TxWithMeta {
 }
 
 func (tx *TxWithMeta) Hash() []byte {
+	tx.mu.Lock()
+	defer tx.mu.Unlock()
 	if len(tx.TxHash) == 0 {
 		tx.TxHash = ethcommon.CopyBytes(tx.Tx.Hash())
 	}
