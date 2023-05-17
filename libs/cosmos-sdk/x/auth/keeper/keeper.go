@@ -114,6 +114,7 @@ func (ak AccountKeeper) RetrieveStateRoot(bz []byte) ethcmn.Hash {
 		return acc.GetStateRoot()
 	}
 	err = ak.cdc.UnmarshalBinaryBare(bz, &acc)
+	fmt.Println("ans---", acc.GetStateRoot().String())
 	if err == nil {
 		return acc.GetStateRoot()
 	}
