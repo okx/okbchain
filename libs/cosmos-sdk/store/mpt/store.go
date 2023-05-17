@@ -253,6 +253,7 @@ func (ms *MptStore) tryGetStorageTrie(addr ethcmn.Address, stateRoot ethcmn.Hash
 			panic("unexcepted err")
 		}
 	}
+	fmt.Println("tryGetStorageTrie", err, addr.String(), stateRoot.String())
 
 	if useCache {
 		ms.storageTrieForWrite[addr] = t
