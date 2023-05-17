@@ -288,7 +288,7 @@ func (app *BaseApp) Commit(req abci.RequestCommit) abci.ResponseCommit {
 		<-mpt.GAccTrieUpdatedChannel
 	}
 
-	//fmt.Println("tt-1", time.Now().Sub(tt))
+	fmt.Println("tt-1", time.Now().Sub(tt))
 	// Write the DeliverTx state which is cache-wrapped and commit the MultiStore.
 	// The write to the DeliverTx state writes all state transitions to the root
 	// MultiStore (app.cms) so when Commit() is called is persists those values.
