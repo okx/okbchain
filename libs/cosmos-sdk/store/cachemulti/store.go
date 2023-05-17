@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"sync"
+	"time"
 
 	dbm "github.com/okx/okbchain/libs/tm-db"
 
@@ -189,8 +190,11 @@ func (cms Store) GetStoreType() types.StoreType {
 // Write calls Write on each underlying store.
 func (cms Store) Write() {
 	cms.db.Write()
-	for _, store := range cms.stores {
+	ts := time.Now()
+	for key, store := range cms.stores {
 		store.Write()
+		fmt.Println("key ", key.String(), time.Now().Sub(ts))
+		ts = time.Now()
 	}
 }
 
