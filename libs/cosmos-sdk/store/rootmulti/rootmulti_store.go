@@ -642,19 +642,16 @@ func (rs *Store) CommitterCommitMap(inputDeltaMap *tmtypes.TreeDelta) (types.Com
 
 		rs.versions = append(rs.versions, version)
 	}
-	fmt.Println("cccc-tt-2", time.Now().Sub(tt).Seconds())
 	persist.GetStatistics().Accumulate(trace.CommitStores, tsCommitStores)
 
 	tsFlushMeta := time.Now()
 	flushMetadata(rs.db, version, rs.lastCommitInfo, rs.pruneHeights, rs.versions)
-	fmt.Println("cccc-tt-3", time.Now().Sub(tt).Seconds())
 	persist.GetStatistics().Accumulate(trace.FlushMeta, tsFlushMeta)
 
 	ans := types.CommitID{
 		Version: version,
 		Hash:    rs.lastCommitInfo.Hash(),
 	}
-	fmt.Println("cccc-tt-4", time.Now().Sub(tt).Seconds())
 	return ans, outputDeltaMap
 }
 
@@ -1177,6 +1174,7 @@ type StoreSort struct {
 // Commits each store and returns a new commitInfo.
 func commitStores(version int64, storeMap map[types.StoreKey]types.CommitKVStore,
 	inputDelta *tmtypes.TreeDelta, filters []types.StoreFilter) (commitInfo, *tmtypes.TreeDelta) {
+	ts := time.Now()
 	var storeInfos []storeInfo
 	outputDeltaMap := tmtypes.NewTreeDelta()
 
@@ -1191,6 +1189,7 @@ func commitStores(version int64, storeMap map[types.StoreKey]types.CommitKVStore
 	if mpt.EnableAsyncCommit {
 		mpt.UpdateCommitGapHeight(gap)
 	}
+	fmt.Println("ccc-1", time.Now().Sub(ts))
 	for key, store := range storeMap {
 		if isUseless(key.Name(), version, store, filters) {
 			continue
@@ -1239,6 +1238,7 @@ func commitStores(version int64, storeMap map[types.StoreKey]types.CommitKVStore
 		si.Core.CommitID = commitID
 		storeInfos = append(storeInfos, si)
 	}
+	fmt.Println("ccc-2", time.Now().Sub(ts))
 	return commitInfo{
 		Version:    version,
 		StoreInfos: storeInfos,

@@ -295,7 +295,6 @@ func (app *BaseApp) Commit(req abci.RequestCommit) abci.ResponseCommit {
 	// MultiStore (app.cms) so when Commit() is called is persists those values.
 	app.deliverState.ms.Write()
 	sdk.PrintLog = false
-	fmt.Println("tt-2.1", time.Now().Sub(tt))
 	var input *tmtypes.TreeDelta
 	if tmtypes.DownloadDelta && req.DeltaMap != nil {
 		var ok bool

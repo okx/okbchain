@@ -2,12 +2,9 @@ package cachemulti
 
 import (
 	"fmt"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
+	dbm "github.com/okx/okbchain/libs/tm-db"
 	"io"
 	"sync"
-	"time"
-
-	dbm "github.com/okx/okbchain/libs/tm-db"
 
 	"github.com/okx/okbchain/libs/cosmos-sdk/store/cachekv"
 	"github.com/okx/okbchain/libs/cosmos-sdk/store/dbadapter"
@@ -191,14 +188,8 @@ func (cms Store) GetStoreType() types.StoreType {
 // Write calls Write on each underlying store.
 func (cms Store) Write() {
 	cms.db.Write()
-	ts := time.Now()
-	for key, store := range cms.stores {
+	for _, store := range cms.stores {
 		store.Write()
-		if sdk.PrintLog {
-			fmt.Println("key ", key.Name(), time.Now().Sub(ts))
-		}
-
-		ts = time.Now()
 	}
 }
 
