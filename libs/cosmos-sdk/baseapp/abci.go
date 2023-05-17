@@ -1,9 +1,11 @@
 package baseapp
 
 import (
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"github.com/okx/okbchain/app/rpc/simulator"
+	cosmost "github.com/okx/okbchain/libs/cosmos-sdk/store/types"
 	cfg "github.com/okx/okbchain/libs/tendermint/config"
 	"os"
 	"sort"
@@ -224,6 +226,12 @@ func (app *BaseApp) EndBlock(req abci.RequestEndBlock) (res abci.ResponseEndBloc
 
 	if app.endBlocker != nil {
 		res = app.endBlocker(app.deliverState.ctx, req)
+	}
+	if app.deliverState.ms != nil && app.deliverState.ctx.BlockHeight() == 949 {
+		app.deliverState.ms.IteratorCache(true, func(key string, value []byte, isDirty bool, isDelete bool, storeKey cosmost.StoreKey) bool {
+			fmt.Println("dirtty", hex.EncodeToString([]byte(key)), hex.EncodeToString(value))
+			return true
+		}, nil)
 	}
 
 	return
