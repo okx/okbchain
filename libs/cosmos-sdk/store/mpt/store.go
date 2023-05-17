@@ -385,7 +385,7 @@ func (ms *MptStore) commitStorage(nodeSets *trie.MergedNodeSet) {
 		if err != nil {
 			panic(fmt.Errorf("unexcepted err:%v while commit storage tire ", err))
 		}
-		//fmt.Println("dffffff", addr.String(), stateR.String())
+		fmt.Println("dffffff", sdk.TxIndex, addr.String(), stateR.String())
 		key := AddressStoreKey(addr.Bytes())
 		preValue, err := ms.trie.TryGet(key)
 		if err == nil { // maybe acc already been deleted
