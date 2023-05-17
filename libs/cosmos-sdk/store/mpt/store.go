@@ -571,7 +571,7 @@ func (ms *MptStore) otherNodePersist(curMptRoot ethcmn.Hash, curHeight int64) {
 		triedb.Cap(nodesLimit - ethdb.IdealBatchSize)
 	}
 
-	fmt.Println("oooo-1.1", time.Now().Sub(tt))
+	fmt.Println("oooo-1.1", time.Now().Sub(tt), nodes.String(), imgs.String())
 
 	//fmt.Println("ooo-2", commitGap, time.Now().Sub(tt).Seconds())
 	// If we exceeded out time allowance, flush an entire trie to disk
