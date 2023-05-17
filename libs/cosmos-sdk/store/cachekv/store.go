@@ -2,9 +2,6 @@ package cachekv
 
 import (
 	"bytes"
-	"encoding/hex"
-	"fmt"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
 	"io"
 	"reflect"
 	"sort"
@@ -372,10 +369,10 @@ func (store *Store) dirtyItems(start, end []byte) {
 
 // Only entrypoint to mutate store.cache.
 func (store *Store) setCacheValue(key, value []byte, deleted bool, dirty bool) {
-	if dirty && hex.EncodeToString(key) == "01beee8e798ee7e0ff7bf08d7189b8637f6846ea54" {
-		fmt.Println("value000", sdk.TxIndex, hex.EncodeToString(value))
-		//debug.PrintStack()
-	}
+	//if dirty && hex.EncodeToString(key) == "01beee8e798ee7e0ff7bf08d7189b8637f6846ea54" {
+	//fmt.Println("value000", sdk.TxIndex, hex.EncodeToString(value))
+	//debug.PrintStack()
+	//}
 	keyStr := string(key)
 	if !dirty {
 		store.readList[keyStr] = value
