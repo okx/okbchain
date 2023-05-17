@@ -213,8 +213,8 @@ func (b *Block) ValidateBasic() error {
 	//	bmsg += fmt.Sprintf("Data.Txs %d is not equal Data.txWithMetas %d ", len(b.Data.Txs), len(b.Data.txWithMetas))
 	//}
 	// NOTE: b.Data.Txs may be nil, but b.Data.Hash() still works fine.
-	//chash, restr := b.Data.HashHavelog(b.Height)
-	if !bytes.Equal(b.DataHash, b.Data.Hash(b.Height)) {
+	chash, restr := b.Data.HashHavelog(b.Height)
+	if !bytes.Equal(b.DataHash, chash) {
 		msg := ""
 		if len(b.Data.Txs) == len(b.Data.txWithMetas) {
 			for i := 0; i < len(b.Data.Txs); i++ {
@@ -229,8 +229,20 @@ func (b *Block) ValidateBasic() error {
 			msg += fmt.Sprintf("Data.Txs %d is not equal Data.txWithMetas %d ", len(b.Data.Txs), len(b.Data.txWithMetas))
 		}
 
+		//return fmt.Errorf(
+		//	"wrong Header.DataHash. height %d, Expected %v, got %v,  original %v, txWithMetas cacl %v, direct hash %v, ProposerAddress %s, msg %s",
+		//	b.Height,
+		//	b.Data.Hash(b.Height),
+		//	b.DataHash,
+		//	ethcommon.Bytes2Hex(b.Data.Txs.Hash()),
+		//	ethcommon.Bytes2Hex(b.Data.txWithMetas.Hash()),
+		//	ethcommon.Bytes2Hex(b.Data.hash),
+		//	b.ProposerAddress.String(),
+		//	msg,
+		//)
+
 		return fmt.Errorf(
-			"wrong Header.DataHash. height %d, Expected %v, got %v,  original %v, txWithMetas cacl %v, direct hash %v, ProposerAddress %s, msg %s",
+			"wrong Header.DataHash. height %d, Expected %v, got %v,  original %v, txWithMetas cacl %v, direct hash %v, ProposerAddress %s, msg %s, inside %s",
 			b.Height,
 			b.Data.Hash(b.Height),
 			b.DataHash,
@@ -239,22 +251,8 @@ func (b *Block) ValidateBasic() error {
 			ethcommon.Bytes2Hex(b.Data.hash),
 			b.ProposerAddress.String(),
 			msg,
+			restr,
 		)
-
-		//return fmt.Errorf(
-		//	"wrong Header.DataHash. height %d, Expected %v, got %v,  original %v, txWithMetas cacl %v, direct hash %v, ProposerAddress %s, bDataHash %s, msg %s, bmsg %s, inside %s",
-		//	b.Height,
-		//	b.Data.Hash(b.Height),
-		//	b.DataHash,
-		//	ethcommon.Bytes2Hex(b.Data.Txs.Hash()),
-		//	ethcommon.Bytes2Hex(b.Data.txWithMetas.Hash()),
-		//	ethcommon.Bytes2Hex(b.Data.hash),
-		//	b.ProposerAddress.String(),
-		//	bDataHash,
-		//	msg,
-		//	bmsg,
-		//	restr,
-		//)
 	}
 
 	// NOTE: b.Evidence.Evidence may be nil, but we're just looping.
@@ -1767,19 +1765,37 @@ func (data *Data) HashHavelog(height int64) (tmbytes.HexBytes, string) {
 	}
 	str := ""
 	var hash []byte
+	msg := ""
 	if data.hash == nil {
 		data.GetTxWithMetas()
-		data.hash = data.txWithMetas.Hash() // NOTE: leaves of merkle tree are TxIDs
-		chechHash := data.Txs.Hash()
-		if !bytes.Equal(chechHash, data.hash) {
-			data.hash = chechHash
+
+		whah, whahs := data.txWithMetas.HashHaveLog()
+		hah, hahs := data.Txs.HashHaveLog()
+		if !bytes.Equal(whah, hah) {
+			for i := 0; i < len(whahs); i++ {
+				if !bytes.Equal(whahs[i], hahs[i]) {
+					msg += fmt.Sprintf("tx index %d is not equal, tx hash is %s, tm hash is %s \n",
+						i, ethcommon.Bytes2Hex(hahs[i]), ethcommon.Bytes2Hex(whahs[i]))
+				}
+			}
+			newh, newhs := data.txWithMetas.HashHaveLog()
+			if !bytes.Equal(whah, newh) {
+				for i := 0; i < len(whahs); i++ {
+					if !bytes.Equal(whahs[i], newhs[i]) {
+						msg += fmt.Sprintf("tx index %d is not equal, newtm hash is %s, tm hash is %s \n",
+							i, ethcommon.Bytes2Hex(newhs[i]), ethcommon.Bytes2Hex(whahs[i]))
+					}
+				}
+			}
 		}
+		data.hash = whah
+
 		str = fmt.Sprintln("data hash is nil")
 	} else {
 		str = fmt.Sprintln("data hash is not nil")
 	}
 	return data.hash, fmt.Sprintln(str, "data hash", ethcommon.Bytes2Hex(data.hash), "hash", ethcommon.Bytes2Hex(hash), "txs len", len(data.Txs), "txw", len(data.txWithMetas),
-		"txsw cacl", ethcommon.Bytes2Hex(data.txWithMetas.Hash()), "txs cacl", ethcommon.Bytes2Hex(data.Txs.Hash()))
+		"txsw cacl", ethcommon.Bytes2Hex(data.txWithMetas.Hash()), "txs cacl", ethcommon.Bytes2Hex(data.Txs.Hash()), "inter msg", msg)
 }
 
 // StringIndented returns a string representation of the transactions

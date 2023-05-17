@@ -81,6 +81,18 @@ func (txs Txs) Hash() []byte {
 	return merkle.SimpleHashFromByteSlices(txBzs)
 }
 
+func (txs Txs) HashHaveLog() ([]byte, [][]byte) {
+	// These allocations will be removed once Txs is switched to [][]byte,
+	// ref #2603. This is because golang does not allow type casting slices without unsafe
+	txBzs := make([][]byte, len(txs))
+	retxBzs := make([][]byte, len(txs))
+	for i := 0; i < len(txs); i++ {
+		txBzs[i] = txs[i].Hash()
+		retxBzs[i] = ethcmn.CopyBytes(txBzs[i])
+	}
+	return merkle.SimpleHashFromByteSlices(txBzs), retxBzs
+}
+
 // Index returns the index of this transaction in the list, or -1 if not found
 func (txs Txs) Index(tx Tx) int {
 	for i := range txs {
