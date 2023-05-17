@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/hex"
 	"fmt"
+	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
 	"io"
 	"reflect"
 	"runtime/debug"
@@ -373,7 +374,7 @@ func (store *Store) dirtyItems(start, end []byte) {
 // Only entrypoint to mutate store.cache.
 func (store *Store) setCacheValue(key, value []byte, deleted bool, dirty bool) {
 	if hex.EncodeToString(key) == "00beee8e798ee7e0ff7bf08d7189b8637f6846ea5460eee22e34ea1cc10282febbaa0eab8c8fcf539c3d3afb4d622e745f1d732d35adf14e3aa1db4717c8c3cbf9029321eb73a9afb9549203124433653446e09031" {
-		fmt.Println("value000", hex.EncodeToString(value))
+		fmt.Println("value000", sdk.TxIndex, hex.EncodeToString(value))
 		debug.PrintStack()
 	}
 	keyStr := string(key)
