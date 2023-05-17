@@ -1666,6 +1666,7 @@ type Data struct {
 	// This means that block.AppHash does not include these txs.
 	Txs Txs `json:"txs"`
 
+	mtx         sync.Mutex
 	txWithMetas TxWithMetas // TxWithMetas is no need participat calculate
 
 	// Volatile
@@ -1732,9 +1733,7 @@ func (data *Data) Hash(height int64) tmbytes.HexBytes {
 		return (Txs{}).Hash()
 	}
 	if data.hash == nil {
-		if len(data.txWithMetas) == 0 {
-			data.txWithMetas = TxsToTxWithMetas(data.Txs)
-		}
+		data.GetTxWithMetas()
 		data.hash = data.txWithMetas.Hash() // NOTE: leaves of merkle tree are TxIDs
 	}
 	return data.hash
@@ -1765,6 +1764,8 @@ func (data *Data) StringIndented(indent string) string {
 }
 
 func (data *Data) GetTxWithMetas() TxWithMetas {
+	data.mtx.Lock()
+	defer data.mtx.Unlock()
 	if len(data.Txs) != len(data.txWithMetas) {
 		data.txWithMetas = TxsToTxWithMetas(data.Txs)
 	}
