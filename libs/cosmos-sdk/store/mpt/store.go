@@ -430,6 +430,7 @@ func (ms *MptStore) CommitterCommit(inputDelta interface{}) (rootHash types.Comm
 		outputDelta = &trie.MptDelta{NodeDelta: outputNodeDelta, Storage: outStorage}
 	} else {
 		ms.commitStorage(nodeSets)
+		fmt.Println("mpt-store-0.0.5", time.Now().Sub(tt))
 		root, set, err = ms.trie.Commit(true)
 	}
 	if err != nil {
