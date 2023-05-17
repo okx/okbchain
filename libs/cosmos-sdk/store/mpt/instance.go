@@ -43,18 +43,7 @@ func InstanceOfMptStore() ethstate.Database {
 		if e != nil {
 			panic("fail to open database: " + e.Error())
 		}
-		nkvstore := NewStatKeyValueStore(kvstore, gStatic)
-		if EnableAsyncCommit && TrieAsyncDB && !TrieDirtyDisabled {
-			gAsyncDB = NewAsyncKeyValueStoreWithOptions(nkvstore, AsyncKeyValueStoreOptions{
-				DisableAutoPrune: TrieAsyncDBAutoPruningOff,
-				SyncPrune:        TrieAsyncDBSyncPruning,
-				InitCap:          TrieAsyncDBInitCap,
-			})
-			nkvstore = gAsyncDB
-		}
-
-		db := rawdb.NewDatabase(nkvstore)
-		gEthDB = db
+		db := rawdb.NewDatabase(kvstore)
 		gMptDatabase = ethstate.NewDatabaseWithConfig(db, &trie.Config{
 			Cache:     int(TrieCacheSize),
 			Journal:   "",
@@ -64,6 +53,42 @@ func InstanceOfMptStore() ethstate.Database {
 
 	return gMptDatabase
 }
+
+//func InstanceOfMptStore() ethstate.Database {
+//	initMptOnce.Do(func() {
+//		homeDir := viper.GetString(flags.FlagHome)
+//		path := filepath.Join(homeDir, mptDataDir)
+//
+//		backend := viper.GetString(sdk.FlagDBBackend)
+//		if backend == "" {
+//			backend = string(types.GoLevelDBBackend)
+//		}
+//
+//		kvstore, e := types.CreateKvDB(mptSpace, types.BackendType(backend), path)
+//		if e != nil {
+//			panic("fail to open database: " + e.Error())
+//		}
+//		nkvstore := NewStatKeyValueStore(kvstore, gStatic)
+//		if EnableAsyncCommit && TrieAsyncDB && !TrieDirtyDisabled {
+//			gAsyncDB = NewAsyncKeyValueStoreWithOptions(nkvstore, AsyncKeyValueStoreOptions{
+//				DisableAutoPrune: TrieAsyncDBAutoPruningOff,
+//				SyncPrune:        TrieAsyncDBSyncPruning,
+//				InitCap:          TrieAsyncDBInitCap,
+//			})
+//			nkvstore = gAsyncDB
+//		}
+//
+//		db := rawdb.NewDatabase(nkvstore)
+//		gEthDB = db
+//		gMptDatabase = ethstate.NewDatabaseWithConfig(db, &trie.Config{
+//			Cache:     int(TrieCacheSize),
+//			Journal:   "",
+//			Preimages: true,
+//		})
+//	})
+//
+//	return gMptDatabase
+//}
 
 func GetEthDB() ethdb.Database {
 	InstanceOfMptStore()
