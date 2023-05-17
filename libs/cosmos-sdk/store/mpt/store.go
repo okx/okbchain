@@ -448,9 +448,9 @@ func (ms *MptStore) CommitterCommit(inputDelta interface{}) (rootHash types.Comm
 	}
 
 	fmt.Println("rrr-1")
-	if err := ms.db.TrieDB().UpdateForOK(nodeSets, AccountStateRootRetriever.RetrieveStateRoot); err != nil {
-		panic("fail to commit trie data (UpdateForOK): " + err.Error())
-	}
+	//if err := ms.db.TrieDB().UpdateForOK(nodeSets, AccountStateRootRetriever.RetrieveStateRoot); err != nil {
+	//	panic("fail to commit trie data (UpdateForOK): " + err.Error())
+	//}
 	fmt.Println("rrrr-2")
 	ms.SetMptRootHash(uint64(ms.version), root)
 	ms.originalRoot = root
