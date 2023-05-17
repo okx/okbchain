@@ -278,6 +278,7 @@ func (ms *MptStore) Set(key, value []byte) {
 		ms.updateSnapStorages(addr, realKey, value)
 	case addressType:
 		ms.trie.TryUpdate(key, value)
+		fmt.Println("ppppppp", hex.EncodeToString(key), hex.EncodeToString(value))
 		ms.updateSnapAccounts(key, value)
 	default:
 		panic(fmt.Errorf("not support key %s for mpt set", hex.EncodeToString(key)))
@@ -385,11 +386,11 @@ func (ms *MptStore) commitStorage(nodeSets *trie.MergedNodeSet) {
 		if err != nil {
 			panic(fmt.Errorf("unexcepted err:%v while commit storage tire ", err))
 		}
-		fmt.Println("dffffff", sdk.TxIndex, addr.String(), stateR.String())
 		key := AddressStoreKey(addr.Bytes())
 		preValue, err := ms.trie.TryGet(key)
 		if err == nil { // maybe acc already been deleted
 			newValue := ms.retriever.ModifyAccStateRoot(preValue, stateR)
+			fmt.Println("pppp-acc", hex.EncodeToString(key), hex.EncodeToString(newValue))
 			if err := ms.trie.TryUpdate(key, newValue); err != nil {
 				panic(fmt.Errorf("unexcepted err:%v while update acc %s ", err, addr.String()))
 			}
