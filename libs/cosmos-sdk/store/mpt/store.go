@@ -554,11 +554,11 @@ func (ms *MptStore) otherNodePersist(curMptRoot ethcmn.Hash, curHeight int64) {
 	}
 
 	commitGap := TrieCommitGap
-	if !EnableAsyncCommit {
-		commitGap = 1
-	}
+	//if !EnableAsyncCommit {
+	//	commitGap = 1
+	//}
 
-	fmt.Println("ooo-2", time.Now().Sub(tt).Seconds())
+	fmt.Println("ooo-2", commitGap, time.Now().Sub(tt).Seconds())
 	// If we exceeded out time allowance, flush an entire trie to disk
 	if curHeight%commitGap == 0 {
 		// If the header is missing (canonical chain behind), we're reorging a low
