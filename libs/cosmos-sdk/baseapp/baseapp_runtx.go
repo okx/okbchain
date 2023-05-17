@@ -294,7 +294,7 @@ func (app *BaseApp) DeliverTx(req abci.RequestDeliverTx) abci.ResponseDeliverTx 
 	var realTx sdk.Tx
 	var err error
 	if mem := GetGlobalMempool(); mem != nil {
-		realTx, _ = mem.ReapEssentialTx(&ttypes.TxWithMeta{req.GetTx(), req.GetTxHash()}).(sdk.Tx)
+		realTx, _ = mem.ReapEssentialTx(&ttypes.TxWithMeta{Tx: req.GetTx(), TxHash: req.GetTxHash()}).(sdk.Tx)
 	}
 	if realTx == nil {
 		realTx, err = app.txDecoderWithHash(req.Tx, req.Txhash)
