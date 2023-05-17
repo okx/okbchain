@@ -29,7 +29,10 @@ type Msg interface {
 	GetSigners() []AccAddress
 }
 
-//__________________________________________________________
+// __________________________________________________________
+var (
+	PrintLog = false
+)
 
 // Transactions objects must fulfill the Tx
 type Tx interface {

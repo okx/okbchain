@@ -289,10 +289,12 @@ func (app *BaseApp) Commit(req abci.RequestCommit) abci.ResponseCommit {
 	}
 
 	fmt.Println("tt-1", time.Now().Sub(tt))
+	sdk.PrintLog = true
 	// Write the DeliverTx state which is cache-wrapped and commit the MultiStore.
 	// The write to the DeliverTx state writes all state transitions to the root
 	// MultiStore (app.cms) so when Commit() is called is persists those values.
 	app.deliverState.ms.Write()
+	sdk.PrintLog = false
 	fmt.Println("tt-2.1", time.Now().Sub(tt))
 	var input *tmtypes.TreeDelta
 	if tmtypes.DownloadDelta && req.DeltaMap != nil {

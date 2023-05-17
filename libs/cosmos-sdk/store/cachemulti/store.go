@@ -2,6 +2,7 @@ package cachemulti
 
 import (
 	"fmt"
+	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
 	"io"
 	"sync"
 	"time"
@@ -193,7 +194,10 @@ func (cms Store) Write() {
 	ts := time.Now()
 	for key, store := range cms.stores {
 		store.Write()
-		fmt.Println("key ", key.String(), time.Now().Sub(ts))
+		if sdk.PrintLog {
+			fmt.Println("key ", key.Name(), time.Now().Sub(ts))
+		}
+
 		ts = time.Now()
 	}
 }
