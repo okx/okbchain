@@ -515,12 +515,14 @@ func (ms *MptStore) PushData2Database(curHeight int64) {
 	defer ms.cmLock.Unlock()
 
 	curMptRoot := ms.GetMptRootHash(uint64(curHeight))
+	ts := time.Now()
 	if TrieDirtyDisabled {
 		// If we're running an archive node, always flush
 		ms.fullNodePersist(curMptRoot, curHeight)
 	} else {
 		ms.otherNodePersist(curMptRoot, curHeight)
 	}
+	fmt.Println("TrieDirtyDisabled ", TrieDirtyDisabled, time.Now().Sub(ts).Seconds())
 }
 
 // fullNodePersist persist data without pruning
