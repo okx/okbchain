@@ -605,8 +605,10 @@ func (rs *Store) CommitterCommitMap(inputDeltaMap *tmtypes.TreeDelta) (types.Com
 
 	tsCommitStores := time.Now()
 	var outputDeltaMap *tmtypes.TreeDelta
+	tt := time.Now()
 	rs.lastCommitInfo, outputDeltaMap = commitStores(version, rs.stores, inputDeltaMap, rs.commitFilters)
 
+	fmt.Println("cccc-tt", time.Now().Sub(tt).Seconds())
 	if !iavltree.EnableAsyncCommit {
 		// Determine if pruneHeight height needs to be added to the list of heights to
 		// be pruned, where pruneHeight = (commitHeight - 1) - KeepRecent.

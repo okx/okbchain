@@ -288,7 +288,7 @@ func (app *BaseApp) Commit(req abci.RequestCommit) abci.ResponseCommit {
 		<-mpt.GAccTrieUpdatedChannel
 	}
 
-	fmt.Println("tt-1", time.Now().Sub(tt))
+	//fmt.Println("tt-1", time.Now().Sub(tt))
 	// Write the DeliverTx state which is cache-wrapped and commit the MultiStore.
 	// The write to the DeliverTx state writes all state transitions to the root
 	// MultiStore (app.cms) so when Commit() is called is persists those values.
@@ -310,7 +310,7 @@ func (app *BaseApp) Commit(req abci.RequestCommit) abci.ResponseCommit {
 
 	app.cms.ResetCount()
 	app.logger.Debug("Commit synced", "commit", amino.BytesHexStringer(commitID.Hash))
-	fmt.Println("tt-4", time.Now().Sub(tt))
+	//fmt.Println("tt-4", time.Now().Sub(tt))
 	// Reset the Check state to the latest committed.
 	//
 	// NOTE: This is safe because Tendermint holds a lock on the mempool for
@@ -338,7 +338,7 @@ func (app *BaseApp) Commit(req abci.RequestCommit) abci.ResponseCommit {
 		// reset or moved to a more distant value.
 		app.halt()
 	}
-	fmt.Println("tt-5", time.Now().Sub(tt))
+	//fmt.Println("tt-5", time.Now().Sub(tt))
 
 	return abci.ResponseCommit{
 		Data:     commitID.Hash,
