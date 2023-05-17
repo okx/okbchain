@@ -542,10 +542,11 @@ func (ms *MptStore) fullNodePersist(curMptRoot ethcmn.Hash, curHeight int64) {
 // otherNodePersist persist data with pruning
 func (ms *MptStore) otherNodePersist(curMptRoot ethcmn.Hash, curHeight int64) {
 	triedb := ms.db.TrieDB()
-
+	tt := time.Now()
 	// Full but not archive node, do proper garbage collection
 	triedb.Reference(curMptRoot, ethcmn.Hash{}) // metadata reference to keep trie alive
 	ms.triegc.Push(curMptRoot, -int64(curHeight))
+	fmt.Println("ooo-1", time.Now().Sub(tt).Seconds())
 
 	// we start at startVersion, but the chosen height may be startVersion - triesInMemory
 	if curHeight <= ms.startVersion {
@@ -557,6 +558,7 @@ func (ms *MptStore) otherNodePersist(curMptRoot ethcmn.Hash, curHeight int64) {
 		commitGap = 1
 	}
 
+	fmt.Println("ooo-2", time.Now().Sub(tt).Seconds())
 	// If we exceeded out time allowance, flush an entire trie to disk
 	if curHeight%commitGap == 0 {
 		// If the header is missing (canonical chain behind), we're reorging a low
@@ -577,6 +579,7 @@ func (ms *MptStore) otherNodePersist(curMptRoot ethcmn.Hash, curHeight int64) {
 		ms.logger.Info("async push acc data to db", "block", curHeight, "trieHash", chRoot)
 	}
 	gAsyncDB.Prune()
+	fmt.Println("ooo-3", time.Now().Sub(tt).Seconds())
 	// Garbage collect anything below our required write retention
 	if curHeight > int64(TriesInMemory) {
 		for !ms.triegc.Empty() {
@@ -588,6 +591,7 @@ func (ms *MptStore) otherNodePersist(curMptRoot ethcmn.Hash, curHeight int64) {
 			triedb.Dereference(root.(ethcmn.Hash))
 		}
 	}
+	fmt.Println("ooo-4", time.Now().Sub(tt).Seconds())
 }
 func (ms *MptStore) CurrentVersion() int64 {
 	return ms.version
