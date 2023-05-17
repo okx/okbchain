@@ -2,9 +2,11 @@ package types
 
 import (
 	"bytes"
+	"encoding/hex"
 	"fmt"
 
 	"github.com/okx/okbchain/libs/cosmos-sdk/store/mpt"
+	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
 
 	ethcmn "github.com/ethereum/go-ethereum/common"
 	ethstate "github.com/ethereum/go-ethereum/core/state"
@@ -140,6 +142,9 @@ func (so *stateObject) updateTrie(db ethstate.Database) (updated bool) {
 	store := so.stateDB.dbAdapter.NewStore(ctx.KVStore(so.stateDB.storeKey), mpt.AddressStoragePrefixMpt(so.address, so.account.StateRoot))
 	// usedStorage := make([][]byte, 0, len(so.pendingStorage))
 	for key, value := range so.pendingStorage {
+		if sdk.TxIndex == 95 {
+			fmt.Println("vvvv", so.account.Address.String(), hex.EncodeToString(key.Bytes()), hex.EncodeToString(value.Bytes()))
+		}
 		// Skip noop changes, persist actual changes
 		if value == so.originStorage[key] {
 			continue
