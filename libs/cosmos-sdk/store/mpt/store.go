@@ -278,11 +278,8 @@ func (ms *MptStore) Set(key, value []byte) {
 		ms.updateSnapStorages(addr, realKey, value)
 	case addressType:
 		ms.trie.TryUpdate(key, value)
-		if hex.EncodeToString(key) == "018fec96b4f7c6d21971bc9d61ed9e5a32574367c9" {
-			fmt.Println("pppp---", sdk.TxIndex, hex.EncodeToString(value))
-			//debug.PrintStack()
-		}
-		//fmt.Println("ppppppp", hex.EncodeToString(key), hex.EncodeToString(value))
+
+		fmt.Println("ppppppp", hex.EncodeToString(key), hex.EncodeToString(value))
 		ms.updateSnapAccounts(key, value)
 	default:
 		panic(fmt.Errorf("not support key %s for mpt set", hex.EncodeToString(key)))

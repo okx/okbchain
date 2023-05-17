@@ -3,8 +3,6 @@ package types
 import (
 	"bytes"
 	"fmt"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-
 	ethcmn "github.com/ethereum/go-ethereum/common"
 	ethstate "github.com/ethereum/go-ethereum/core/state"
 	types2 "github.com/ethereum/go-ethereum/core/types"
@@ -134,7 +132,7 @@ func (so *stateObject) updateTrie(db ethstate.Database) (updated bool) {
 	if len(so.pendingStorage) == 0 {
 		return
 	}
-	fmt.Println("updateTrie", sdk.TxIndex, len(so.pendingStorage))
+	//fmt.Println("updateTrie", sdk.TxIndex, len(so.pendingStorage))
 
 	// Insert all the pending updates into the trie
 	ctx := &so.stateDB.ctx
