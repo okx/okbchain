@@ -578,6 +578,7 @@ func (ms *MptStore) otherNodePersist(curMptRoot ethcmn.Hash, curHeight int64) {
 		ms.SetLatestStoredBlockHeight(uint64(curHeight))
 		ms.logger.Info("async push acc data to db", "block", curHeight, "trieHash", chRoot)
 	}
+	fmt.Println("ooo-2.1", time.Now().Sub(tt).Seconds())
 	gAsyncDB.Prune()
 	fmt.Println("ooo-3", time.Now().Sub(tt).Seconds())
 	// Garbage collect anything below our required write retention
