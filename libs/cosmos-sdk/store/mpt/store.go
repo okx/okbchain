@@ -406,9 +406,11 @@ func (ms *MptStore) commitStorage(nodeSets *trie.MergedNodeSet) {
 	}
 
 	it := trie.NewIterator(ms.trie.NodeIterator(nil))
+	cc := 0
 	for it.Next() {
-		fmt.Println("kkk", hex.EncodeToString(it.Key), hex.EncodeToString(it.Value))
+		cc++
 	}
+	fmt.Println("cc", cc)
 
 }
 
