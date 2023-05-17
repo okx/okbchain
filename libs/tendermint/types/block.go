@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/binary"
 	"fmt"
+	ethcommon "github.com/ethereum/go-ethereum/common"
 	"io"
 	"strings"
 	"sync"
@@ -199,10 +200,30 @@ func (b *Block) ValidateBasic() error {
 
 	// NOTE: b.Data.Txs may be nil, but b.Data.Hash() still works fine.
 	if !bytes.Equal(b.DataHash, b.Data.Hash(b.Height)) {
+		msg := ""
+		if len(b.Data.Txs) == len(b.Data.txWithMetas) {
+			for i := 0; i < len(b.Data.Txs); i++ {
+				thash := b.Data.Txs[i].Hash()
+				tmhash := b.Data.txWithMetas[i].Hash()
+				if !bytes.Equal(thash, tmhash) {
+					msg += fmt.Sprintf("tx index %d is not equal, tx hash is %s, tm hash is %s \n",
+						i, ethcommon.Bytes2Hex(thash), ethcommon.Bytes2Hex(tmhash))
+				}
+			}
+		} else {
+			msg += "Data.Txs is not equal Data.txWithMetas"
+		}
+
 		return fmt.Errorf(
-			"wrong Header.DataHash. Expected %v, got %v",
+			"wrong Header.DataHash. height %d, Expected %v, got %v,  original %v, txWithMetas cacl %v, direct hash %v, ProposerAddress %s, msg %s",
+			b.Height,
 			b.Data.Hash(b.Height),
 			b.DataHash,
+			ethcommon.Bytes2Hex(b.Data.Txs.Hash()),
+			ethcommon.Bytes2Hex(b.Data.txWithMetas.Hash()),
+			ethcommon.Bytes2Hex(b.Data.hash),
+			b.ProposerAddress.String(),
+			msg,
 		)
 	}
 

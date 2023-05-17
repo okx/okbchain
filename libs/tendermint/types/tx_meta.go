@@ -18,7 +18,7 @@ func NewTxWithMeta(tx Tx) *TxWithMeta {
 
 func (tx *TxWithMeta) Hash() []byte {
 	if len(tx.TxHash) == 0 {
-		tx.TxHash = tx.Tx.Hash()
+		tx.TxHash = ethcommon.CopyBytes(tx.Tx.Hash())
 	}
 	return ethcommon.CopyBytes(tx.TxHash)
 }
