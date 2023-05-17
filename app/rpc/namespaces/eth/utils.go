@@ -14,6 +14,7 @@ import (
 	"github.com/spf13/viper"
 
 	ethermint "github.com/okx/okbchain/app/types"
+	clientCtx "github.com/okx/okbchain/libs/cosmos-sdk/client/context"
 	"github.com/okx/okbchain/libs/cosmos-sdk/server"
 	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
 	sdkerror "github.com/okx/okbchain/libs/cosmos-sdk/types/errors"
@@ -21,6 +22,8 @@ import (
 	"github.com/okx/okbchain/libs/cosmos-sdk/x/supply"
 	"github.com/okx/okbchain/x/evm/types"
 	"github.com/okx/okbchain/x/token"
+	wasmkeeper "github.com/okx/okbchain/x/wasm/keeper"
+	wasmtypes "github.com/okx/okbchain/x/wasm/types"
 )
 
 const (
@@ -37,7 +40,7 @@ const (
 	RPCNullData  = "null"
 )
 
-//gasPrice: to get "minimum-gas-prices" config or to get ethermint.DefaultGasPrice
+// gasPrice: to get "minimum-gas-prices" config or to get ethermint.DefaultGasPrice
 func ParseGasPrice() *hexutil.Big {
 	gasPrices, err := sdk.ParseDecCoins(viper.GetString(server.FlagMinGasPrices))
 	if err == nil && gasPrices != nil && len(gasPrices) > 0 {
@@ -176,9 +179,9 @@ func TransformDataError(err error, method string) error {
 	}
 }
 
-//Preprocess error string, the string of realErr.Log is most like:
-//`["execution reverted","message","HexData","0x00000000000"];some failed information`
-//we need marshalled json slice from realErr.Log and using segment tag `[` and `]` to cut it
+// Preprocess error string, the string of realErr.Log is most like:
+// `["execution reverted","message","HexData","0x00000000000"];some failed information`
+// we need marshalled json slice from realErr.Log and using segment tag `[` and `]` to cut it
 func preProcessError(realErr *cosmosError, origErrorMsg string) (map[string]string, error) {
 	var logs []string
 	lastSeg := strings.LastIndexAny(realErr.Log, "]")
@@ -242,15 +245,19 @@ func getStorageByAddressKey(addr common.Address, key []byte) common.Hash {
 	return ethcrypto.Keccak256Hash(compositeKey)
 }
 
-func accountType(account authexported.Account) token.AccType {
+func accountType(account authexported.Account, cliCtx clientCtx.CLIContext, wasmAddr sdk.WasmAddress) token.AccType {
 	switch account.(type) {
 	case *ethermint.EthAccount:
-		if sdk.IsWasmAddress(account.GetAddress()) {
-			return token.WasmAccount
-		}
 		ethAcc, _ := account.(*ethermint.EthAccount)
 		if !bytes.Equal(ethAcc.CodeHash, ethcrypto.Keccak256(nil)) {
 			return token.ContractAccount
+		}
+		// Determine whether it is a wasm contract
+		route := fmt.Sprintf("custom/%s/%s/%s", wasmtypes.QuerierRoute, wasmkeeper.QueryGetContract, wasmAddr.String())
+		_, _, err := cliCtx.Query(route)
+		// Here, the address format must be valid, and only wasmtypes.ErrNotFound error may occur.
+		if err == nil {
+			return token.WasmAccount
 		}
 		return token.UserAccount
 	case *supply.ModuleAccount:

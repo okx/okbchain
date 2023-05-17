@@ -24,7 +24,7 @@ run() {
     LOG_LEVEL=main:info,iavl:info,*:error,state:info,provider:info
 #--mempool.enable_delete_min_gp_tx false \
 #    okbchaind start --pruning=nothing --rpc.unsafe \
-    okbchaind start --rpc.unsafe \
+    nohup okbchaind start --rpc.unsafe \
       --local-rpc-port 26657 \
       --log_level $LOG_LEVEL \
       --log_file json \
@@ -33,6 +33,7 @@ run() {
       --enable-preruntx=1 \
       --tree-enable-async-commit=false \
       --enable-gid \
+      --fast-query=true \
       --append-pid=true \
       --iavl-output-modules evm=0,acc=0 \
       --commit-gap-height 3 \
@@ -129,5 +130,10 @@ okbchaind validate-genesis --home $HOME_SERVER
 okbchaincli config keyring-backend test
 
 run
+
+sleep 4
+
+okbchaincli tx gov submit-proposal upgrade $CURDIR/proposals/wasm.proposal --from captain --fees 1okb  -y -b block
+okbchaincli tx gov vote 1 yes --from captain --fees 0.01okb  -y -b block
 
 # okbchaincli tx send captain 0x83D83497431C2D3FEab296a9fba4e5FaDD2f7eD0 1okb --fees 1okb -b block -y

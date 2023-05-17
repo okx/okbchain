@@ -3,6 +3,7 @@ package mpt
 import (
 	"encoding/hex"
 	"fmt"
+	mpttype "github.com/okx/okbchain/libs/cosmos-sdk/store/mpt/types"
 	"io"
 	"sync"
 
@@ -82,12 +83,39 @@ func (ms *ImmutableMptStore) Delete(key []byte) {
 	panic("immutable store cannot delete")
 }
 
+func (ms *ImmutableMptStore) getStorageTrie(addr ethcmn.Address, stateRoot ethcmn.Hash) ethstate.Trie {
+	addrHash := mpttype.Keccak256HashWithSyncPool(addr[:])
+	var t ethstate.Trie
+	var err error
+	t, err = ms.db.OpenStorageTrie(addrHash, stateRoot)
+	if err != nil {
+		t, err = ms.db.OpenStorageTrie(addrHash, ethcmn.Hash{})
+		if err != nil {
+			panic("unexpected err")
+		}
+	}
+
+	return t
+}
+
 func (ms *ImmutableMptStore) Iterator(start, end []byte) types.Iterator {
-	return newMptIterator(ms.db.CopyTrie(ms.trie), start, end)
+	if IsStorageKey(start) {
+		addr, stateRoot, _ := decodeAddressStorageInfo(start)
+		t := ms.getStorageTrie(addr, stateRoot)
+
+		return newMptIterator(t, start, end, true)
+	}
+	return newMptIterator(ms.db.CopyTrie(ms.trie), start, end, true)
 }
 
 func (ms *ImmutableMptStore) ReverseIterator(start, end []byte) types.Iterator {
-	return newMptIterator(ms.db.CopyTrie(ms.trie), start, end)
+	if IsStorageKey(start) {
+		addr, stateRoot, _ := decodeAddressStorageInfo(start)
+		t := ms.getStorageTrie(addr, stateRoot)
+
+		return newMptIterator(t, start, end, false)
+	}
+	return newMptIterator(ms.db.CopyTrie(ms.trie), start, end, false)
 }
 
 func (ms *ImmutableMptStore) GetStoreType() types.StoreType {

@@ -32,6 +32,8 @@ import (
 
 const (
 	FlagTrieAccStoreCache = "trie.account-store-cache"
+
+	StorageRootLen = len(ethcmn.Hash{})
 )
 
 var (
@@ -306,11 +308,23 @@ func (ms *MptStore) Delete(key []byte) {
 }
 
 func (ms *MptStore) Iterator(start, end []byte) types.Iterator {
-	return newMptIterator(ms.db.CopyTrie(ms.trie), start, end)
+	if IsStorageKey(start) {
+		addr, stateRoot, _ := decodeAddressStorageInfo(start)
+		t := ms.tryGetStorageTrie(addr, stateRoot, false)
+
+		return newMptIterator(t, start, end, true)
+	}
+	return newMptIterator(ms.db.CopyTrie(ms.trie), start, end, true)
 }
 
 func (ms *MptStore) ReverseIterator(start, end []byte) types.Iterator {
-	return newMptIterator(ms.db.CopyTrie(ms.trie), start, end)
+	if IsStorageKey(start) {
+		addr, stateRoot, _ := decodeAddressStorageInfo(start)
+		t := ms.tryGetStorageTrie(addr, stateRoot, false)
+
+		return newMptIterator(t, start, end, false)
+	}
+	return newMptIterator(ms.db.CopyTrie(ms.trie), start, end, false)
 }
 
 /*
@@ -810,8 +824,11 @@ var (
 	prefixSizeInMpt      = 1
 	storageKeySize       = prefixSizeInMpt + len(ethcmn.Address{}) + len(ethcmn.Hash{}) + len(ethcmn.Hash{})
 	addrKeySize          = prefixSizeInMpt + sdk.AddrLen
-	wasmContractKeySize  = prefixSizeInMpt + sdk.WasmContractAddrLen
+	wasmContractKeySize  = prefixSizeInMpt + sdk.LongAddrLen
 	storageKeyPrefixSize = prefixSizeInMpt + len(ethcmn.Address{}) + len(ethcmn.Hash{})
+
+	minWasmStorageKeySize = prefixSizeInMpt + len(ethcmn.Address{}) + StorageRootLen
+	PrefixSizeInMpt       = prefixSizeInMpt
 )
 
 func AddressStoragePrefixMpt(address ethcmn.Address, stateRoot ethcmn.Hash) []byte {
@@ -849,10 +866,7 @@ func mptKeyType(key []byte) int {
 		}
 		return -1
 	case keyPrefixStorageMpt:
-		if len(key) == storageKeySize {
-			return storageType
-		}
-		return -1
+		return storageType
 	default:
 		return -1
 
@@ -865,4 +879,12 @@ func IsStoragePrefix(prefix []byte) bool {
 
 func GetAddressFromStoragePrefix(prefix []byte) ethcmn.Address {
 	return ethcmn.BytesToAddress(prefix[1:21])
+}
+
+// IsStorageKey used for wasm contract storage key.
+func IsStorageKey(key []byte) bool {
+	if key == nil {
+		return false
+	}
+	return key[0] == keyPrefixStorageMpt && len(key) >= minWasmStorageKeySize
 }
