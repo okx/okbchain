@@ -35,6 +35,7 @@ func (csdb *CommitStateDB) CommitMpt(prefetcher *mpt.TriePrefetcher) (ethcmn.Has
 			accProto := csdb.accountKeeper.GetAccount(csdb.ctx, obj.account.Address)
 			if ethermintAccount, ok := accProto.(*ethermint.EthAccount); ok {
 				ethermintAccount.StateRoot = obj.account.StateRoot
+				fmt.Println("fffffffff", ethermintAccount.EthAddress().String(), ethermintAccount.StateRoot.String())
 				csdb.accountKeeper.SetAccount(csdb.ctx, ethermintAccount)
 			}
 		}
