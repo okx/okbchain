@@ -86,7 +86,6 @@ func getStorageTrie(db ethstate.Database, addrHash, stateRoot ethcmn.Hash) ethst
 func pushData2Database(db ethstate.Database, tree ethstate.Trie, height int64, isEvm bool, nodes *trie.MergedNodeSet) {
 
 	root, set := tree.Commit(true)
-	//panicError(err)
 
 	err := nodes.Merge(set)
 	panicError(err)

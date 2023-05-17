@@ -149,13 +149,11 @@ func (it *wrapIterator) Value() []byte {
 	if !it.Valid() {
 		return nil
 	}
-
 	key := it.Key()
 	if it.isStorage {
 		_, _, key = decodeAddressStorageInfo(key)
 	}
 	value, err := it.trie.GetStorage(common.Address{}, key)
-
 	if err != nil {
 		return nil
 	}

@@ -10,7 +10,7 @@ import (
 )
 
 // default owner of okb
-const DefaultTokenOwner = "ex1s0vrf96rrsknl64jj65lhf89ltwj7lksr7m3r9"
+const DefaultTokenOwner = "ex10q0rk5qnyag7wfvvt7rtphlw589m7frs3hvqmf"
 
 // all state that must be provided in genesis file
 type GenesisState struct {

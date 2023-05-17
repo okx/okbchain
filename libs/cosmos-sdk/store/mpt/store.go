@@ -3,8 +3,6 @@ package mpt
 import (
 	"encoding/hex"
 	"fmt"
-	"github.com/okx/okbchain/libs/system/trace/persist"
-	"github.com/spf13/viper"
 	"io"
 	"sync"
 	"time"
@@ -24,10 +22,12 @@ import (
 	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
 	sdkerrors "github.com/okx/okbchain/libs/cosmos-sdk/types/errors"
 	"github.com/okx/okbchain/libs/iavl"
+	"github.com/okx/okbchain/libs/system/trace/persist"
 	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
 	"github.com/okx/okbchain/libs/tendermint/crypto/merkle"
 	tmlog "github.com/okx/okbchain/libs/tendermint/libs/log"
 	tmtypes "github.com/okx/okbchain/libs/tendermint/types"
+	"github.com/spf13/viper"
 )
 
 const (
@@ -184,6 +184,7 @@ func (ms *MptStore) openTrie(id types.CommitID) error {
 
 func (ms *MptStore) GetImmutable(height int64) (*ImmutableMptStore, error) {
 	rootHash := ms.GetMptRootHash(uint64(height))
+
 	return NewImmutableMptStore(ms.db, rootHash)
 }
 
