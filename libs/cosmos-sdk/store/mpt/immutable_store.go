@@ -87,9 +87,9 @@ func (ms *ImmutableMptStore) getStorageTrie(addr ethcmn.Address, stateRoot ethcm
 	addrHash := mpttype.Keccak256HashWithSyncPool(addr[:])
 	var t ethstate.Trie
 	var err error
-	t, err = ms.db.OpenStorageTrie(addrHash, stateRoot)
+	t, err = ms.db.OpenStorageTrie(ms.root, addrHash, stateRoot)
 	if err != nil {
-		t, err = ms.db.OpenStorageTrie(addrHash, ethcmn.Hash{})
+		t, err = ms.db.OpenStorageTrie(ms.root, addrHash, ethcmn.Hash{})
 		if err != nil {
 			panic("unexpected err")
 		}
