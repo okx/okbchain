@@ -650,10 +650,12 @@ func (rs *Store) CommitterCommitMap(inputDeltaMap *tmtypes.TreeDelta) (types.Com
 	fmt.Println("cccc-tt-3", time.Now().Sub(tt).Seconds())
 	persist.GetStatistics().Accumulate(trace.FlushMeta, tsFlushMeta)
 
-	return types.CommitID{
+	ans := types.CommitID{
 		Version: version,
 		Hash:    rs.lastCommitInfo.Hash(),
-	}, outputDeltaMap
+	}
+	fmt.Println("cccc-tt-4", time.Now().Sub(tt).Seconds())
+	return ans, outputDeltaMap
 }
 
 // pruneStores will batch delete a list of heights from each mounted sub-store.
