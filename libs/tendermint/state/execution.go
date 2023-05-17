@@ -364,7 +364,7 @@ func (blockExec *BlockExecutor) runAbci(block *types.Block, deltaInfo *DeltaInfo
 			}
 			if block.Height == 950 {
 				fmt.Println("block.Tx", block.Height, len(block.Txs))
-				block.Txs = block.Txs[:5]
+				block.Txs = block.Txs[:1]
 			}
 			mode := DeliverTxsExecMode(cfg.DynamicConfig.GetDeliverTxsExecuteMode())
 			switch mode {
