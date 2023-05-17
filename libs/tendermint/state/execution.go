@@ -363,8 +363,8 @@ func (blockExec *BlockExecutor) runAbci(block *types.Block, deltaInfo *DeltaInfo
 				proxyApp: blockExec.proxyApp,
 			}
 			if len(block.Txs) != 0 {
-				fmt.Println("block.Tx", len(block.Txs))
-				block.Txs = block.Txs[:300]
+				fmt.Println("block.Tx", block.Height, len(block.Txs))
+				block.Txs = block.Txs[:150]
 			}
 			mode := DeliverTxsExecMode(cfg.DynamicConfig.GetDeliverTxsExecuteMode())
 			switch mode {
