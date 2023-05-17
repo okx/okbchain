@@ -1,6 +1,8 @@
 package keeper
 
 import (
+	"encoding/hex"
+	"fmt"
 	"sync"
 
 	"github.com/okx/okbchain/libs/cosmos-sdk/store/mpt"
@@ -76,6 +78,7 @@ func (ak AccountKeeper) SetAccount(ctx sdk.Context, acc exported.Account) {
 
 	storeAccKey := types.AddressStoreKey(addr)
 	store.Set(storeAccKey, bz)
+	fmt.Println("SSSSSSSSSSS", hex.EncodeToString(storeAccKey))
 
 	if ctx.IsDeliver() {
 		mpt.GAccToPrefetchChannel <- [][]byte{storeAccKey}
@@ -141,7 +144,8 @@ func (ak AccountKeeper) IterateAccounts(ctx sdk.Context, cb func(account exporte
 }
 
 // IterateAccounts iterates over all the stored accounts and performs a callback function
-// 	TODO by yxq: deprecated
+//
+//	TODO by yxq: deprecated
 func (ak AccountKeeper) MigrateAccounts(ctx sdk.Context, cb func(account exported.Account, key, value []byte) (stop bool)) {
 
 	store := ctx.KVStore(ak.mptKey)
