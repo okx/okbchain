@@ -3,8 +3,8 @@ package types
 import (
 	"bytes"
 	"fmt"
-
 	"github.com/okx/okbchain/libs/cosmos-sdk/store/mpt"
+	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
 
 	ethcmn "github.com/ethereum/go-ethereum/common"
 	ethstate "github.com/ethereum/go-ethereum/core/state"
@@ -52,12 +52,14 @@ func (so *stateObject) GetCommittedStateMpt(db ethstate.Database, key ethcmn.Has
 
 	var (
 		enc   []byte
+		err   error
 		value ethcmn.Hash
 	)
 
-	ctx := &so.stateDB.ctx
-	store := so.stateDB.dbAdapter.NewStore(ctx.KVStore(so.stateDB.storeKey), mpt.AddressStoragePrefixMpt(so.address, so.account.StateRoot))
-	enc = store.Get(key.Bytes())
+	if enc, err = so.getTrie(db).TryGet(key.Bytes()); err != nil {
+		so.setError(err)
+		return ethcmn.Hash{}
+	}
 
 	if len(enc) > 0 {
 		_, content, _, err := rlp.Split(enc)
@@ -122,34 +124,32 @@ func (so *stateObject) getTrie(db ethstate.Database) ethstate.Trie {
 // UpdateRoot sets the trie root to the current root hash of
 func (so *stateObject) updateRoot(db ethstate.Database) {
 	// If nothing changed, don't bother with hashing anything
-	so.updateTrie(db)
+	if trie := so.updateTrie(db); trie != nil {
+		//so.account.StateRoot = trie.Hash()
+	}
 }
 
 // updateTrie writes cached storage modifications into the object's storage trie.
 // It will return nil if the trie has not been loaded and no changes have been made
-func (so *stateObject) updateTrie(db ethstate.Database) (updated bool) {
+func (so *stateObject) updateTrie(db ethstate.Database) ethstate.Trie {
 	// Make sure all dirty slots are finalized into the pending storage area
 	so.finalise(false) // Don't prefetch any more, pull directly if need be
-	updated = false
 	if len(so.pendingStorage) == 0 {
-		return
+		return so.trie
 	}
 
-	// Insert all the pending updates into the trie
-	ctx := &so.stateDB.ctx
-	store := so.stateDB.dbAdapter.NewStore(ctx.KVStore(so.stateDB.storeKey), mpt.AddressStoragePrefixMpt(so.address, so.account.StateRoot))
+	tr := so.getTrie(db)
 	// usedStorage := make([][]byte, 0, len(so.pendingStorage))
 	for key, value := range so.pendingStorage {
 		// Skip noop changes, persist actual changes
 		if value == so.originStorage[key] {
 			continue
 		}
-		updated = true
 		so.originStorage[key] = value
 		copyKey := ethcmn.CopyBytes(key[:])
 		// usedStorage = append(usedStorage) // Copy needed for closure
 		if (value == ethcmn.Hash{}) {
-			store.Delete(key[:])
+			tr.TryDelete(key[:])
 			if !so.stateDB.ctx.IsCheckTx() {
 				if so.stateDB.ctx.GetWatcher().Enabled() {
 					so.stateDB.ctx.GetWatcher().SaveState(so.Address(), copyKey, ethcmn.Hash{}.Bytes())
@@ -158,7 +158,7 @@ func (so *stateObject) updateTrie(db ethstate.Database) (updated bool) {
 		} else {
 			// Encoding []byte cannot fail, ok to ignore the error.
 			v, _ := rlp.EncodeToBytes(ethcmn.TrimLeftZeroes(value[:]))
-			store.Set(key[:], v)
+			tr.TryUpdate(key[:], v)
 			if !so.stateDB.ctx.IsCheckTx() {
 				if so.stateDB.ctx.GetWatcher().Enabled() {
 					so.stateDB.ctx.GetWatcher().SaveState(so.Address(), copyKey, v)
@@ -174,14 +174,14 @@ func (so *stateObject) updateTrie(db ethstate.Database) (updated bool) {
 		delete(so.pendingStorage, key)
 	}
 
-	return
+	return tr
 }
 
 // CommitTrie the storage trie of the object to db.
 // This updates the trie root.
 func (so *stateObject) CommitTrie(db ethstate.Database) error {
 	// If nothing changed, don't bother with hashing anything
-	if updated := so.updateTrie(db); !updated {
+	if updated := so.updateTrie(db); updated == nil {
 		return nil
 	}
 
@@ -189,7 +189,18 @@ func (so *stateObject) CommitTrie(db ethstate.Database) error {
 		return so.dbErr
 	}
 
-	return nil
+	root, set, err := so.trie.Commit(false)
+	if err != nil {
+	}
+	if set != nil {
+		if err := sdk.BB.Merge(set); err != nil {
+			panic("fail to commit trie data(storage nodeSets merge): " + err.Error())
+		}
+	}
+	if err == nil {
+		so.account.StateRoot = root
+	}
+	return err
 }
 
 // finalise moves all dirty storage slots into the pending area to be hashed or

@@ -17,6 +17,7 @@ func NewHandler(k *Keeper) sdk.Handler {
 		ctx.SetEventManager(sdk.NewEventManager())
 
 		if ctx.IsDeliver() {
+			k.EvmStateDb.WithContext(ctx).MarkUpdatedAcc(k.UpdatedAccount)
 			k.UpdatedAccount = k.UpdatedAccount[:0]
 		}
 

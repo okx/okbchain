@@ -2,6 +2,7 @@ package types
 
 import (
 	"context"
+	"github.com/ethereum/go-ethereum/trie"
 	"sync"
 	"time"
 
@@ -22,6 +23,10 @@ It contains a context.Context object inside if you want to use that,
 but please do not over-use it. We try to keep all data structured
 and standard additions here would be better just to add to the Context struct
 */
+var (
+	BB = trie.NewMergedNodeSet()
+)
+
 type Context struct {
 	ctx                context.Context
 	ms                 MultiStore

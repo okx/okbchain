@@ -141,7 +141,8 @@ func (ak AccountKeeper) IterateAccounts(ctx sdk.Context, cb func(account exporte
 }
 
 // IterateAccounts iterates over all the stored accounts and performs a callback function
-// 	TODO by yxq: deprecated
+//
+//	TODO by yxq: deprecated
 func (ak AccountKeeper) MigrateAccounts(ctx sdk.Context, cb func(account exported.Account, key, value []byte) (stop bool)) {
 
 	store := ctx.KVStore(ak.mptKey)
