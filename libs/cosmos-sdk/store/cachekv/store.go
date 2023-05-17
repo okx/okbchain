@@ -7,7 +7,6 @@ import (
 	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
 	"io"
 	"reflect"
-	"runtime/debug"
 	"sort"
 	"sync"
 	"unsafe"
@@ -375,7 +374,7 @@ func (store *Store) dirtyItems(start, end []byte) {
 func (store *Store) setCacheValue(key, value []byte, deleted bool, dirty bool) {
 	if dirty && hex.EncodeToString(key) == "01beee8e798ee7e0ff7bf08d7189b8637f6846ea54" {
 		fmt.Println("value000", sdk.TxIndex, hex.EncodeToString(value))
-		debug.PrintStack()
+		//debug.PrintStack()
 	}
 	keyStr := string(key)
 	if !dirty {
