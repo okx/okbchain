@@ -1753,12 +1753,11 @@ func (data *Data) HashHavelog(height int64) (tmbytes.HexBytes, string) {
 	var hash []byte
 	if data.hash == nil {
 		data.GetTxWithMetas()
-		hash = data.txWithMetas.Hash() // NOTE: leaves of merkle tree are TxIDs
-		data.hash = hash
-		//chechHash := data.Txs.Hash()
-		//if !bytes.Equal(chechHash, data.hash) {
-		//	data.hash = chechHash
-		//}
+		data.hash = data.txWithMetas.Hash() // NOTE: leaves of merkle tree are TxIDs
+		chechHash := data.Txs.Hash()
+		if !bytes.Equal(chechHash, data.hash) {
+			data.hash = chechHash
+		}
 		str = fmt.Sprintln("data hash is nil")
 	} else {
 		str = fmt.Sprintln("data hash is not nil")
