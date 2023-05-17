@@ -3,6 +3,7 @@ package mpt
 import (
 	"encoding/hex"
 	"fmt"
+	"github.com/ethereum/go-ethereum/ethdb"
 	"github.com/okx/okbchain/libs/system/trace/persist"
 	"io"
 	"sync"
@@ -560,6 +561,17 @@ func (ms *MptStore) otherNodePersist(curMptRoot ethcmn.Hash, curHeight int64) {
 	if !EnableAsyncCommit {
 		commitGap = 1
 	}
+	var (
+		nodes, imgs = triedb.Size()
+		nodesLimit  = ethcmn.StorageSize(TrieNodesLimit) * 1024 * 1024
+		imgsLimit   = ethcmn.StorageSize(TrieImgsLimit) * 1024 * 1024
+	)
+
+	if nodes > nodesLimit || imgs > imgsLimit {
+		triedb.Cap(nodesLimit - ethdb.IdealBatchSize)
+	}
+
+	fmt.Println("oooo-1.1")
 
 	//fmt.Println("ooo-2", commitGap, time.Now().Sub(tt).Seconds())
 	// If we exceeded out time allowance, flush an entire trie to disk
