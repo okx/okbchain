@@ -213,7 +213,8 @@ func (b *Block) ValidateBasic() error {
 		bmsg += fmt.Sprintf("Data.Txs %d is not equal Data.txWithMetas %d ", len(b.Data.Txs), len(b.Data.txWithMetas))
 	}
 	// NOTE: b.Data.Txs may be nil, but b.Data.Hash() still works fine.
-	if !bytes.Equal(b.DataHash, b.Data.Hash(b.Height)) {
+	chash, restr := b.Data.HashHavelog(b.Height)
+	if !bytes.Equal(b.DataHash, chash) {
 		msg := ""
 		if len(b.Data.Txs) == len(b.Data.txWithMetas) {
 			for i := 0; i < len(b.Data.Txs); i++ {
@@ -229,7 +230,7 @@ func (b *Block) ValidateBasic() error {
 		}
 
 		return fmt.Errorf(
-			"wrong Header.DataHash. height %d, Expected %v, got %v,  original %v, txWithMetas cacl %v, direct hash %v, ProposerAddress %s, bDataHash %s, msg %s, bmsg %s",
+			"wrong Header.DataHash. height %d, Expected %v, got %v,  original %v, txWithMetas cacl %v, direct hash %v, ProposerAddress %s, bDataHash %s, msg %s, bmsg %s, inside %s",
 			b.Height,
 			b.Data.Hash(b.Height),
 			b.DataHash,
@@ -240,6 +241,7 @@ func (b *Block) ValidateBasic() error {
 			bDataHash,
 			msg,
 			bmsg,
+			restr,
 		)
 	}
 
@@ -1741,6 +1743,22 @@ func (data *Data) Hash(height int64) tmbytes.HexBytes {
 
 func (data *Data) GetHash() tmbytes.HexBytes {
 	return data.hash
+}
+
+func (data *Data) HashHavelog(height int64) (tmbytes.HexBytes, string) {
+	if data == nil {
+		return (Txs{}).Hash(), "data is nil"
+	}
+	str := ""
+	if data.hash == nil {
+		data.GetTxWithMetas()
+		data.hash = data.txWithMetas.Hash() // NOTE: leaves of merkle tree are TxIDs
+		str = fmt.Sprintln("data hash is nil")
+	} else {
+		str = fmt.Sprintln("data hash is not nil")
+	}
+	return data.hash, fmt.Sprintln(str, "data hash", ethcommon.Bytes2Hex(data.hash), "txs len", len(data.Txs), "txw", len(data.txWithMetas),
+		"txsw cacl", ethcommon.Bytes2Hex(data.txWithMetas.Hash()), "txs cacl", ethcommon.Bytes2Hex(data.Txs.Hash()))
 }
 
 // StringIndented returns a string representation of the transactions
