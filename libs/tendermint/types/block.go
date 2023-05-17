@@ -211,7 +211,7 @@ func (b *Block) ValidateBasic() error {
 				}
 			}
 		} else {
-			msg += "Data.Txs is not equal Data.txWithMetas"
+			msg += fmt.Sprintf("Data.Txs %d is not equal Data.txWithMetas %d ", len(b.Data.Txs), len(b.Data.txWithMetas))
 		}
 
 		return fmt.Errorf(
