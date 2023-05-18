@@ -5,6 +5,7 @@ package types
 import (
 	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
 	authexported "github.com/okx/okbchain/libs/cosmos-sdk/x/auth/exported"
+	"github.com/okx/okbchain/x/common"
 	"github.com/okx/okbchain/x/params"
 	stakingexported "github.com/okx/okbchain/x/staking/exported"
 )
@@ -46,6 +47,8 @@ type StakingKeeper interface {
 
 	//Append abandoned validator to staking keeper
 	AppendAbandonedValidatorAddrs(ctx sdk.Context, ConsAddr sdk.ConsAddress)
+
+	ParamsConsensusType(ctx sdk.Context) (consensusType common.ConsensusType)
 }
 
 // StakingHooks event hooks for staking validator object (noalias)
