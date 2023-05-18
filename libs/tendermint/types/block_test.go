@@ -84,8 +84,7 @@ func TestBlockValidateBasic(t *testing.T) {
 		{"Tampered Data", func(blk *Block) {
 			blk.Data.Txs[0] = Tx("something else")
 			blk.Data.txWithMetas[0].Tx = blk.Data.Txs[0] // need update TxWithMetas
-			blk.Data.txWithMetas[0].TxHash = nil
-			blk.Data.hash = nil // clear hash or change wont be noticed
+			blk.Data.hash = nil                          // clear hash or change wont be noticed
 		}, true},
 		{"Tampered DataHash", func(blk *Block) {
 			blk.DataHash = tmrand.Bytes(len(blk.DataHash))

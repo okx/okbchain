@@ -700,7 +700,7 @@ type RequestCheckTx struct {
 	Type                 CheckTxType `protobuf:"varint,2,opt,name=type,proto3,enum=tendermint.abci.types.CheckTxType" json:"type,omitempty"`
 	From                 string      `protobuf:"bytes,1,opt,name=from,proto3" json:"from,omitempty"`
 	Nonce                uint64      `protobuf:"uint64,1,opt,name=nonce,proto3" json:"nonce,omitempty"`
-	TxHash               []byte      `protobuf:"bytes,1,opt,name=txHash,proto3" json:"txHash,omitempty"`
+	TxType               int32       `protobuf:"bytes,1,opt,name=txtype,proto3" json:"txtype,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}    `json:"-"`
 	XXX_unrecognized     []byte      `json:"-"`
 	XXX_sizecache        int32       `json:"-"`
@@ -767,16 +767,16 @@ func (m *RequestCheckTx) GetNonce() uint64 {
 	return 0
 }
 
-func (m *RequestCheckTx) GetTxHash() []byte {
+func (m *RequestCheckTx) GetTxType() int32 {
 	if m != nil {
-		return m.TxHash
+		return m.TxType
 	}
-	return nil
+	return 0
 }
 
 type RequestDeliverTx struct {
 	Tx                   []byte   `protobuf:"bytes,1,opt,name=tx,proto3" json:"tx,omitempty"`
-	Txhash               []byte   `protobuf:"bytes,1,opt,name=txhash,proto3" json:"txhash,omitempty"`
+	TxType               int32    `protobuf:"bytes,1,opt,name=txtype,proto3" json:"txtype,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -822,11 +822,11 @@ func (m *RequestDeliverTx) GetTx() []byte {
 	return nil
 }
 
-func (m *RequestDeliverTx) GetTxHash() []byte {
+func (m *RequestDeliverTx) GetTxType() int32 {
 	if m != nil {
-		return m.Txhash
+		return m.TxType
 	}
-	return nil
+	return 0
 }
 
 type RequestEndBlock struct {

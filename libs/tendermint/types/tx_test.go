@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"math"
+	"sync"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -268,4 +269,20 @@ func TestTxsToTxWithMetas(t *testing.T) {
 		assert.Equal(t, txs[i].Hash(), retxs[i].Hash())
 	}
 	fmt.Println(len(retxs))
+}
+
+func TestTxWithMeta(t *testing.T) {
+	txs := makeTxs(1000, randInt(16, 128))
+	retxs := TxsToTxWithMetas(txs)
+	var sy sync.WaitGroup
+	sy.Add(100)
+	for i := 0; i < 100; i++ {
+		go func() {
+			sy.Done()
+			for i := 0; i < len(retxs); i++ {
+				assert.Equal(t, retxs[i].Hash(), txs[i].Hash())
+			}
+		}()
+	}
+	sy.Wait()
 }

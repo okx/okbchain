@@ -2,14 +2,20 @@ package types
 
 import (
 	"bytes"
-	ethcommon "github.com/ethereum/go-ethereum/common"
 	"github.com/okx/okbchain/libs/tendermint/crypto/merkle"
+	"sync/atomic"
+)
+
+const (
+	unknowTy = iota // unknow TX type
+	ethTy           // eth tx
+	cmTy            // cosmos tx type
 )
 
 // TxWithMeta contains tx hash
 type TxWithMeta struct {
 	Tx
-	TxHash []byte
+	TxType int32
 }
 
 func NewTxWithMeta(tx Tx) *TxWithMeta {
@@ -17,14 +23,20 @@ func NewTxWithMeta(tx Tx) *TxWithMeta {
 }
 
 func (tx *TxWithMeta) Hash() []byte {
-	if len(tx.TxHash) == 0 {
-		tx.TxHash = tx.Tx.Hash()
+	val := atomic.LoadInt32(&tx.TxType)
+	hash, ty := tx.HashWithTxType(val)
+	if val == unknowTy {
+		atomic.StoreInt32(&tx.TxType, ty)
 	}
-	return ethcommon.CopyBytes(tx.TxHash)
+	return hash
 }
 
 func (tx *TxWithMeta) GetTx() []byte {
 	return tx.Tx
+}
+
+func (tx *TxWithMeta) GetTxType() int32 {
+	return tx.TxType
 }
 
 type TxWithMetas []*TxWithMeta

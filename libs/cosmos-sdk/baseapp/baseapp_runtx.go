@@ -293,11 +293,12 @@ func (app *BaseApp) DeliverTx(req abci.RequestDeliverTx) abci.ResponseDeliverTx 
 
 	var realTx sdk.Tx
 	var err error
+	txm := ttypes.TxWithMeta{req.GetTx(), req.GetTxType()}
 	if mem := GetGlobalMempool(); mem != nil {
-		realTx, _ = mem.ReapEssentialTx(&ttypes.TxWithMeta{req.GetTx(), req.GetTxHash()}).(sdk.Tx)
+		realTx, _ = mem.ReapEssentialTx(&txm).(sdk.Tx)
 	}
 	if realTx == nil {
-		realTx, err = app.txDecoderWithHash(req.Tx, req.Txhash)
+		realTx, err = app.txDecoderWithHash(req.Tx, txm.Hash())
 		if err != nil {
 			return sdkerrors.ResponseDeliverTx(err, 0, 0, app.trace)
 		}

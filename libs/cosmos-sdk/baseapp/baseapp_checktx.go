@@ -3,6 +3,7 @@ package baseapp
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/okx/okbchain/libs/tendermint/types"
 	"sync/atomic"
 
 	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
@@ -18,7 +19,8 @@ import (
 // will contain releveant error information. Regardless of tx execution outcome,
 // the ResponseCheckTx will contain relevant gas execution context.
 func (app *BaseApp) CheckTx(req abci.RequestCheckTx) abci.ResponseCheckTx {
-	tx, err := app.txDecoderWithHash(req.Tx, req.TxHash, global.GetGlobalHeight())
+	txhash, _ := types.Tx(req.Tx).HashWithTxType(req.TxType)
+	tx, err := app.txDecoderWithHash(req.Tx, txhash, global.GetGlobalHeight())
 	if err != nil {
 		return sdkerrors.ResponseCheckTx(err, 0, 0, app.trace)
 	}

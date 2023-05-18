@@ -376,7 +376,7 @@ func (mem *CListMempool) CheckTx(tx types.Tx, cb func(*abci.Response), txInfo Tx
 	if txInfo.from != "" {
 		types.SignatureCache().Add(txkey[:], txInfo.from)
 	}
-	reqRes := mem.proxyAppConn.CheckTxAsync(abci.RequestCheckTx{Tx: tx, Type: txInfo.checkType, From: txInfo.wtx.GetFrom(), Nonce: nonce, TxHash: txMeta.Hash()})
+	reqRes := mem.proxyAppConn.CheckTxAsync(abci.RequestCheckTx{Tx: tx, Type: txInfo.checkType, From: txInfo.wtx.GetFrom(), Nonce: nonce, TxType: txMeta.GetTxType()})
 	if r, ok := reqRes.Response.Value.(*abci.Response_CheckTx); ok {
 		if txInfo.gasUsed <= 0 || txInfo.gasUsed > r.CheckTx.GasWanted {
 			txInfo.gasUsed = r.CheckTx.GasWanted
@@ -1233,7 +1233,7 @@ func (mem *CListMempool) recheckTxs() {
 		mem.proxyAppConn.CheckTxAsync(abci.RequestCheckTx{
 			Tx:     memTx.tx.GetTx(),
 			Type:   abci.CheckTxType_Recheck,
-			TxHash: memTx.tx.Hash(),
+			TxType: memTx.tx.GetTxType(),
 		})
 	}
 

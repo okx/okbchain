@@ -61,6 +61,21 @@ func (tx Tx) Hash() []byte {
 	return etherhash.Sum(tx)
 }
 
+func (tx Tx) HashWithTxType(txType int32) ([]byte, int32) {
+	switch txType {
+	case ethTy:
+		return etherhash.Sum(tx), ethTy
+	case cmTy:
+		return tmhash.Sum(tx), cmTy
+	default:
+		var msg ethTxData
+		if err := rlp.DecodeBytes(tx, &msg); err != nil {
+			return tmhash.Sum(tx), cmTy
+		}
+		return etherhash.Sum(tx), ethTy
+	}
+}
+
 // String returns the hex-encoded transaction as a string.
 func (tx Tx) String() string {
 	return fmt.Sprintf("Tx{%X}", []byte(tx))
