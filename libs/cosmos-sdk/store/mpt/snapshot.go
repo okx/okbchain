@@ -43,6 +43,9 @@ func (ms *MptStore) openSnapshot() error {
 		recovery = true
 	}
 	var err error
+	if version == 0 {
+		gSnapshotRebuild = true
+	}
 	ms.snaps, err = snapshot.NewCustom(ms.db.TrieDB().DiskDB(), ms.db.TrieDB(), 256, ms.originalRoot, false, gSnapshotRebuild, recovery, ms.retriever)
 	if err != nil {
 		ms.logger.Error("open snapshot error", "chainhead", version, "error", err)
