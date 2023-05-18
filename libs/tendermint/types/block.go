@@ -1769,7 +1769,10 @@ func (data *Data) HashHavelog(height int64) (tmbytes.HexBytes, string) {
 	if data.hash == nil {
 		data.GetTxWithMetas()
 
+		data.mtx.Lock()
 		whah, whahs := data.txWithMetas.HashHaveLog()
+		data.mtx.Unlock()
+
 		hah, hahs := data.Txs.HashHaveLog()
 		if !bytes.Equal(whah, hah) {
 			for i := 0; i < len(whahs); i++ {
