@@ -1,0 +1,13 @@
+{
+  "title": "upgrade wasm",
+  "description": "Update to using wasm",
+  "deposit": [
+    {
+      "denom": "okb",
+      "amount": "10000"
+    }
+  ],
+  "name": "earth",
+  "expectHeight": "10",
+  "config": ""
+}

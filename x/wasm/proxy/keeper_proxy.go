@@ -18,7 +18,6 @@ import (
 	"github.com/okx/okbchain/libs/tendermint/global"
 	distr "github.com/okx/okbchain/x/distribution"
 	"github.com/okx/okbchain/x/gov"
-	ptypes "github.com/okx/okbchain/x/params/types"
 	"github.com/okx/okbchain/x/staking"
 	token "github.com/okx/okbchain/x/token/types"
 	"github.com/okx/okbchain/x/wasm/types"
@@ -128,7 +127,7 @@ func NewBankKeeperProxy(akp AccountKeeperProxy) BankKeeperProxy {
 }
 
 func (b BankKeeperProxy) GetAllBalances(ctx sdk.Context, addr sdk.AccAddress) sdk.Coins {
-	acc, err := watcher.GetAccount(addr)
+	acc, err := watcher.GetAccount(sdk.AccToAWasmddress(addr))
 	if err == nil {
 		return acc.GetCoins()
 	}
@@ -235,7 +234,3 @@ type PortKeeperProxy struct{}
 func (p PortKeeperProxy) BindPort(ctx sdk.Context, portID string) *capabilitytypes.Capability {
 	return nil
 }
-
-type ParamsKeeperProxy struct{}
-
-func (p ParamsKeeperProxy) ClaimReadyForUpgrade(name string, cb func(ptypes.UpgradeInfo)) {}
