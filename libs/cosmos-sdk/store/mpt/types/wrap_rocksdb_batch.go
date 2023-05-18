@@ -30,7 +30,7 @@ func (wrb *WrapRocksDBBatch) Put(key []byte, value []byte) error {
 		key:   key,
 		value: nonNilBytes(value),
 	})
-	wrb.size += (len(value) + len(key))
+	wrb.size += len(value)
 	return nil
 }
 
@@ -78,7 +78,6 @@ func (wrb *WrapRocksDBBatch) Replay(w ethdb.KeyValueWriter) error {
 
 func (wrb *WrapRocksDBBatch) Reset() {
 	wrb.records = wrb.records[:0]
-	wrb.size = 0
 }
 
 func nonNilBytes(bz []byte) []byte {
