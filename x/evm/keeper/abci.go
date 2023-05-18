@@ -128,9 +128,8 @@ func (k *Keeper) EndBlock(ctx sdk.Context, req abci.RequestEndBlock) []abci.Vali
 			params := k.GetParams(ctx)
 			k.Watcher.SaveParams(params)
 
-			k.Watcher.SaveBlock(block, ethBlockHash)
-
-			k.Watcher.SaveBlockStdTxHash(ethBlockHash)
+			k.Watcher.SaveBlock(block)
+			k.Watcher.SaveBlockStdTxHash()
 		}
 	}
 

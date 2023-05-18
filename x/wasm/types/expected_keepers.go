@@ -12,7 +12,6 @@ import (
 	connectiontypes "github.com/okx/okbchain/libs/ibc-go/modules/core/03-connection/types"
 	channeltypes "github.com/okx/okbchain/libs/ibc-go/modules/core/04-channel/types"
 	ibcexported "github.com/okx/okbchain/libs/ibc-go/modules/core/exported"
-	ptypes "github.com/okx/okbchain/x/params/types"
 )
 
 // BankViewKeeper defines a subset of methods implemented by the cosmos-sdk bank keeper
@@ -110,8 +109,4 @@ type Subspace interface {
 
 type DBAdapter interface {
 	NewStore(gasMeter sdk.GasMeter, parent sdk.KVStore, prefix []byte) sdk.KVStore
-}
-
-type ParamsKeeper interface {
-	ClaimReadyForUpgrade(name string, cb func(ptypes.UpgradeInfo))
 }

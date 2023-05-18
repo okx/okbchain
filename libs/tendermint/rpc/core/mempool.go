@@ -22,12 +22,13 @@ import (
 // CheckTx nor DeliverTx results.
 // More: https://docs.tendermint.com/master/rpc/#/Tx/broadcast_tx_async
 func BroadcastTxAsync(ctx *rpctypes.Context, tx types.Tx) (*ctypes.ResultBroadcastTx, error) {
+	rtx := mempl.GetRealTxFromWrapCMTx(tx)
 	err := env.Mempool.CheckTx(tx, nil, mempl.TxInfo{})
 
 	if err != nil {
 		return nil, err
 	}
-	return &ctypes.ResultBroadcastTx{Hash: tx.Hash()}, nil
+	return &ctypes.ResultBroadcastTx{Hash: rtx.Hash()}, nil
 }
 
 // BroadcastTxSync returns with the response from CheckTx. Does not wait for
@@ -35,6 +36,7 @@ func BroadcastTxAsync(ctx *rpctypes.Context, tx types.Tx) (*ctypes.ResultBroadca
 // More: https://docs.tendermint.com/master/rpc/#/Tx/broadcast_tx_sync
 func BroadcastTxSync(ctx *rpctypes.Context, tx types.Tx) (*ctypes.ResultBroadcastTx, error) {
 	resCh := make(chan *abci.Response, 1)
+	rtx := mempl.GetRealTxFromWrapCMTx(tx)
 	err := env.Mempool.CheckTx(tx, func(res *abci.Response) {
 		resCh <- res
 	}, mempl.TxInfo{})
@@ -50,7 +52,7 @@ func BroadcastTxSync(ctx *rpctypes.Context, tx types.Tx) (*ctypes.ResultBroadcas
 		Data:      r.Data,
 		Log:       r.Log,
 		Codespace: r.Codespace,
-		Hash:      tx.Hash(),
+		Hash:      rtx.Hash(),
 	}, nil
 }
 
@@ -68,7 +70,8 @@ func BroadcastTxCommit(ctx *rpctypes.Context, tx types.Tx) (*ctypes.ResultBroadc
 	// Subscribe to tx being committed in block.
 	subCtx, cancel := context.WithTimeout(ctx.Context(), SubscribeTimeout)
 	defer cancel()
-	q := types.EventQueryTxFor(tx)
+	rtx := mempl.GetRealTxFromWrapCMTx(tx)
+	q := types.EventQueryTxFor(rtx)
 	deliverTxSub, err := env.EventBus.Subscribe(subCtx, subscriber, q)
 	if err != nil {
 		err = fmt.Errorf("failed to subscribe to tx: %w", err)
@@ -92,7 +95,7 @@ func BroadcastTxCommit(ctx *rpctypes.Context, tx types.Tx) (*ctypes.ResultBroadc
 		return &ctypes.ResultBroadcastTxCommit{
 			CheckTx:   *checkTxRes,
 			DeliverTx: abci.ResponseDeliverTx{},
-			Hash:      tx.Hash(),
+			Hash:      rtx.Hash(),
 		}, nil
 	}
 
@@ -103,7 +106,7 @@ func BroadcastTxCommit(ctx *rpctypes.Context, tx types.Tx) (*ctypes.ResultBroadc
 		return &ctypes.ResultBroadcastTxCommit{
 			CheckTx:   *checkTxRes,
 			DeliverTx: deliverTxRes.Result,
-			Hash:      tx.Hash(),
+			Hash:      rtx.Hash(),
 			Height:    deliverTxRes.Height,
 		}, nil
 	case <-deliverTxSub.Cancelled():
@@ -118,7 +121,7 @@ func BroadcastTxCommit(ctx *rpctypes.Context, tx types.Tx) (*ctypes.ResultBroadc
 		return &ctypes.ResultBroadcastTxCommit{
 			CheckTx:   *checkTxRes,
 			DeliverTx: abci.ResponseDeliverTx{},
-			Hash:      tx.Hash(),
+			Hash:      rtx.Hash(),
 		}, err
 	case <-time.After(env.Config.TimeoutBroadcastTxCommit):
 		err = errors.New("timed out waiting for tx to be included in a block")
@@ -126,7 +129,7 @@ func BroadcastTxCommit(ctx *rpctypes.Context, tx types.Tx) (*ctypes.ResultBroadc
 		return &ctypes.ResultBroadcastTxCommit{
 			CheckTx:   *checkTxRes,
 			DeliverTx: abci.ResponseDeliverTx{},
-			Hash:      tx.Hash(),
+			Hash:      rtx.Hash(),
 		}, err
 	}
 }
