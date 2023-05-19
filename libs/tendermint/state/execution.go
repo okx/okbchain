@@ -517,14 +517,15 @@ func execBlockOnProxyApp(context *executionTask) (*ABCIResponses, error) {
 	realTxCh := make(chan abci.TxEssentials, len(block.Txs))
 	stopedCh := make(chan struct{}, 1)
 
-	go preDeliverRoutine(proxyAppConn, block.GetTxWithMetas(), realTxCh, stopedCh)
+	txm := block.GetTxWithMetas()
+	go preDeliverRoutine(proxyAppConn, txm, realTxCh, stopedCh)
 
 	count := 0
 	for realTx := range realTxCh {
 		if realTx != nil {
 			proxyAppConn.DeliverRealTxAsync(realTx)
 		} else {
-			proxyAppConn.DeliverTxAsync(abci.RequestDeliverTx{Tx: block.Txs[count]})
+			proxyAppConn.DeliverTxAsync(abci.RequestDeliverTx{Tx: txm[count].GetTx(), Txhash: txm[count].Hash()})
 		}
 
 		if err = proxyAppConn.Error(); err != nil {
