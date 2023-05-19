@@ -6,6 +6,10 @@ import (
 	"encoding/base64"
 	"errors"
 	"fmt"
+	chain "github.com/okx/okbchain/app/types"
+	"github.com/okx/okbchain/libs/cosmos-sdk/store/mpt"
+	"github.com/okx/okbchain/libs/cosmos-sdk/x/auth"
+	authtypes "github.com/okx/okbchain/libs/cosmos-sdk/x/auth/types"
 	"io/ioutil"
 	"math/rand"
 	"os"
@@ -16,7 +20,6 @@ import (
 	"github.com/okx/okbchain/libs/cosmos-sdk/store"
 	"github.com/okx/okbchain/libs/cosmos-sdk/store/prefix"
 	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	authkeeper "github.com/okx/okbchain/libs/cosmos-sdk/x/auth/keeper"
 	paramskeeper "github.com/okx/okbchain/libs/cosmos-sdk/x/params"
 	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
 	"github.com/okx/okbchain/libs/tendermint/libs/log"
@@ -43,6 +46,8 @@ func TestGenesisExportImport(t *testing.T) {
 
 	wasmKeeper.SetParams(srcCtx, types.DefaultParams())
 
+	accounts := make([]sdk.WasmAddress, 0)
+
 	for i := 0; i < 25; i++ {
 		var (
 			codeInfo          types.CodeInfo
@@ -59,7 +64,7 @@ func TestGenesisExportImport(t *testing.T) {
 		f.Fuzz(&pinned)
 		f.Fuzz(&contractExtension)
 
-		creatorAddr, err := sdk.AccAddressFromBech32(codeInfo.Creator)
+		creatorAddr, err := sdk.WasmAddressFromBech32(codeInfo.Creator)
 		require.NoError(t, err)
 		codeID, err := contractKeeper.Create(srcCtx, creatorAddr, wasmCode, &codeInfo.InstantiateConfig)
 		require.NoError(t, err)
@@ -79,8 +84,15 @@ func TestGenesisExportImport(t *testing.T) {
 		contractAddr := wasmKeeper.generateContractAddress(srcCtx, codeID)
 		wasmKeeper.storeContractInfo(srcCtx, contractAddr, &contract)
 		wasmKeeper.appendToContractHistory(srcCtx, contractAddr, history...)
+
+		accounts = append(accounts, contractAddr)
+
+		contractAccount := wasmKeeper.accountKeeper.NewAccountWithAddress(srcCtx, sdk.WasmToAccAddress(contractAddr))
+		wasmKeeper.accountKeeper.SetAccount(srcCtx, contractAccount)
 		wasmKeeper.importContractState(srcCtx, contractAddr, stateModels)
 	}
+	srcCtx.MultiStore().GetKVStore(srcStoreKeys[2]).(*mpt.MptStore).CommitterCommit(nil)
+
 	var wasmParams types.Params
 	f.NilChance(0).Fuzz(&wasmParams)
 	wasmKeeper.SetParams(srcCtx, wasmParams)
@@ -104,7 +116,7 @@ func TestGenesisExportImport(t *testing.T) {
 	dstKeeper, dstCtx, dstStoreKeys := setupKeeper(t)
 
 	// reset contract code index in source DB for comparison with dest DB
-	wasmKeeper.IterateContractInfo(srcCtx, func(address sdk.AccAddress, info wasmTypes.ContractInfo) bool {
+	wasmKeeper.IterateContractInfo(srcCtx, func(address sdk.WasmAddress, info wasmTypes.ContractInfo) bool {
 		wasmKeeper.removeFromContractCodeSecondaryIndex(srcCtx, address, wasmKeeper.getLastContractHistoryEntry(srcCtx, address))
 		prefixStore := prefix.NewStore(srcCtx.KVStore(wasmKeeper.storeKey), types.GetContractCodeHistoryElementPrefix(address))
 		iter := prefixStore.Iterator(nil, nil)
@@ -125,7 +137,14 @@ func TestGenesisExportImport(t *testing.T) {
 	var importState wasmTypes.GenesisState
 	err = dstKeeper.cdc.GetProtocMarshal().UnmarshalJSON(exportedGenesis, &importState)
 	require.NoError(t, err)
+
+	for _, acc := range accounts {
+		contractAddr := dstKeeper.accountKeeper.NewAccountWithAddress(dstCtx, sdk.WasmToAccAddress(acc))
+		dstKeeper.accountKeeper.SetAccount(dstCtx, contractAddr)
+	}
+
 	InitGenesis(dstCtx, dstKeeper, importState, TestHandler(contractKeeper))
+	dstCtx.MultiStore().GetKVStore(dstStoreKeys[2]).(*mpt.MptStore).CommitterCommit(nil)
 
 	// compare whole DB
 	for j := range srcStoreKeys {
@@ -425,10 +444,18 @@ func TestGenesisInit(t *testing.T) {
 	}
 	for msg, spec := range specs {
 		t.Run(msg, func(t *testing.T) {
-			keeper, ctx, _ := setupKeeper(t)
+			keeper, ctx, storeKeys := setupKeeper(t)
 
 			require.NoError(t, types.ValidateGenesis(spec.src))
+			for _, contract := range spec.src.GetContracts() {
+				contractAccount := keeper.accountKeeper.NewAccountWithAddress(ctx, sdk.MustAccAddressFromBech32(contract.ContractAddress))
+				keeper.accountKeeper.SetAccount(ctx, contractAccount)
+			}
 			gotValidatorSet, gotErr := InitGenesis(ctx, keeper, spec.src, spec.msgHandlerMock.Handle)
+			if len(spec.src.GetContracts()) > 0 {
+				ctx.MultiStore().GetKVStore(storeKeys[2]).(*mpt.MptStore).CommitterCommit(nil)
+			}
+
 			if !spec.expSuccess {
 				require.Error(t, gotErr)
 				return
@@ -458,10 +485,10 @@ func TestImportContractWithCodeHistoryReset(t *testing.T) {
       "code_id": "1",
       "code_info": {
         "code_hash": %q,
-        "creator": "cosmos1qtu5n0cnhfkjj6l2rq97hmky9fd89gwca9yarx",
+        "creator": "ex190227rqaps5nplhg2tg8hww7slvvquzy0qa0l0",
         "instantiate_config": {
           "permission": "OnlyAddress",
-          "address": "cosmos1qtu5n0cnhfkjj6l2rq97hmky9fd89gwca9yarx"
+          "address": "ex190227rqaps5nplhg2tg8hww7slvvquzy0qa0l0"
         }
       },
       "code_bytes": %q
@@ -469,11 +496,11 @@ func TestImportContractWithCodeHistoryReset(t *testing.T) {
   ],
   "contracts": [
     {
-      "contract_address": "cosmos14hj2tavq8fpesdwxxcu44rty3hh90vhujrvcmstl4zr3txmfvw9s4hmalr",
+      "contract_address": "0x5A8D648DEE57b2fc90D98DC17fa887159b69638b",
       "contract_info": {
         "code_id": "1",
-        "creator": "cosmos13x849jzd03vne42ynpj25hn8npjecxqrjghd8x",
-        "admin": "cosmos1h5t8zxmjr30e9dqghtlpl40f2zz5cgey6esxtn",
+        "creator": "ex1fsfwwvl93qv6r56jpu084hxxzn9zphnyxhske5",
+        "admin": "ex1s0vrf96rrsknl64jj65lhf89ltwj7lksr7m3r9",
         "label": "ȀĴnZV芢毤"
       }
     }
@@ -483,7 +510,7 @@ func TestImportContractWithCodeHistoryReset(t *testing.T) {
   {"id_key": "BGxhc3RDb250cmFjdElk", "value": "3"}
   ]
 }`
-	keeper, ctx, _ := setupKeeper(t)
+	keeper, ctx, storeKeys := setupKeeper(t)
 	contractKeeper := NewGovPermissionKeeper(keeper)
 
 	wasmCode, err := ioutil.ReadFile("./testdata/hackatom.wasm")
@@ -502,8 +529,11 @@ func TestImportContractWithCodeHistoryReset(t *testing.T) {
 	ctx.SetGasMeter(sdk.NewInfiniteGasMeter())
 
 	// when
+	contractAccount := keeper.accountKeeper.NewAccountWithAddress(ctx, sdk.MustAccAddressFromBech32("0x5A8D648DEE57b2fc90D98DC17fa887159b69638b"))
+	keeper.accountKeeper.SetAccount(ctx, contractAccount)
 	_, err = InitGenesis(ctx, keeper, importState, TestHandler(contractKeeper))
 	require.NoError(t, err)
+	ctx.MultiStore().GetKVStore(storeKeys[2]).(*mpt.MptStore).CommitterCommit(nil)
 
 	// verify wasm code
 	gotWasmCode, err := keeper.GetByteCode(ctx, 1)
@@ -513,7 +543,7 @@ func TestImportContractWithCodeHistoryReset(t *testing.T) {
 	// verify code info
 	gotCodeInfo := keeper.GetCodeInfo(ctx, 1)
 	require.NotNil(t, gotCodeInfo)
-	codeCreatorAddr := "cosmos1qtu5n0cnhfkjj6l2rq97hmky9fd89gwca9yarx"
+	codeCreatorAddr := "ex190227rqaps5nplhg2tg8hww7slvvquzy0qa0l0"
 	expCodeInfo := types.CodeInfo{
 		CodeHash: wasmCodeHash[:],
 		Creator:  codeCreatorAddr,
@@ -525,11 +555,11 @@ func TestImportContractWithCodeHistoryReset(t *testing.T) {
 	assert.Equal(t, expCodeInfo, *gotCodeInfo)
 
 	// verify contract
-	contractAddr, _ := sdk.AccAddressFromBech32("cosmos14hj2tavq8fpesdwxxcu44rty3hh90vhujrvcmstl4zr3txmfvw9s4hmalr")
+	contractAddr, _ := sdk.WasmAddressFromBech32("0x5A8D648DEE57b2fc90D98DC17fa887159b69638b")
 	gotContractInfo := keeper.GetContractInfo(ctx, contractAddr)
 	require.NotNil(t, gotContractInfo)
-	contractCreatorAddr := "cosmos13x849jzd03vne42ynpj25hn8npjecxqrjghd8x"
-	adminAddr := "cosmos1h5t8zxmjr30e9dqghtlpl40f2zz5cgey6esxtn"
+	contractCreatorAddr := "ex1fsfwwvl93qv6r56jpu084hxxzn9zphnyxhske5"
+	adminAddr := "ex1s0vrf96rrsknl64jj65lhf89ltwj7lksr7m3r9"
 
 	expContractInfo := types.ContractInfo{
 		CodeID:  firstCodeID,
@@ -556,9 +586,9 @@ func TestSupportedGenMsgTypes(t *testing.T) {
 	wasmCode, err := ioutil.ReadFile("./testdata/hackatom.wasm")
 	require.NoError(t, err)
 	var (
-		myAddress          sdk.AccAddress = bytes.Repeat([]byte{1}, types.ContractAddrLen)
-		verifierAddress    sdk.AccAddress = bytes.Repeat([]byte{2}, types.ContractAddrLen)
-		beneficiaryAddress sdk.AccAddress = bytes.Repeat([]byte{3}, types.ContractAddrLen)
+		myAddress          sdk.WasmAddress = bytes.Repeat([]byte{1}, types.SDKAddrLen)
+		verifierAddress    sdk.WasmAddress = bytes.Repeat([]byte{2}, types.SDKAddrLen)
+		beneficiaryAddress sdk.WasmAddress = bytes.Repeat([]byte{3}, types.SDKAddrLen)
 	)
 	const denom = "stake"
 	importState := types.GenesisState{
@@ -620,7 +650,7 @@ func TestSupportedGenMsgTypes(t *testing.T) {
 	require.NotNil(t, cInfo)
 
 	// verify contract executed
-	coins := keepers.BankKeeper.GetCoins(ctx, beneficiaryAddress)
+	coins := keepers.BankKeeper.GetCoins(ctx, sdk.WasmToAccAddress(beneficiaryAddress))
 	gotBalance := coins.AmountOf(denom)
 	assert.Equal(t, sdk.NewCoin(denom, sdk.NewInt(10)), sdk.NewDecCoinFromDec(denom, gotBalance))
 }
@@ -634,6 +664,8 @@ func setupKeeper(t *testing.T) (*Keeper, sdk.Context, []sdk.StoreKey) {
 		keyParams  = sdk.NewKVStoreKey(paramtypes.StoreKey)
 		tkeyParams = sdk.NewTransientStoreKey(paramtypes.TStoreKey)
 		keyWasm    = sdk.NewKVStoreKey(wasmTypes.StoreKey)
+
+		keyMpt = sdk.NewKVStoreKey(mpt.StoreKey)
 	)
 
 	db := dbm.NewMemDB()
@@ -641,6 +673,7 @@ func setupKeeper(t *testing.T) (*Keeper, sdk.Context, []sdk.StoreKey) {
 	ms.MountStoreWithDB(keyWasm, sdk.StoreTypeIAVL, db)
 	ms.MountStoreWithDB(keyParams, sdk.StoreTypeIAVL, db)
 	ms.MountStoreWithDB(tkeyParams, sdk.StoreTypeTransient, db)
+	ms.MountStoreWithDB(keyMpt, sdk.StoreTypeMPT, db)
 	require.NoError(t, ms.LoadLatestVersion())
 
 	ctx := sdk.NewContext(ms, abci.Header{
@@ -656,8 +689,31 @@ func setupKeeper(t *testing.T) (*Keeper, sdk.Context, []sdk.StoreKey) {
 
 	wasmConfig := wasmTypes.DefaultWasmConfig()
 	pk := paramskeeper.NewKeeper(encodingConfig.Amino, keyParams, tkeyParams)
-	srcKeeper := NewKeeper(&encodingConfig.Marshaler, keyWasm, pk.Subspace(wasmTypes.ModuleName), &authkeeper.AccountKeeper{}, nil, nil, nil, nil, nil, nil, nil, nil, tempDir, wasmConfig, SupportedFeatures)
-	return &srcKeeper, ctx, []sdk.StoreKey{keyWasm, keyParams}
+	for _, m := range []string{authtypes.ModuleName,
+		//		bank.ModuleName,
+		//		stakingtypes.ModuleName,
+		//		mint.ModuleName,
+		//		distributiontypes.ModuleName,
+		//		slashingtypes.ModuleName,
+		//		crisistypes.ModuleName,
+		//		ibctransfertypes.ModuleName,
+		//		capabilitytypes.ModuleName,
+		//		ibchost.ModuleName,
+		//		govtypes.ModuleName,
+		types.ModuleName,
+	} {
+		pk.Subspace(m)
+	}
+	subspace := func(m string) paramtypes.Subspace {
+		r, ok := pk.GetSubspace(m)
+		require.True(t, ok)
+		return r
+	}
+
+	accountKeeper := auth.NewAccountKeeper(encodingConfig.Amino, keyMpt, subspace(authtypes.ModuleName), chain.ProtoAccount)
+	srcKeeper := NewKeeper(&encodingConfig.Marshaler, keyWasm, keyMpt, subspace(wasmTypes.ModuleName), &accountKeeper, nil, nil, nil, nil, nil, nil, nil, tempDir, wasmConfig, SupportedFeatures)
+
+	return &srcKeeper, ctx, []sdk.StoreKey{keyWasm, keyParams, keyMpt}
 }
 
 type StakingKeeperMock struct {
