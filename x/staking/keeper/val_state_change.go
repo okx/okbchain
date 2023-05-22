@@ -7,6 +7,7 @@ import (
 
 	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
 	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
+	"github.com/okx/okbchain/x/common"
 	"github.com/okx/okbchain/x/staking/types"
 )
 
@@ -244,6 +245,10 @@ func (k Keeper) unjailValidator(ctx sdk.Context, validator types.Validator) {
 	validator.Jailed = false
 	k.SetValidator(ctx, validator)
 	k.SetValidatorByPowerIndex(ctx, validator)
+
+	if k.ParamsConsensusType(ctx) == common.PoA {
+		k.SetProposeValidator(ctx, validator.OperatorAddress, true)
+	}
 }
 
 // bondValidator performs all the store operations for when a validator status becomes bonded

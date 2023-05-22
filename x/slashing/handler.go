@@ -3,6 +3,8 @@ package slashing
 import (
 	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
 	sdkerrors "github.com/okx/okbchain/libs/cosmos-sdk/types/errors"
+	types2 "github.com/okx/okbchain/libs/tendermint/types"
+	"github.com/okx/okbchain/x/common"
 	"github.com/okx/okbchain/x/slashing/internal/types"
 )
 
@@ -29,7 +31,12 @@ func handleMsgUnjail(ctx sdk.Context, msg MsgUnjail, k Keeper) (*sdk.Result, err
 		return nil, sdkerrors.Wrapf(ErrNoValidatorForAddress, "Unjail failed")
 	}
 
-	if validator.GetMinSelfDelegation().IsZero() {
+	checkSelfDelegation := true
+	if types2.HigherThanEarth(ctx.BlockHeight()) && k.GetStakingKeeper().ParamsConsensusType(ctx) == common.PoA {
+		checkSelfDelegation = false
+	}
+
+	if checkSelfDelegation && validator.GetMinSelfDelegation().IsZero() {
 		return nil, sdkerrors.Wrapf(ErrMissingSelfDelegation, "Unjail failed")
 	}
 
