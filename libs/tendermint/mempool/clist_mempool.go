@@ -79,7 +79,8 @@ type CListMempool struct {
 
 	eventBus types.TxEventPublisher
 
-	logger log.Logger
+	logger    log.Logger
+	pguLogger log.Logger
 
 	metrics *Metrics
 
@@ -155,6 +156,7 @@ func NewCListMempool(
 		recheckEnd:    nil,
 		eventBus:      types.NopEventBus{},
 		logger:        log.NewNopLogger(),
+		pguLogger:     log.NewNopLogger(),
 		metrics:       NopMetrics(),
 		txs:           txQueue,
 		simQueue:      make(chan *mempoolTx, 100000),
@@ -206,6 +208,7 @@ func (mem *CListMempool) SetEventBus(eventBus types.TxEventPublisher) {
 // SetLogger sets the Logger.
 func (mem *CListMempool) SetLogger(l log.Logger) {
 	mem.logger = l
+	mem.pguLogger = l.With("module", "pgu")
 }
 
 // WithPreCheck sets a filter for the mempool to reject a tx if f(tx) returns
@@ -1033,6 +1036,10 @@ func (mem *CListMempool) Update(
 			nonce = ele.Nonce
 			gasPricePerTx = ele.GasPrice
 			mem.logUpdate(ele.Address, ele.Nonce)
+			if cfg.DynamicConfig.GetMaxGasUsedPerBlock() > 0 && cfg.DynamicConfig.GetEnablePGU() {
+				memTx := ele.Value.(*mempoolTx)
+				mem.pguLogger.Info("PGU info", "txHash", hex.EncodeToString(memTx.tx.Hash()), "gasLimit", memTx.gasLimit, "agu", gasUsedPerTx, "egu", memTx.gasWanted)
+			}
 		} else {
 			if mem.txInfoparser != nil {
 				txInfo := mem.txInfoparser.GetRawTxInfo(tx)
