@@ -57,11 +57,20 @@ func InstanceOfMptStore() ethstate.Database {
 
 		db := rawdb.NewDatabase(nkvstore)
 		gEthDB = db
+
+		var pbssConfig *snap.Config
+		if viper.GetBool(FlagTriePbss) {
+			pbssConfig = snap.Defaults
+			if MaxDiffLayers == -1 {
+				panic("not support pbss when pruning nothing")
+			}
+			pbssConfig.MaxDiffLayers = MaxDiffLayers
+		}
 		gMptDatabase = ethstate.NewDatabaseWithConfig(db, &trie.Config{
 			Cache:     int(TrieCacheSize),
 			Journal:   "",
 			Preimages: true,
-			Snap:      snap.Defaults,
+			Snap:      pbssConfig,
 		})
 	})
 

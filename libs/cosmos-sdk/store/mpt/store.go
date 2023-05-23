@@ -137,11 +137,11 @@ func generateMptStore(logger tmlog.Logger, id types.CommitID, db ethstate.Databa
 	if err != nil {
 		return mptStore, err
 	}
-	if err := mptStore.openSnapshot(); err != nil {
-		mptStore.logger.Error("open snapshot fail", "warn", err)
-	} else {
-		mptStore.logger.Info("open snapshot successfully", "snapshot", "ok")
-	}
+	//if err := mptStore.openSnapshot(); err != nil {
+	//	mptStore.logger.Error("open snapshot fail", "warn", err)
+	//} else {
+	//	mptStore.logger.Info("open snapshot successfully", "snapshot", "ok")
+	//}
 
 	return mptStore, err
 }
@@ -458,6 +458,12 @@ func (ms *MptStore) CommitterCommit(inputDelta interface{}) (rootHash types.Comm
 			panic("Fail to open root mpt: " + err.Error())
 		}
 		ms.trie = tr
+
+		// Ensure that the in-memory trie nodes are journaled to disk properly.
+		// In order to repair data when panic
+		if err := ms.db.TrieDB().Journal(root); err != nil {
+			panic(fmt.Sprintf("Failed to journal in-memory trie nodes: %s", err))
+		}
 	}
 
 	ms.SetMptRootHash(uint64(ms.version), root)
@@ -534,8 +540,7 @@ func (ms *MptStore) PushData2Database(curHeight int64, root ethcmn.Hash) {
 	defer ms.cmLock.Unlock()
 
 	curMptRoot := ms.GetMptRootHash(uint64(curHeight))
-	TrieDirtyDisabled = viper.GetBool(FlagTrieDirtyDisabled)
-	if TrieDirtyDisabled {
+	if TrieDirtyDisabled || viper.GetBool(FlagTriePbss) {
 		// If we're running an archive node, always flush
 		ms.fullNodePersist(curMptRoot, root, curHeight)
 	} else {
@@ -549,11 +554,10 @@ func (ms *MptStore) fullNodePersist(curMptRoot, root ethcmn.Hash, curHeight int6
 		curMptRoot = ethcmn.Hash{}
 	} else {
 		ms.commitSnap(curMptRoot)
-		if ms.db.TrieDB().Scheme() == rawdb.PathScheme {
-			return
-		}
-		if err := ms.db.TrieDB().Commit(root, false); err != nil {
-			panic("fail to commit mpt data: " + err.Error())
+		if ms.db.TrieDB().Scheme() != rawdb.PathScheme {
+			if err := ms.db.TrieDB().Commit(root, false); err != nil {
+				panic("fail to commit mpt data: " + err.Error())
+			}
 		}
 	}
 	ms.SetLatestStoredBlockHeight(uint64(curHeight))
@@ -635,7 +639,6 @@ func (ms *MptStore) StopWithVersion(targetVersion int64, root ethcmn.Hash) error
 		}
 	} else {
 		// Ensure the state of a recent block is also stored to disk before exiting.
-		TrieDirtyDisabled = viper.GetBool(FlagTrieDirtyDisabled)
 		if !TrieDirtyDisabled {
 			triedb := ms.db.TrieDB()
 			okbcStartHeight := uint64(tmtypes.GetStartBlockHeight()) // start height of okbc

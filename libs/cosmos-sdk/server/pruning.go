@@ -26,10 +26,14 @@ func GetPruningOptionsFromFlags() (types.PruningOptions, error) {
 		tmiavl.CommitIntervalHeight = 1
 		mpt.TrieCommitGap = 1
 		iavlcfg.DynamicConfig.SetCommitGapHeight(1)
+		mpt.MaxDiffLayers = -1 // when nothing, set MaxDiffLayers -1
 		return types.NewPruningOptionsFromString(strategy), nil
 
 	case types.PruningOptionDefault, types.PruningOptionEverything:
-		return types.NewPruningOptionsFromString(strategy), nil
+		opts := types.NewPruningOptionsFromString(strategy)
+		mpt.MaxDiffLayers = int(opts.KeepRecent)
+
+		return opts, nil
 
 	case types.PruningOptionCustom:
 		opts := types.NewPruningOptions(
@@ -43,6 +47,11 @@ func GetPruningOptionsFromFlags() (types.PruningOptions, error) {
 		}
 
 		mpt.TrieDirtyDisabled = opts.KeepEvery == 1
+		if opts.KeepEvery == 1 && opts.Interval == 0 {
+			mpt.MaxDiffLayers = -1 //pruningNothing
+		} else {
+			mpt.MaxDiffLayers = int(opts.KeepRecent)
+		}
 
 		return opts, nil
 

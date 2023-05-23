@@ -24,6 +24,8 @@ const (
 	FlagTrieAsyncDBInitCap        = "trie.asyncdb.init-cap"
 	FlagTrieAsyncDBAutoPruningOff = "trie.asyncdb.auto-pruning-off"
 	FlagTrieAsyncDBSyncPruning    = "trie.asyncdb.sync-pruning"
+
+	FlagTriePbss = "trie.pbss"
 )
 
 var (
@@ -40,6 +42,8 @@ var (
 	TrieAsyncDBSyncPruning    = false
 
 	EnableAsyncCommit = false
+
+	MaxDiffLayers = 128
 )
 
 var (

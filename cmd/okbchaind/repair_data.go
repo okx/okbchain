@@ -50,6 +50,7 @@ func repairStateCmd(ctx *server.Context) *cobra.Command {
 	cmd.Flags().StringP(pprofAddrFlag, "p", "0.0.0.0:6060", "Address and port of pprof HTTP server listening")
 	cmd.Flags().Bool(tmiavl.FlagIavlDiscardFastStorage, false, "Discard fast storage")
 	cmd.Flags().MarkHidden(tmiavl.FlagIavlDiscardFastStorage)
+	cmd.Flags().Bool(mpt.FlagTriePbss, false, "Enable pbss")
 
 	return cmd
 }
