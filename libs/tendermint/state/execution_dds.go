@@ -305,6 +305,7 @@ func (dc *DeltaContext) prepareStateDelta(height int64) *DeltaInfo {
 	if !dc.downloadDelta {
 		return nil
 	}
+	time.Sleep(time.Second)
 
 	deltaInfo, mrh := dc.dataMap.fetch(height)
 
