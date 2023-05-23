@@ -7,6 +7,7 @@ import (
 	"github.com/ethereum/go-ethereum/core/state/snapshot"
 	"github.com/ethereum/go-ethereum/trie"
 	mpttypes "github.com/okx/okbchain/libs/cosmos-sdk/store/mpt/types"
+	"log"
 )
 
 var (
@@ -108,6 +109,8 @@ func (ms *MptStore) updateSnapAccounts(addr, bz []byte) {
 
 	// If state snapshotting is active, cache the data til commit
 	addrHash := mpttypes.Keccak256HashWithSyncPool(addr[:])
+	log.Printf("giskook updateSnapAccounts addr:%v-%v-%v \n", common.Bytes2Hex(addr), common.Bytes2Hex(addrHash.Bytes()), common.Bytes2Hex(bz))
+
 	ms.snapRWLock.Lock()
 	ms.snapAccounts[addrHash] = bz
 	delete(ms.snapDestructs, addrHash)

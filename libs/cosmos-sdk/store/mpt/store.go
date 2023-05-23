@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/okx/okbchain/libs/system/trace/persist"
 	"io"
+	"log"
 	"sync"
 	"time"
 
@@ -422,6 +423,9 @@ func (ms *MptStore) CommitterCommit(inputDelta interface{}) (rootHash types.Comm
 		if !ok {
 			panic(fmt.Sprintf("wrong input delta of mpt. delta: %v", inputDelta))
 		}
+		if len(delta.NodeDelta) > 1 {
+			log.Println("delta.NodeDelta", delta.NodeDelta)
+		}
 		ms.commitStorageWithDelta(delta.Storage, nodeSets)
 		root, set, snapVal, err = ms.trie.CommitWithDelta(delta.NodeDelta, true)
 		ms.updateSnapAccountsWithDelta(snapVal)
@@ -429,6 +433,10 @@ func (ms *MptStore) CommitterCommit(inputDelta interface{}) (rootHash types.Comm
 		var outputNodeDelta []*trie.NodeDelta
 		outStorage := ms.commitStorageForDelta(nodeSets)
 		root, set, outputNodeDelta, err = ms.trie.CommitForDelta(true)
+		for _, v := range outputNodeDelta {
+			log.Printf("giskook dds_p %x %v\n", []byte(v.Key), ethcmn.Bytes2Hex(v.Val))
+			set.String()
+		}
 		outputDelta = &trie.MptDelta{NodeDelta: outputNodeDelta, Storage: outStorage}
 	} else {
 		ms.commitStorage(nodeSets)
