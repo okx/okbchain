@@ -883,13 +883,8 @@ func (mem *CListMempool) ReapMaxBytesMaxGas(maxBytes, maxGas int64) []types.Tx {
 		mem.info.txCount = simCount
 		mem.info.gasUsed = simGas
 	}()
-	var e *clist.CElement
-	defer func() {
-		if cfg.DynamicConfig.GetMaxGasUsedPerBlock() > 0 && cfg.DynamicConfig.GetEnablePGU() {
-			go mem.pgu4NextBlock(e)
-		}
-	}()
-	for e = mem.txs.Front(); e != nil; e = e.Next() {
+
+	for e := mem.txs.Front(); e != nil; e = e.Next() {
 		memTx := e.Value.(*mempoolTx)
 		key := txOrTxHashToKey(memTx.tx, memTx.realTx.TxHash())
 		if _, ok := txFilter[key]; ok {
@@ -1039,6 +1034,13 @@ func (mem *CListMempool) Update(
 		addressNonce = make(map[string]uint64)
 	}
 
+	var lastElement *clist.CElement
+	defer func() {
+		if cfg.DynamicConfig.GetMaxGasUsedPerBlock() > 0 && cfg.DynamicConfig.GetEnablePGU() {
+			go mem.pgu4NextBlock(lastElement)
+		}
+	}()
+
 	for i, tx := range txs {
 		txCode := deliverTxResponses[i].Code
 		addr := ""
@@ -1047,6 +1049,7 @@ func (mem *CListMempool) Update(
 		gasUsedPerTx := deliverTxResponses[i].GasUsed
 		gasPricePerTx := big.NewInt(0)
 		if ele := mem.cleanTx(height, tx, txCode); ele != nil {
+			lastElement = ele
 			atomic.AddUint32(&(ele.Value.(*mempoolTx).isOutdated), 1)
 			addr = ele.Address
 			nonce = ele.Nonce
