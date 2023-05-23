@@ -853,6 +853,8 @@ func (mem *CListMempool) ReapEssentialTx(tx types.Tx) abci.TxEssentials {
 
 // these txs may have been simulated, redo simulation to get a more precise gas estimation
 func (mem *CListMempool) pgu4NextBlock(e *clist.CElement) {
+	mem.Lock()
+	defer mem.Unlock()
 	var totalGas int64
 	for totalGas < cfg.DynamicConfig.GetMaxGasUsedPerBlock() && e != nil {
 		gas := mem.simulationJob(e.Value.(*mempoolTx))
@@ -863,7 +865,9 @@ func (mem *CListMempool) pgu4NextBlock(e *clist.CElement) {
 
 // Safe for concurrent use by multiple goroutines.
 func (mem *CListMempool) ReapMaxBytesMaxGas(maxBytes, maxGas int64) []types.Tx {
+	start := time.Now()
 	mem.updateMtx.RLock()
+	fmt.Println("debug time elapsed", time.Since(start))
 	defer mem.updateMtx.RUnlock()
 
 	var (
