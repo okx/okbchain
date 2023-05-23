@@ -851,6 +851,16 @@ func (mem *CListMempool) ReapEssentialTx(tx types.Tx) abci.TxEssentials {
 	return nil
 }
 
+// these txs may have been simulated, redo simulation to get a more precise gas estimation
+func (mem *CListMempool) pgu4NextBlock(e *clist.CElement) {
+	var totalGas int64
+	for totalGas < cfg.DynamicConfig.GetMaxGasUsedPerBlock() && e != nil {
+		gas := mem.simulationJob(e.Value.(*mempoolTx))
+		totalGas += gas
+		e = e.Next()
+	}
+}
+
 // Safe for concurrent use by multiple goroutines.
 func (mem *CListMempool) ReapMaxBytesMaxGas(maxBytes, maxGas int64) []types.Tx {
 	mem.updateMtx.RLock()
@@ -873,7 +883,13 @@ func (mem *CListMempool) ReapMaxBytesMaxGas(maxBytes, maxGas int64) []types.Tx {
 		mem.info.txCount = simCount
 		mem.info.gasUsed = simGas
 	}()
-	for e := mem.txs.Front(); e != nil; e = e.Next() {
+	var e *clist.CElement
+	defer func() {
+		if cfg.DynamicConfig.GetMaxGasUsedPerBlock() > 0 && cfg.DynamicConfig.GetEnablePGU() {
+			go mem.pgu4NextBlock(e)
+		}
+	}()
+	for e = mem.txs.Front(); e != nil; e = e.Next() {
 		memTx := e.Value.(*mempoolTx)
 		key := txOrTxHashToKey(memTx.tx, memTx.realTx.TxHash())
 		if _, ok := txFilter[key]; ok {
@@ -1038,7 +1054,7 @@ func (mem *CListMempool) Update(
 			mem.logUpdate(ele.Address, ele.Nonce)
 			if cfg.DynamicConfig.GetMaxGasUsedPerBlock() > 0 && cfg.DynamicConfig.GetEnablePGU() {
 				memTx := ele.Value.(*mempoolTx)
-				mem.pguLogger.Info("PGU info", "txHash", hex.EncodeToString(memTx.tx.Hash()), "gasLimit", memTx.gasLimit, "agu", gasUsedPerTx, "egu", memTx.gasWanted)
+				mem.pguLogger.Info("PGU info", "txHash", hex.EncodeToString(memTx.tx.Hash()), "gasLimit", memTx.gasLimit, "agu", gasUsedPerTx, "egu", memTx.gasWanted, "num", memTx.isSim)
 			}
 		} else {
 			if mem.txInfoparser != nil {
@@ -1451,16 +1467,16 @@ func (mem *CListMempool) simulationRoutine() {
 	}
 }
 
-func (mem *CListMempool) simulationJob(memTx *mempoolTx) {
+func (mem *CListMempool) simulationJob(memTx *mempoolTx) int64 {
 	defer types.SignatureCache().Remove(memTx.realTx.TxHash())
 	if atomic.LoadUint32(&memTx.isOutdated) != 0 {
 		// memTx is outdated
-		return
+		return 0
 	}
 	simuRes, err := mem.simulateTx(memTx.tx)
 	if err != nil {
 		mem.logger.Error("simulateTx", "error", err, "txHash", memTx.tx.Hash())
-		return
+		return 0
 	}
 	gas := int64(simuRes.GasUsed) * int64(cfg.DynamicConfig.GetPGUAdjustment()*100) / 100
 	if gas < atomic.LoadInt64(&memTx.gasLimit) {
@@ -1468,6 +1484,7 @@ func (mem *CListMempool) simulationJob(memTx *mempoolTx) {
 	}
 	atomic.AddUint32(&memTx.isSim, 1)
 	mem.gasCache.Add(hex.EncodeToString(memTx.realTx.TxHash()), gas)
+	return gas
 }
 
 func (mem *CListMempool) deleteMinGPTxOnlyFull() {
