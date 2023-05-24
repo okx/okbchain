@@ -18,7 +18,7 @@ func (k Keeper) getStorageStore(ctx sdk.Context, acc sdk.WasmAddress) sdk.KVStor
 	} else {
 		stateRoot = account.GetStateRoot()
 	}
-	return k.ada.NewStore(ctx.GasMeter(), ctx.KVStore(k.storageStoreKey), mpt.AddressStoragePrefixMpt(ethAcc, stateRoot))
+	return k.ada.NewStore(ctx, k.storageStoreKey, mpt.AddressStoragePrefixMpt(ethAcc, stateRoot))
 }
 
 func (k Keeper) GetStorageStore4Query(ctx sdk.Context, acc sdk.WasmAddress) sdk.KVStore {
