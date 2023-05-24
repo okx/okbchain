@@ -431,12 +431,15 @@ func (ms *MptStore) CommitterCommit(inputDelta interface{}) (rootHash types.Comm
 		ms.commitStorageWithDelta(delta.Storage, nodeSets)
 		root, set, err = ms.trie.CommitWithDelta(delta.NodeDelta, true)
 		ms.applySnapshotDelta(delta.Snapshot)
+		ms.applyRawDBDelta(delta.RawDB)
 	} else if produceDelta {
 		var outputNodeDelta []*trie.NodeDelta
 		outStorage := ms.commitStorageForDelta(nodeSets)
 		root, set, outputNodeDelta, err = ms.trie.CommitForDelta(true)
-		outputDelta = &trie.MptDelta{NodeDelta: outputNodeDelta, Storage: outStorage, Snapshot: ms.snapshotDelta.Marshal()}
+		outputDelta = &trie.MptDelta{NodeDelta: outputNodeDelta, Storage: outStorage,
+			Snapshot: ms.snapshotDelta.Marshal(), RawDB: GetRawDBDeltaInstance().Marshal()}
 		ms.resetSnapshotDelta()
+		GetRawDBDeltaInstance().reset()
 	} else {
 		ms.commitStorage(nodeSets)
 		root, set, err = ms.trie.Commit(true)
