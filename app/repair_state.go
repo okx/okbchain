@@ -223,8 +223,14 @@ func doRepair(ctx *server.Context, state sm.State, stateStoreDB dbm.DB,
 	}()
 
 	global.SetGlobalHeight(startHeight + 1)
+	originalBlockDB, err := sdk.NewDB(blockStoreDB, dataDir)
+	defer originalBlockDB.Close()
+	originalBlockStore := store.NewBlockStore(originalBlockDB)
+	panicError(err)
 	for height := startHeight + 1; height <= latestHeight; height++ {
-		repairBlock, repairBlockMeta := loadBlock(height, dataDir)
+		//repairBlock, repairBlockMeta := loadBlock(height, dataDir)
+		repairBlock := originalBlockStore.LoadBlock(height)
+		repairBlockMeta := originalBlockStore.LoadBlockMeta(height)
 		state, _, err = blockExec.ApplyBlockWithTrace(state, repairBlockMeta.BlockID, repairBlock)
 		panicError(err)
 		ctx.Logger.Debug("repairedState", "state", fmt.Sprintf("%+v", state))
@@ -234,7 +240,36 @@ func doRepair(ctx *server.Context, state sm.State, stateStoreDB dbm.DB,
 		repairedAppHash := res.LastBlockAppHash
 		log.Println("Repaired block height", repairedBlockHeight)
 		log.Println("Repaired app hash", fmt.Sprintf("%X", repairedAppHash))
+
+		SaveBlock(ctx, originalBlockStore, height)
 	}
+}
+
+var (
+	alreadyInit  bool
+	stateStoreDb *store.BlockStore
+)
+
+// TODO need delete
+func SaveBlock(ctx *server.Context, originDB *store.BlockStore, height int64) {
+	if !alreadyInit {
+		alreadyInit = true
+		dataDir := filepath.Join(ctx.Config.RootDir, "data")
+		blockStoreDB, err := sdk.NewDB("blockstore-bak", dataDir)
+		panicError(err)
+		stateStoreDb = store.NewBlockStore(blockStoreDB)
+	}
+
+	block := originDB.LoadBlock(height)
+	meta := originDB.LoadBlockMeta(height)
+	seenCommit := originDB.LoadSeenCommit(height)
+
+	ps := types.NewPartSetFromHeader(meta.BlockID.PartsHeader)
+	for index := 0; index < ps.Total(); index++ {
+		ps.AddPart(originDB.LoadBlockPart(height, index))
+	}
+
+	stateStoreDb.SaveBlock(block, ps, seenCommit)
 }
 
 func startEventBusAndIndexerService(config *cfg.Config, eventBus *types.EventBus, logger tmlog.Logger) (txStore dbm.DB, blockIndexStore dbm.DB, indexerService *txindex.IndexerService, err error) {
