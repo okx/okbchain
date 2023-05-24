@@ -201,3 +201,25 @@ func (ms *MptStore) flattenPersistSnapshot() error {
 	}
 	return ms.snaps.Cap(root, 0)
 }
+
+func (ms *MptStore) applySnapshotDelta(payload []byte) {
+	if ms.snap == nil {
+		return
+	}
+
+	delta := snapshotDelta{}
+	err := delta.Unmarshal(payload)
+	if err != nil {
+		ms.logger.Error("Failed to unmarshal snapshot delta", "err", err)
+		return
+	}
+
+	deltaAccounts := delta.getAccounts()
+	deltaStorage := delta.getStorage()
+	deltaDestructs := delta.getDestructs()
+	ms.snapRWLock.Lock()
+	ms.snapAccounts = deltaAccounts
+	ms.snapStorage = deltaStorage
+	ms.snapDestructs = deltaDestructs
+	ms.snapRWLock.Unlock()
+}

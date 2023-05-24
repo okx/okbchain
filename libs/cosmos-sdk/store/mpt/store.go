@@ -88,6 +88,8 @@ type MptStore struct {
 	snapStorage   map[ethcmn.Hash]map[ethcmn.Hash][]byte
 	snapRWLock    sync.RWMutex
 
+	*snapshotDelta
+
 	// for time statistics
 	statisticsBeginTime time.Time
 }
@@ -126,6 +128,8 @@ func generateMptStore(logger tmlog.Logger, id types.CommitID, db ethstate.Databa
 		logger:              logger,
 		retriever:           retriever,
 		exitSignal:          make(chan struct{}),
+
+		snapshotDelta: newSnapshotDelta(),
 	}
 	if mptStore.logger == nil {
 		mptStore.logger = tmlog.NewNopLogger()
@@ -276,9 +280,11 @@ func (ms *MptStore) Set(key, value []byte) {
 		t := ms.tryGetStorageTrie(addr, stateRoot, true)
 		t.TryUpdate(realKey, value)
 		ms.updateSnapStorages(addr, realKey, value)
+		ms.addStorage(addr, realKey, value)
 	case addressType:
 		ms.trie.TryUpdate(key, value)
 		ms.updateSnapAccounts(key, value)
+		ms.addAccount(key, value)
 	default:
 		panic(fmt.Errorf("not support key %s for mpt set", hex.EncodeToString(key)))
 	}
@@ -296,9 +302,11 @@ func (ms *MptStore) Delete(key []byte) {
 		t := ms.tryGetStorageTrie(addr, stateRoot, true)
 		t.TryDelete(realKey)
 		ms.updateSnapStorages(addr, realKey, nil)
+		ms.addStorage(addr, realKey, nil)
 	case addressType:
 		ms.trie.TryDelete(key)
 		ms.updateDestructs(key)
+		ms.addDestruct(key)
 	default:
 		panic(fmt.Errorf("not support key %s for mpt delete", hex.EncodeToString(key)))
 
@@ -364,6 +372,7 @@ func (ms *MptStore) commitStorageForDelta(nodeSets *trie.MergedNodeSet) []*trie.
 				panic(fmt.Errorf("unexcepted err:%v while update acc %s ", err, addr.String()))
 			}
 			ms.updateSnapAccounts(key, newValue)
+			ms.addAccount(key, newValue)
 		} else {
 			panic(fmt.Errorf("unexcepted err:%v while update get acc %s ", err, addr.String()))
 		}
@@ -421,11 +430,13 @@ func (ms *MptStore) CommitterCommit(inputDelta interface{}) (rootHash types.Comm
 		}
 		ms.commitStorageWithDelta(delta.Storage, nodeSets)
 		root, set, err = ms.trie.CommitWithDelta(delta.NodeDelta, true)
+		ms.applySnapshotDelta(delta.Snapshot)
 	} else if produceDelta {
 		var outputNodeDelta []*trie.NodeDelta
 		outStorage := ms.commitStorageForDelta(nodeSets)
 		root, set, outputNodeDelta, err = ms.trie.CommitForDelta(true)
-		outputDelta = &trie.MptDelta{NodeDelta: outputNodeDelta, Storage: outStorage}
+		outputDelta = &trie.MptDelta{NodeDelta: outputNodeDelta, Storage: outStorage, Snapshot: ms.snapshotDelta.Marshal()}
+		ms.resetSnapshotDelta()
 	} else {
 		ms.commitStorage(nodeSets)
 		root, set, err = ms.trie.Commit(true)
