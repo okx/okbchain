@@ -458,12 +458,6 @@ func (ms *MptStore) CommitterCommit(inputDelta interface{}) (rootHash types.Comm
 			panic("Fail to open root mpt: " + err.Error())
 		}
 		ms.trie = tr
-
-		// Ensure that the in-memory trie nodes are journaled to disk properly.
-		// In order to repair data when panic
-		if err := ms.db.TrieDB().Journal(root); err != nil {
-			panic(fmt.Sprintf("Failed to journal in-memory trie nodes: %s", err))
-		}
 	}
 
 	ms.SetMptRootHash(uint64(ms.version), root)
@@ -554,7 +548,23 @@ func (ms *MptStore) fullNodePersist(curMptRoot, root ethcmn.Hash, curHeight int6
 		curMptRoot = ethcmn.Hash{}
 	} else {
 		ms.commitSnap(curMptRoot)
-		if ms.db.TrieDB().Scheme() != rawdb.PathScheme {
+		if ms.db.TrieDB().Scheme() == rawdb.PathScheme {
+			commitGap := TrieCommitGap
+			if !EnableAsyncCommit {
+				commitGap = 1
+			}
+
+			// If we exceeded out time allowance, flush an entire trie to disk
+			if curHeight%commitGap == 0 {
+				// Ensure that the in-memory trie nodes are journaled to disk properly.
+				// In order to repair data when panic
+				go func() {
+					if err := ms.db.TrieDB().Journal(root); err != nil {
+						panic(fmt.Sprintf("Failed to journal in-memory trie nodes: %s", err))
+					}
+				}()
+			}
+		} else {
 			if err := ms.db.TrieDB().Commit(root, false); err != nil {
 				panic("fail to commit mpt data: " + err.Error())
 			}
