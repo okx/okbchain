@@ -24,7 +24,7 @@ const (
 var (
 	once             sync.Once
 	GasUsedFactor    = 0.4
-	regressionFactor = 0.01
+	regressionFactor = 0.05
 	jobQueueLen      = 10
 	cacheSize        = 10000
 
@@ -111,7 +111,7 @@ func (h *HistoryGasUsedRecordDB) getHgu(key []byte) (hgu *HguRecord, fromCache b
 func (h *HistoryGasUsedRecordDB) flushHgu(gks ...gasKey) {
 	for _, gk := range gks {
 		hgu, cacheHit := h.getHgu([]byte(gk.key))
-		if hgu == nil || hgu.BlockNum < preciseBlockNum/2 {
+		if hgu == nil {
 			hgu = &HguRecord{
 				MaxGas:           gk.gas,
 				MinGas:           gk.gas,
