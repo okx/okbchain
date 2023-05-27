@@ -382,6 +382,9 @@ func (mem *CListMempool) CheckTx(tx types.Tx, cb func(*abci.Response), txInfo Tx
 		gasLimit := r.CheckTx.GasWanted
 		if cfg.DynamicConfig.GetMaxGasUsedPerBlock() > -1 {
 			txInfo.gasUsed, txInfo.isGasPrecise = mem.txInfoparser.GetTxHistoryGasUsed(tx, gasLimit) // r.CheckTx.GasWanted is gasLimit
+			if txInfo.gasUsed <= 0 {
+				txInfo.gasUsed, _ = mem.simulateTx(tx, gasLimit)
+			}
 			mem.logger.Info(fmt.Sprintf("mempool.SimulateTx: txhash<%s>, gasLimit<%d>, gasUsed<%d>",
 				hex.EncodeToString(tx.Hash()), r.CheckTx.GasWanted, txInfo.gasUsed))
 		}

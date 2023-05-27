@@ -120,9 +120,9 @@ func (h *HistoryGasUsedRecordDB) flushHgu(gks ...gasKey) {
 		} else {
 			// MovingAverageGas = 0.4 * newGas + 0.6 * oldMovingAverageGas
 			hgu.MovingAverageGas = int64(GasUsedFactor*float64(gk.gas) + (1.0-GasUsedFactor)*float64(hgu.MovingAverageGas))
-			// MaxGas = 0.01 * MovingAverageGas + 0.99 * oldMaxGas
+			// MaxGas = 0.05 * MovingAverageGas + 0.95 * oldMaxGas
 			hgu.MaxGas = int64(regressionFactor*float64(hgu.MovingAverageGas) + (1.0-regressionFactor)*float64(hgu.MaxGas))
-			// MinGas = 0.01 * MovingAverageGas + 0.99 * oldMinGas
+			// MinGas = 0.05 * MovingAverageGas + 0.95 * oldMinGas
 			hgu.MinGas = int64(regressionFactor*float64(hgu.MovingAverageGas) + (1.0-regressionFactor)*float64(hgu.MinGas))
 			hgu.BlockNum++
 			if gk.gas > hgu.MaxGas {
