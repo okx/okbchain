@@ -137,10 +137,10 @@ func NewKeeper(
 }
 
 var (
-	nilFuck           = types.AccountKeeper(nil)
+	nilAccountKeeper  = types.AccountKeeper(nil)
 	wasmStorageKey    = sdk.StoreKey(sdk.NewKVStoreKey("wasm")) // need reset by NewKeeper
 	wasmMptStorageKey = sdk.StoreKey(sdk.NewKVStoreKey("mpt"))  //need reset by NewKeeper
-	wasmAccountKeeper = &nilFuck                                //need reset by NewKeeper
+	wasmAccountKeeper = &nilAccountKeeper                       //need reset by NewKeeper
 )
 
 func NewSimulateKeeper(
