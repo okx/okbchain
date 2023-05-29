@@ -2,6 +2,7 @@ package baseapp
 
 import (
 	"context"
+	"fmt"
 	"strconv"
 
 	gogogrpc "github.com/gogo/protobuf/grpc"
@@ -82,7 +83,8 @@ func (app *BaseApp) createQueryContext(height int64, prove bool) (sdk.Context, e
 		cacheMS, app.checkState.ctx.BlockHeader(), true, app.logger,
 	)
 	ctx.SetMinGasPrices(app.minGasPrices)
-
+	ctx.SetMultiStore(app.checkState.ms)
+	fmt.Println("---BaseApp createQueryContext", height)
 	return ctx, nil
 }
 

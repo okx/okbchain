@@ -339,10 +339,10 @@ func (q grpcQuerier) UnwrapSDKContext(c context.Context) sdk.Context {
 }
 
 func (q grpcQuerier) PrefixStore(c context.Context, pre []byte) sdk.KVStore {
-	if watcher.Enable() {
-		return watcher.NewReadStore(pre, nil)
-	}
 	ctx := sdk.UnwrapSDKContext(c)
+	if watcher.Enable() {
+		return watcher.NewReadStore(nil, prefix.NewStore(ctx.KVStore(q.storeKey), pre))
+	}
 	return prefix.NewStore(ctx.KVStore(q.storeKey), pre)
 
 }
