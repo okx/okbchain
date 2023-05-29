@@ -20,16 +20,12 @@ func (k Keeper) getStorageStore(ctx sdk.Context, acc sdk.WasmAddress) sdk.KVStor
 	} else {
 		stateRoot = account.GetStateRoot()
 	}
+	if watcher.Enable() {
+		return watcher.NewReadStore(nil, prefix.NewStore(ctx.KVStore(k.storageStoreKey), mpt.AddressStoragePrefixMpt(ethAcc, account.GetStateRoot())))
+	}
 	return k.ada.NewStore(ctx, k.storageStoreKey, mpt.AddressStoragePrefixMpt(ethAcc, stateRoot))
 }
 
 func (k Keeper) GetStorageStore4Query(ctx sdk.Context, acc sdk.WasmAddress) sdk.KVStore {
-	if watcher.Enable() {
-		ethAcc := common.BytesToAddress(acc.Bytes())
-		account := k.accountKeeper.GetAccount(ctx, sdk.WasmToAccAddress(acc))
-		return watcher.NewReadStore(nil, prefix.NewStore(ctx.KVStore(k.storageStoreKey), mpt.AddressStoragePrefixMpt(ethAcc, account.GetStateRoot())))
-
-	}
-
 	return k.getStorageStore(ctx, acc)
 }
