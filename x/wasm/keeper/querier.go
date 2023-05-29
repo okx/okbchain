@@ -341,6 +341,7 @@ func (q grpcQuerier) PrefixStore(c context.Context, pre []byte) sdk.KVStore {
 		return watcher.NewReadStore(nil, prefix.NewStore(ctx.KVStore(q.storeKey), pre))
 	}
 	return prefix.NewStore(ctx.KVStore(q.storeKey), pre)
+
 }
 
 func (q grpcQuerier) release(ctx sdk.Context) {

@@ -82,7 +82,6 @@ func (app *BaseApp) createQueryContext(height int64, prove bool) (sdk.Context, e
 		cacheMS, app.checkState.ctx.BlockHeader(), true, app.logger,
 	)
 	ctx.SetMinGasPrices(app.minGasPrices)
-
 	return ctx, nil
 }
 
