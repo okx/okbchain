@@ -2,12 +2,12 @@ package mpt
 
 import (
 	"fmt"
-	"github.com/ethereum/go-ethereum/trie"
 	"path/filepath"
 
 	ethcmn "github.com/ethereum/go-ethereum/common"
 	ethstate "github.com/ethereum/go-ethereum/core/state"
 	"github.com/ethereum/go-ethereum/ethdb"
+	"github.com/ethereum/go-ethereum/trie"
 	"github.com/okx/okbchain/app"
 	"github.com/okx/okbchain/libs/cosmos-sdk/server"
 	iavlstore "github.com/okx/okbchain/libs/cosmos-sdk/store/iavl"
@@ -90,7 +90,7 @@ func pushData2Database(db ethstate.Database, tree ethstate.Trie, height int64, i
 	err := nodes.Merge(set)
 	panicError(err)
 
-	err = db.TrieDB().UpdateForOK(root, ethcmn.Hash{}, nodes)
+	err = db.TrieDB().UpdateForOK(root, ethcmn.Hash{}, nodes, mpt.AccountStateRootRetriever.RetrieveStateRoot)
 	panicError(err)
 	err = db.TrieDB().Commit(root, false)
 	panicError(err)

@@ -33,7 +33,7 @@ func (tx *Tx) SaveTx(msg *types.MsgEthereumTx) {
 	defer tx.AnalyzeStop(bam.SaveTx)
 
 	// Prepare db for logs
-	tx.StateTransition.Csdb.Prepare_old(*tx.StateTransition.TxHash, tx.Keeper.Bhash, tx.Keeper.TxCount)
+	tx.StateTransition.Csdb.PrepareBlockTx(*tx.StateTransition.TxHash, tx.Keeper.Bhash, tx.Keeper.TxCount)
 	tx.StateTransition.Csdb.SetLogSize(tx.Keeper.LogSize)
 	tx.Keeper.TxCount++
 	if tx.Ctx.ParaMsg() != nil {

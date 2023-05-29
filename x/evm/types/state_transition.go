@@ -194,10 +194,9 @@ func (st StateTransition) TransitionDb(ctx sdk.Context, config ChainConfig) (exe
 	}
 	tracer := newTracer(ctx, st.TxHash)
 	vmConfig := vm.Config{
-		ExtraEips: params.ExtraEIPs,
-		//Debug:                   st.TraceTxLog,
-		Tracer: tracer,
-		//ContractVerifier:        NewContractVerifier(params),
+		ExtraEips:               params.ExtraEIPs,
+		Tracer:                  tracer,
+		ContractVerifier:        NewContractVerifier(params),
 		EnablePreimageRecording: st.TraceTxLog,
 	}
 
