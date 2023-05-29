@@ -230,6 +230,9 @@ func (ms *MptStore) applySnapshotDelta(payload []byte) {
 	}
 	for addr, storage := range deltaStorage {
 		for k, v := range storage {
+			if ms.snapStorage[addr] == nil {
+				ms.snapStorage[addr] = make(map[common.Hash][]byte)
+			}
 			ms.snapStorage[addr][k] = v
 		}
 	}
