@@ -344,7 +344,7 @@ func (ms *MptStore) commitStorageWithDelta(storageDelta []*trie.StorageDelta, no
 	}
 	for _, storage := range storageDelta {
 		addr := storage.Addr
-		if bytes.Equal(addr[:], ethcmn.Hex2Bytes("0x6428691F926840bf2C123bB2c281B9aF980f52a3")) {
+		if bytes.Equal(addr[:], ethcmn.Hex2Bytes("6428691F926840bf2C123bB2c281B9aF980f52a3")) {
 			log.Println("dds--------commitStorageWithDelta", addr.String())
 		}
 		addrHash := mpttype.Keccak256HashWithSyncPool(addr[:])
@@ -394,7 +394,7 @@ func (ms *MptStore) commitStorageForDelta(nodeSets *trie.MergedNodeSet) []*trie.
 
 func (ms *MptStore) commitStorage(nodeSets *trie.MergedNodeSet) {
 	for addr, v := range ms.storageTrieForWrite {
-		if bytes.Equal(addr[:], ethcmn.Hex2Bytes("0x6428691F926840bf2C123bB2c281B9aF980f52a3")) {
+		if bytes.Equal(addr[:], ethcmn.Hex2Bytes("6428691F926840bf2C123bB2c281B9aF980f52a3")) {
 			log.Println("normal------commitStorage", addr.String())
 		}
 		stateR, set, err := v.Commit(false)
