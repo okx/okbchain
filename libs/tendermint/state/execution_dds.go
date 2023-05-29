@@ -320,6 +320,25 @@ func (dc *DeltaContext) prepareStateDelta(height int64) *DeltaInfo {
 			return nil
 		}
 		succeed = true
+	} else {
+		times := 0
+		for times < 50 && (1629288 < height && height < 1638245) {
+			err, delta, _ := dc.download(height)
+			if err != nil {
+				time.Sleep(time.Millisecond * 100)
+				times++
+				continue
+			}
+
+			// unmarshal delta bytes to delta info
+			deltaInfo = &DeltaInfo{
+				from:        delta.From,
+				deltaLen:    delta.Size(),
+				deltaHeight: delta.Height,
+			}
+			_ = deltaInfo.bytes2DeltaInfo(&delta.Payload)
+			break
+		}
 	}
 
 	dc.logger.Info("Prepare delta", "expected-height", height,
