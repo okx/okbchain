@@ -34,7 +34,6 @@ run() {
       --tree-enable-async-commit=false \
       --enable-gid \
       --fast-query=true \
-      --wasm-fast-query=true \
       --append-pid=true \
       --iavl-output-modules evm=0,acc=0 \
       --commit-gap-height 3 \

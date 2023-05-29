@@ -130,7 +130,6 @@ func NewKeeper(
 	wasmStorageKey = storeKey
 	wasmMptStorageKey = storageKey
 	*wasmAccountKeeper = accountKeeper
-	fmt.Println("SSSSSSSSS----", &accountKeeper, wasmAccountKeeper)
 	k := newKeeper(cdc, storeKey, storageKey, paramSpace, accountKeeper, bankKeeper, channelKeeper, portKeeper, capabilityKeeper, portSource, router, queryRouter, homeDir, wasmConfig, supportedFeatures, defaultAdapter{}, opts...)
 	accountKeeper.SetObserverKeeper(k)
 
@@ -143,8 +142,6 @@ var (
 	wasmMptStorageKey = sdk.StoreKey(sdk.NewKVStoreKey("mpt"))  //need reset by NewKeeper
 	wasmAccountKeeper = &nilFuck                                //need reset by NewKeeper
 )
-
-//var wasmAccountKeeper types.AccountKeeper
 
 func NewSimulateKeeper(
 	cdc *codec.CodecProxy,
@@ -162,8 +159,6 @@ func NewSimulateKeeper(
 	supportedFeatures string,
 	opts ...Option,
 ) Keeper {
-	fmt.Println("Simmmmmm", wasmAccountKeeper)
-
 	return newKeeper(cdc, wasmStorageKey, wasmMptStorageKey, paramSpace, *wasmAccountKeeper, bankKeeper, channelKeeper, portKeeper, capabilityKeeper, portSource, router, queryRouter, homeDir, wasmConfig, supportedFeatures, watcher.Adapter{}, opts...)
 }
 

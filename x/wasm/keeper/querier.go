@@ -332,9 +332,6 @@ func (q grpcQuerier) PinnedCodes(c context.Context, req *types.QueryPinnedCodesR
 }
 
 func (q grpcQuerier) UnwrapSDKContext(c context.Context) sdk.Context {
-	if watcher.Enable() {
-		return proxy.MakeContext(q.storeKey, q.storageStoreKey)
-	}
 	return sdk.UnwrapSDKContext(c)
 }
 
