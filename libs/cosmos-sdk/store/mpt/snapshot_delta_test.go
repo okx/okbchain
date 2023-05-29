@@ -23,9 +23,9 @@ func TestSnapshotDeltaMarshalUnMarshal(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			delta := &snapshotDelta{
-				SnapDestructs: tt.fields.snapDestructs,
-				SnapAccounts:  tt.fields.snapAccounts,
-				SnapStorage:   tt.fields.snapStorage,
+				DeltaSnapshotDestructs:   tt.fields.snapDestructs,
+				DeltaSnapshotAccounts:    tt.fields.snapAccounts,
+				DeltaSnapshotSnapStorage: tt.fields.snapStorage,
 			}
 			data := delta.Marshal()
 			assert.NotNil(t, data)

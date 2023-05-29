@@ -7,16 +7,16 @@ import (
 )
 
 type snapshotDelta struct {
-	SnapDestructs map[ethcmn.Hash]struct{}               `json:"snap_destructs"`
-	SnapAccounts  map[ethcmn.Hash][]byte                 `json:"snap_accounts"`
-	SnapStorage   map[ethcmn.Hash]map[ethcmn.Hash][]byte `json:"snap_storage"`
+	DeltaSnapshotDestructs   map[ethcmn.Hash]struct{}               `json:"snap_destructs"`
+	DeltaSnapshotAccounts    map[ethcmn.Hash][]byte                 `json:"snap_accounts"`
+	DeltaSnapshotSnapStorage map[ethcmn.Hash]map[ethcmn.Hash][]byte `json:"snap_storage"`
 }
 
 func newSnapshotDelta() *snapshotDelta {
 	return &snapshotDelta{
-		SnapDestructs: make(map[ethcmn.Hash]struct{}),
-		SnapAccounts:  make(map[ethcmn.Hash][]byte),
-		SnapStorage:   make(map[ethcmn.Hash]map[ethcmn.Hash][]byte),
+		DeltaSnapshotDestructs:   make(map[ethcmn.Hash]struct{}),
+		DeltaSnapshotAccounts:    make(map[ethcmn.Hash][]byte),
+		DeltaSnapshotSnapStorage: make(map[ethcmn.Hash]map[ethcmn.Hash][]byte),
 	}
 }
 
@@ -25,9 +25,9 @@ func (delta *snapshotDelta) addDestruct(key []byte) {
 		return
 	}
 	hash := mpttype.Keccak256HashWithSyncPool(key)
-	delete(delta.SnapAccounts, hash)
-	delete(delta.SnapStorage, hash)
-	delta.SnapDestructs[hash] = struct{}{}
+	delete(delta.DeltaSnapshotAccounts, hash)
+	delete(delta.DeltaSnapshotSnapStorage, hash)
+	delta.DeltaSnapshotDestructs[hash] = struct{}{}
 }
 
 func (delta *snapshotDelta) addAccount(key []byte, account []byte) {
@@ -35,8 +35,8 @@ func (delta *snapshotDelta) addAccount(key []byte, account []byte) {
 		return
 	}
 	hash := mpttype.Keccak256HashWithSyncPool(key)
-	delete(delta.SnapDestructs, hash)
-	delta.SnapAccounts[hash] = account
+	delete(delta.DeltaSnapshotDestructs, hash)
+	delta.DeltaSnapshotAccounts[hash] = account
 }
 
 func (delta *snapshotDelta) addStorage(addr ethcmn.Address, realKey, value []byte) {
@@ -44,33 +44,33 @@ func (delta *snapshotDelta) addStorage(addr ethcmn.Address, realKey, value []byt
 		return
 	}
 	hash := mpttype.Keccak256HashWithSyncPool(AddressStoreKey(addr.Bytes()))
-	if _, ok := delta.SnapStorage[hash]; !ok {
-		delta.SnapStorage[hash] = make(map[ethcmn.Hash][]byte)
+	if _, ok := delta.DeltaSnapshotSnapStorage[hash]; !ok {
+		delta.DeltaSnapshotSnapStorage[hash] = make(map[ethcmn.Hash][]byte)
 	}
 
 	key := mpttype.Keccak256HashWithSyncPool(realKey)
-	delta.SnapStorage[hash][key] = value
+	delta.DeltaSnapshotSnapStorage[hash][key] = value
 }
 
 func (delta *snapshotDelta) resetSnapshotDelta() {
 	if !produceDelta || delta == nil {
 		return
 	}
-	delta.SnapDestructs = make(map[ethcmn.Hash]struct{})
-	delta.SnapAccounts = make(map[ethcmn.Hash][]byte)
-	delta.SnapStorage = make(map[ethcmn.Hash]map[ethcmn.Hash][]byte)
+	delta.DeltaSnapshotDestructs = make(map[ethcmn.Hash]struct{})
+	delta.DeltaSnapshotAccounts = make(map[ethcmn.Hash][]byte)
+	delta.DeltaSnapshotSnapStorage = make(map[ethcmn.Hash]map[ethcmn.Hash][]byte)
 }
 
 func (delta *snapshotDelta) getDestructs() map[ethcmn.Hash]struct{} {
-	return delta.SnapDestructs
+	return delta.DeltaSnapshotDestructs
 }
 
 func (delta *snapshotDelta) getAccounts() map[ethcmn.Hash][]byte {
-	return delta.SnapAccounts
+	return delta.DeltaSnapshotAccounts
 }
 
 func (delta *snapshotDelta) getStorage() map[ethcmn.Hash]map[ethcmn.Hash][]byte {
-	return delta.SnapStorage
+	return delta.DeltaSnapshotSnapStorage
 }
 
 func (delta *snapshotDelta) Marshal() []byte {

@@ -218,8 +218,20 @@ func (ms *MptStore) applySnapshotDelta(payload []byte) {
 	deltaStorage := delta.getStorage()
 	deltaDestructs := delta.getDestructs()
 	ms.snapRWLock.Lock()
-	ms.snapAccounts = deltaAccounts
-	ms.snapStorage = deltaStorage
-	ms.snapDestructs = deltaDestructs
+	// for async commit snapshots may have previous version values
+	for k, v := range deltaDestructs {
+		delete(ms.snapAccounts, k)
+		delete(ms.snapStorage, k)
+		ms.snapDestructs[k] = v
+	}
+	for k, v := range deltaAccounts {
+		delete(ms.snapDestructs, k)
+		ms.snapAccounts[k] = v
+	}
+	for addr, storage := range deltaStorage {
+		for k, v := range storage {
+			ms.snapStorage[addr][k] = v
+		}
+	}
 	ms.snapRWLock.Unlock()
 }
