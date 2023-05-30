@@ -19,13 +19,17 @@ import (
 
 func mptViewerCmd(ctx *server.Context) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "viewer [tree] [height] [contract addr]",
-		Args:  cobra.ExactArgs(2),
+		Use: "viewer [tree] [height] [contract addr]",
+		// Args:  cobra.ExactArgs(2),
 		Short: "iterate mpt store (acc, evm)",
 		PreRunE: func(cmd *cobra.Command, args []string) error {
 			return checkValidKey(args[0])
 		},
 		Run: func(cmd *cobra.Command, args []string) {
+			if len(args) < 2 {
+				log.Printf("args error, please check\n")
+				return
+			}
 			log.Printf("--------- iterate %s data start ---------\n", args[0])
 			height, err := strconv.Atoi(args[1])
 			if err != nil {
