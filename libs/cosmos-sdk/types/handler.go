@@ -2,6 +2,7 @@ package types
 
 import (
 	"github.com/ethereum/go-ethereum/common"
+	stypes "github.com/okx/okbchain/libs/cosmos-sdk/store/types"
 
 	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
 )
@@ -24,6 +25,8 @@ type EvmSysContractAddressHandler func(ctx Context, addr AccAddress) bool
 type UpdateCMTxNonceHandler func(tx Tx, nonce uint64)
 
 type UpdateFeeCollectorAccHandler func(ctx Context, balance Coins, txFeesplit []*FeeSplitInfo) error
+
+type GetGasConfigHandler func(ctx Context) *stypes.GasConfig
 
 type LogFix func(tx []Tx, logIndex []int, hasEnterEvmTx []bool, errs []error, resp []abci.ResponseDeliverTx) (logs [][]byte)
 type UpdateFeeSplitHandler func(txHash common.Hash, addr AccAddress, fee Coins, isDelete bool)

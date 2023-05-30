@@ -2,6 +2,7 @@ package app
 
 import (
 	"fmt"
+	stypes "github.com/okx/okbchain/libs/cosmos-sdk/store/types"
 	paramstypes "github.com/okx/okbchain/x/params/types"
 	"io"
 	"os"
@@ -703,6 +704,7 @@ func NewOKBChainApp(
 	app.SetEvmSysContractAddressHandler(NewEvmSysContractAddressHandler(app.EvmKeeper))
 	app.SetEvmWatcherCollector(app.EvmKeeper.Watcher.Collect)
 	app.SetUpdateCMTxNonceHandler(NewUpdateCMTxNonceHandler())
+	app.SetGetGasConfigHandler(NewGetGasConfigHandler(app.ParamsKeeper))
 	mpt.AccountStateRootRetriever = app.AccountKeeper
 	if loadLatest {
 		err := app.LoadLatestVersion(app.keys[bam.MainStoreKey])
@@ -945,5 +947,11 @@ func NewUpdateCMTxNonceHandler() sdk.UpdateCMTxNonceHandler {
 		if ok && nonce != 0 {
 			stdtx.Nonce = nonce
 		}
+	}
+}
+
+func NewGetGasConfigHandler(pk params.Keeper) sdk.GetGasConfigHandler {
+	return func(ctx sdk.Context) *stypes.GasConfig {
+		return pk.GetGasConfig(ctx)
 	}
 }
