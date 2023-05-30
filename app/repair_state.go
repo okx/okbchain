@@ -89,7 +89,8 @@ func repairStateOnStart(ctx *server.Context) {
 func RepairState(ctx *server.Context, onStart bool) {
 	sm.SetIgnoreSmbCheck(true)
 	iavl.SetIgnoreVersionCheck(true)
-	rootmulti.SetRepair()
+	global.SetRepairState(true)
+	defer global.SetRepairState(false)
 
 	// load latest block height
 	dataDir := filepath.Join(ctx.Config.RootDir, "data")
