@@ -36,7 +36,7 @@ func (w *Simulator) Simulate(msgs []sdk.Msg, ms sdk.CacheMultiStore) (*sdk.Resul
 	events := sdk.EmptyEvents()
 
 	for _, msg := range msgs {
-		w.ctx.ResetWasmKvStoreForSimulate()
+		w.ctx.ResetWasmSimulateCache()
 		w.ctx.SetMultiStore(ms)
 		res, err := w.handler(w.ctx, msg)
 		if err != nil {

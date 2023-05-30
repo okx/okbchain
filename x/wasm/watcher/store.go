@@ -106,9 +106,9 @@ func DeleteAccount(addr sdk.WasmAddress) {
 	}
 }
 
-func NewReadStore(pre []byte, store sdk.KVStore) sdk.KVStore {
+func NewReadStore(mp map[string][]byte, store sdk.KVStore) sdk.KVStore {
 	rs := &readStore{
-		mp: make(map[string][]byte, 0),
+		mp: mp,
 		kv: store,
 	}
 	return rs
@@ -117,19 +117,12 @@ func NewReadStore(pre []byte, store sdk.KVStore) sdk.KVStore {
 type Adapter struct{}
 
 func (a Adapter) NewStore(ctx sdk.Context, storeKey sdk.StoreKey, pre []byte) sdk.KVStore {
-	var ans sdk.KVStore
-	if ctx.WasmKvStoreForSimulate() != nil {
-		ans = ctx.WasmKvStoreForSimulate()
-	} else {
-		ans = NewReadStore(pre, ctx.KVStore(storeKey))
-		ctx.SetWasmKvStoreForSimulate(ans)
-	}
-
+	s := NewReadStore(ctx.GetWasmSimulateCache(), ctx.KVStore(storeKey))
 	if len(pre) != 0 {
-		ans = prefix.NewStore(ans, pre)
+		s = prefix.NewStore(s, pre)
 	}
 
-	return ans
+	return s
 }
 
 type readStore struct {

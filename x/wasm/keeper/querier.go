@@ -338,7 +338,7 @@ func (q grpcQuerier) UnwrapSDKContext(c context.Context) sdk.Context {
 func (q grpcQuerier) PrefixStore(c context.Context, pre []byte) sdk.KVStore {
 	ctx := sdk.UnwrapSDKContext(c)
 	if watcher.Enable() {
-		return watcher.NewReadStore(nil, prefix.NewStore(ctx.KVStore(q.storeKey), pre))
+		return watcher.NewReadStore(ctx.GetWasmSimulateCache(), prefix.NewStore(ctx.KVStore(q.storeKey), pre))
 	}
 	return prefix.NewStore(ctx.KVStore(q.storeKey), pre)
 
