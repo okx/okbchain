@@ -1,13 +1,13 @@
 package mpt
 
 import (
+	"bytes"
 	"encoding/binary"
 	"fmt"
 	"github.com/okx/okbchain/cmd/okbchaind/base"
-	"strconv"
-
 	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
 	"log"
+	"strconv"
 
 	ethcmn "github.com/ethereum/go-ethereum/common"
 	ethcrypto "github.com/ethereum/go-ethereum/crypto"
@@ -150,7 +150,7 @@ func printEmmMpt(height uint64, contractAddr string) {
 		addr := ethcmn.BytesToAddress(accTrie.GetKey(itr.Key))
 		addrHash := ethcrypto.Keccak256Hash(addr[:])
 		acc := base.DecodeAccount(addr.String(), itr.Value)
-		if acc == nil || acc.GetAddress().String() != contractAddr {
+		if acc == nil || !bytes.Equal(acc.GetAddress().Bytes(), ethcmn.Hex2Bytes(contractAddr)) {
 			continue
 		}
 		stateRoot.SetBytes(acc.GetStateRoot().Bytes())
