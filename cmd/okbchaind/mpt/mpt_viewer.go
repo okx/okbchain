@@ -19,7 +19,7 @@ import (
 
 func mptViewerCmd(ctx *server.Context) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "viewer [tree] [height]",
+		Use:   "viewer [tree] [height] [contract addr]",
 		Args:  cobra.ExactArgs(2),
 		Short: "iterate mpt store (acc, evm)",
 		PreRunE: func(cmd *cobra.Command, args []string) error {
@@ -41,7 +41,11 @@ func mptViewerCmd(ctx *server.Context) *cobra.Command {
 			case accStoreKey:
 				iterateAccMpt(uint64(height))
 			case evmStoreKey:
-				iterateEvmMpt(uint64(height))
+				if len(args) > 2 {
+					printEmmMpt(uint64(height), args[2])
+				} else {
+					iterateEvmMpt(uint64(height))
+				}
 			}
 			log.Printf("--------- iterate %s data end ---------\n", args[0])
 		},
@@ -114,5 +118,44 @@ func iterateEvmMpt(height uint64) {
 		for cItr.Next() {
 			fmt.Printf("%s: %s\n", ethcmn.Bytes2Hex(cItr.Key), ethcmn.Bytes2Hex(cItr.Value))
 		}
+	}
+}
+
+func printEmmMpt(height uint64, contractAddr string) {
+	accMptDb := mpt.InstanceOfMptStore()
+	heightBytes, err := accMptDb.TrieDB().DiskDB().Get(mpt.KeyPrefixAccLatestStoredHeight)
+	panicError(err)
+	lastestHeight := binary.BigEndian.Uint64(heightBytes)
+	if lastestHeight < height {
+		panic(fmt.Errorf("height(%d) > lastestHeight(%d)", height, lastestHeight))
+	}
+	if height == 0 {
+		height = lastestHeight
+	}
+
+	hhash := sdk.Uint64ToBigEndian(height)
+	rootHash, err := accMptDb.TrieDB().DiskDB().Get(append(mpt.KeyPrefixAccRootMptHash, hhash...))
+	panicError(err)
+	accTrie, err := accMptDb.OpenTrie(ethcmn.BytesToHash(rootHash))
+	panicError(err)
+	fmt.Println("accTrie root hash:", accTrie.Hash())
+
+	var stateRoot ethcmn.Hash
+	addr := ethcmn.BytesToAddress(mpt.AddressStoreKey(ethcmn.Hex2Bytes(contractAddr)))
+	addrHash := ethcrypto.Keccak256Hash(addr[:])
+	accBytes, err := accTrie.TryGet(addr[:])
+	panicError(err)
+	acc := base.DecodeAccount(addr.String(), accBytes)
+	if acc == nil {
+		panicError(fmt.Errorf("account not found"))
+	}
+	stateRoot.SetBytes(acc.GetStateRoot().Bytes())
+
+	contractTrie := getStorageTrie(accMptDb, addrHash, stateRoot)
+	fmt.Println(addr.String(), contractTrie.Hash())
+
+	cItr := trie.NewIterator(contractTrie.NodeIterator(nil))
+	for cItr.Next() {
+		fmt.Printf("%s: %s\n", ethcmn.Bytes2Hex(cItr.Key), ethcmn.Bytes2Hex(cItr.Value))
 	}
 }
