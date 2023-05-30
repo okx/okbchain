@@ -145,21 +145,22 @@ func printEmmMpt(height uint64, contractAddr string) {
 	fmt.Println("accTrie root hash:", accTrie.Hash())
 
 	var stateRoot ethcmn.Hash
-	addr := ethcmn.BytesToAddress(mpt.AddressStoreKey(ethcmn.Hex2Bytes(contractAddr)))
-	addrHash := ethcrypto.Keccak256Hash(addr[:])
-	accBytes, err := accTrie.TryGet(addr[:])
-	panicError(err)
-	acc := base.DecodeAccount(addr.String(), accBytes)
-	if acc == nil {
-		panicError(fmt.Errorf("account not found"))
-	}
-	stateRoot.SetBytes(acc.GetStateRoot().Bytes())
+	itr := trie.NewIterator(accTrie.NodeIterator(nil))
+	for itr.Next() {
+		addr := ethcmn.BytesToAddress(accTrie.GetKey(itr.Key))
+		addrHash := ethcrypto.Keccak256Hash(addr[:])
+		acc := base.DecodeAccount(addr.String(), itr.Value)
+		if acc == nil || acc.GetAddress().String() != contractAddr {
+			continue
+		}
+		stateRoot.SetBytes(acc.GetStateRoot().Bytes())
 
-	contractTrie := getStorageTrie(accMptDb, addrHash, stateRoot)
-	fmt.Println(addr.String(), contractTrie.Hash())
+		contractTrie := getStorageTrie(accMptDb, addrHash, stateRoot)
+		fmt.Println(addr.String(), contractTrie.Hash())
 
-	cItr := trie.NewIterator(contractTrie.NodeIterator(nil))
-	for cItr.Next() {
-		fmt.Printf("%s: %s\n", ethcmn.Bytes2Hex(cItr.Key), ethcmn.Bytes2Hex(cItr.Value))
+		cItr := trie.NewIterator(contractTrie.NodeIterator(nil))
+		for cItr.Next() {
+			fmt.Printf("%s: %s\n", ethcmn.Bytes2Hex(cItr.Key), ethcmn.Bytes2Hex(cItr.Value))
+		}
 	}
 }
