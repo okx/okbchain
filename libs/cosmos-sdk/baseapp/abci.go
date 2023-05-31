@@ -185,7 +185,7 @@ func (app *BaseApp) UpdateGlobalGasConfig(ctx sdk.Context) {
 	if ctx.IsCheckTx() || ctx.IsTraceTx() {
 		return
 	}
-	stypes.UpdateGlobalGasConfig(app.getGasConfigHandler(app.deliverState.ctx))
+	stypes.UpdateGlobalGasConfig(app.getGasConfigHandler(ctx))
 }
 
 func (app *BaseApp) UpdateFeeCollector(fee sdk.Coins, add bool) {
