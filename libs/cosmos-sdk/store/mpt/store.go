@@ -235,6 +235,7 @@ func (ms *MptStore) Get(key []byte) []byte {
 		if err != nil {
 			return nil
 		}
+		return value
 	default:
 		panic(fmt.Errorf("not support key %s for mpt get", hex.EncodeToString(key)))
 	}
