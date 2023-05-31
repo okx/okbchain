@@ -46,7 +46,7 @@ func mptViewerCmd(ctx *server.Context) *cobra.Command {
 				iterateAccMpt(uint64(height))
 			case evmStoreKey:
 				if len(args) > 2 {
-					printEmmMpt(uint64(height), args[2])
+					printEmmMptEx(uint64(height), args[2])
 				} else {
 					iterateEvmMpt(uint64(height))
 				}
@@ -163,4 +163,49 @@ func printEmmMpt(height uint64, contractAddr string) {
 			fmt.Printf("%s: %s\n", ethcmn.Bytes2Hex(cItr.Key), ethcmn.Bytes2Hex(cItr.Value))
 		}
 	}
+}
+
+func printEmmMptEx(height uint64, contractAddr string) {
+	accMptDb := mpt.InstanceOfMptStore()
+	heightBytes, err := accMptDb.TrieDB().DiskDB().Get(mpt.KeyPrefixAccLatestStoredHeight)
+	panicError(err)
+	lastestHeight := binary.BigEndian.Uint64(heightBytes)
+	if lastestHeight < height {
+		panic(fmt.Errorf("height(%d) > lastestHeight(%d)", height, lastestHeight))
+	}
+	if height == 0 {
+		height = lastestHeight
+	}
+
+	hhash := sdk.Uint64ToBigEndian(height)
+	rootHash, err := accMptDb.TrieDB().DiskDB().Get(append(mpt.KeyPrefixAccRootMptHash, hhash...))
+	panicError(err)
+	accTrie, err := accMptDb.OpenTrie(ethcmn.BytesToHash(rootHash))
+	panicError(err)
+	fmt.Println("accTrie root hash:", accTrie.Hash())
+
+	var stateRoot ethcmn.Hash
+	// itr := trie.NewIterator(accTrie.NodeIterator(nil))
+	// for itr.Next() {
+	addr := ethcmn.BytesToAddress(ethcmn.Hex2Bytes(contractAddr))
+	addrHash := ethcrypto.Keccak256Hash(addr[:])
+	payload, err := accTrie.TryGet(ethcmn.Hex2Bytes(contractAddr))
+	panicError(err)
+	if len(payload) == 0 {
+		panic("payload is nil")
+	}
+	acc := base.DecodeAccount(addr.String(), payload)
+	//	if acc == nil || !bytes.Equal(acc.GetAddress().Bytes(), ethcmn.Hex2Bytes(contractAddr)) {
+	//		continue
+	//	}
+	stateRoot.SetBytes(acc.GetStateRoot().Bytes())
+
+	contractTrie := getStorageTrie(accMptDb, addrHash, stateRoot)
+	fmt.Println(addr.String(), contractTrie.Hash())
+
+	cItr := trie.NewIterator(contractTrie.NodeIterator(nil))
+	for cItr.Next() {
+		fmt.Printf("%s: %s\n", ethcmn.Bytes2Hex(cItr.Key), ethcmn.Bytes2Hex(cItr.Value))
+	}
+	// }
 }
