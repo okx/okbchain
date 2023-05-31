@@ -4,6 +4,7 @@ import (
 	"encoding/binary"
 	"encoding/json"
 	"fmt"
+	"sync"
 	"time"
 
 	"github.com/spf13/viper"
@@ -150,3 +151,19 @@ func (e EmptyWatcher) DeleteContractBlockedList(addr interface{})               
 func (e EmptyWatcher) DeleteContractDeploymentWhitelist(addr interface{})                 {}
 func (e EmptyWatcher) Finalize()                                                          {}
 func (e EmptyWatcher) Destruct() []WatchMessage                                           { return nil }
+
+var (
+	storePool = sync.Pool{
+		New: func() interface{} {
+			return make(map[string][]byte)
+		},
+	}
+)
+
+func putBackWasmCacheMap(d map[string][]byte) {
+	storePool.Put(d)
+}
+
+func getWasmCacheMap() map[string][]byte {
+	return storePool.Get().(map[string][]byte)
+}
