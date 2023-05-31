@@ -430,6 +430,10 @@ func handleSimulateWithBuffer(app *BaseApp, path []string, height int64, txBytes
 
 }
 
+var (
+	msCacheForSimulate = newCacheMultiStoreList()
+)
+
 func handleSimulate(app *BaseApp, path []string, height int64, txBytes []byte, overrideBytes []byte) (sdk.SimulationResponse, bool, error) {
 	// if path contains address, it means 'eth_estimateGas' the sender
 	hasExtraPaths := len(path) > 2
@@ -472,7 +476,10 @@ func handleSimulate(app *BaseApp, path []string, height int64, txBytes []byte, o
 			}
 		}
 		if isPureWasm {
-			res, err := handleSimulateWasm(height, txBytes, msgs, app.checkState.ms.CacheMultiStore())
+			mss := msCacheForSimulate.GetStoreWithParent(app.checkState.ms)
+			res, err := handleSimulateWasm(height, txBytes, msgs, mss)
+			msCacheForSimulate.PushStore(mss)
+			fmt.Println("fffffff", msCacheForSimulate.Len())
 			return res, shouldAddBuffer, err
 		}
 	}
