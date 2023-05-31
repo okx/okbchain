@@ -229,8 +229,12 @@ func (ms *MptStore) Get(key []byte) []byte {
 		if err != nil {
 			return nil
 		}
-
 		return value
+	case putType:
+		value, err := ms.db.TrieDB().DiskDB().Get(key[1:])
+		if err != nil {
+			return nil
+		}
 	default:
 		panic(fmt.Errorf("not support key %s for mpt get", hex.EncodeToString(key)))
 	}
@@ -279,6 +283,8 @@ func (ms *MptStore) Set(key, value []byte) {
 	case addressType:
 		ms.trie.TryUpdate(key, value)
 		ms.updateSnapAccounts(key, value)
+	case putType:
+		ms.db.TrieDB().DiskDB().Put(key[1:], value)
 	default:
 		panic(fmt.Errorf("not support key %s for mpt set", hex.EncodeToString(key)))
 	}
@@ -790,6 +796,8 @@ func (ms *MptStore) SetUpgradeVersion(i int64) {}
 var (
 	keyPrefixStorageMpt  = byte(0)
 	keyPrefixAddrMpt     = byte(1) // TODO auth.AddressStoreKeyPrefix
+	keyPrefixCodeMpt     = byte(2)
+	keyPrefixPutMpt      = byte(3)
 	prefixSizeInMpt      = 1
 	storageKeySize       = prefixSizeInMpt + len(ethcmn.Address{}) + len(ethcmn.Hash{}) + len(ethcmn.Hash{})
 	addrKeySize          = prefixSizeInMpt + sdk.AddrLen
@@ -816,9 +824,15 @@ func AddressStoreKey(addr []byte) []byte {
 	return append([]byte{keyPrefixAddrMpt}, addr...)
 }
 
+func PutStoreKey(key []byte) []byte {
+	return append([]byte{keyPrefixPutMpt}, key...)
+}
+
 var (
 	storageType = 0
 	addressType = 1
+	codeType    = 2
+	putType     = 3
 )
 
 /*
@@ -836,6 +850,10 @@ func mptKeyType(key []byte) int {
 		return -1
 	case keyPrefixStorageMpt:
 		return storageType
+	case keyPrefixCodeMpt:
+		return codeType
+	case keyPrefixPutMpt:
+		return putType
 	default:
 		return -1
 

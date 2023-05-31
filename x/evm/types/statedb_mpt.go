@@ -89,13 +89,17 @@ func (csdb *CommitStateDB) GetCodeByHashInRawDB(hash ethcmn.Hash) []byte {
 
 func (csdb *CommitStateDB) setHeightHashInRawDB(height uint64, hash ethcmn.Hash) {
 	key := AppendHeightHashKey(height)
-	csdb.db.TrieDB().DiskDB().Put(key, hash.Bytes())
+	st := csdb.ctx.MultiStore().GetKVStore(csdb.storeKey)
+	preKey := mpt.PutStoreKey(key)
+	st.Set(preKey, hash.Bytes())
 }
 
 func (csdb *CommitStateDB) getHeightHashInRawDB(height uint64) ethcmn.Hash {
 	key := AppendHeightHashKey(height)
-	bz, err := csdb.db.TrieDB().DiskDB().Get(key)
-	if err != nil {
+	st := csdb.ctx.MultiStore().GetKVStore(csdb.storeKey)
+	preKey := mpt.PutStoreKey(key)
+	bz := st.Get(preKey)
+	if bz == nil || len(bz) == 0 {
 		return ethcmn.Hash{}
 	}
 	return ethcmn.BytesToHash(bz)
