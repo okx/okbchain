@@ -49,8 +49,14 @@ type OkbcConfig struct {
 	maxGasUsedPerBlock int64
 	// mempool.enable-pgu
 	enablePGU bool
+	// mempool.pgu-percentage-threshold
+	pguPercentageThreshold int64
+	// mempool.pgu-concurrency
+	pguConcurrency int
 	// mempool.pgu-adjustment
 	pguAdjustment float64
+	// mempool.pgu-persist
+	pguPersist bool
 	// mempool.node_key_whitelist
 	nodeKeyWhitelist []string
 	//mempool.check_tx_cost
@@ -135,7 +141,10 @@ const (
 	FlagMaxTxNumPerBlock           = "mempool.max_tx_num_per_block"
 	FlagMaxGasUsedPerBlock         = "mempool.max_gas_used_per_block"
 	FlagEnablePGU                  = "mempool.enable-pgu"
+	FlagPGUPercentageThreshold     = "mempool.pgu-percentage-threshold"
+	FlagPGUConcurrency             = "mempool.pgu-concurrency"
 	FlagPGUAdjustment              = "mempool.pgu-adjustment"
+	FlagPGUPersist                 = "mempool.pgu-persist"
 	FlagNodeKeyWhitelist           = "mempool.node_key_whitelist"
 	FlagMempoolCheckTxCost         = "mempool.check_tx_cost"
 	FlagMempoolEnableDeleteMinGPTx = "mempool.enable_delete_min_gp_tx"
@@ -277,7 +286,10 @@ func (c *OkbcConfig) loadFromConfig() {
 	c.SetEnableDeleteMinGPTx(viper.GetBool(FlagMempoolEnableDeleteMinGPTx))
 	c.SetMaxGasUsedPerBlock(viper.GetInt64(FlagMaxGasUsedPerBlock))
 	c.SetEnablePGU(viper.GetBool(FlagEnablePGU))
+	c.SetPGUPercentageThreshold(viper.GetInt64(FlagPGUPercentageThreshold))
+	c.SetPGUConcurrency(viper.GetInt(FlagPGUConcurrency))
 	c.SetPGUAdjustment(viper.GetFloat64(FlagPGUAdjustment))
+	c.SetPGUPersist(viper.GetBool(FlagPGUPersist))
 	c.SetGasLimitBuffer(viper.GetUint64(FlagGasLimitBuffer))
 
 	c.SetEnableDynamicGp(viper.GetBool(FlagEnableDynamicGp))
@@ -484,12 +496,30 @@ func (c *OkbcConfig) updateFromKVStr(k, v string) {
 			return
 		}
 		c.SetEnablePGU(r)
+	case FlagPGUPercentageThreshold:
+		r, err := strconv.ParseInt(v, 10, 64)
+		if err != nil {
+			return
+		}
+		c.SetPGUPercentageThreshold(r)
+	case FlagPGUConcurrency:
+		r, err := strconv.Atoi(v)
+		if err != nil {
+			return
+		}
+		c.SetPGUConcurrency(r)
 	case FlagPGUAdjustment:
 		r, err := strconv.ParseFloat(v, 64)
 		if err != nil {
 			return
 		}
 		c.SetPGUAdjustment(r)
+	case FlagPGUPersist:
+		r, err := strconv.ParseBool(v)
+		if err != nil {
+			return
+		}
+		c.SetPGUPersist(r)
 	case FlagGasLimitBuffer:
 		r, err := strconv.ParseUint(v, 10, 64)
 		if err != nil {
@@ -802,12 +832,36 @@ func (c *OkbcConfig) SetEnablePGU(value bool) {
 	c.enablePGU = value
 }
 
+func (c *OkbcConfig) GetPGUPercentageThreshold() int64 {
+	return c.pguPercentageThreshold
+}
+
+func (c *OkbcConfig) SetPGUPercentageThreshold(value int64) {
+	c.pguPercentageThreshold = value
+}
+
+func (c *OkbcConfig) GetPGUConcurrency() int {
+	return c.pguConcurrency
+}
+
+func (c *OkbcConfig) SetPGUConcurrency(value int) {
+	c.pguConcurrency = value
+}
+
 func (c *OkbcConfig) GetPGUAdjustment() float64 {
 	return c.pguAdjustment
 }
 
 func (c *OkbcConfig) SetPGUAdjustment(value float64) {
 	c.pguAdjustment = value
+}
+
+func (c *OkbcConfig) GetPGUPersist() bool {
+	return c.pguPersist
+}
+
+func (c *OkbcConfig) SetPGUPersist(value bool) {
+	c.pguPersist = value
 }
 
 func (c *OkbcConfig) GetGasLimitBuffer() uint64 {
