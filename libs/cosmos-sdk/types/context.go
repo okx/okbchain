@@ -211,9 +211,13 @@ func (c *Context) SetDeliver() *Context {
 	return c
 }
 
+func (c *Context) SetWasmSimulateCache() {
+	c.wasmSimulateCache = getWasmCacheMap()
+}
 func (c *Context) GetWasmSimulateCache() map[string][]byte {
 	if c.wasmSimulateCache == nil {
-		return getWasmCacheMap()
+		c.wasmSimulateCache = getWasmCacheMap()
+		return c.wasmSimulateCache
 	}
 	return c.wasmSimulateCache
 }

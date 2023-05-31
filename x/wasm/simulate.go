@@ -34,6 +34,7 @@ func (w *Simulator) Simulate(msgs []sdk.Msg, ms sdk.CacheMultiStore) (*sdk.Resul
 	defer func() {
 		w.ctx.MoveWasmSimulateCacheToPool()
 	}()
+	w.ctx.SetWasmSimulateCache()
 	//wasm Result has no Logs
 	data := make([]byte, 0, len(msgs))
 	events := sdk.EmptyEvents()
