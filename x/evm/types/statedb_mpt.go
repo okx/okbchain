@@ -22,7 +22,7 @@ func (csdb *CommitStateDB) CommitMpt(prefetcher *mpt.TriePrefetcher) (ethcmn.Has
 		if obj := csdb.stateObjects[addr]; !obj.deleted {
 			// Write any contract code associated with the state object
 			if obj.code != nil && obj.dirtyCode {
-				st := csdb.ctx.KVStore(csdb.storeKey)
+				st := csdb.ctx.MultiStore().GetKVStore(csdb.storeKey)
 				preKey := mpt.CodeStoreKey(ethcmn.Hash{}, obj.CodeHash())
 				st.Set(preKey, obj.code)
 				//rawdb.WriteCode(codeWriter, ethcmn.BytesToHash(obj.CodeHash()), obj.code)
@@ -81,7 +81,7 @@ func (csdb *CommitStateDB) ForEachStorageMpt(so *stateObject, cb func(key, value
 }
 
 func (csdb *CommitStateDB) GetCodeByHashInRawDB(hash ethcmn.Hash) []byte {
-	st := csdb.ctx.KVStore(csdb.storeKey)
+	st := csdb.ctx.MultiStore().GetKVStore(csdb.storeKey)
 	preKey := mpt.CodeStoreKey(ethcmn.Hash{}, hash.Bytes())
 	code := st.Get(preKey)
 
@@ -90,14 +90,14 @@ func (csdb *CommitStateDB) GetCodeByHashInRawDB(hash ethcmn.Hash) []byte {
 
 func (csdb *CommitStateDB) setHeightHashInRawDB(height uint64, hash ethcmn.Hash) {
 	key := AppendHeightHashKey(height)
-	st := csdb.ctx.KVStore(csdb.storeKey)
+	st := csdb.ctx.MultiStore().GetKVStore(csdb.storeKey)
 	preKey := mpt.PutStoreKey(key)
 	st.Set(preKey, hash.Bytes())
 }
 
 func (csdb *CommitStateDB) getHeightHashInRawDB(height uint64) ethcmn.Hash {
 	key := AppendHeightHashKey(height)
-	st := csdb.ctx.KVStore(csdb.storeKey)
+	st := csdb.ctx.MultiStore().GetKVStore(csdb.storeKey)
 	preKey := mpt.PutStoreKey(key)
 	bz := st.Get(preKey)
 	if bz == nil || len(bz) == 0 {

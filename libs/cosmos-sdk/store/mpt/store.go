@@ -295,7 +295,6 @@ func (ms *MptStore) Set(key, value []byte) {
 		ms.trie.TryUpdate(key, value)
 		ms.updateSnapAccounts(key, value)
 	case codeType:
-		//ms.bt.Put()
 		rawdb.WriteCode(ms.db.TrieDB().DiskDB().NewBatch(), ethcmn.BytesToHash(key[1:]), value)
 	case putType:
 		ms.db.TrieDB().DiskDB().Put(key[1:], value)

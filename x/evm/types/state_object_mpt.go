@@ -85,7 +85,7 @@ func (so *stateObject) CodeInRawDB(db ethstate.Database) []byte {
 	if bytes.Equal(so.CodeHash(), emptyCodeHash) {
 		return nil
 	}
-	st := so.stateDB.ctx.KVStore(so.stateDB.storeKey)
+	st := so.stateDB.ctx.MultiStore().GetKVStore(so.stateDB.storeKey)
 	preKey := mpt.CodeStoreKey(so.addrHash, so.CodeHash())
 	code := st.Get(preKey)
 	so.code = code
@@ -225,7 +225,7 @@ func (so *stateObject) CodeSize(db ethstate.Database) int {
 	if bytes.Equal(so.CodeHash(), emptyCodeHash) {
 		return 0
 	}
-	st := so.stateDB.ctx.KVStore(so.stateDB.storeKey)
+	st := so.stateDB.ctx.MultiStore().GetKVStore(so.stateDB.storeKey)
 	preKey := mpt.CodeStoreKey(so.addrHash, so.CodeHash())
 	code := st.Get(preKey)
 	size := len(code)
