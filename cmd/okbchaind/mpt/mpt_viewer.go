@@ -189,7 +189,7 @@ func printEmmMptEx(height uint64, contractAddr string) {
 	// for itr.Next() {
 	addr := ethcmn.BytesToAddress(ethcmn.Hex2Bytes(contractAddr))
 	addrHash := ethcrypto.Keccak256Hash(addr[:])
-	payload, err := accTrie.TryGet(ethcmn.Hex2Bytes(contractAddr))
+	payload, err := accTrie.TryGet(append([]byte{1}, ethcmn.Hex2Bytes(contractAddr)...))
 	panicError(err)
 	if len(payload) == 0 {
 		panic("payload is nil")
