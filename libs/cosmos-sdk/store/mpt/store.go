@@ -296,7 +296,7 @@ func (ms *MptStore) Set(key, value []byte) {
 		ms.updateSnapAccounts(key, value)
 	case codeType:
 		//ms.bt.Put()
-		rawdb.WriteCode(ms.bt, ethcmn.BytesToHash(key[1:]), value)
+		rawdb.WriteCode(ms.db.TrieDB().DiskDB().NewBatch(), ethcmn.BytesToHash(key[1:]), value)
 	case putType:
 		ms.db.TrieDB().DiskDB().Put(key[1:], value)
 
@@ -873,7 +873,7 @@ func mptKeyType(key []byte) int {
 		}
 		return -1
 	case keyPrefixStorageMpt:
-    return storageType
+		return storageType
 	case keyPrefixCodeMpt:
 		return codeType
 	case keyPrefixPutMpt:
