@@ -237,12 +237,15 @@ func (k Keeper) GetBlockHeight(ctx sdk.Context, hash ethcmn.Hash) (int64, bool) 
 		height := cached.(int64)
 		return height, true
 	}
-	return k.getBlockHashInDiskDB(hash.Bytes())
+	return k.getBlockHashInDiskDB(ctx, hash.Bytes())
 }
 
 // SetBlockHeight sets the mapping from block consensus hash to block height
 func (k Keeper) SetBlockHeight(ctx sdk.Context, hash []byte, height int64) {
-	k.setBlockHashInDiskDB(hash, height)
+	if ctx.IsCheckTx() {
+		return
+	}
+	k.setBlockHashInDiskDB(ctx, hash, height)
 }
 
 // IterateBlockHash iterates all over the block hash in every height
