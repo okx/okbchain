@@ -7,6 +7,7 @@ import (
 	"github.com/okx/okbchain/libs/cosmos-sdk/x/auth/exported"
 	"github.com/okx/okbchain/libs/cosmos-sdk/x/auth/keeper"
 	"github.com/okx/okbchain/libs/cosmos-sdk/x/auth/types"
+	tmtypes "github.com/okx/okbchain/libs/tendermint/types"
 
 	sdkerrors "github.com/okx/okbchain/libs/cosmos-sdk/types/errors"
 )
@@ -104,18 +105,27 @@ func (dfd DeductFeeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bo
 	// Note: In order to support the parallel execution of StdTx,
 	// we eliminated the GasConsumed of DeductFees,
 	// otherwise SMB will be triggered when refunding.
-	gasMeter := ctx.GasMeter()
-	tmpGasMeter := sdk.GetReusableInfiniteGasMeter()
-	ctx.SetGasMeter(tmpGasMeter)
-	// deduct the fees
-	if !feeTx.GetFee().IsZero() {
-		err = DeductFees(dfd.supplyKeeper, ctx, feePayerAcc, feeTx.GetFee())
-		if err != nil {
-			return ctx, err
+	if tmtypes.HigherThanMercury(ctx.BlockHeight()) {
+		gasMeter := ctx.GasMeter()
+		tmpGasMeter := sdk.GetReusableInfiniteGasMeter()
+		ctx.SetGasMeter(tmpGasMeter)
+		// deduct the fees
+		if !feeTx.GetFee().IsZero() {
+			err = DeductFees(dfd.supplyKeeper, ctx, feePayerAcc, feeTx.GetFee())
+			if err != nil {
+				return ctx, err
+			}
+		}
+		sdk.ReturnInfiniteGasMeter(tmpGasMeter)
+		ctx.SetGasMeter(gasMeter)
+	} else {
+		if !feeTx.GetFee().IsZero() {
+			err = DeductFees(dfd.supplyKeeper, ctx, feePayerAcc, feeTx.GetFee())
+			if err != nil {
+				return ctx, err
+			}
 		}
 	}
-	sdk.ReturnInfiniteGasMeter(tmpGasMeter)
-	ctx.SetGasMeter(gasMeter)
 
 	return next(ctx, tx, simulate)
 }
