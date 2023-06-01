@@ -211,15 +211,22 @@ func (c *Context) SetDeliver() *Context {
 	return c
 }
 
+func (c *Context) SetWasmSimulateCache() {
+	c.wasmSimulateCache = getWasmCacheMap()
+}
 func (c *Context) GetWasmSimulateCache() map[string][]byte {
 	if c.wasmSimulateCache == nil {
-		return make(map[string][]byte, 0)
+		c.wasmSimulateCache = getWasmCacheMap()
+		return c.wasmSimulateCache
 	}
 	return c.wasmSimulateCache
 }
 
-func (c *Context) ResetWasmSimulateCache() {
-	c.wasmSimulateCache = make(map[string][]byte)
+func (c *Context) MoveWasmSimulateCacheToPool() {
+	for k, _ := range c.wasmSimulateCache {
+		delete(c.wasmSimulateCache, k)
+	}
+	putBackWasmCacheMap(c.wasmSimulateCache)
 }
 
 // TODO: remove???
