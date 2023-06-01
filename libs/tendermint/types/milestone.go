@@ -23,8 +23,9 @@ const (
 	MainNet = system.Chain + "-196"
 	TestNet = system.TestnetPrefix + "-195"
 
-	MILESTONE_EARTH  = "earth"
-	MILESTONE_Venus4 = "venus4"
+	MILESTONE_EARTH   = "earth"
+	MILESTONE_Venus4  = "venus4"
+	MILESTONE_MERCURY = "mercury"
 )
 
 func SetupMainNetEnvironment(pruneH int64) {
