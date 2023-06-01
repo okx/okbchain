@@ -64,7 +64,6 @@ func (w *Simulator) Release() {
 		return
 	}
 	proxy.PutBackStorePool(w.ctx.MultiStore().(sdk.CacheMultiStore))
-	//w.k.Cleanup()
 }
 
 var (

@@ -430,10 +430,6 @@ func handleSimulateWithBuffer(app *BaseApp, path []string, height int64, txBytes
 
 }
 
-//var (
-//	ts = time.Now()
-//)
-
 func handleSimulate(app *BaseApp, path []string, height int64, txBytes []byte, overrideBytes []byte) (sdk.SimulationResponse, bool, error) {
 	// if path contains address, it means 'eth_estimateGas' the sender
 	hasExtraPaths := len(path) > 2
@@ -467,7 +463,6 @@ func handleSimulate(app *BaseApp, path []string, height int64, txBytes []byte, o
 
 	msgs := tx.GetMsgs()
 
-	//ts = time.Now()
 	if enableWasmFastQuery() {
 		isPureWasm := true
 		for _, msg := range msgs {
@@ -477,10 +472,7 @@ func handleSimulate(app *BaseApp, path []string, height int64, txBytes []byte, o
 			}
 		}
 		if isPureWasm {
-			tt := app.checkState.ms.CacheMultiStore()
-			res, err := handleSimulateWasm(height, txBytes, msgs, tt)
-			//tt.Clear()
-			//fmt.Println("fq", time.Now().Sub(ts))
+			res, err := handleSimulateWasm(height, txBytes, msgs, app.checkState.ms.CacheMultiStore())
 			return res, shouldAddBuffer, err
 		}
 	}
@@ -488,7 +480,6 @@ func handleSimulate(app *BaseApp, path []string, height int64, txBytes []byte, o
 	if err != nil && !isMempoolSim {
 		return sdk.SimulationResponse{}, false, sdkerrors.Wrap(err, "failed to simulate tx")
 	}
-	//fmt.Println("not fq", time.Now().Sub(ts))
 
 	return sdk.SimulationResponse{
 		GasInfo: gInfo,
