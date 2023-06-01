@@ -354,4 +354,12 @@ func SetExternalPackageValue(cmd *cobra.Command) {
 	consensus.SetActiveVC(viper.GetBool(FlagActiveViewChange))
 
 	tmtypes.EnableEventBlockTime = viper.GetBool(FlagEventBlockTime)
+
+	mptstore.TrieDirtyDisabled = viper.GetBool(mptstore.FlagTrieDirtyDisabled)
+	mptstore.TrieCacheSize = viper.GetUint(mptstore.FlagTrieCacheSize)
+	mptstore.TriesInMemory = viper.GetUint(mptstore.FlagTrieInMemory)
+	mptstore.TrieAsyncDB = viper.GetBool(mptstore.FlagTrieAsyncDB)
+	mptstore.TrieAsyncDBInitCap = viper.GetInt(mptstore.FlagTrieAsyncDBInitCap)
+	mptstore.TrieAsyncDBAutoPruningOff = viper.GetBool(mptstore.FlagTrieAsyncDBAutoPruningOff)
+	mptstore.TrieAsyncDBSyncPruning = viper.GetBool(mptstore.FlagTrieAsyncDBSyncPruning)
 }

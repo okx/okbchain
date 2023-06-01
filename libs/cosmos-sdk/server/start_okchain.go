@@ -252,18 +252,15 @@ func RegisterServerFlags(cmd *cobra.Command) *cobra.Command {
 	cmd.Flags().String(flags.FlagChainID, ChainID, "Chain ID of tendermint node for web3")
 	cmd.Flags().StringP(flags.FlagBroadcastMode, "b", flags.BroadcastSync, "Transaction broadcasting mode (sync|async|block) for web3")
 
-	cmd.Flags().BoolVar(&mpt.TrieDirtyDisabled, mpt.FlagTrieDirtyDisabled, false, "Disable cache dirty trie nodes")
-	cmd.Flags().UintVar(&mpt.TrieCacheSize, mpt.FlagTrieCacheSize, 2048, "Size (MB) to cache trie nodes")
-	cmd.Flags().UintVar(&mpt.TrieNodesLimit, mpt.FlagTrieNodesLimit, 256, "Max node size (MB) cached in triedb")
-	cmd.Flags().UintVar(&mpt.TrieImgsLimit, mpt.FlagTrieImgsLimit, 4, "Max img size (MB) cached in triedb")
-	cmd.Flags().UintVar(&mpt.TrieAccStoreCache, mpt.FlagTrieAccStoreCache, 32, "Size (MB) to cache account")
-	cmd.Flags().UintVar(&mpt.TriesInMemory, mpt.FlagTrieInMemory, 100, "Max cache tire count in Memory")
-	cmd.Flags().BoolVar(&mpt.TrieAsyncDB, mpt.FlagTrieAsyncDB, true, "Enable async commit to trie db")
-	cmd.Flags().IntVar(&mpt.TrieAsyncDBInitCap, mpt.FlagTrieAsyncDBInitCap, 200_0000, "Init cap of trie async db")
-	cmd.Flags().BoolVar(&mpt.TrieAsyncDBAutoPruningOff, mpt.FlagTrieAsyncDBAutoPruningOff, false, "Disable auto prune of trie async db")
-	cmd.Flags().BoolVar(&mpt.TrieAsyncDBSyncPruning, mpt.FlagTrieAsyncDBSyncPruning, false, "if auto pruning is off and this is on, trie async db will be pruned every block in sync mode")
-	cmd.Flags().Int64(FlagCommitGapHeight, 10, "Block interval to commit cached data into db, affects iavl & mpt")
+	cmd.Flags().Bool(mpt.FlagTrieDirtyDisabled, false, "Disable cache dirty trie nodes")
+	cmd.Flags().Uint(mpt.FlagTrieCacheSize, 2048, "Size (MB) to cache trie nodes")
+	cmd.Flags().Uint(mpt.FlagTrieInMemory, 100, "Max cache tire count in Memory")
+	cmd.Flags().Bool(mpt.FlagTrieAsyncDB, true, "Enable async commit to trie db")
+	cmd.Flags().Int(mpt.FlagTrieAsyncDBInitCap, 200_0000, "Init cap of trie async db")
+	cmd.Flags().Bool(mpt.FlagTrieAsyncDBAutoPruningOff, false, "Disable auto prune of trie async db")
+	cmd.Flags().Bool(mpt.FlagTrieAsyncDBSyncPruning, false, "if auto pruning is off and this is on, trie async db will be pruned every block in sync mode")
 
+	cmd.Flags().Int64(FlagCommitGapHeight, 10, "Block interval to commit cached data into db, affects iavl & mpt")
 	cmd.Flags().Int64(FlagFastSyncGap, 20, "Block height interval to switch fast-sync mode")
 
 	return cmd

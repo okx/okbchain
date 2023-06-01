@@ -3,6 +3,7 @@ package keeper
 import (
 	"encoding/binary"
 	ethtypes "github.com/ethereum/go-ethereum/core/types"
+	"github.com/okx/okbchain/libs/cosmos-sdk/store/mpt"
 	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
 	"github.com/okx/okbchain/x/evm/types"
 )
@@ -12,13 +13,12 @@ import (
  * TODO: these interfaces are used for setting/getting data in rawdb, instead of iavl.
  * TODO: delete these if we decide persist data in iavl.
  */
-func (k Keeper) getBlockHashInDiskDB(hash []byte) (int64, bool) {
+func (k Keeper) getBlockHashInDiskDB(ctx sdk.Context, hash []byte) (int64, bool) {
 	key := types.AppendBlockHashKey(hash)
-	bz, err := k.db.TrieDB().DiskDB().Get(key)
-	if err != nil {
-		return 0, false
-	}
-	if len(bz) == 0 {
+	st := ctx.MultiStore().GetKVStore(k.storeKey)
+	preKey := mpt.PutStoreKey(key)
+	bz := st.Get(preKey)
+	if bz == nil || len(bz) == 0 {
 		return 0, false
 	}
 
@@ -26,10 +26,12 @@ func (k Keeper) getBlockHashInDiskDB(hash []byte) (int64, bool) {
 	return int64(height), true
 }
 
-func (k Keeper) setBlockHashInDiskDB(hash []byte, height int64) {
+func (k Keeper) setBlockHashInDiskDB(ctx sdk.Context, hash []byte, height int64) {
 	key := types.AppendBlockHashKey(hash)
 	bz := sdk.Uint64ToBigEndian(uint64(height))
-	k.db.TrieDB().DiskDB().Put(key, bz)
+	st := ctx.MultiStore().GetKVStore(k.storeKey)
+	preKey := mpt.PutStoreKey(key)
+	st.Set(preKey, bz)
 }
 
 func (k Keeper) iterateBlockHashInDiskDB(fn func(key []byte, value []byte) (stop bool)) {
