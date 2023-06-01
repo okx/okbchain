@@ -431,10 +431,13 @@ func (ms *MptStore) CommitterCommit(inputDelta interface{}) (rootHash types.Comm
 		for _, kvs := range delta.DelKV {
 			ms.Delete(kvs.Key)
 		}
+		ms.applyRawDBDelta(delta.CodeKV)
 	}
 	if produceDelta {
+		GetRawDBDeltaInstance().fillCodeDelta(ms.outputDelta)
 		outputDelta = ms.outputDelta
 		ms.outputDelta = trie.NewMptDelta()
+		GetRawDBDeltaInstance().reset()
 	}
 
 	ms.version++
