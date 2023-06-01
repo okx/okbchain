@@ -237,12 +237,15 @@ func (k Keeper) GetBlockHeight(ctx sdk.Context, hash ethcmn.Hash) (int64, bool) 
 		height := cached.(int64)
 		return height, true
 	}
-	return k.getBlockHashInDiskDB(hash.Bytes())
+	return k.getBlockHashInDiskDB(ctx, hash.Bytes())
 }
 
 // SetBlockHeight sets the mapping from block consensus hash to block height
 func (k Keeper) SetBlockHeight(ctx sdk.Context, hash []byte, height int64) {
-	k.setBlockHashInDiskDB(hash, height)
+	if ctx.IsCheckTx() {
+		return
+	}
+	k.setBlockHashInDiskDB(ctx, hash, height)
 }
 
 // IterateBlockHash iterates all over the block hash in every height
@@ -275,13 +278,17 @@ func (k Keeper) SetEthBlockByHeight(ctx sdk.Context, height uint64, block types.
 	if err != nil {
 		panic(err)
 	}
-	k.db.TrieDB().DiskDB().Put(key, value)
+	st := ctx.MultiStore().GetKVStore(k.storeKey)
+	preKey := mpt.PutStoreKey(key)
+	st.Set(preKey, value)
 }
 
 func (k Keeper) GetEthBlockBytesByHeight(ctx sdk.Context, height uint64) ([]byte, bool) {
 	key := types.AppendBlockByHeightKey(height)
-	bz, err := k.db.TrieDB().DiskDB().Get(key)
-	if err != nil || len(bz) == 0 {
+	st := ctx.MultiStore().GetKVStore(k.storeKey)
+	preKey := mpt.PutStoreKey(key)
+	bz := st.Get(preKey)
+	if bz == nil || len(bz) == 0 {
 		return nil, false
 	}
 	return bz, true
@@ -293,13 +300,17 @@ func (k Keeper) SetEthBlockByHash(ctx sdk.Context, hash []byte, block types.Bloc
 	if err != nil {
 		panic(err)
 	}
-	k.db.TrieDB().DiskDB().Put(key, value)
+	st := ctx.MultiStore().GetKVStore(k.storeKey)
+	preKey := mpt.PutStoreKey(key)
+	st.Set(preKey, value)
 }
 
 func (k Keeper) GetEthBlockBytesByHash(ctx sdk.Context, hash []byte) ([]byte, bool) {
 	key := types.AppendBlockByHashKey(hash)
-	bz, err := k.db.TrieDB().DiskDB().Get(key)
-	if err != nil || len(bz) == 0 {
+	st := ctx.MultiStore().GetKVStore(k.storeKey)
+	preKey := mpt.PutStoreKey(key)
+	bz := st.Get(preKey)
+	if bz == nil || len(bz) == 0 {
 		return nil, false
 	}
 	return bz, true
