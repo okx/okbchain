@@ -797,8 +797,7 @@ func (ms *MptStore) SetUpgradeVersion(i int64) {}
 var (
 	keyPrefixStorageMpt  = byte(0)
 	keyPrefixAddrMpt     = byte(1) // TODO auth.AddressStoreKeyPrefix
-	keyPrefixCodeMpt     = byte(2)
-	keyPrefixPutMpt      = byte(3)
+	keyPrefixPutMpt      = byte(2)
 	prefixSizeInMpt      = 1
 	storageKeySize       = prefixSizeInMpt + len(ethcmn.Address{}) + len(ethcmn.Hash{}) + len(ethcmn.Hash{})
 	addrKeySize          = prefixSizeInMpt + sdk.AddrLen
@@ -832,8 +831,7 @@ func PutStoreKey(key []byte) []byte {
 var (
 	storageType = 0
 	addressType = 1
-	codeType    = 2
-	putType     = 3
+	putType     = 2
 )
 
 /*
@@ -851,8 +849,6 @@ func mptKeyType(key []byte) int {
 		return -1
 	case keyPrefixStorageMpt:
 		return storageType
-	case keyPrefixCodeMpt:
-		return codeType
 	case keyPrefixPutMpt:
 		return putType
 	default:
