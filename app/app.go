@@ -5,6 +5,7 @@ import (
 	paramstypes "github.com/okx/okbchain/x/params/types"
 	"io"
 	"os"
+	"runtime/debug"
 	"sync"
 
 	"github.com/okx/okbchain/x/vmbridge"
@@ -201,7 +202,8 @@ var (
 		icatypes.ModuleName:         nil,
 	}
 
-	onceLog sync.Once
+	onceLog              sync.Once
+	FlagGolangMaxThreads string = "golang-max-threads"
 )
 
 var _ simapp.App = (*OKBChainApp)(nil)
@@ -886,6 +888,9 @@ func PreRun(ctx *server.Context, cmd *cobra.Command) error {
 		return err
 	}
 
+	if maxThreads := viper.GetInt(FlagGolangMaxThreads); maxThreads != 0 {
+		debug.SetMaxThreads(maxThreads)
+	}
 	// set config by node mode
 	err = setNodeConfig(ctx)
 	if err != nil {

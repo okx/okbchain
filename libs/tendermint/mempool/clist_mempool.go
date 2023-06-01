@@ -29,7 +29,7 @@ import (
 
 type TxInfoParser interface {
 	GetRawTxInfo(tx types.Tx) ExTxInfo
-	GetTxHistoryGasUsed(tx types.Tx) int64
+	GetTxHistoryGasUsed(tx types.Tx, gasLimit int64) (int64, bool)
 	GetRealTxFromRawTx(rawTx types.Tx) abci.TxEssentials
 }
 
@@ -79,7 +79,8 @@ type CListMempool struct {
 
 	eventBus types.TxEventPublisher
 
-	logger log.Logger
+	logger    log.Logger
+	pguLogger log.Logger
 
 	metrics *Metrics
 
@@ -155,6 +156,7 @@ func NewCListMempool(
 		recheckEnd:    nil,
 		eventBus:      types.NopEventBus{},
 		logger:        log.NewNopLogger(),
+		pguLogger:     log.NewNopLogger(),
 		metrics:       NopMetrics(),
 		txs:           txQueue,
 		simQueue:      make(chan *mempoolTx, 100000),
@@ -166,7 +168,9 @@ func NewCListMempool(
 		mempool.rmPendingTxChan = make(chan types.EventDataRmPendingTx, 1000)
 		go mempool.fireRmPendingTxEvents()
 	}
-	go mempool.simulationRoutine()
+	for i := 0; i < cfg.DynamicConfig.GetPGUConcurrency(); i++ {
+		go mempool.simulationRoutine()
+	}
 
 	if cfg.DynamicConfig.GetMempoolCacheSize() > 0 {
 		mempool.cache = newMapTxCache(cfg.DynamicConfig.GetMempoolCacheSize())
@@ -206,10 +210,11 @@ func (mem *CListMempool) SetEventBus(eventBus types.TxEventPublisher) {
 // SetLogger sets the Logger.
 func (mem *CListMempool) SetLogger(l log.Logger) {
 	mem.logger = l
+	mem.pguLogger = l.With("module", "pgu")
 }
 
 // WithPreCheck sets a filter for the mempool to reject a tx if f(tx) returns
-// false. This is ran before CheckTx.
+// false. This is run before CheckTx.
 func WithPreCheck(f PreCheckFunc) CListMempoolOption {
 	return func(mem *CListMempool) { mem.preCheck = f }
 }
@@ -357,9 +362,6 @@ func (mem *CListMempool) CheckTx(tx types.Tx, cb func(*abci.Response), txInfo Tx
 	defer mem.updateMtx.RUnlock()
 
 	var err error
-	if cfg.DynamicConfig.GetMaxGasUsedPerBlock() > -1 {
-		txInfo.gasUsed = mem.txInfoparser.GetTxHistoryGasUsed(tx)
-	}
 
 	if mem.preCheck != nil {
 		if err = mem.preCheck(tx); err != nil {
@@ -377,12 +379,17 @@ func (mem *CListMempool) CheckTx(tx types.Tx, cb func(*abci.Response), txInfo Tx
 	}
 	reqRes := mem.proxyAppConn.CheckTxAsync(abci.RequestCheckTx{Tx: tx, Type: txInfo.checkType, From: txInfo.wtx.GetFrom(), Nonce: nonce})
 	if r, ok := reqRes.Response.Value.(*abci.Response_CheckTx); ok {
-		if txInfo.gasUsed <= 0 || txInfo.gasUsed > r.CheckTx.GasWanted {
-			txInfo.gasUsed = r.CheckTx.GasWanted
-		}
+		gasLimit := r.CheckTx.GasWanted
 		if cfg.DynamicConfig.GetMaxGasUsedPerBlock() > -1 {
+			txInfo.gasUsed, txInfo.isGasPrecise = mem.txInfoparser.GetTxHistoryGasUsed(tx, gasLimit) // r.CheckTx.GasWanted is gasLimit
+			if txInfo.gasUsed <= 0 {
+				txInfo.gasUsed, _ = mem.simulateTx(tx, gasLimit)
+			}
 			mem.logger.Info(fmt.Sprintf("mempool.SimulateTx: txhash<%s>, gasLimit<%d>, gasUsed<%d>",
 				hex.EncodeToString(tx.Hash()), r.CheckTx.GasWanted, txInfo.gasUsed))
+		}
+		if txInfo.gasUsed <= 0 || txInfo.gasUsed > gasLimit {
+			txInfo.gasUsed = gasLimit
 		}
 	}
 	reqRes.SetCallback(mem.reqResCb(tx, txInfo, cb))
@@ -478,7 +485,7 @@ func (mem *CListMempool) addTx(memTx *mempoolTx) error {
 	if err := mem.txs.Insert(memTx); err != nil {
 		return err
 	}
-	if cfg.DynamicConfig.GetMaxGasUsedPerBlock() > -1 && cfg.DynamicConfig.GetEnablePGU() {
+	if cfg.DynamicConfig.GetMaxGasUsedPerBlock() > -1 && cfg.DynamicConfig.GetEnablePGU() && atomic.LoadUint32(&memTx.isSim) == 0 {
 		select {
 		case mem.simQueue <- memTx:
 		default:
@@ -716,6 +723,11 @@ func (mem *CListMempool) resCbFirstTime(
 				senderNonce: r.CheckTx.SenderNonce,
 			}
 
+			if txInfo.isGasPrecise {
+				// gas for hgu is precise, just mark it simulated, so it will not be simulated again
+				memTx.isSim = 1
+			}
+
 			if txInfo.wrapCMTx != nil {
 				memTx.isWrapCMTx = true
 				memTx.wrapCMNonce = txInfo.wrapCMTx.GetNonce()
@@ -833,12 +845,7 @@ func (mem *CListMempool) notifyTxsAvailable() {
 }
 
 func (mem *CListMempool) GetTxSimulateGas(txHash string) int64 {
-	hash := hex.EncodeToString([]byte(txHash))
-	v, ok := mem.gasCache.Get(hash)
-	if !ok {
-		return -1
-	}
-	return v.(int64)
+	return getPGUGas([]byte(txHash))
 }
 
 func (mem *CListMempool) ReapEssentialTx(tx types.Tx) abci.TxEssentials {
@@ -889,6 +896,7 @@ func (mem *CListMempool) ReapMaxBytesMaxGas(maxBytes, maxGas int64) []types.Tx {
 		// If maxGas is negative, skip this check.
 		// Since newTotalGas < masGas, which
 		// must be non-negative, it follows that this won't overflow.
+		atomic.AddUint32(&memTx.outdated, 1)
 		gasWanted := atomic.LoadInt64(&memTx.gasWanted)
 		newTotalGas := totalGas + gasWanted
 		if maxGas > -1 && gasWanted >= maxGas {
@@ -1028,7 +1036,7 @@ func (mem *CListMempool) Update(
 		gasUsedPerTx := deliverTxResponses[i].GasUsed
 		gasPricePerTx := big.NewInt(0)
 		if ele := mem.cleanTx(height, tx, txCode); ele != nil {
-			atomic.AddUint32(&(ele.Value.(*mempoolTx).isOutdated), 1)
+			atomic.AddUint32(&(ele.Value.(*mempoolTx).outdated), 1)
 			addr = ele.Address
 			nonce = ele.Nonce
 			gasPricePerTx = ele.GasPrice
@@ -1263,8 +1271,8 @@ type mempoolTx struct {
 	from        string
 	senderNonce uint64
 
-	isOutdated uint32
-	isSim      uint32
+	outdated uint32
+	isSim    uint32
 
 	isWrapCMTx  bool
 	wrapCMNonce uint64
@@ -1425,17 +1433,29 @@ func (mem *CListMempool) consumePendingTxQueueJob() {
 	}
 }
 
-func (mem *CListMempool) simulateTx(tx types.Tx) (*SimulationResponse, error) {
+func (mem *CListMempool) simulateTx(tx types.Tx, gasLimit int64) (int64, error) {
 	var simuRes SimulationResponse
 	res, err := mem.proxyAppConn.QuerySync(abci.RequestQuery{
 		Path: "app/simulate/mempool",
 		Data: tx,
 	})
 	if err != nil {
-		return nil, err
+		return 0, err
 	}
 	err = cdc.UnmarshalBinaryBare(res.Value, &simuRes)
-	return &simuRes, err
+	if err != nil {
+		return 0, err
+	}
+	gas := int64(simuRes.GasUsed) * int64(cfg.DynamicConfig.GetPGUAdjustment()*100) / 100
+	mem.pguLogger.Info("simulateTx", "txHash", hex.EncodeToString(tx.Hash()), "gas", gas, "gasLimit", gasLimit)
+	if gas > gasLimit {
+		gas = gasLimit
+	}
+	txHash := tx.Hash()
+	if err = updatePGU(txHash, gas); err != nil {
+		mem.logger.Error("updatePGU", "txHash", hex.EncodeToString(txHash), "simGas", gas, "error", err)
+	}
+	return gas, err
 }
 
 func (mem *CListMempool) simulationRoutine() {
@@ -1446,19 +1466,16 @@ func (mem *CListMempool) simulationRoutine() {
 
 func (mem *CListMempool) simulationJob(memTx *mempoolTx) {
 	defer types.SignatureCache().Remove(memTx.realTx.TxHash())
-	if atomic.LoadUint32(&memTx.isOutdated) != 0 {
+	if atomic.LoadUint32(&memTx.outdated) != 0 {
 		// memTx is outdated
 		return
 	}
-	simuRes, err := mem.simulateTx(memTx.tx)
+	gas, err := mem.simulateTx(memTx.tx, memTx.gasLimit)
 	if err != nil {
 		mem.logger.Error("simulateTx", "error", err, "txHash", memTx.tx.Hash())
 		return
 	}
-	gas := int64(simuRes.GasUsed) * int64(cfg.DynamicConfig.GetPGUAdjustment()*100) / 100
-	if gas < atomic.LoadInt64(&memTx.gasLimit) {
-		atomic.StoreInt64(&memTx.gasWanted, gas)
-	}
+	atomic.StoreInt64(&memTx.gasWanted, gas)
 	atomic.AddUint32(&memTx.isSim, 1)
 	mem.gasCache.Add(hex.EncodeToString(memTx.realTx.TxHash()), gas)
 }
