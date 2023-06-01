@@ -132,18 +132,21 @@ func NewKeeper(
 	*wasmAccountKeeper = accountKeeper
 	*WasmbankKeeper = bankKeeper
 	k := newKeeper(nil, cdc, storeKey, storageKey, paramSpace, accountKeeper, bankKeeper, channelKeeper, portKeeper, capabilityKeeper, portSource, router, queryRouter, homeDir, wasmConfig, supportedFeatures, defaultAdapter{}, opts...)
+	*wasmGasRegister = k.gasRegister
 	accountKeeper.SetObserverKeeper(k)
 
 	return k
 }
 
 var (
-	nilAccountKeeper  = types.AccountKeeper(nil)
-	nilBankKeeper     = types.BankKeeper(nil)
-	wasmStorageKey    = sdk.StoreKey(sdk.NewKVStoreKey("wasm")) // need reset by NewKeeper
-	wasmMptStorageKey = sdk.StoreKey(sdk.NewKVStoreKey("mpt"))  //need reset by NewKeeper
-	wasmAccountKeeper = &nilAccountKeeper                       //need reset by NewKeeper
-	WasmbankKeeper    = &nilBankKeeper
+	nilwasmGasRegister = GasRegister(nil)
+	nilAccountKeeper   = types.AccountKeeper(nil)
+	nilBankKeeper      = types.BankKeeper(nil)
+	wasmStorageKey     = sdk.StoreKey(sdk.NewKVStoreKey("wasm")) // need reset by NewKeeper
+	wasmMptStorageKey  = sdk.StoreKey(sdk.NewKVStoreKey("mpt"))  //need reset by NewKeeper
+	wasmAccountKeeper  = &nilAccountKeeper                       //need reset by NewKeeper
+	WasmbankKeeper     = &nilBankKeeper
+	wasmGasRegister    = &nilwasmGasRegister
 )
 
 func NewSimulateKeeper(
@@ -163,7 +166,9 @@ func NewSimulateKeeper(
 	supportedFeatures string,
 	opts ...Option,
 ) Keeper {
-	return newKeeper(vm, cdc, wasmStorageKey, wasmMptStorageKey, paramSpace, *wasmAccountKeeper, *WasmbankKeeper, channelKeeper, portKeeper, capabilityKeeper, portSource, router, queryRouter, homeDir, wasmConfig, supportedFeatures, watcher.Adapter{}, opts...)
+	k := newKeeper(vm, cdc, wasmStorageKey, wasmMptStorageKey, paramSpace, *wasmAccountKeeper, *WasmbankKeeper, channelKeeper, portKeeper, capabilityKeeper, portSource, router, queryRouter, homeDir, wasmConfig, supportedFeatures, watcher.Adapter{}, opts...)
+	k.gasRegister = *wasmGasRegister
+	return k
 }
 
 func newKeeper(wasmer *wasmvm.VM, cdc *codec.CodecProxy,
