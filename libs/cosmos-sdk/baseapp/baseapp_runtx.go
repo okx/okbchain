@@ -4,13 +4,12 @@ import (
 	"fmt"
 	"runtime/debug"
 
-	"github.com/pkg/errors"
-
-	"github.com/okx/okbchain/libs/system/trace"
-
 	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
 	sdkerrors "github.com/okx/okbchain/libs/cosmos-sdk/types/errors"
+	"github.com/okx/okbchain/libs/system/trace"
 	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
+	tmtypes "github.com/okx/okbchain/libs/tendermint/types"
+	"github.com/pkg/errors"
 )
 
 type runTxInfo struct {
@@ -153,7 +152,9 @@ func (app *BaseApp) runtxWithInfo(info *runTxInfo, mode runTxMode, txBytes []byt
 			tx.GetType() == sdk.EvmTxType {
 			handler.handleDeferRefund(info)
 		} else {
-			info.ctx.GasMeter().SetGas(info.ctx.GasMeter().Limit())
+			if tmtypes.HigherThanEarth(info.ctx.BlockHeight()) {
+				info.ctx.GasMeter().SetGas(info.ctx.GasMeter().Limit())
+			}
 		}
 	}()
 
