@@ -38,8 +38,6 @@ const (
 )
 
 var (
-	TrieAccStoreCache uint = 32 // MB
-
 	AccountStateRootRetriever StateRootRetriever = EmptyStateRootRetriever{}
 
 	applyDelta   = false
