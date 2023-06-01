@@ -9,6 +9,7 @@ import (
 	"github.com/pkg/errors"
 
 	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
+	"github.com/okx/okbchain/libs/tendermint/config"
 	mempl "github.com/okx/okbchain/libs/tendermint/mempool"
 	ctypes "github.com/okx/okbchain/libs/tendermint/rpc/core/types"
 	rpctypes "github.com/okx/okbchain/libs/tendermint/rpc/jsonrpc/types"
@@ -61,8 +62,8 @@ func BroadcastTxSync(ctx *rpctypes.Context, tx types.Tx) (*ctypes.ResultBroadcas
 func BroadcastTxCommit(ctx *rpctypes.Context, tx types.Tx) (*ctypes.ResultBroadcastTxCommit, error) {
 	subscriber := ctx.RemoteAddr()
 
-	if env.EventBus.NumClients() >= env.Config.MaxSubscriptionClients {
-		return nil, fmt.Errorf("max_subscription_clients %d reached", env.Config.MaxSubscriptionClients)
+	if env.EventBus.NumClients() >= config.DynamicConfig.GetMaxSubscriptionClients() {
+		return nil, fmt.Errorf("max_subscription_clients %d reached", config.DynamicConfig.GetMaxSubscriptionClients())
 	} else if env.EventBus.NumClientSubscriptions(subscriber) >= env.Config.MaxSubscriptionsPerClient {
 		return nil, fmt.Errorf("max_subscriptions_per_client %d reached", env.Config.MaxSubscriptionsPerClient)
 	}

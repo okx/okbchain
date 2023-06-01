@@ -91,6 +91,8 @@ type Store struct {
 var (
 	_ types.CommitMultiStore = (*Store)(nil)
 	_ types.Queryable        = (*Store)(nil)
+
+	IgPruneHeightsLen = false
 )
 
 // NewStore returns a reference to a new Store object with the provided DB. The
@@ -462,10 +464,10 @@ func (rs *Store) loadVersion(ver int64, upgrades *types.StoreUpgrades) error {
 	if rs.logger != nil {
 		rs.logger.Info("loadVersion info", "pruned heights length", len(rs.pruneHeights), "versions", len(rs.versions))
 	}
-	if len(rs.pruneHeights) > maxPruneHeightsLength {
+	if !IgPruneHeightsLen && len(rs.pruneHeights) > maxPruneHeightsLength {
 		return fmt.Errorf("Pruned heights length <%d> exceeds <%d>, "+
 			"need to prune them with command "+
-			"<okbchaind data prune-compact all --home your_okbchaind_home_directory> before running okbchaind",
+			"<okbchaind data prune-compact state --home your_okbchaind_home_directory> before running okbchaind",
 			len(rs.pruneHeights), maxPruneHeightsLength)
 	}
 	return nil
@@ -638,7 +640,9 @@ func (rs *Store) CommitterCommitMap(inputDeltaMap *tmtypes.TreeDelta) (types.Com
 			rs.pruneStores()
 		}
 
-		rs.versions = append(rs.versions, version)
+		if len(rs.versions) == 0 || version > rs.versions[len(rs.versions)-1] {
+			rs.versions = append(rs.versions, version)
+		}
 	}
 	persist.GetStatistics().Accumulate(trace.CommitStores, tsCommitStores)
 
