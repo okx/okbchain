@@ -152,7 +152,7 @@ func (app *BaseApp) runtxWithInfo(info *runTxInfo, mode runTxMode, txBytes []byt
 			tx.GetType() == sdk.EvmTxType {
 			handler.handleDeferRefund(info)
 		} else {
-			if tmtypes.HigherThanEarth(info.ctx.BlockHeight()) {
+			if tmtypes.HigherThanMercury(info.ctx.BlockHeight()) {
 				info.ctx.GasMeter().SetGas(info.ctx.GasMeter().Limit())
 			}
 		}

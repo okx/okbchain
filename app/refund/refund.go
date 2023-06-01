@@ -63,7 +63,7 @@ func gasRefund(ik innertx.InnerTxKeeper, ak accountKeeperInterface, sk types.Sup
 		return nil, nil
 	}
 
-	if tmtypes.HigherThanEarth(ctx.BlockHeight()) {
+	if tmtypes.HigherThanMercury(ctx.BlockHeight()) {
 		if ctx.GetOutOfGas() {
 			ctx.GasMeter().SetGas(ctx.GasMeter().Limit())
 			currentGasMeter.SetGas(gasLimit)
