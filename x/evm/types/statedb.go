@@ -350,11 +350,13 @@ func (csdb *CommitStateDB) IteratorCode(cb func(addr ethcmn.Address, c CacheCode
 
 // SetHeightHash sets the block header hash associated with a given height.
 func (csdb *CommitStateDB) SetHeightHash(height uint64, hash ethcmn.Hash) {
-	if !csdb.ctx.IsCheckTx() {
-		funcName := "SetHeightHash"
-		trace.StartTxLog(funcName)
-		defer trace.StopTxLog(funcName)
+	if csdb.ctx.IsCheckTx() {
+		return
 	}
+
+	funcName := "SetHeightHash"
+	trace.StartTxLog(funcName)
+	defer trace.StopTxLog(funcName)
 
 	csdb.setHeightHashInRawDB(height, hash)
 }
