@@ -28,7 +28,6 @@ import (
 	"github.com/okx/okbchain/libs/tendermint/crypto/merkle"
 	tmlog "github.com/okx/okbchain/libs/tendermint/libs/log"
 	tmtypes "github.com/okx/okbchain/libs/tendermint/types"
-	"github.com/spf13/viper"
 )
 
 const (
@@ -242,8 +241,8 @@ func (ms *MptStore) tryGetStorageTrie(addr ethcmn.Address, stateRoot ethcmn.Hash
 			return t
 		}
 	}
-	//addrHash := mpttype.Keccak256HashWithSyncPool(addr[:])
-	addrHash := addr.Hash()
+	addrHash := mpttype.Keccak256HashWithSyncPool(addr[:])
+
 	var t ethstate.Trie
 	var err error
 	t, err = ms.db.OpenStorageTrie(ms.originalRoot, addrHash, stateRoot)
@@ -530,7 +529,7 @@ func (ms *MptStore) PushData2Database(curHeight int64, root ethcmn.Hash) {
 	defer ms.cmLock.Unlock()
 
 	curMptRoot := ms.GetMptRootHash(uint64(curHeight))
-	if TrieDirtyDisabled || viper.GetBool(FlagTriePbss) {
+	if TrieDirtyDisabled || TriePbss {
 		// If we're running an archive node, always flush
 		ms.fullNodePersist(curMptRoot, root, curHeight)
 	} else {

@@ -68,4 +68,5 @@ func setExternalPackageValue() {
 	if !viper.GetBool(tmiavl.FlagIavlDiscardFastStorage) {
 		mpt.SetSnapshotRebuild(true)
 	}
+	mpt.TriePbss = viper.GetBool(mpt.FlagTriePbss)
 }

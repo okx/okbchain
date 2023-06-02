@@ -50,8 +50,9 @@ func (ms *ImmutableMptStore) Get(key []byte) []byte {
 	switch mptKeyType(key) {
 	case storageType:
 		addr, stateRoot, realKey := decodeAddressStorageInfo(key)
+		addrHash := mpttype.Keccak256HashWithSyncPool(addr[:])
 
-		t, err := ms.db.OpenStorageTrie(ms.root, addr.Hash(), stateRoot)
+		t, err := ms.db.OpenStorageTrie(ms.root, addrHash, stateRoot)
 		if err != nil {
 			panic(err)
 		}

@@ -59,7 +59,7 @@ func InstanceOfMptStore() ethstate.Database {
 		gEthDB = db
 
 		var pbssConfig *snap.Config
-		if viper.GetBool(FlagTriePbss) {
+		if TriePbss {
 			pbssConfig = snap.Defaults
 			if MaxDiffLayers == -1 {
 				panic("not support pbss when pruning nothing")

@@ -29,15 +29,15 @@ const (
 )
 
 var (
-	TrieDirtyDisabled       = false
-	TrieCacheSize     uint  = 2048 // MB
-	TrieCommitGap     int64 = 100
-	TriesInMemory     uint  = 100
-
-	TrieAsyncDB               = true
-	TrieAsyncDBInitCap        = 200_0000
-	TrieAsyncDBAutoPruningOff = false
-	TrieAsyncDBSyncPruning    = false
+	TrieDirtyDisabled               = false
+	TrieCacheSize             uint  = 2048 // MB
+	TrieCommitGap             int64 = 100
+	TriesInMemory             uint  = 100
+	TriePbss                        = false
+	TrieAsyncDB                     = true
+	TrieAsyncDBInitCap              = 200_0000
+	TrieAsyncDBAutoPruningOff       = false
+	TrieAsyncDBSyncPruning          = false
 
 	EnableAsyncCommit = false
 
