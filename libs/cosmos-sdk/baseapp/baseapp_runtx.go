@@ -4,13 +4,12 @@ import (
 	"fmt"
 	"runtime/debug"
 
-	"github.com/pkg/errors"
-
-	"github.com/okx/okbchain/libs/system/trace"
-
 	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
 	sdkerrors "github.com/okx/okbchain/libs/cosmos-sdk/types/errors"
+	"github.com/okx/okbchain/libs/system/trace"
 	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
+	tmtypes "github.com/okx/okbchain/libs/tendermint/types"
+	"github.com/pkg/errors"
 )
 
 type runTxInfo struct {
@@ -152,6 +151,10 @@ func (app *BaseApp) runtxWithInfo(info *runTxInfo, mode runTxMode, txBytes []byt
 		if (tx.GetType() == sdk.StdTxType && isAnteSucceed && err == nil) ||
 			tx.GetType() == sdk.EvmTxType {
 			handler.handleDeferRefund(info)
+		} else {
+			if tmtypes.HigherThanMercury(info.ctx.BlockHeight()) {
+				info.ctx.GasMeter().SetGas(info.ctx.GasMeter().Limit())
+			}
 		}
 	}()
 
@@ -386,7 +389,7 @@ func (app *BaseApp) runTx_defer_recover(r interface{}, info *runTxInfo) error {
 		err = sdkerrors.Wrap(
 			sdkerrors.ErrOutOfGas, fmt.Sprintf(
 				"out of gas in location: %v; gasWanted: %d, gasUsed: %d",
-				rType.Descriptor, info.gasWanted, info.ctx.GasMeter().GasConsumed(),
+				rType.Descriptor, info.gasWanted, info.gasWanted,
 			),
 		)
 
@@ -417,7 +420,7 @@ func (app *BaseApp) asyncDeliverTx(txIndex int) *executeResult {
 		return asyncExe
 	}
 
-	if !txStatus.isEvm {
+	if !txStatus.supportPara {
 		asyncExe := newExecuteResult(abci.ResponseDeliverTx{}, nil, uint32(txIndex), nil,
 			blockHeight, sdk.EmptyWatcher{}, nil, app.parallelTxManage, nil)
 		return asyncExe
