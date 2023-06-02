@@ -289,7 +289,7 @@ func (ms *MptStore) Set(key, value []byte) {
 		ms.updateSnapStorages(addr, realKey, value)
 	case addressType:
 		if bytes.Equal(key[1:], tmp) {
-			return
+			// return
 		}
 
 		ms.trie.TryUpdate(key, value)
