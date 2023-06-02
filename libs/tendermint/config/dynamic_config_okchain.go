@@ -11,7 +11,10 @@ type IDynamicConfig interface {
 	GetEnableDeleteMinGPTx() bool
 	GetMaxGasUsedPerBlock() int64
 	GetEnablePGU() bool
+	GetPGUPercentageThreshold() int64
+	GetPGUConcurrency() int
 	GetPGUAdjustment() float64
+	GetPGUPersist() bool
 	GetMempoolFlush() bool
 	GetNodeKeyWhitelist() []string
 	GetMempoolCheckTxCost() bool
@@ -34,6 +37,7 @@ type IDynamicConfig interface {
 	GetDynamicGpMaxTxNum() int64
 	GetDynamicGpMaxGasUsed() int64
 	GetGasLimitBuffer() uint64
+	GetMaxSubscriptionClients() int
 }
 
 var DynamicConfig IDynamicConfig = MockDynamicConfig{}
@@ -43,10 +47,11 @@ func SetDynamicConfig(c IDynamicConfig) {
 }
 
 type MockDynamicConfig struct {
-	enableDeleteMinGPTx bool
-	dynamicGpMode       int
-	dynamicGpMaxTxNum   int64
-	dynamicGpMaxGasUsed int64
+	enableDeleteMinGPTx    bool
+	dynamicGpMode          int
+	dynamicGpMaxTxNum      int64
+	dynamicGpMaxGasUsed    int64
+	maxSubscriptionClients int
 }
 
 func (d MockDynamicConfig) GetMempoolRecheck() bool {
@@ -77,8 +82,20 @@ func (d MockDynamicConfig) GetEnablePGU() bool {
 	return false
 }
 
+func (d MockDynamicConfig) GetPGUPercentageThreshold() int64 {
+	return 10
+}
+
+func (d MockDynamicConfig) GetPGUConcurrency() int {
+	return 1
+}
+
 func (d MockDynamicConfig) GetPGUAdjustment() float64 {
 	return 1
+}
+
+func (d MockDynamicConfig) GetPGUPersist() bool {
+	return false
 }
 
 func (d MockDynamicConfig) GetMempoolFlush() bool {
@@ -189,4 +206,15 @@ func (d MockDynamicConfig) GetDynamicGpMaxGasUsed() int64 {
 
 func (d MockDynamicConfig) GetGasLimitBuffer() uint64 {
 	return 0
+}
+
+func (d MockDynamicConfig) GetMaxSubscriptionClients() int {
+	return d.maxSubscriptionClients
+}
+
+func (d *MockDynamicConfig) SetMaxSubscriptionClients(value int) {
+	if value < 0 {
+		return
+	}
+	d.maxSubscriptionClients = value
 }

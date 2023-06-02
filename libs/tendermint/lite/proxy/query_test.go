@@ -10,6 +10,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/okx/okbchain/libs/tendermint/abci/example/kvstore"
+	cfg "github.com/okx/okbchain/libs/tendermint/config"
 	"github.com/okx/okbchain/libs/tendermint/crypto/merkle"
 	"github.com/okx/okbchain/libs/tendermint/lite"
 	certclient "github.com/okx/okbchain/libs/tendermint/lite/client"
@@ -126,6 +127,7 @@ func _TestAppProofs(t *testing.T) {
 }
 
 func TestTxProofs(t *testing.T) {
+	setMocConfig(100)
 	assert, require := assert.New(t), require.New(t)
 
 	cl := rpclocal.New(node)
@@ -162,4 +164,11 @@ func TestTxProofs(t *testing.T) {
 	commit, err := GetCertifiedCommit(br.Height, cl, cert)
 	require.Nil(err, "%#v", err)
 	require.Equal(res.Proof.RootHash, commit.Header.DataHash)
+}
+
+func setMocConfig(clientNum int) {
+	moc := cfg.MockDynamicConfig{}
+	moc.SetMaxSubscriptionClients(100)
+
+	cfg.SetDynamicConfig(moc)
 }
