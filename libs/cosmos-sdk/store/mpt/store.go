@@ -269,6 +269,9 @@ func (ms *MptStore) Has(key []byte) bool {
 
 func (ms *MptStore) Set(key, value []byte) {
 	types.AssertValidValue(value)
+	if global.GetGlobalHeight() == 1752186 {
+		log.Println("------ set key ", hex.EncodeToString(key), " value ", hex.EncodeToString(value))
+	}
 
 	if ms.prefetcher != nil {
 		ms.prefetcher.Used(ms.originalRoot, [][]byte{key})
@@ -278,8 +281,8 @@ func (ms *MptStore) Set(key, value []byte) {
 	case storageType:
 		addr, stateRoot, realKey := decodeAddressStorageInfo(key)
 		if bytes.Equal(addr[:], tmp) {
-			log.Println("height  ----- ", global.GetGlobalHeight())
-			return
+			// log.Println("height  ----- ", global.GetGlobalHeight())
+			// return
 		}
 		t := ms.tryGetStorageTrie(addr, stateRoot, true)
 		t.TryUpdate(realKey, value)
