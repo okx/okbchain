@@ -1,7 +1,6 @@
 package simapp
 
 import (
-	"encoding/hex"
 	"fmt"
 	"io"
 	"math/big"
@@ -12,6 +11,10 @@ import (
 	"sync"
 
 	"github.com/okx/okbchain/libs/cosmos-sdk/store/mpt"
+
+	"github.com/spf13/viper"
+	"google.golang.org/grpc/encoding"
+	"google.golang.org/grpc/encoding/proto"
 
 	authante "github.com/okx/okbchain/libs/cosmos-sdk/x/auth/ante"
 	icacontroller "github.com/okx/okbchain/libs/ibc-go/modules/apps/27-interchain-accounts/controller"
@@ -39,9 +42,6 @@ import (
 	icamauthtypes "github.com/okx/okbchain/x/icamauth/types"
 	"github.com/okx/okbchain/x/wasm"
 	wasmkeeper "github.com/okx/okbchain/x/wasm/keeper"
-	"github.com/spf13/viper"
-	"google.golang.org/grpc/encoding"
-	"google.golang.org/grpc/encoding/proto"
 
 	"github.com/okx/okbchain/app/ante"
 	chaincodec "github.com/okx/okbchain/app/codec"
@@ -694,6 +694,7 @@ func NewSimApp(
 	app.SetEndBlocker(app.EndBlocker)
 	app.SetGasRefundHandler(refund.NewGasRefundHandler(app.AccountKeeper, app.SupplyKeeper, app.EvmKeeper))
 	app.SetAccNonceHandler(NewAccHandler(app.AccountKeeper))
+	app.SetUpdateWasmTxCount(fixCosmosTxCountInWasmForParallelTx(app.WasmHandler.TXCounterStoreKey))
 	app.SetUpdateFeeCollectorAccHandler(updateFeeCollectorHandler(app.BankKeeper, app.SupplyKeeper.Keeper))
 	app.SetParallelTxLogHandlers(fixLogForParallelTxHandler(app.EvmKeeper))
 	app.SetPartialConcurrentHandlers(getTxFeeAndFromHandler(app.AccountKeeper))
@@ -743,7 +744,7 @@ func evmTxVerifySigHandler(chainID string, blockHeight int64, evmTx *evmtypes.Ms
 	return nil
 }
 func getTxFeeAndFromHandler(ak auth.AccountKeeper) sdk.GetTxFeeAndFromHandler {
-	return func(ctx sdk.Context, tx sdk.Tx) (fee sdk.Coins, isEvm bool, from string, to string, err error) {
+	return func(ctx sdk.Context, tx sdk.Tx) (fee sdk.Coins, isEvm bool, from string, to string, err error, supportPara bool) {
 		if evmTx, ok := tx.(*evmtypes.MsgEthereumTx); ok {
 			isEvm = true
 			err = evmTxVerifySigHandler(ctx.ChainID(), ctx.BlockHeight(), evmTx)
@@ -760,9 +761,14 @@ func getTxFeeAndFromHandler(ak auth.AccountKeeper) sdk.GetTxFeeAndFromHandler {
 			}
 		} else if feeTx, ok := tx.(authante.FeeTx); ok {
 			fee = feeTx.GetFee()
-			feePayer := feeTx.FeePayer(ctx)
-			feePayerAcc := ak.GetAccount(ctx, feePayer)
-			from = hex.EncodeToString(feePayerAcc.GetAddress())
+			if stdTx, ok := tx.(*auth.StdTx); ok && len(stdTx.Msgs) == 1 { // only support one message
+				if msg, ok := stdTx.Msgs[0].(interface{ CalFromAndToForPara() (string, string) }); ok {
+					from, to = msg.CalFromAndToForPara()
+					if tmtypes.HigherThanMercury(ctx.BlockHeight()) {
+						supportPara = true
+					}
+				}
+			}
 		}
 
 		return
@@ -1108,4 +1114,10 @@ func (o *SimApp) CollectUpgradeModules(m *module.Manager) (map[int64]*upgradetyp
 // NOTE: used for testing purposes
 func (app *SimApp) GetModuleManager() *module.Manager {
 	return app.mm
+}
+
+func fixCosmosTxCountInWasmForParallelTx(storeKey sdk.StoreKey) sdk.UpdateCosmosTxCount {
+	return func(ctx sdk.Context, txCount int) {
+		wasmkeeper.UpdateTxCount(ctx, storeKey, txCount)
+	}
 }

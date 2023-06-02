@@ -152,7 +152,7 @@ func (app *BaseApp) runtxWithInfo(info *runTxInfo, mode runTxMode, txBytes []byt
 			tx.GetType() == sdk.EvmTxType {
 			handler.handleDeferRefund(info)
 		} else {
-			if tmtypes.HigherThanEarth(info.ctx.BlockHeight()) {
+			if tmtypes.HigherThanMercury(info.ctx.BlockHeight()) {
 				info.ctx.GasMeter().SetGas(info.ctx.GasMeter().Limit())
 			}
 		}
@@ -420,7 +420,7 @@ func (app *BaseApp) asyncDeliverTx(txIndex int) *executeResult {
 		return asyncExe
 	}
 
-	if !txStatus.isEvm {
+	if !txStatus.supportPara {
 		asyncExe := newExecuteResult(abci.ResponseDeliverTx{}, nil, uint32(txIndex), nil,
 			blockHeight, sdk.EmptyWatcher{}, nil, app.parallelTxManage, nil)
 		return asyncExe
