@@ -528,12 +528,12 @@ func (ms *MptStore) fullNodePersist(curMptRoot ethcmn.Hash, curHeight int64) {
 	if curMptRoot == (ethcmn.Hash{}) || curMptRoot == ethtypes.EmptyRootHash {
 		curMptRoot = ethcmn.Hash{}
 	} else {
-		if curHeight != 1752187 {
-			if err := ms.db.TrieDB().Commit(curMptRoot, false, nil); err != nil {
-				panic("fail to commit mpt data: " + err.Error())
-			}
-			ms.commitSnap(curMptRoot)
+		//if curHeight != 1752187 {
+		if err := ms.db.TrieDB().Commit(curMptRoot, false, nil); err != nil {
+			panic("fail to commit mpt data: " + err.Error())
 		}
+		ms.commitSnap(curMptRoot)
+		//}
 	}
 	ms.SetLatestStoredBlockHeight(uint64(curHeight))
 	ms.logger.Info("sync push acc data to db", "block", curHeight, "trieHash", curMptRoot)
@@ -565,15 +565,15 @@ func (ms *MptStore) otherNodePersist(curMptRoot ethcmn.Hash, curHeight int64) {
 		if chRoot == (ethcmn.Hash{}) || chRoot == ethtypes.EmptyRootHash {
 			chRoot = ethcmn.Hash{}
 		} else {
-			if curHeight != 1752187 {
-				// Flush an entire trie and restart the counters, it's not a thread safe process,
-				// cannot use a go thread to run, or it will lead 'fatal error: concurrent map read and map write' error
-				if err := triedb.Commit(chRoot, true, nil); err != nil {
-					panic("fail to commit mpt data: " + err.Error())
-				}
-				ms.commitSnap(chRoot)
-				gAsyncDB.LogStats()
+			//	if curHeight != 1752187 {
+			// Flush an entire trie and restart the counters, it's not a thread safe process,
+			// cannot use a go thread to run, or it will lead 'fatal error: concurrent map read and map write' error
+			if err := triedb.Commit(chRoot, true, nil); err != nil {
+				panic("fail to commit mpt data: " + err.Error())
 			}
+			ms.commitSnap(chRoot)
+			gAsyncDB.LogStats()
+			//	}
 		}
 		ms.SetLatestStoredBlockHeight(uint64(curHeight))
 		ms.logger.Info("async push acc data to db", "block", curHeight, "trieHash", chRoot)
