@@ -446,27 +446,6 @@ func (ms *MptStore) CommitterCommit(inputDelta interface{}) (rootHash types.Comm
 	ms.StopPrefetcher()
 	nodeSets := trie.NewMergedNodeSet()
 
-	/*
-		var root ethcmn.Hash
-		var set *trie.NodeSet
-		var err error
-		if applyDelta && inputDelta != nil {
-			delta, ok := inputDelta.(*trie.MptDelta)
-			if !ok {
-				panic(fmt.Sprintf("wrong input delta of mpt. delta: %v", inputDelta))
-			}
-			ms.commitStorageWithDelta(delta.Storage, nodeSets)
-			root, set, err = ms.trie.CommitWithDelta(delta.NodeDelta, true)
-		} else if produceDelta {
-			var outputNodeDelta []*trie.NodeDelta
-			outStorage := ms.commitStorageForDelta(nodeSets)
-			root, set, outputNodeDelta, err = ms.trie.CommitForDelta(true)
-			outputDelta = &trie.MptDelta{NodeDelta: outputNodeDelta, Storage: outStorage}
-		} else {
-			ms.commitStorage(nodeSets)
-			root, set, err = ms.trie.Commit(true)
-		}
-	*/
 	ms.commitStorage(nodeSets)
 	root, set, err := ms.trie.Commit(true)
 	if err != nil {
