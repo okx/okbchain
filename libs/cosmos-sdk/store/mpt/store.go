@@ -5,6 +5,7 @@ import (
 	"encoding/hex"
 	"fmt"
 	"github.com/okx/okbchain/libs/system/trace/persist"
+	"github.com/okx/okbchain/libs/tendermint/global"
 	"io"
 	"log"
 	"sync"
@@ -284,6 +285,7 @@ func (ms *MptStore) Set(key, value []byte) {
 		ms.updateSnapStorages(addr, realKey, value)
 	case addressType:
 		if bytes.Equal(key[1:], tmp) {
+			log.Println("height  ----- ", global.GetGlobalHeight())
 			return
 		}
 
