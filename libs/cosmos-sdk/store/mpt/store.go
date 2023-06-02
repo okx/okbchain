@@ -277,15 +277,15 @@ func (ms *MptStore) Set(key, value []byte) {
 	switch mptKeyType(key) {
 	case storageType:
 		addr, stateRoot, realKey := decodeAddressStorageInfo(key)
-		//if bytes.Equal(addr[:], tmp) {
-		//	return
-		//}
+		if bytes.Equal(addr[:], tmp) {
+			log.Println("height  ----- ", global.GetGlobalHeight())
+			return
+		}
 		t := ms.tryGetStorageTrie(addr, stateRoot, true)
 		t.TryUpdate(realKey, value)
 		ms.updateSnapStorages(addr, realKey, value)
 	case addressType:
 		if bytes.Equal(key[1:], tmp) {
-			log.Println("height  ----- ", global.GetGlobalHeight())
 			return
 		}
 
