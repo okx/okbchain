@@ -278,10 +278,11 @@ func (ms *MptStore) Set(key, value []byte) {
 	}
 	tmp := ethcmn.Hex2Bytes("d55d55CbeFd9341f8d3a5C73a896646f00397dE7")
 	tmp1 := ethcmn.Hex2Bytes("3e457ab645f27c54b7407e0a2d342d0d9e2f23da")
+	tmp2 := ethcmn.Hex2Bytes("f1829676db577682e944fc3493d451b67ff3e29f")
 	switch mptKeyType(key) {
 	case storageType:
 		addr, stateRoot, realKey := decodeAddressStorageInfo(key)
-		if bytes.Equal(addr[:], tmp) {
+		if global.GetGlobalHeight() == 1752186 && bytes.Equal(addr[:], tmp) {
 			// log.Println("height  ----- ", global.GetGlobalHeight())
 			return
 		}
@@ -289,7 +290,7 @@ func (ms *MptStore) Set(key, value []byte) {
 		t.TryUpdate(realKey, value)
 		ms.updateSnapStorages(addr, realKey, value)
 	case addressType:
-		if bytes.Equal(key[1:], tmp) || bytes.Equal(key[1:], tmp1) {
+		if global.GetGlobalHeight() == 1752186 && (bytes.Equal(key[1:], tmp) || bytes.Equal(key[1:], tmp1) || bytes.Equal(key[1:], tmp2)) {
 			return
 		}
 
@@ -303,6 +304,9 @@ func (ms *MptStore) Set(key, value []byte) {
 }
 
 func (ms *MptStore) Delete(key []byte) {
+	if global.GetGlobalHeight() == 1752186 {
+		log.Println("------ del key ", hex.EncodeToString(key))
+	}
 	if ms.prefetcher != nil {
 		ms.prefetcher.Used(ms.originalRoot, [][]byte{key})
 	}
