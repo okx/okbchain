@@ -208,7 +208,8 @@ func iaviewerReadRawCmd(ctx *iaviewerContext) *cobra.Command {
 		Short: "Read iavl tree key-value from db",
 		Long:  "Read iavl tree key-value from db, you must specify data_dir and module, if version is 0 or not specified, read data from the latest version.\n",
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
-			db, err := base.OpenDB(ctx.DataDir, ctx.DbBackend)
+			dir := "/data/okbchain_data/rest/okbchaind/data/application.db"
+			db, err := base.OpenDB(dir, dbm.RocksDBBackend)
 			if err != nil {
 				return fmt.Errorf("error opening DB: %w", err)
 			}
