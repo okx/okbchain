@@ -385,6 +385,8 @@ func (app *BaseApp) deliverTxWithCache(txIndex int) *executeResult {
 			Data:      info.result.Data,
 			Events:    info.result.Events.ToABCIEvents(),
 		}
+		resp.SetHash(txStatus.stdTx.TxHash())
+		resp.SetType(int(txStatus.stdTx.GetType()))
 	}
 
 	asyncExe := newExecuteResult(resp, info.msCacheAnte, uint32(txIndex), info.ctx.ParaMsg(),
