@@ -28,9 +28,11 @@ type UpdateFeeCollectorAccHandler func(ctx Context, balance Coins, txFeesplit []
 
 type GetGasConfigHandler func(ctx Context) *stypes.GasConfig
 
+type UpdateCosmosTxCount func(ctx Context, txCount int)
+
 type LogFix func(tx []Tx, logIndex []int, hasEnterEvmTx []bool, errs []error, resp []abci.ResponseDeliverTx) (logs [][]byte)
 type UpdateFeeSplitHandler func(txHash common.Hash, addr AccAddress, fee Coins, isDelete bool)
-type GetTxFeeAndFromHandler func(ctx Context, tx Tx) (Coins, bool, string, string, error)
+type GetTxFeeAndFromHandler func(ctx Context, tx Tx) (Coins, bool, string, string, error, bool)
 type GetTxFeeHandler func(tx Tx) Coins
 
 type CustomizeOnStop func(ctx Context) error
