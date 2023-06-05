@@ -131,7 +131,7 @@ func NewKeeper(
 	wasmMptStorageKey = storageKey
 	*wasmAccountKeeper = accountKeeper
 	*WasmbankKeeper = bankKeeper
-	k := newKeeper(nil, cdc, storeKey, storageKey, paramSpace, accountKeeper, bankKeeper, channelKeeper, portKeeper, capabilityKeeper, portSource, router, queryRouter, homeDir, wasmConfig, supportedFeatures, defaultAdapter{}, opts...)
+	k := newKeeper(cdc, storeKey, storageKey, paramSpace, accountKeeper, bankKeeper, channelKeeper, portKeeper, capabilityKeeper, portSource, router, queryRouter, homeDir, wasmConfig, supportedFeatures, defaultAdapter{}, opts...)
 	*wasmGasRegister = k.gasRegister
 	accountKeeper.SetObserverKeeper(k)
 
@@ -150,7 +150,6 @@ var (
 )
 
 func NewSimulateKeeper(
-	vm *wasmvm.VM,
 	cdc *codec.CodecProxy,
 	paramSpace types.Subspace,
 	accountKeeper types.AccountKeeper,
@@ -166,12 +165,12 @@ func NewSimulateKeeper(
 	supportedFeatures string,
 	opts ...Option,
 ) Keeper {
-	k := newKeeper(vm, cdc, wasmStorageKey, wasmMptStorageKey, paramSpace, *wasmAccountKeeper, *WasmbankKeeper, channelKeeper, portKeeper, capabilityKeeper, portSource, router, queryRouter, homeDir, wasmConfig, supportedFeatures, watcher.Adapter{}, opts...)
+	k := newKeeper(cdc, wasmStorageKey, wasmMptStorageKey, paramSpace, *wasmAccountKeeper, *WasmbankKeeper, channelKeeper, portKeeper, capabilityKeeper, portSource, router, queryRouter, homeDir, wasmConfig, supportedFeatures, watcher.Adapter{}, opts...)
 	k.gasRegister = *wasmGasRegister
 	return k
 }
 
-func newKeeper(wasmer *wasmvm.VM, cdc *codec.CodecProxy,
+func newKeeper(cdc *codec.CodecProxy,
 	storeKey sdk.StoreKey,
 	storageStoreKey sdk.StoreKey,
 	paramSpace types.Subspace,
@@ -189,12 +188,9 @@ func newKeeper(wasmer *wasmvm.VM, cdc *codec.CodecProxy,
 	ada types.DBAdapter,
 	opts ...Option,
 ) Keeper {
-	if wasmer == nil {
-		var err = error(nil)
-		wasmer, err = wasmvm.NewVM(filepath.Join(homeDir, "wasm"), supportedFeatures, ContractMemoryLimit, wasmConfig.ContractDebugMode, wasmConfig.MemoryCacheSize)
-		if err != nil {
-			panic(err)
-		}
+	wasmer, err := wasmvm.NewVM(filepath.Join(homeDir, "wasm"), supportedFeatures, ContractMemoryLimit, wasmConfig.ContractDebugMode, wasmConfig.MemoryCacheSize)
+	if err != nil {
+		panic(err)
 	}
 
 	keeper := &Keeper{
