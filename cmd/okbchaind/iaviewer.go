@@ -7,6 +7,10 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"github.com/okx/okbchain/libs/cosmos-sdk/x/auth"
+	tmos "github.com/okx/okbchain/libs/tendermint/libs/os"
+	"github.com/okx/okbchain/libs/tendermint/state"
+	"log"
 	"os"
 	"sort"
 	"strconv"
@@ -131,6 +135,7 @@ func iaviewerCmd(ctx *server.Context, cdc *codec.Codec) *cobra.Command {
 		iaviewerDiffCmd(iavlCtx),
 		iaviewerVersionsCmd(iavlCtx),
 		iaviewerListModulesCmd(),
+		iaviewerReadRawCmd(iavlCtx),
 	)
 	iavlCtx.flags.DbBackend = cmd.PersistentFlags().String(sdk.FlagDBBackend, tmtypes.DBBackend, "Database backend: goleveldb | rocksdb")
 	iavlCtx.flags.Start = cmd.PersistentFlags().Int(flagStart, 0, "index of result set start from")
@@ -197,6 +202,40 @@ func iaviewerListModulesCmd() *cobra.Command {
 	return cmd
 }
 
+func iaviewerReadRawCmd(ctx *iaviewerContext) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "read_raw <data_dir> <module> [version]",
+		Short: "Read iavl tree key-value from db",
+		Long:  "Read iavl tree key-value from db, you must specify data_dir and module, if version is 0 or not specified, read data from the latest version.\n",
+		RunE: func(cmd *cobra.Command, args []string) (err error) {
+			db, err := base.OpenDB(ctx.DataDir, ctx.DbBackend)
+			if err != nil {
+				return fmt.Errorf("error opening DB: %w", err)
+			}
+			defer db.Close()
+			key := []byte(fmt.Sprintf("validatorsKey:%v", 1626176))
+			buf, err := db.Get(key)
+			if err != nil {
+				panic(err)
+			}
+			if len(buf) == 0 {
+				return nil
+			}
+
+			v := new(state.ValidatorsInfo)
+			err = auth.ModuleCdc.UnmarshalBinaryBare(buf, v)
+			if err != nil {
+				// DATA HAS BEEN CORRUPTED OR THE SPEC HAS CHANGED
+				tmos.Exit(fmt.Sprintf(`LoadValidators: Data has been corrupted or its spec has changed:
+                %v\n`, err))
+			}
+			log.Println(v)
+			return nil
+		},
+	}
+
+	return cmd
+}
 func iaviewerReadCmd(ctx *iaviewerContext) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "read <data_dir> <module> [version]",
