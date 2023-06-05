@@ -4,6 +4,7 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"strconv"
 	"sync"
 
@@ -357,6 +358,8 @@ func (q Querier) GetTxResultByBlock(clientCtx clientcontext.CLIContext,
 		return nil, errors.New(MsgFunctionDisable)
 	}
 
+	fmt.Println("-----GetTxResultByBlock-------")
+	fmt.Printf("height=%d, offset=%d, limit=%d\n", height, offset, limit)
 	// get block hash
 	rawBlockHash, err := q.store.Get(append(prefixBlockInfo, []byte(strconv.Itoa(int(height)))...))
 	if err != nil {
@@ -367,7 +370,7 @@ func (q Querier) GetTxResultByBlock(clientCtx clientcontext.CLIContext,
 	}
 
 	blockHash := common.HexToHash(string(rawBlockHash))
-
+	fmt.Println("blockHash=", blockHash)
 	// get block by hash
 	var block evmtypes.Block
 	var blockHashKey []byte
@@ -390,6 +393,7 @@ func (q Querier) GetTxResultByBlock(clientCtx clientcontext.CLIContext,
 	if err != nil {
 		return nil, err
 	}
+	fmt.Println("block=", block)
 
 	results := make([]*TransactionResult, 0, limit)
 	var ethStart, ethEnd, ethTxLen uint64
@@ -405,7 +409,7 @@ func (q Querier) GetTxResultByBlock(clientCtx clientcontext.CLIContext,
 				ethEnd = ethTxLen
 			}
 		}
-
+		fmt.Printf("ethStart=%d, ethEnd=%d, ethTxLen=%d\n", ethStart, ethEnd, ethTxLen)
 		for i := ethStart; i < ethEnd; i++ {
 			txHash := common.HexToHash(txsHash[i].(string))
 			//Get Eth Tx
@@ -435,6 +439,7 @@ func (q Querier) GetTxResultByBlock(clientCtx clientcontext.CLIContext,
 	// enough Tx by Eth
 	ethTxNums := ethEnd - ethStart
 	if ethTxNums == limit {
+		fmt.Println("ethTxNums == limit", ethTxNums, limit)
 		return results, nil
 	}
 	// calc remain std txs
@@ -447,8 +452,8 @@ func (q Querier) GetTxResultByBlock(clientCtx clientcontext.CLIContext,
 	}
 
 	if b == nil {
+		fmt.Println("b == nil")
 		return results, nil
-
 	}
 	err = json.Unmarshal(b, &stdTxsHash)
 	if err != nil {
@@ -476,7 +481,7 @@ func (q Querier) GetTxResultByBlock(clientCtx clientcontext.CLIContext,
 			results = append(results, res)
 		}
 	}
-
+	fmt.Println("-----GetTxResultByBlock-------end", results)
 	return results, nil
 }
 
