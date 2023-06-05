@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"context"
+	"log"
 
 	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
 	sdkerrors "github.com/okx/okbchain/libs/cosmos-sdk/types/errors"
@@ -64,6 +65,9 @@ func (m msgServer) InstantiateContract(goCtx context.Context, msg *types.MsgInst
 
 	contractAddr, data, err := m.keeper.Instantiate(ctx, msg.CodeID, senderAddr, adminAddr, msg.Msg, msg.Label, sdk.CoinAdaptersToCoins(msg.Funds))
 	if err != nil {
+		log.Println("msg.CodeID", msg.CodeID, "senderAddr", senderAddr, "adminAddr", adminAddr,
+			"msg.Msg", string(msg.Msg), "msg.Label", msg.Label, "msg.Funds", msg.Funds,
+			"error in msgServer.InstantiateContract", err)
 		return nil, err
 	}
 

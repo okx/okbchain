@@ -2,7 +2,9 @@ package state
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
+	"log"
 	"strings"
 
 	"github.com/tendermint/go-amino"
@@ -535,7 +537,14 @@ func saveValidatorsInfo(db dbm.DB, height, lastHeightChanged int64, valSet *type
 	if height == lastHeightChanged || height%valSetCheckpointInterval == 0 {
 		valInfo.ValidatorSet = valSet
 	}
-	db.Set(calcValidatorsKey(height), valInfo.Bytes())
+	err := db.Set(calcValidatorsKey(height), valInfo.Bytes())
+	if err != nil {
+		log.Println(fmt.Sprintf("---------Error setting height %d, validators: %v", height, err))
+		info, er := json.Marshal(valInfo)
+		log.Println("-------vinfo", info, "error", er)
+	} else {
+		log.Println(fmt.Sprintf("---------Success setting height %d, validators: %v", height, valInfo))
+	}
 }
 
 //-----------------------------------------------------------------------------
