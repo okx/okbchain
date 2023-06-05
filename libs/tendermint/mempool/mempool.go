@@ -120,7 +120,8 @@ type TxInfo struct {
 	wtx       *WrappedTx
 	checkType abci.CheckTxType
 
-	gasUsed int64
+	isGasPrecise bool
+	gasUsed      int64
 
 	wrapCMTx *types.WrapCMTx
 }

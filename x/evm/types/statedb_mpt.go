@@ -24,6 +24,7 @@ func (csdb *CommitStateDB) CommitMpt(prefetcher *mpt.TriePrefetcher) (ethcmn.Has
 			// Write any contract code associated with the state object
 			if obj.code != nil && obj.dirtyCode {
 				rawdb.WriteCode(codeWriter, ethcmn.BytesToHash(obj.CodeHash()), obj.code)
+				mpt.GetRawDBDeltaInstance().SetCode(ethcmn.BytesToHash(obj.CodeHash()), obj.code)
 				obj.dirtyCode = false
 			}
 
@@ -89,13 +90,17 @@ func (csdb *CommitStateDB) GetCodeByHashInRawDB(hash ethcmn.Hash) []byte {
 
 func (csdb *CommitStateDB) setHeightHashInRawDB(height uint64, hash ethcmn.Hash) {
 	key := AppendHeightHashKey(height)
-	csdb.db.TrieDB().DiskDB().Put(key, hash.Bytes())
+	st := csdb.ctx.MultiStore().GetKVStore(csdb.storeKey)
+	preKey := mpt.PutStoreKey(key)
+	st.Set(preKey, hash.Bytes())
 }
 
 func (csdb *CommitStateDB) getHeightHashInRawDB(height uint64) ethcmn.Hash {
 	key := AppendHeightHashKey(height)
-	bz, err := csdb.db.TrieDB().DiskDB().Get(key)
-	if err != nil {
+	st := csdb.ctx.MultiStore().GetKVStore(csdb.storeKey)
+	preKey := mpt.PutStoreKey(key)
+	bz := st.Get(preKey)
+	if bz == nil || len(bz) == 0 {
 		return ethcmn.Hash{}
 	}
 	return ethcmn.BytesToHash(bz)

@@ -11,8 +11,9 @@ import (
 // 4. ibc
 
 var (
-	milestoneEarthHeight  int64
-	milestoneVenus4Height int64
+	milestoneEarthHeight   int64
+	milestoneVenus4Height  int64
+	milestoneMercuryHeight int64
 
 	// note: it stores the earlies height of the node,and it is used by cli
 	nodePruneHeight int64
@@ -22,8 +23,9 @@ const (
 	MainNet = system.Chain + "-196"
 	TestNet = system.TestnetPrefix + "-195"
 
-	MILESTONE_EARTH  = "earth"
-	MILESTONE_Venus4 = "venus4"
+	MILESTONE_EARTH   = "earth"
+	MILESTONE_Venus4  = "venus4"
+	MILESTONE_MERCURY = "mercury"
 )
 
 func SetupMainNetEnvironment(pruneH int64) {
@@ -108,4 +110,32 @@ func GetVenus4Height() int64 {
 }
 
 // =========== Venus4 ===============
+// ==================================
+
+// ==================================
+// =========== Mercury ===============
+func UnittestOnlySetMilestoneMercuryHeight(h int64) {
+	milestoneEarthHeight = h
+}
+
+func SetMilestoneMercuryHeight(h int64) {
+	milestoneMercuryHeight = h
+}
+
+func HigherThanMercury(h int64) bool {
+	if milestoneMercuryHeight == 0 {
+		return false
+	}
+	return h >= milestoneMercuryHeight
+}
+
+func GetMercuryHeight() int64 {
+	return milestoneMercuryHeight
+}
+
+func InitMilestoneMercuryHeight(h int64) {
+	milestoneMercuryHeight = h
+}
+
+// =========== Mercury ===============
 // ==================================
