@@ -27,6 +27,8 @@ type UpdateFeeCollectorAccHandler func(ctx Context, balance Coins, txFeesplit []
 
 type UpdateCosmosTxCount func(ctx Context, txCount int)
 
+type GetFeeCollectorInfo func(ctx Context, onlyGetFeeCollectorStoreKey bool) (Coins, []byte)
+
 type LogFix func(tx []Tx, logIndex []int, hasEnterEvmTx []bool, errs []error, resp []abci.ResponseDeliverTx) (logs [][]byte)
 type UpdateFeeSplitHandler func(txHash common.Hash, addr AccAddress, fee Coins, isDelete bool)
 type GetTxFeeAndFromHandler func(ctx Context, tx Tx) (Coins, bool, bool, string, string, error, bool)
