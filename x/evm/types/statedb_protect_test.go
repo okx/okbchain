@@ -114,9 +114,9 @@ func (suite *StateDB_ProtectTestSuite) TestProtectStateDBEnvironment() {
 
 				suite.app.AccountKeeper.IterateAccounts(*ctx, func(account authexported.Account) bool {
 					if account.GetAddress().Equals(sdk.AccAddress(suite.updateAddr.Bytes())) {
-						suite.Require().Equal(sdk.NewCoins(sdk.NewCoin("okt", sdk.NewDec(2))), account.GetCoins())
+						suite.Require().Equal(sdk.NewCoins(sdk.NewCoin("okb", sdk.NewDec(2))), account.GetCoins())
 					} else if account.GetAddress().Equals(sdk.AccAddress(suite.insertAddr.Bytes())) {
-						suite.Require().Equal(sdk.NewCoins(sdk.NewCoin("okt", sdk.NewDec(1))), account.GetCoins())
+						suite.Require().Equal(sdk.NewCoins(sdk.NewCoin("okb", sdk.NewDec(1))), account.GetCoins())
 					}
 					return false
 				})
@@ -189,9 +189,9 @@ func (suite *StateDB_ProtectTestSuite) TestProtectStateDBEnvironment() {
 
 				suite.app.AccountKeeper.IterateAccounts(*ctx, func(account authexported.Account) bool {
 					if account.GetAddress().Equals(sdk.AccAddress(suite.updateAddr.Bytes())) {
-						suite.Require().Equal(sdk.NewCoins(sdk.NewCoin("okt", sdk.NewDec(2))), account.GetCoins())
+						suite.Require().Equal(sdk.NewCoins(sdk.NewCoin("okb", sdk.NewDec(2))), account.GetCoins())
 					} else if account.GetAddress().Equals(sdk.AccAddress(suite.insertAddr.Bytes())) {
-						suite.Require().Equal(sdk.NewCoins(sdk.NewCoin("okt", sdk.NewDec(1))), account.GetCoins())
+						suite.Require().Equal(sdk.NewCoins(sdk.NewCoin("okb", sdk.NewDec(1))), account.GetCoins())
 					}
 					return false
 				})
@@ -250,9 +250,9 @@ func (suite *StateDB_ProtectTestSuite) TestProtectStateDBEnvironment() {
 
 				suite.app.AccountKeeper.IterateAccounts(*ctx, func(account authexported.Account) bool {
 					if account.GetAddress().Equals(sdk.AccAddress(suite.updateAddr.Bytes())) {
-						suite.Require().Equal(sdk.NewCoins(sdk.NewCoin("okt", sdk.NewDec(2))), account.GetCoins())
+						suite.Require().Equal(sdk.NewCoins(sdk.NewCoin("okb", sdk.NewDec(2))), account.GetCoins())
 					} else if account.GetAddress().Equals(sdk.AccAddress(suite.insertAddr.Bytes())) {
-						suite.Require().Equal(sdk.NewCoins(sdk.NewCoin("okt", sdk.NewDec(1))), account.GetCoins())
+						suite.Require().Equal(sdk.NewCoins(sdk.NewCoin("okb", sdk.NewDec(1))), account.GetCoins())
 					}
 					return false
 				})
@@ -279,11 +279,11 @@ func (suite *StateDB_ProtectTestSuite) TestProtectStateDBEnvironment() {
 
 				suite.app.AccountKeeper.IterateAccounts(*ctx, func(account authexported.Account) bool {
 					if account.GetAddress().Equals(sdk.AccAddress(suite.updateAddr.Bytes())) {
-						suite.Require().Equal(sdk.NewCoins(sdk.NewCoin("okt", sdk.NewDec(1))), account.GetCoins())
+						suite.Require().Equal(sdk.NewCoins(sdk.NewCoin("okb", sdk.NewDec(1))), account.GetCoins())
 					} else if account.GetAddress().Equals(sdk.AccAddress(suite.insertAddr.Bytes())) {
-						suite.Require().Equal(sdk.NewCoins(sdk.NewCoin("okt", sdk.NewDec(1))), account.GetCoins())
+						suite.Require().Equal(sdk.NewCoins(sdk.NewCoin("okb", sdk.NewDec(1))), account.GetCoins())
 					} else if account.GetAddress().Equals(sdk.AccAddress(suite.deleteAddr.Bytes())) {
-						suite.Require().Equal(sdk.NewCoins(sdk.NewCoin("okt", sdk.NewDec(1))), account.GetCoins())
+						suite.Require().Equal(sdk.NewCoins(sdk.NewCoin("okb", sdk.NewDec(1))), account.GetCoins())
 					}
 					return false
 				})

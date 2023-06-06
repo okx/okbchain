@@ -2,6 +2,7 @@ package types
 
 import (
 	"bytes"
+	"github.com/okx/okbchain/libs/cosmos-sdk/store/mpt"
 	"os"
 	"testing"
 
@@ -331,14 +332,14 @@ func (suite *JournalTestSuite) TestJournal_cmchange_revert() {
 	suite.stateDB.accountKeeper.RemoveAccount(suite.ctx, acc)
 
 	// prepare account
-	update := suite.stateDB.accountKeeper.NewAccountWithAddress(suite.ctx, sdk.AccAddress{0x1})
-	update.SetCoins(sdk.NewCoins(sdk.NewCoin("okt", sdk.NewDec(1))))
+	update := suite.stateDB.accountKeeper.NewAccountWithAddress(suite.ctx, sdk.AccAddress(ethcmn.HexToAddress("0x0000000000000000000000000000000000000001").Bytes()))
+	update.SetCoins(sdk.NewCoins(sdk.NewCoin("okb", sdk.NewDec(1))))
 
-	insert := suite.stateDB.accountKeeper.NewAccountWithAddress(suite.ctx, sdk.AccAddress{0x2})
-	insert.SetCoins(sdk.NewCoins(sdk.NewCoin("okt", sdk.NewDec(1))))
+	insert := suite.stateDB.accountKeeper.NewAccountWithAddress(suite.ctx, sdk.AccAddress(ethcmn.HexToAddress("0x0000000000000000000000000000000000000002").Bytes()))
+	insert.SetCoins(sdk.NewCoins(sdk.NewCoin("okb", sdk.NewDec(1))))
 
-	delete := suite.stateDB.accountKeeper.NewAccountWithAddress(suite.ctx, sdk.AccAddress{0x3})
-	delete.SetCoins(sdk.NewCoins(sdk.NewCoin("okt", sdk.NewDec(1))))
+	delete := suite.stateDB.accountKeeper.NewAccountWithAddress(suite.ctx, sdk.AccAddress(ethcmn.HexToAddress("0x0000000000000000000000000000000000000003").Bytes()))
+	delete.SetCoins(sdk.NewCoins(sdk.NewCoin("okb", sdk.NewDec(1))))
 
 	suite.stateDB.accountKeeper.SetAccount(suite.ctx, update)
 	suite.stateDB.accountKeeper.SetAccount(suite.ctx, delete)
@@ -346,7 +347,7 @@ func (suite *JournalTestSuite) TestJournal_cmchange_revert() {
 	//prepare storgae key
 	suite.stateDB.dbAdapter = DefaultPrefixDb{}
 	stateDB := suite.stateDB
-	storeDB := stateDB.dbAdapter.NewStore(suite.ctx.KVStore(stateDB.storeKey), AddressStoragePrefix(ethcmn.Address{0x1}))
+	storeDB := stateDB.dbAdapter.NewStore(suite.ctx.KVStore(stateDB.storeKey), mpt.AddressStoragePrefixMpt(ethcmn.BytesToAddress(update.GetAddress()), update.GetStateRoot()))
 	prefixDB, ok := storeDB.(prefix.Store)
 	suite.Require().True(ok)
 	updateKey := []byte("1")
@@ -357,11 +358,11 @@ func (suite *JournalTestSuite) TestJournal_cmchange_revert() {
 
 	subCtx, write := suite.ctx.CacheContextWithMultiSnapshotRWSet()
 	suite.stateDB.accountKeeper.SetAccount(subCtx, insert)
-	update.SetCoins(sdk.NewCoins(sdk.NewCoin("okt", sdk.NewDec(0))))
+	update.SetCoins(sdk.NewCoins(sdk.NewCoin("okb", sdk.NewDec(0))))
 	suite.stateDB.accountKeeper.SetAccount(subCtx, update)
 	suite.stateDB.accountKeeper.RemoveAccount(subCtx, delete)
 
-	storeDB1 := stateDB.dbAdapter.NewStore(subCtx.KVStore(stateDB.storeKey), AddressStoragePrefix(ethcmn.Address{0x1}))
+	storeDB1 := stateDB.dbAdapter.NewStore(subCtx.KVStore(stateDB.storeKey), mpt.AddressStoragePrefixMpt(ethcmn.BytesToAddress(update.GetAddress()), update.GetStateRoot()))
 	prefixDB1, ok := storeDB1.(prefix.Store)
 	suite.Require().True(ok)
 	prefixDB1.Set(insertKey, []byte("1"))
@@ -399,7 +400,7 @@ func (suite *JournalTestSuite) TestJournal_cmchange_revert() {
 
 	suite.stateDB.accountKeeper.IterateAccounts(suite.ctx, func(account authexported.Account) bool {
 		if account.GetAddress().Equals(update.GetAddress()) {
-			update.SetCoins(sdk.NewCoins(sdk.NewCoin("okt", sdk.NewDec(1))))
+			update.SetCoins(sdk.NewCoins(sdk.NewCoin("okb", sdk.NewDec(1))))
 			suite.Require().Equal(update.String(), account.String())
 		} else if account.GetAddress().Equals(insert.GetAddress()) {
 			suite.Require().Equal(insert.String(), account.String())
@@ -412,7 +413,7 @@ func (suite *JournalTestSuite) TestJournal_cmchange_revert() {
 		return false
 	})
 
-	storeDB2 := stateDB.dbAdapter.NewStore(subCtx.KVStore(stateDB.storeKey), AddressStoragePrefix(ethcmn.Address{0x1}))
+	storeDB2 := stateDB.dbAdapter.NewStore(subCtx.KVStore(stateDB.storeKey), mpt.AddressStoragePrefixMpt(ethcmn.BytesToAddress(update.GetAddress()), update.GetStateRoot()))
 	prefixDB2, ok := storeDB2.(prefix.Store)
 	suite.Require().True(ok)
 
