@@ -43,7 +43,7 @@ import (
 	"github.com/okx/okbchain/x/wasm"
 	wasmkeeper "github.com/okx/okbchain/x/wasm/keeper"
 
-	"github.com/okx/okbchain/app/ante"
+	appante "github.com/okx/okbchain/app/ante"
 	chaincodec "github.com/okx/okbchain/app/codec"
 	appconfig "github.com/okx/okbchain/app/config"
 	"github.com/okx/okbchain/app/refund"
@@ -690,14 +690,14 @@ func NewSimApp(
 		WasmConfig:        &wasmConfig,
 		TXCounterStoreKey: keys[wasm.StoreKey],
 	}
-	app.SetAnteHandler(ante.NewAnteHandler(app.AccountKeeper, app.EvmKeeper, app.SupplyKeeper, validateMsgHook(), app.WasmHandler, app.IBCKeeper, app.StakingKeeper, app.ParamsKeeper))
+	app.SetAnteHandler(appante.NewAnteHandler(app.AccountKeeper, app.EvmKeeper, app.SupplyKeeper, validateMsgHook(), app.WasmHandler, app.IBCKeeper, app.StakingKeeper, app.ParamsKeeper))
 	app.SetEndBlocker(app.EndBlocker)
 	app.SetGasRefundHandler(refund.NewGasRefundHandler(app.AccountKeeper, app.SupplyKeeper, app.EvmKeeper))
 	app.SetAccNonceHandler(NewAccHandler(app.AccountKeeper))
 	app.SetUpdateWasmTxCount(fixCosmosTxCountInWasmForParallelTx(app.WasmHandler.TXCounterStoreKey))
 	app.SetUpdateFeeCollectorAccHandler(updateFeeCollectorHandler(app.BankKeeper, app.SupplyKeeper.Keeper))
 	app.SetParallelTxLogHandlers(fixLogForParallelTxHandler(app.EvmKeeper))
-	app.SetPartialConcurrentHandlers(getTxFeeAndFromHandler(app.AccountKeeper))
+	app.SetPartialConcurrentHandlers(getTxFeeAndFromHandler(app.EvmKeeper))
 	app.SetGetTxFeeHandler(getTxFeeHandler())
 	app.SetEvmSysContractAddressHandler(NewEvmSysContractAddressHandler(app.EvmKeeper))
 	app.SetEvmWatcherCollector(func(...sdk.IWatcher) {})
@@ -743,10 +743,16 @@ func evmTxVerifySigHandler(chainID string, blockHeight int64, evmTx *evmtypes.Ms
 	}
 	return nil
 }
-func getTxFeeAndFromHandler(ak auth.AccountKeeper) sdk.GetTxFeeAndFromHandler {
-	return func(ctx sdk.Context, tx sdk.Tx) (fee sdk.Coins, isEvm bool, from string, to string, err error, supportPara bool) {
+
+func getTxFeeAndFromHandler(ek appante.EVMKeeper) sdk.GetTxFeeAndFromHandler {
+	return func(ctx sdk.Context, tx sdk.Tx) (fee sdk.Coins, isEvm bool, isE2C bool, from string, to string, err error, supportPara bool) {
 		if evmTx, ok := tx.(*evmtypes.MsgEthereumTx); ok {
 			isEvm = true
+			supportPara = true
+			if appante.IsE2CTx(ek, &ctx, evmTx) {
+				isE2C = true
+				// supportPara = false
+			}
 			err = evmTxVerifySigHandler(ctx.ChainID(), ctx.BlockHeight(), evmTx)
 			if err != nil {
 				return
@@ -931,7 +937,7 @@ func GetMaccPerms() map[string][]string {
 	return dupMaccPerms
 }
 
-func validateMsgHook() ante.ValidateMsgHandler {
+func validateMsgHook() appante.ValidateMsgHandler {
 	return func(newCtx sdk.Context, msgs []sdk.Msg) error {
 
 		wrongMsgErr := sdk.ErrUnknownRequest(
