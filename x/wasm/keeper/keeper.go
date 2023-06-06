@@ -28,7 +28,7 @@ import (
 
 // contractMemoryLimit is the memory limit of each contract execution (in MiB)
 // constant value so all nodes run with the same limit.
-const contractMemoryLimit = 32
+const ContractMemoryLimit = 32
 const SupportedFeatures = "iterator,staking,stargate"
 
 type contextKey int
@@ -129,15 +129,24 @@ func NewKeeper(
 	watcher.SetWatchDataManager()
 	wasmStorageKey = storeKey
 	wasmMptStorageKey = storageKey
+	*wasmAccountKeeper = accountKeeper
+	*WasmbankKeeper = bankKeeper
 	k := newKeeper(cdc, storeKey, storageKey, paramSpace, accountKeeper, bankKeeper, channelKeeper, portKeeper, capabilityKeeper, portSource, router, queryRouter, homeDir, wasmConfig, supportedFeatures, defaultAdapter{}, opts...)
+	*wasmGasRegister = k.gasRegister
 	accountKeeper.SetObserverKeeper(k)
 
 	return k
 }
 
 var (
-	wasmStorageKey    = sdk.StoreKey(sdk.NewKVStoreKey("wasm")) // need reset by NewKeeper
-	wasmMptStorageKey = sdk.StoreKey(sdk.NewKVStoreKey("mpt"))  //need reset by NewKeeper
+	nilwasmGasRegister = GasRegister(nil)
+	nilAccountKeeper   = types.AccountKeeper(nil)
+	nilBankKeeper      = types.BankKeeper(nil)
+	wasmStorageKey     = sdk.StoreKey(sdk.NewKVStoreKey("wasm")) // need reset by NewKeeper
+	wasmMptStorageKey  = sdk.StoreKey(sdk.NewKVStoreKey("mpt"))  //need reset by NewKeeper
+	wasmAccountKeeper  = &nilAccountKeeper                       //need reset by NewKeeper
+	WasmbankKeeper     = &nilBankKeeper
+	wasmGasRegister    = &nilwasmGasRegister
 )
 
 func NewSimulateKeeper(
@@ -156,7 +165,9 @@ func NewSimulateKeeper(
 	supportedFeatures string,
 	opts ...Option,
 ) Keeper {
-	return newKeeper(cdc, wasmStorageKey, wasmMptStorageKey, paramSpace, accountKeeper, bankKeeper, channelKeeper, portKeeper, capabilityKeeper, portSource, router, queryRouter, homeDir, wasmConfig, supportedFeatures, watcher.Adapter{}, opts...)
+	k := newKeeper(cdc, wasmStorageKey, wasmMptStorageKey, paramSpace, *wasmAccountKeeper, *WasmbankKeeper, channelKeeper, portKeeper, capabilityKeeper, portSource, router, queryRouter, homeDir, wasmConfig, supportedFeatures, watcher.Adapter{}, opts...)
+	k.gasRegister = *wasmGasRegister
+	return k
 }
 
 func newKeeper(cdc *codec.CodecProxy,
@@ -177,7 +188,7 @@ func newKeeper(cdc *codec.CodecProxy,
 	ada types.DBAdapter,
 	opts ...Option,
 ) Keeper {
-	wasmer, err := wasmvm.NewVM(filepath.Join(homeDir, "wasm"), supportedFeatures, contractMemoryLimit, wasmConfig.ContractDebugMode, wasmConfig.MemoryCacheSize)
+	wasmer, err := wasmvm.NewVM(filepath.Join(homeDir, "wasm"), supportedFeatures, ContractMemoryLimit, wasmConfig.ContractDebugMode, wasmConfig.MemoryCacheSize)
 	if err != nil {
 		panic(err)
 	}
