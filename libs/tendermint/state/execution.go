@@ -110,7 +110,7 @@ func NewBlockExecutor(
 		metrics:      NopMetrics(),
 		prerunCtx:    newPrerunContex(logger),
 		deltaContext: newDeltaContext(logger),
-		eventsChan:   make(chan event, 5),
+		eventsChan:   make(chan event, 100),
 	}
 
 	for _, option := range options {
@@ -314,8 +314,10 @@ func (blockExec *BlockExecutor) ApplyBlock(
 	blockExec.logger.Debug("SaveState", "state", &state)
 	fail.Fail() // XXX
 
+	trc.Pin("dds")
 	dc.postApplyBlock(block.Height, deltaInfo, abciResponses, commitResp.DeltaMap, blockExec.isFastSync)
 
+	trc.Pin("indexer")
 	// Events are fired after everything else.
 	// NOTE: if we crash between Commit and Save, events wont be fired during replay
 	if !types.EnableEventBlockTime {
