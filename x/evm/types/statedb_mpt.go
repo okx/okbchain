@@ -24,6 +24,7 @@ func (csdb *CommitStateDB) CommitMpt(prefetcher *mpt.TriePrefetcher) (ethcmn.Has
 			// Write any contract code associated with the state object
 			if obj.code != nil && obj.dirtyCode {
 				rawdb.WriteCode(codeWriter, ethcmn.BytesToHash(obj.CodeHash()), obj.code)
+				mpt.GetRawDBDeltaInstance().SetCode(ethcmn.BytesToHash(obj.CodeHash()), obj.code)
 				obj.dirtyCode = false
 			}
 
