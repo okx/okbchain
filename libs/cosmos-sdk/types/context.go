@@ -48,11 +48,11 @@ type Context struct {
 	accountCache       *AccountCache
 	paraMsg            *ParaMsg
 	//	txCount            uint32
-	overridesBytes         []byte // overridesBytes is used to save overrides info, passed from ethCall to x/evm
-	watcher                *TxWatcher
-	feesplitInfo           *FeeSplitInfo
-	outOfGas               bool
-	wasmKvStoreForSimulate *KVStore
+	overridesBytes    []byte // overridesBytes is used to save overrides info, passed from ethCall to x/evm
+	watcher           *TxWatcher
+	feesplitInfo      *FeeSplitInfo
+	outOfGas          bool
+	wasmSimulateCache map[string][]byte
 }
 
 // Proposed rename, not done to avoid API breakage
@@ -83,10 +83,6 @@ func (c *Context) BlockGasMeter() GasMeter    { return c.blockGasMeter }
 
 func (c *Context) IsDeliver() bool {
 	return c.isDeliver
-}
-
-func (c *Context) WasmKvStoreForSimulate() KVStore {
-	return *c.wasmKvStoreForSimulate
 }
 
 func (c *Context) UseParamCache() bool {
@@ -197,17 +193,16 @@ func NewContext(ms MultiStore, header abci.Header, isCheckTx bool, logger log.Lo
 	// https://github.com/gogo/protobuf/issues/519
 	header.Time = header.Time.UTC()
 	return Context{
-		ctx:                    context.Background(),
-		ms:                     ms,
-		header:                 &header,
-		chainID:                header.ChainID,
-		checkTx:                isCheckTx,
-		logger:                 logger,
-		gasMeter:               stypes.NewInfiniteGasMeter(),
-		minGasPrice:            DecCoins{},
-		eventManager:           NewEventManager(),
-		watcher:                &TxWatcher{EmptyWatcher{}},
-		wasmKvStoreForSimulate: &nilKvStore,
+		ctx:          context.Background(),
+		ms:           ms,
+		header:       &header,
+		chainID:      header.ChainID,
+		checkTx:      isCheckTx,
+		logger:       logger,
+		gasMeter:     stypes.NewInfiniteGasMeter(),
+		minGasPrice:  DecCoins{},
+		eventManager: NewEventManager(),
+		watcher:      &TxWatcher{EmptyWatcher{}},
 	}
 }
 
@@ -216,12 +211,22 @@ func (c *Context) SetDeliver() *Context {
 	return c
 }
 
-func (c *Context) SetWasmKvStoreForSimulate(k KVStore) {
-	*c.wasmKvStoreForSimulate = k
+func (c *Context) SetWasmSimulateCache() {
+	c.wasmSimulateCache = getWasmCacheMap()
+}
+func (c *Context) GetWasmSimulateCache() map[string][]byte {
+	if c.wasmSimulateCache == nil {
+		c.wasmSimulateCache = getWasmCacheMap()
+		return c.wasmSimulateCache
+	}
+	return c.wasmSimulateCache
 }
 
-func (c *Context) ResetWasmKvStoreForSimulate() {
-	*c.wasmKvStoreForSimulate = KVStore(nil)
+func (c *Context) MoveWasmSimulateCacheToPool() {
+	for k, _ := range c.wasmSimulateCache {
+		delete(c.wasmSimulateCache, k)
+	}
+	putBackWasmCacheMap(c.wasmSimulateCache)
 }
 
 // TODO: remove???
