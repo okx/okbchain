@@ -625,7 +625,7 @@ func (w *Watcher) lazyInitialization() {
 	// lazy initial:
 	// now we will allocate chan memory
 	// 5*3 means watcherCommitJob+DelayEraseKey+commitBatchJob(just in case)
-	w.jobChan = make(chan func(), 5*3)
+	w.jobChan = make(chan func(), 500*3)
 	w.jobDone = new(sync.WaitGroup)
 	w.jobDone.Add(1)
 }
