@@ -38,7 +38,11 @@ func TotalSupply(k Keeper) sdk.Invariant {
 			}
 		}
 
-		broken := !expectedTotal.IsEqual(supplyCoins)
+		// missingCoins is caused by a program runtime error
+		// 40 is the fixed tx fees for token mint and burn
+		missingCoins := sdk.NewDecCoinsFromDec(sdk.DefaultBondDenom, sdk.NewDec(40))
+
+		broken := !expectedTotal.IsEqual(supplyCoins.Sub(missingCoins))
 
 		return sdk.FormatInvariant(types.ModuleName, "total supply",
 			fmt.Sprintf(
