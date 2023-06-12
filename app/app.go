@@ -2,10 +2,12 @@ package app
 
 import (
 	"fmt"
-	paramstypes "github.com/okx/okbchain/x/params/types"
 	"io"
 	"os"
+	"runtime/debug"
 	"sync"
+
+	paramstypes "github.com/okx/okbchain/x/params/types"
 
 	"github.com/okx/okbchain/x/vmbridge"
 
@@ -201,7 +203,8 @@ var (
 		icatypes.ModuleName:         nil,
 	}
 
-	onceLog sync.Once
+	onceLog              sync.Once
+	FlagGolangMaxThreads string = "golang-max-threads"
 )
 
 var _ simapp.App = (*OKBChainApp)(nil)
@@ -693,10 +696,11 @@ func NewOKBChainApp(
 	app.SetGasRefundHandler(refund.NewGasRefundHandler(app.AccountKeeper, app.SupplyKeeper, app.EvmKeeper))
 	app.SetAccNonceHandler(NewAccNonceHandler(app.AccountKeeper))
 
+	app.SetUpdateWasmTxCount(fixCosmosTxCountInWasmForParallelTx(app.WasmHandler.TXCounterStoreKey))
 	app.SetUpdateFeeCollectorAccHandler(updateFeeCollectorHandler(app.BankKeeper, app.SupplyKeeper))
 	app.SetParallelTxLogHandlers(fixLogForParallelTxHandler(app.EvmKeeper))
 	app.SetPreDeliverTxHandler(preDeliverTxHandler(app.AccountKeeper))
-	app.SetPartialConcurrentHandlers(getTxFeeAndFromHandler(app.AccountKeeper))
+	app.SetPartialConcurrentHandlers(getTxFeeAndFromHandler(app.EvmKeeper))
 	app.SetGetTxFeeHandler(getTxFeeHandler())
 	app.SetEvmSysContractAddressHandler(NewEvmSysContractAddressHandler(app.EvmKeeper))
 	app.SetEvmWatcherCollector(app.EvmKeeper.Watcher.Collect)
@@ -733,6 +737,9 @@ func (app *OKBChainApp) InitUpgrade(ctx sdk.Context) {
 	// Claim before ApplyEffectiveUpgrade
 	app.ParamsKeeper.ClaimReadyForUpgrade(tmtypes.MILESTONE_EARTH, func(info paramstypes.UpgradeInfo) {
 		tmtypes.InitMilestoneEarthHeight(int64(info.EffectiveHeight))
+	})
+	app.ParamsKeeper.ClaimReadyForUpgrade(tmtypes.MILESTONE_MERCURY, func(info paramstypes.UpgradeInfo) {
+		tmtypes.InitMilestoneMercuryHeight(int64(info.EffectiveHeight))
 	})
 	if err := app.ParamsKeeper.ApplyEffectiveUpgrade(ctx); err != nil {
 		tmos.Exit(fmt.Sprintf("failed apply effective upgrade height info: %s", err))
@@ -886,6 +893,9 @@ func PreRun(ctx *server.Context, cmd *cobra.Command) error {
 		return err
 	}
 
+	if maxThreads := viper.GetInt(FlagGolangMaxThreads); maxThreads != 0 {
+		debug.SetMaxThreads(maxThreads)
+	}
 	// set config by node mode
 	err = setNodeConfig(ctx)
 	if err != nil {

@@ -125,13 +125,11 @@ func NewAPI(
 	module := evm.AppModuleBasic{}
 	api.cdc = codec.New()
 	module.RegisterCodec(api.cdc)
-	if watcher.IsWatcherEnabled() {
-		callCache, err := lru.New(CacheOfEthCallLru)
-		if err != nil {
-			panic(err)
-		}
-		api.callCache = callCache
+	callCache, err := lru.New(CacheOfEthCallLru)
+	if err != nil {
+		panic(err)
 	}
+	api.callCache = callCache
 
 	if err := api.GetKeyringInfo(); err != nil {
 		api.logger.Error("failed to get keybase info", "error", err)
@@ -1320,7 +1318,6 @@ func (api *PublicEthereumAPI) GetTransactionReceipt(hash common.Hash) (*watcher.
 	if err != nil {
 		return nil, err
 	}
-
 	blockHash := common.BytesToHash(block.Block.Hash())
 
 	// Convert tx bytes to eth transaction

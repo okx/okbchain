@@ -463,7 +463,7 @@ func handleSimulate(app *BaseApp, path []string, height int64, txBytes []byte, o
 
 	msgs := tx.GetMsgs()
 
-	if enableFastQuery() {
+	if enableWasmFastQuery() {
 		isPureWasm := true
 		for _, msg := range msgs {
 			if msg.Route() != "wasm" {
@@ -472,7 +472,7 @@ func handleSimulate(app *BaseApp, path []string, height int64, txBytes []byte, o
 			}
 		}
 		if isPureWasm {
-			res, err := handleSimulateWasm(height, txBytes, msgs)
+			res, err := handleSimulateWasm(height, txBytes, msgs, app.checkState.ms.CacheMultiStore())
 			return res, shouldAddBuffer, err
 		}
 	}
@@ -487,7 +487,7 @@ func handleSimulate(app *BaseApp, path []string, height int64, txBytes []byte, o
 	}, shouldAddBuffer, nil
 }
 
-func handleSimulateWasm(height int64, txBytes []byte, msgs []sdk.Msg) (simRes sdk.SimulationResponse, err error) {
+func handleSimulateWasm(height int64, txBytes []byte, msgs []sdk.Msg, ms sdk.CacheMultiStore) (simRes sdk.SimulationResponse, err error) {
 	wasmSimulator := simulator.NewWasmSimulator()
 	defer wasmSimulator.Release()
 	defer func() {
@@ -503,7 +503,7 @@ func handleSimulateWasm(height int64, txBytes []byte, msgs []sdk.Msg) (simRes sd
 
 	wasmSimulator.Context().GasMeter().ConsumeGas(73000, "general ante check cost")
 	wasmSimulator.Context().GasMeter().ConsumeGas(uint64(10*len(txBytes)), "tx size cost")
-	res, err := wasmSimulator.Simulate(msgs)
+	res, err := wasmSimulator.Simulate(msgs, ms)
 	if err != nil {
 		return sdk.SimulationResponse{}, sdkerrors.Wrap(err, "failed to simulate wasm tx")
 	}
@@ -720,9 +720,9 @@ var (
 	fqOnce    sync.Once
 )
 
-func enableFastQuery() bool {
+func enableWasmFastQuery() bool {
 	fqOnce.Do(func() {
-		fastQuery = viper.GetBool("fast-query")
+		fastQuery = viper.GetBool("wasm-fast-query")
 	})
 	return fastQuery
 }

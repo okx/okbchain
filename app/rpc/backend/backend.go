@@ -2,7 +2,6 @@ package backend
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"time"
@@ -147,31 +146,27 @@ func (b *EthermintBackend) GetBlockByNumber(blockNum rpctypes.BlockNumber, fullT
 	if block, err := b.backendCache.GetBlockByNumber(uint64(blockNum), fullTx); err == nil {
 		return block, nil
 	}
+	block, err := b.wrappedBackend.GetBlockByNumber(uint64(blockNum), fullTx)
+	if err == nil {
+		b.backendCache.AddOrUpdateBlock(block.Hash, block, fullTx)
+		return block, nil
+	}
 	height := blockNum.Int64()
 	if height <= 0 {
 		// get latest block height
 		height = b.BlockNumber()
 	}
-	res, _, err := b.clientCtx.Query(fmt.Sprintf("custom/%s/%s/%d", evmtypes.ModuleName, evmtypes.QueryEthBlockByHeight, height))
+	resBlock, err := b.Block(&height)
 	if err != nil {
 		return nil, fmt.Errorf("not found block by height(%d)", blockNum)
 	}
-	var ethBlock evmtypes.Block
-	if err := json.Unmarshal(res, &ethBlock); err != nil {
+
+	block, err = rpctypes.RpcBlockFromTendermint(b.clientCtx, resBlock.Block, fullTx, b.logsLimit)
+	if err != nil {
 		return nil, err
 	}
-	// return empty slice instead of null when there is no transactions in block
-	if ethBlock.TransactionsRoot == ethtypes.EmptyRootHash {
-		ethBlock.Transactions = []common.Hash{}
-	} else if fullTx {
-		ethTxs, err := b.getBlockFullTxs(height, ethBlock.Hash)
-		if err != nil {
-			return nil, err
-		}
-		ethBlock.Transactions = ethTxs
-	}
-	b.backendCache.AddOrUpdateBlock(ethBlock.Hash, &ethBlock, fullTx)
-	return &ethBlock, nil
+	b.backendCache.AddOrUpdateBlock(block.Hash, block, fullTx)
+	return block, nil
 }
 
 func (b *EthermintBackend) getBlockFullTxs(height int64, blockHash common.Hash) ([]*watcher.Transaction, error) {
@@ -195,32 +190,19 @@ func (b *EthermintBackend) GetBlockByHash(hash common.Hash, fullTx bool) (*evmty
 	if block, err := b.backendCache.GetBlockByHash(hash, fullTx); err == nil {
 		return block, err
 	}
-	// query block by eth block hash
-	res, _, err := b.clientCtx.Query(fmt.Sprintf("custom/%s/%s/%s", evmtypes.ModuleName, evmtypes.QueryEthBlockByHash, hash.Hex()))
+	//query block from watch db
+	block, err := b.wrappedBackend.GetBlockByHash(hash, fullTx)
 	if err == nil {
-		var ethBlock evmtypes.Block
-		if err := json.Unmarshal(res, &ethBlock); err != nil {
-			return nil, err
-		}
-		// return empty slice instead of null when there is no transactions in block
-		if ethBlock.TransactionsRoot == ethtypes.EmptyRootHash {
-			ethBlock.Transactions = []common.Hash{}
-		} else if fullTx {
-			ethTxs, err := b.getBlockFullTxs(int64(ethBlock.Number), ethBlock.Hash)
-			if err != nil {
-				return nil, err
-			}
-			ethBlock.Transactions = ethTxs
-		}
-		b.backendCache.AddOrUpdateBlock(hash, &ethBlock, fullTx)
-		return &ethBlock, nil
+		b.backendCache.AddOrUpdateBlock(hash, block, fullTx)
+		return block, nil
 	}
+
 	// query block by tendermint block hash
 	resBlock, err := b.clientCtx.Client.BlockByHash(hash.Bytes())
 	if err != nil {
 		return nil, err
 	}
-	block, err := rpctypes.RpcBlockFromTendermint(b.clientCtx, resBlock.Block, fullTx)
+	block, err = rpctypes.RpcBlockFromTendermint(b.clientCtx, resBlock.Block, fullTx, b.logsLimit)
 	if err != nil {
 		return nil, err
 	}
@@ -477,7 +459,6 @@ func (b *EthermintBackend) GetLogs(height int64) ([][]*ethtypes.Log, error) {
 	default:
 		return nil, ErrInvalidBlock
 	}
-	ethBlockHash := block.EthHash()
 	// return empty directly when block was produced during stress testing.
 	var blockLogs = [][]*ethtypes.Log{}
 	if b.logsLimit > 0 && len(txs) > b.logsLimit {
@@ -502,7 +483,6 @@ func (b *EthermintBackend) GetLogs(height int64) ([][]*ethtypes.Log, error) {
 			var validLogs []*ethtypes.Log
 			for _, log := range execRes.Logs {
 				if log.BlockNumber == uint64(block.Number) {
-					log.BlockHash = ethBlockHash
 					validLogs = append(validLogs, log)
 				}
 			}

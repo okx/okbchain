@@ -350,11 +350,13 @@ func (csdb *CommitStateDB) IteratorCode(cb func(addr ethcmn.Address, c CacheCode
 
 // SetHeightHash sets the block header hash associated with a given height.
 func (csdb *CommitStateDB) SetHeightHash(height uint64, hash ethcmn.Hash) {
-	if !csdb.ctx.IsCheckTx() {
-		funcName := "SetHeightHash"
-		trace.StartTxLog(funcName)
-		defer trace.StopTxLog(funcName)
+	if csdb.ctx.IsCheckTx() {
+		return
 	}
+
+	funcName := "SetHeightHash"
+	trace.StartTxLog(funcName)
+	defer trace.StopTxLog(funcName)
 
 	csdb.setHeightHashInRawDB(height, hash)
 }
@@ -879,7 +881,6 @@ func (csdb *CommitStateDB) Commit(deleteEmptyObjects bool) (ethcmn.Hash, error) 
 // removing the csdb destructed objects and clearing the journal as well as the
 // refunds.
 func (csdb *CommitStateDB) Finalise(deleteEmptyObjects bool) {
-	addressesToPrefetch := make([][]byte, 0, len(csdb.journal.dirties))
 	for addr := range csdb.journal.dirties {
 		obj, exist := csdb.stateObjects[addr]
 		if !exist {
@@ -898,11 +899,6 @@ func (csdb *CommitStateDB) Finalise(deleteEmptyObjects bool) {
 		}
 		csdb.stateObjectsPending[addr] = struct{}{}
 		csdb.stateObjectsDirty[addr] = struct{}{}
-
-		// At this point, also ship the address off to the precacher. The precacher
-		// will start loading tries, and when the change is eventually committed,
-		// the commit-phase will be a lot faster
-		addressesToPrefetch = append(addressesToPrefetch, ethcmn.CopyBytes(addr[:])) // Copy needed for closure
 	}
 	//TODO need to prefecth to acc trie
 
@@ -941,12 +937,13 @@ func (csdb *CommitStateDB) IntermediateRoot(deleteEmptyObjects bool) ethcmn.Hash
 		}
 		//usedAddrs = append(usedAddrs, ethcmn.CopyBytes(addr[:])) // Copy needed for closure
 	}
+
 	//if csdb.prefetcher != nil {
 	//	csdb.prefetcher.used(csdb.originalRoot, usedAddrs)
 	//}
 
-	if len(csdb.stateObjectsPending) > 0 {
-		csdb.stateObjectsPending = make(map[ethcmn.Address]struct{})
+	for addr := range csdb.stateObjectsPending {
+		delete(csdb.stateObjectsPending, addr)
 	}
 
 	return ethcmn.Hash{}
