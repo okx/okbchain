@@ -48,10 +48,11 @@ type Context struct {
 	accountCache       *AccountCache
 	paraMsg            *ParaMsg
 	//	txCount            uint32
-	overridesBytes []byte // overridesBytes is used to save overrides info, passed from ethCall to x/evm
-	watcher        *TxWatcher
-	feesplitInfo   *FeeSplitInfo
-	outOfGas       bool
+	overridesBytes    []byte // overridesBytes is used to save overrides info, passed from ethCall to x/evm
+	watcher           *TxWatcher
+	feesplitInfo      *FeeSplitInfo
+	outOfGas          bool
+	wasmSimulateCache map[string][]byte
 }
 
 // Proposed rename, not done to avoid API breakage
@@ -183,6 +184,10 @@ func (c *Context) ConsensusParams() *abci.ConsensusParams {
 //	return c.txCount
 //}
 
+var (
+	nilKvStore = KVStore(nil)
+)
+
 // NewContext create a new context
 func NewContext(ms MultiStore, header abci.Header, isCheckTx bool, logger log.Logger) Context {
 	// https://github.com/gogo/protobuf/issues/519
@@ -204,6 +209,24 @@ func NewContext(ms MultiStore, header abci.Header, isCheckTx bool, logger log.Lo
 func (c *Context) SetDeliver() *Context {
 	c.isDeliver = true
 	return c
+}
+
+func (c *Context) SetWasmSimulateCache() {
+	c.wasmSimulateCache = getWasmCacheMap()
+}
+func (c *Context) GetWasmSimulateCache() map[string][]byte {
+	if c.wasmSimulateCache == nil {
+		c.wasmSimulateCache = getWasmCacheMap()
+		return c.wasmSimulateCache
+	}
+	return c.wasmSimulateCache
+}
+
+func (c *Context) MoveWasmSimulateCacheToPool() {
+	for k, _ := range c.wasmSimulateCache {
+		delete(c.wasmSimulateCache, k)
+	}
+	putBackWasmCacheMap(c.wasmSimulateCache)
 }
 
 // TODO: remove???

@@ -37,8 +37,6 @@ const (
 )
 
 var (
-	TrieAccStoreCache uint = 32 // MB
-
 	AccountStateRootRetriever StateRootRetriever = EmptyStateRootRetriever{}
 
 	applyDelta   = false
@@ -90,6 +88,8 @@ type MptStore struct {
 
 	// for time statistics
 	statisticsBeginTime time.Time
+
+	outputDelta *trie.MptDelta
 }
 
 func (ms *MptStore) CommitterCommitMap(deltaMap iavl.TreeDeltaMap) (_ types.CommitID, _ iavl.TreeDeltaMap) {
@@ -126,6 +126,7 @@ func generateMptStore(logger tmlog.Logger, id types.CommitID, db ethstate.Databa
 		logger:              logger,
 		retriever:           retriever,
 		exitSignal:          make(chan struct{}),
+		outputDelta:         trie.NewMptDelta(),
 	}
 	if mptStore.logger == nil {
 		mptStore.logger = tmlog.NewNopLogger()
@@ -229,7 +230,12 @@ func (ms *MptStore) Get(key []byte) []byte {
 		if err != nil {
 			return nil
 		}
-
+		return value
+	case putType:
+		value, err := ms.db.TrieDB().DiskDB().Get(key[1:])
+		if err != nil {
+			return nil
+		}
 		return value
 	default:
 		panic(fmt.Errorf("not support key %s for mpt get", hex.EncodeToString(key)))
@@ -267,6 +273,10 @@ func (ms *MptStore) Has(key []byte) bool {
 func (ms *MptStore) Set(key, value []byte) {
 	types.AssertValidValue(value)
 
+	if produceDelta {
+		ms.outputDelta.SetKV = append(ms.outputDelta.SetKV, &trie.DeltaKV{Key: key, Val: value})
+	}
+
 	if ms.prefetcher != nil {
 		ms.prefetcher.Used(ms.originalRoot, [][]byte{key})
 	}
@@ -279,6 +289,8 @@ func (ms *MptStore) Set(key, value []byte) {
 	case addressType:
 		ms.trie.TryUpdate(key, value)
 		ms.updateSnapAccounts(key, value)
+	case putType:
+		ms.db.TrieDB().DiskDB().Put(key[1:], value)
 	default:
 		panic(fmt.Errorf("not support key %s for mpt set", hex.EncodeToString(key)))
 	}
@@ -287,6 +299,9 @@ func (ms *MptStore) Set(key, value []byte) {
 }
 
 func (ms *MptStore) Delete(key []byte) {
+	if produceDelta {
+		ms.outputDelta.DelKV = append(ms.outputDelta.DelKV, &trie.DeltaKV{Key: key, Val: nil})
+	}
 	if ms.prefetcher != nil {
 		ms.prefetcher.Used(ms.originalRoot, [][]byte{key})
 	}
@@ -405,31 +420,34 @@ func (ms *MptStore) commitStorage(nodeSets *trie.MergedNodeSet) {
 }
 
 func (ms *MptStore) CommitterCommit(inputDelta interface{}) (rootHash types.CommitID, outputDelta interface{}) {
+	if applyDelta && inputDelta != nil {
+		delta, ok := inputDelta.(*trie.MptDelta)
+		if !ok {
+			panic(fmt.Sprintf("wrong input delta of mpt. delta: %v", inputDelta))
+		}
+		for _, kvs := range delta.SetKV {
+			ms.Set(kvs.Key, kvs.Val)
+		}
+		for _, kvs := range delta.DelKV {
+			ms.Delete(kvs.Key)
+		}
+		ms.applyRawDBDelta(delta.CodeKV)
+	}
+	if produceDelta {
+		GetRawDBDeltaInstance().fillCodeDelta(ms.outputDelta)
+		outputDelta = ms.outputDelta
+		ms.outputDelta = trie.NewMptDelta()
+		GetRawDBDeltaInstance().reset()
+	}
+
 	ms.version++
 
 	// stop pre round prefetch
 	ms.StopPrefetcher()
 	nodeSets := trie.NewMergedNodeSet()
 
-	var root ethcmn.Hash
-	var set *trie.NodeSet
-	var err error
-	if applyDelta && inputDelta != nil {
-		delta, ok := inputDelta.(*trie.MptDelta)
-		if !ok {
-			panic(fmt.Sprintf("wrong input delta of mpt. delta: %v", inputDelta))
-		}
-		ms.commitStorageWithDelta(delta.Storage, nodeSets)
-		root, set, err = ms.trie.CommitWithDelta(delta.NodeDelta, true)
-	} else if produceDelta {
-		var outputNodeDelta []*trie.NodeDelta
-		outStorage := ms.commitStorageForDelta(nodeSets)
-		root, set, outputNodeDelta, err = ms.trie.CommitForDelta(true)
-		outputDelta = &trie.MptDelta{NodeDelta: outputNodeDelta, Storage: outStorage}
-	} else {
-		ms.commitStorage(nodeSets)
-		root, set, err = ms.trie.Commit(true)
-	}
+	ms.commitStorage(nodeSets)
+	root, set, err := ms.trie.Commit(true)
 	if err != nil {
 		panic("fail to commit trie data(acc_trie.Commit): " + err.Error())
 	}
@@ -790,6 +808,7 @@ func (ms *MptStore) SetUpgradeVersion(i int64) {}
 var (
 	keyPrefixStorageMpt  = byte(0)
 	keyPrefixAddrMpt     = byte(1) // TODO auth.AddressStoreKeyPrefix
+	keyPrefixPutMpt      = byte(2)
 	prefixSizeInMpt      = 1
 	storageKeySize       = prefixSizeInMpt + len(ethcmn.Address{}) + len(ethcmn.Hash{}) + len(ethcmn.Hash{})
 	addrKeySize          = prefixSizeInMpt + sdk.AddrLen
@@ -816,9 +835,14 @@ func AddressStoreKey(addr []byte) []byte {
 	return append([]byte{keyPrefixAddrMpt}, addr...)
 }
 
+func PutStoreKey(key []byte) []byte {
+	return append([]byte{keyPrefixPutMpt}, key...)
+}
+
 var (
 	storageType = 0
 	addressType = 1
+	putType     = 2
 )
 
 /*
@@ -836,6 +860,8 @@ func mptKeyType(key []byte) int {
 		return -1
 	case keyPrefixStorageMpt:
 		return storageType
+	case keyPrefixPutMpt:
+		return putType
 	default:
 		return -1
 
