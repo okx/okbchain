@@ -82,6 +82,8 @@ func (ms *MptStore) commitSnap(root common.Hash) {
 	if ms.snap == nil {
 		return
 	}
+	ms.snapRWLock.Lock()
+	defer ms.snapRWLock.Unlock()
 	// Only update if there's a state transition
 	if parent := ms.snap.Root(); parent != root {
 		if err := ms.snaps.Update(root, parent, ms.snapDestructs, ms.snapAccounts, ms.snapStorage); err != nil {
