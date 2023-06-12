@@ -146,7 +146,9 @@ func generateMptStore(logger tmlog.Logger, id types.CommitID, db ethstate.Databa
 		mptStore.logger.Info("open snapshot successfully", "snapshot", "ok")
 	}
 
-	go mptStore.threadPushData2DB()
+	if TrieAsyncPushDB {
+		go mptStore.threadPushData2DB()
+	}
 
 	return mptStore, err
 }
@@ -469,7 +471,11 @@ func (ms *MptStore) CommitterCommit(inputDelta interface{}) (rootHash types.Comm
 	ms.originalRoot = root
 
 	// push data to database
-	ms.pushDBHeightChan <- ms.version
+	if TrieAsyncPushDB {
+		ms.pushDBHeightChan <- ms.version
+	} else {
+		ms.PushData2Database(ms.version)
+	}
 
 	ms.sprintDebugLog(ms.version)
 

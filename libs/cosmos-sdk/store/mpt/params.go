@@ -24,6 +24,8 @@ const (
 	FlagTrieAsyncDBInitCap        = "trie.asyncdb.init-cap"
 	FlagTrieAsyncDBAutoPruningOff = "trie.asyncdb.auto-pruning-off"
 	FlagTrieAsyncDBSyncPruning    = "trie.asyncdb.sync-pruning"
+
+	FlagTrieAsyncPushDB = "trie.async-push-db"
 )
 
 var (
@@ -38,6 +40,8 @@ var (
 	TrieAsyncDBSyncPruning    = false
 
 	EnableAsyncCommit = false
+
+	TrieAsyncPushDB = false
 )
 
 var (
