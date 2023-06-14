@@ -1,6 +1,7 @@
 package mempool
 
 import (
+	"strconv"
 	"sync"
 
 	"github.com/okx/okbchain/libs/tendermint/types"
@@ -37,6 +38,21 @@ func (p *PendingPool) Size() int {
 	p.mtx.RLock()
 	defer p.mtx.RUnlock()
 	return len(p.txsMap)
+}
+
+func (p *PendingPool) GetWrappedAddressTxsMap() map[string]map[string]types.WrappedMempoolTx {
+	p.mtx.RLock()
+	defer p.mtx.RUnlock()
+	wrappedAddressTxsMap := make(map[string]map[string]types.WrappedMempoolTx)
+	for address, subMap := range p.addressTxsMap {
+		nonceTxsMap := make(map[string]types.WrappedMempoolTx)
+		for nonce, memTxPtr := range subMap {
+			nonceStr := strconv.Itoa(int(nonce))
+			nonceTxsMap[nonceStr] = memTxPtr.ToWrappedMempoolTx()
+		}
+		wrappedAddressTxsMap[address] = nonceTxsMap
+	}
+	return wrappedAddressTxsMap
 }
 
 func (p *PendingPool) txCount(address string) int {

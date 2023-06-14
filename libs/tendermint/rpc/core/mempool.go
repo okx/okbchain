@@ -201,3 +201,8 @@ func GetEnableDeleteMinGPTx(ctx *rpctypes.Context) (*ctypes.ResultEnableDeleteMi
 	status := env.Mempool.GetEnableDeleteMinGPTx()
 	return &ctypes.ResultEnableDeleteMinGPTx{Enable: status}, nil
 }
+
+func GetPendingTxs(ctx *rpctypes.Context) (*ctypes.ResultPendingTxs, error) {
+	pendingTx := env.Mempool.GetPendingPoolTxsBytes()
+	return &ctypes.ResultPendingTxs{Txs: pendingTx}, nil
+}
