@@ -2,8 +2,10 @@ package mempool
 
 import (
 	"strconv"
+	"strings"
 	"sync"
 
+	cfg "github.com/okx/okbchain/libs/tendermint/config"
 	"github.com/okx/okbchain/libs/tendermint/types"
 )
 
@@ -83,6 +85,17 @@ func (p *PendingPool) hasTx(tx types.Tx) bool {
 func (p *PendingPool) addTx(pendingTx *mempoolTx) {
 	p.mtx.Lock()
 	defer p.mtx.Unlock()
+	blacklist := strings.Split(cfg.DynamicConfig.GetPendingPoolBlacklist(), ",")
+	// When cfg.DynamicConfig.GetPendingPoolBlacklist() == "", blacklist == []string{""} and len(blacklist) == 1.
+	// Above case should be avoided.
+	if len(blacklist) == 1 && blacklist[0] == "" {
+		blacklist = []string{}
+	}
+	for _, address := range blacklist {
+		if pendingTx.from == address {
+			return
+		}
+	}
 	if _, ok := p.addressTxsMap[pendingTx.from]; !ok {
 		p.addressTxsMap[pendingTx.from] = make(map[uint64]*mempoolTx)
 	}
