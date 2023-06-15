@@ -442,17 +442,15 @@ func (ms *MptStore) CommitterCommit(inputDelta interface{}) (rootHash types.Comm
 	}
 
 	ms.version++
-
 	// stop pre round prefetch
 	ms.StopPrefetcher()
 	nodeSets := trie.NewMergedNodeSet()
 
 	ms.commitStorage(nodeSets)
-	root, set, err := ms.trie.Commit(true)
-	if err != nil {
-		panic("fail to commit trie data(acc_trie.Commit): " + err.Error())
+	root, set := ms.trie.Commit(true)
+	if root == (ethcmn.Hash{}) {
+		root = ethtypes.EmptyRootHash
 	}
-
 	if set != nil {
 		if err := nodeSets.Merge(set); err != nil {
 			panic("fail to commit trie data(acc nodeSets merge): " + err.Error())

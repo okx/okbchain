@@ -1186,8 +1186,8 @@ github.com/oklog/run v1.1.0/go.mod h1:sVPdnTZT1zYwAJeCMu2Th4T21pA3FPOQRfWjQlk7DV
 github.com/oklog/ulid v1.3.1/go.mod h1:CirwcVhetQ6Lv90oh/F+FBtV6XMibvdAFo93nm5qn4U=
 github.com/okx/go-amino v0.15.1-okc4 h1:K0xPoVjkz33ySNC4VLStyit4dblMeVlWJQQ6sq+aUBY=
 github.com/okx/go-amino v0.15.1-okc4/go.mod h1:TQU0M1i/ImAo+tYpZi73AU3V/dKeCoMC9Sphe2ZwGME=
-github.com/okx/go-ethereum v1.10.26-0.20230605041300-9db59c1d91e6 h1:pXsdHnWHejHIc1cJZ625U44eBN3x12Sr5H8Qm9EQCtY=
-github.com/okx/go-ethereum v1.10.26-0.20230605041300-9db59c1d91e6/go.mod h1:f9/CleoGkiU7NWF9tdpWGfEYmFbN7zUi17jGick31KM=
+github.com/okx/go-ethereum v1.10.9-0.20230615142245-7be68cd3f535 h1:km8Jh3iX3dm87ahrxuvs7dQp6J8LwxEPq6Kyy5z+B68=
+github.com/okx/go-ethereum v1.10.9-0.20230615142245-7be68cd3f535/go.mod h1:GK12daV/3ep5MoG0CrUBddxff2045IwACrkCVERe7t4=
 github.com/okx/grocksdb v1.6.45-okc2 h1:Dbmax+uY71YuGTkJftpF55dbGW7hfIVOfNz2mnFqXl0=
 github.com/okx/grocksdb v1.6.45-okc2/go.mod h1:+/BHUY+mT0tbaVXwO2wTtD9eytazyw1W5n2O7AGyXZA=
 github.com/olekukonko/tablewriter v0.0.0-20170122224234-a0225b3f23b5/go.mod h1:vsDQFd/mU46D+Z4whnwzcISnGGzXWMclvtLoiIKAKIo=
@@ -1560,8 +1560,6 @@ github.com/xrash/smetrics v0.0.0-20201216005158-039620a65673/go.mod h1:N3UwUGtsr
 github.com/xtaci/kcp-go v5.4.5+incompatible/go.mod h1:bN6vIwHQbfHaHtFpEssmWsN45a+AZwO7eyRCmEIbtvE=
 github.com/xtaci/lossyconn v0.0.0-20190602105132-8df528c0c9ae/go.mod h1:gXtu8J62kEgmN++bm9BVICuT/e8yiLI2KFobd/TRFsE=
 github.com/yalp/jsonpath v0.0.0-20180802001716-5cc68e5049a0/go.mod h1:/LWChgwKmvncFJFHJ7Gvn9wZArjbV5/FppcK2fKk/tI=
-github.com/ylsGit/go-ethereum v1.6.6-0.20230530104238-3eaec1cbbe7c h1:Zh3BNNBJ/oJEnbJ3NjZn+2sPZVgo1PuIRw9Q+hbz38g=
-github.com/ylsGit/go-ethereum v1.6.6-0.20230530104238-3eaec1cbbe7c/go.mod h1:GK12daV/3ep5MoG0CrUBddxff2045IwACrkCVERe7t4=
 github.com/yosssi/ace v0.0.5/go.mod h1:ALfIzm2vT7t5ZE7uoIZqF3TQ7SAOyupFZnkrF5id+K0=
 github.com/yudai/gojsondiff v1.0.0/go.mod h1:AY32+k2cwILAkW1fbgxQ5mUmMiZFgLIV+FBNExI05xg=
 github.com/yudai/golcs v0.0.0-20170316035057-ecda9a501e82/go.mod h1:lgjkn3NuSvDfVJdfcVVdX+jpBxNmX4rDAzaS45IcYoM=
