@@ -387,9 +387,9 @@ func (app *BaseApp) deliverTxWithCache(txIndex int) *executeResult {
 			Data:      info.result.Data,
 			Events:    info.result.Events.ToABCIEvents(),
 		}
-		resp.SetHash(txStatus.stdTx.TxHash())
-		resp.SetType(int(txStatus.stdTx.GetType()))
 	}
+	resp.SetHash(txStatus.stdTx.TxHash())
+	resp.SetType(int(txStatus.stdTx.GetType()))
 
 	asyncExe := newExecuteResult(resp, info.msCacheAnte, uint32(txIndex), info.ctx.ParaMsg(),
 		0, info.runMsgCtx.GetWatcher(), info.tx.GetMsgs(), app.parallelTxManage, info.ctx.GetFeeSplitInfo())
@@ -703,6 +703,10 @@ var (
 func (pm *parallelTxManager) isConflict(e *executeResult) bool {
 	if e.msIsNil {
 		return true //TODO fix later
+	}
+
+	if e.paraMsg.InvalidExecute {
+		return true
 	}
 	for storeKey, rw := range e.rwSet {
 		delete(rw.Read, string(feeAccountKey))

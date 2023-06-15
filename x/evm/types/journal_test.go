@@ -1,6 +1,8 @@
 package types
 
 import (
+	"bytes"
+	"github.com/okx/okbchain/libs/cosmos-sdk/store/mpt"
 	"os"
 	"testing"
 
@@ -11,8 +13,10 @@ import (
 	ethermint "github.com/okx/okbchain/app/types"
 	sdkcodec "github.com/okx/okbchain/libs/cosmos-sdk/codec"
 	"github.com/okx/okbchain/libs/cosmos-sdk/store"
+	"github.com/okx/okbchain/libs/cosmos-sdk/store/prefix"
 	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
 	"github.com/okx/okbchain/libs/cosmos-sdk/x/auth"
+	authexported "github.com/okx/okbchain/libs/cosmos-sdk/x/auth/exported"
 	"github.com/okx/okbchain/libs/cosmos-sdk/x/bank"
 	"github.com/okx/okbchain/libs/cosmos-sdk/x/gov/types"
 	"github.com/okx/okbchain/libs/cosmos-sdk/x/supply"
@@ -316,4 +320,115 @@ func (suite *JournalTestSuite) TestJournal_dirty() {
 	// update dirty count
 	suite.journal.dirty(suite.address)
 	suite.Require().Equal(1, suite.journal.dirties[suite.address])
+}
+
+func (suite *JournalTestSuite) TestJournal_cmchange_revert() {
+	balance := sdk.NewCoins(ethermint.NewPhotonCoin(sdk.NewInt(100)))
+	acc := &ethermint.EthAccount{
+		BaseAccount: auth.NewBaseAccount(sdk.AccAddress(suite.address.Bytes()), balance, nil, 0, 0),
+		CodeHash:    ethcrypto.Keccak256(nil),
+	}
+
+	suite.stateDB.accountKeeper.RemoveAccount(suite.ctx, acc)
+
+	// prepare account
+	update := suite.stateDB.accountKeeper.NewAccountWithAddress(suite.ctx, sdk.AccAddress(ethcmn.HexToAddress("0x0000000000000000000000000000000000000001").Bytes()))
+	update.SetCoins(sdk.NewCoins(sdk.NewCoin("okb", sdk.NewDec(1))))
+
+	insert := suite.stateDB.accountKeeper.NewAccountWithAddress(suite.ctx, sdk.AccAddress(ethcmn.HexToAddress("0x0000000000000000000000000000000000000002").Bytes()))
+	insert.SetCoins(sdk.NewCoins(sdk.NewCoin("okb", sdk.NewDec(1))))
+
+	delete := suite.stateDB.accountKeeper.NewAccountWithAddress(suite.ctx, sdk.AccAddress(ethcmn.HexToAddress("0x0000000000000000000000000000000000000003").Bytes()))
+	delete.SetCoins(sdk.NewCoins(sdk.NewCoin("okb", sdk.NewDec(1))))
+
+	suite.stateDB.accountKeeper.SetAccount(suite.ctx, update)
+	suite.stateDB.accountKeeper.SetAccount(suite.ctx, delete)
+
+	//prepare storgae key
+	suite.stateDB.dbAdapter = DefaultPrefixDb{}
+	stateDB := suite.stateDB
+	storeDB := stateDB.dbAdapter.NewStore(suite.ctx.KVStore(stateDB.storeKey), mpt.AddressStoragePrefixMpt(ethcmn.BytesToAddress(update.GetAddress()), update.GetStateRoot()))
+	prefixDB, ok := storeDB.(prefix.Store)
+	suite.Require().True(ok)
+	updateKey := []byte("1")
+	insertKey := []byte("2")
+	deleteKey := []byte("3")
+	prefixDB.Set(updateKey, []byte("1"))
+	prefixDB.Set(deleteKey, []byte("1"))
+
+	subCtx, write := suite.ctx.CacheContextWithMultiSnapshotRWSet()
+	suite.stateDB.accountKeeper.SetAccount(subCtx, insert)
+	update.SetCoins(sdk.NewCoins(sdk.NewCoin("okb", sdk.NewDec(0))))
+	suite.stateDB.accountKeeper.SetAccount(subCtx, update)
+	suite.stateDB.accountKeeper.RemoveAccount(subCtx, delete)
+
+	storeDB1 := stateDB.dbAdapter.NewStore(subCtx.KVStore(stateDB.storeKey), mpt.AddressStoragePrefixMpt(ethcmn.BytesToAddress(update.GetAddress()), update.GetStateRoot()))
+	prefixDB1, ok := storeDB1.(prefix.Store)
+	suite.Require().True(ok)
+	prefixDB1.Set(insertKey, []byte("1"))
+	prefixDB1.Set(updateKey, []byte("2"))
+	prefixDB1.Delete(deleteKey)
+
+	snapshot := write()
+	suite.stateDB.accountKeeper.IterateAccounts(suite.ctx, func(account authexported.Account) bool {
+		if account.GetAddress().Equals(update.GetAddress()) {
+			suite.Require().Equal(update.String(), account.String())
+		} else if account.GetAddress().Equals(insert.GetAddress()) {
+			suite.Require().Equal(insert.String(), account.String())
+		} else {
+			panic("must be only update or insert acc")
+			return true
+		}
+		return false
+	})
+	iter := prefixDB1.Iterator(nil, nil)
+	for iter.Valid() {
+		if bytes.Compare(iter.Key(), updateKey) == 0 {
+			suite.Require().Equal(iter.Value(), []byte("2"))
+		} else if bytes.Compare(iter.Key(), insertKey) == 0 {
+			suite.Require().Equal(iter.Value(), []byte("1"))
+		} else {
+			panic("must be only update or insert acc")
+		}
+		iter.Next()
+	}
+
+	change := cmChange{sets: &snapshot}
+
+	// delete first entry
+	change.revert(suite.stateDB)
+
+	suite.stateDB.accountKeeper.IterateAccounts(suite.ctx, func(account authexported.Account) bool {
+		if account.GetAddress().Equals(update.GetAddress()) {
+			update.SetCoins(sdk.NewCoins(sdk.NewCoin("okb", sdk.NewDec(1))))
+			suite.Require().Equal(update.String(), account.String())
+		} else if account.GetAddress().Equals(insert.GetAddress()) {
+			suite.Require().Equal(insert.String(), account.String())
+		} else if account.GetAddress().Equals(delete.GetAddress()) {
+			suite.Require().Equal(delete.String(), account.String())
+		} else {
+			panic("must be only update or insert acc")
+			return true
+		}
+		return false
+	})
+
+	storeDB2 := stateDB.dbAdapter.NewStore(subCtx.KVStore(stateDB.storeKey), mpt.AddressStoragePrefixMpt(ethcmn.BytesToAddress(update.GetAddress()), update.GetStateRoot()))
+	prefixDB2, ok := storeDB2.(prefix.Store)
+	suite.Require().True(ok)
+
+	iter = prefixDB2.Iterator(nil, nil)
+	for iter.Valid() {
+		if bytes.Compare(iter.Key(), updateKey) == 0 {
+			suite.Require().Equal(iter.Value(), []byte("1"))
+		} else if bytes.Compare(iter.Key(), insertKey) == 0 {
+			suite.Require().Equal(iter.Value(), []byte("1"))
+		} else if bytes.Compare(iter.Key(), deleteKey) == 0 {
+			suite.Require().Equal(iter.Value(), []byte("1"))
+		} else {
+			panic("must be only update or insert acc")
+		}
+		iter.Next()
+	}
+
 }
