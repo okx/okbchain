@@ -10,6 +10,8 @@ import (
 	"strings"
 
 	"github.com/gogo/protobuf/proto"
+	"github.com/spf13/viper"
+
 	"github.com/okx/okbchain/libs/cosmos-sdk/codec/types"
 	"github.com/okx/okbchain/libs/cosmos-sdk/store"
 	"github.com/okx/okbchain/libs/cosmos-sdk/store/mpt"
@@ -27,7 +29,6 @@ import (
 	ctypes "github.com/okx/okbchain/libs/tendermint/rpc/core/types"
 	tmtypes "github.com/okx/okbchain/libs/tendermint/types"
 	dbm "github.com/okx/okbchain/libs/tm-db"
-	"github.com/spf13/viper"
 )
 
 const (
@@ -150,10 +151,12 @@ type BaseApp struct { // nolint: maligned
 
 	updateFeeCollectorAccHandler sdk.UpdateFeeCollectorAccHandler
 	logFix                       sdk.LogFix
+	updateCosmosTxCount          sdk.UpdateCosmosTxCount
 
 	getTxFeeAndFromHandler sdk.GetTxFeeAndFromHandler
 	getTxFeeHandler        sdk.GetTxFeeHandler
 	updateCMTxNonceHandler sdk.UpdateCMTxNonceHandler
+	getGasConfigHandler    sdk.GetGasConfigHandler
 
 	// volatile states:
 	//
@@ -689,6 +692,7 @@ func (app *BaseApp) getContextForTx(mode runTxMode, txBytes []byte) sdk.Context 
 	if app.parallelTxManage.isAsyncDeliverTx && mode == runTxModeDeliverInAsync {
 		ctx.SetParaMsg(&sdk.ParaMsg{
 			HaveCosmosTxInBlock: app.parallelTxManage.haveCosmosTxInBlock,
+			CosmosIndexInBlock:  app.parallelTxManage.txByteMpCosmosIndex[string(txBytes)],
 		})
 		ctx.SetTxBytes(txBytes)
 		ctx.ResetWatcher()

@@ -68,6 +68,12 @@ func (ms *ImmutableMptStore) Get(key []byte) []byte {
 			return nil
 		}
 		return value
+	case putType:
+		value, err := ms.db.TrieDB().DiskDB().Get(key[1:])
+		if err != nil {
+			return nil
+		}
+		return value
 	default:
 		panic(fmt.Errorf("not support key %s for immutable mpt get", hex.EncodeToString(key)))
 	}

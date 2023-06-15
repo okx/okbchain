@@ -7,9 +7,11 @@ import (
 
 	wasmvmtypes "github.com/CosmWasm/wasmvm/types"
 	"github.com/gogo/protobuf/proto"
+
 	codectypes "github.com/okx/okbchain/libs/cosmos-sdk/codec/types"
 	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
 	sdkerrors "github.com/okx/okbchain/libs/cosmos-sdk/types/errors"
+	"github.com/okx/okbchain/libs/tendermint/types"
 )
 
 const (
@@ -129,10 +131,11 @@ func (c *ContractInfo) SetExtension(ext ContractInfoExtension) error {
 
 // ReadExtension copies the extension value to the pointer passed as argument so that there is no need to cast
 // For example with a custom extension of type `MyContractDetails` it will look as following:
-// 		var d MyContractDetails
-//		if err := info.ReadExtension(&d); err != nil {
-//			return nil, sdkerrors.Wrap(err, "extension")
-//		}
+//
+//	var d MyContractDetails
+//	if err := info.ReadExtension(&d); err != nil {
+//		return nil, sdkerrors.Wrap(err, "extension")
+//	}
 func (c *ContractInfo) ReadExtension(e ContractInfoExtension) error {
 	rv := reflect.ValueOf(e)
 	if rv.Kind() != reflect.Ptr || rv.IsNil() {
@@ -274,8 +277,16 @@ func NewEnv(ctx sdk.Context, contractAddr sdk.WasmAddress) wasmvmtypes.Env {
 			Address: contractAddr.String(),
 		},
 	}
-	if txCounter, ok := TXCounter(ctx); ok {
-		env.Transaction = &wasmvmtypes.TransactionInfo{Index: txCounter}
+	if ctx.ParaMsg() != nil {
+		env.Transaction = &wasmvmtypes.TransactionInfo{Index: uint32(ctx.ParaMsg().CosmosIndexInBlock)}
+	} else {
+		if txCounter, ok := TXCounter(ctx); ok {
+			env.Transaction = &wasmvmtypes.TransactionInfo{Index: txCounter}
+		} else if types.HigherThanMercury(ctx.BlockHeight()) {
+			// fix smb caused by vm-bridge tx
+			// more detail see https://github.com/okx/oec/issues/2190
+			env.Transaction = &wasmvmtypes.TransactionInfo{Index: 0}
+		}
 	}
 	return env
 }

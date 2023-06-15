@@ -177,6 +177,10 @@ func (app *BaseApp) SetParallelTxLogHandlers(fixLog sdk.LogFix) {
 	app.logFix = fixLog
 }
 
+func (app *BaseApp) SetUpdateWasmTxCount(d sdk.UpdateCosmosTxCount) {
+	app.updateCosmosTxCount = d
+}
+
 func (app *BaseApp) SetEvmWatcherCollector(collector sdk.EvmWatcherCollector) {
 	if app.sealed {
 		panic("SetEvmWatcherCollector() on sealed BaseApp")
@@ -214,4 +218,11 @@ func (app *BaseApp) SetUpdateCMTxNonceHandler(handler sdk.UpdateCMTxNonceHandler
 		panic("SetUpdateCMTxNonceHandler() on sealed BaseApp")
 	}
 	app.updateCMTxNonceHandler = handler
+}
+
+func (app *BaseApp) SetGetGasConfigHandler(handler sdk.GetGasConfigHandler) {
+	if app.sealed {
+		panic("SetGetGasConfigHandler() on sealed BaseApp")
+	}
+	app.getGasConfigHandler = handler
 }

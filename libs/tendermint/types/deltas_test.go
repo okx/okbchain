@@ -247,9 +247,9 @@ func TestDeltasMessageAmino(t *testing.T) {
 }
 
 func TestTreeDeltaMarshalAndUnmarshal(t *testing.T) {
-	nodeDelta := make([]*trie.NodeDelta, 1)
-	nodeDelta[0] = &trie.NodeDelta{Key: "test-key", Val: []byte("test-val")}
-	mptDelta := trie.MptDeltaMap{"test1": &trie.MptDelta{NodeDelta: nodeDelta}}
+	nodeDelta := make([]*trie.DeltaKV, 1)
+	nodeDelta[0] = &trie.DeltaKV{Key: []byte("test-key"), Val: []byte("test-val")}
+	mptDelta := trie.MptDeltaMap{"test1": &trie.MptDelta{SetKV: nodeDelta}}
 	_ = &iavl.TreeDelta{
 		NodesDelta:         []*iavl.NodeJsonImp{},
 		OrphansDelta:       []*iavl.NodeJson{{Version: 3}, {Version: 4}},
