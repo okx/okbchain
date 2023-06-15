@@ -1,6 +1,7 @@
 package keeper
 
 import (
+	wasmvmtypes "github.com/CosmWasm/wasmvm/types"
 	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
 	"github.com/okx/okbchain/x/wasm/types"
 )
@@ -23,7 +24,8 @@ type decoratedKeeper interface {
 	updateContractMethodBlockedList(ctx sdk.Context, blockedMethods *types.ContractMethods, isDelete bool) error
 
 	GetParams(ctx sdk.Context) types.Params
-
+	newQueryHandler(ctx sdk.Context, contractAddress sdk.WasmAddress) QueryHandler
+	runtimeGasForContract(ctx sdk.Context) uint64
 	InvokeExtraProposal(ctx sdk.Context, action string, extra string) error
 }
 
@@ -102,6 +104,13 @@ func (p PermissionedKeeper) GetParams(ctx sdk.Context) types.Params {
 	return p.nested.GetParams(ctx)
 }
 
+func (p PermissionedKeeper) NewQueryHandler(ctx sdk.Context, contractAddress sdk.WasmAddress) wasmvmtypes.Querier {
+	return p.nested.newQueryHandler(ctx, contractAddress)
+}
+
+func (p PermissionedKeeper) RuntimeGasForContract(ctx sdk.Context) uint64 {
+	return p.nested.runtimeGasForContract(ctx)
+}
 func (p PermissionedKeeper) InvokeExtraProposal(ctx sdk.Context, action string, extra string) error {
 	return p.nested.InvokeExtraProposal(ctx, action, extra)
 }
