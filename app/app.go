@@ -51,6 +51,7 @@ import (
 	"github.com/okx/okbchain/libs/cosmos-sdk/server"
 	"github.com/okx/okbchain/libs/cosmos-sdk/simapp"
 	"github.com/okx/okbchain/libs/cosmos-sdk/store/mpt"
+	stypes "github.com/okx/okbchain/libs/cosmos-sdk/store/types"
 	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
 	"github.com/okx/okbchain/libs/cosmos-sdk/types/module"
 	upgradetypes "github.com/okx/okbchain/libs/cosmos-sdk/types/upgrade"
@@ -564,7 +565,7 @@ func NewOKBChainApp(
 	wasmModule := wasm.NewAppModule(*app.marshal, &app.WasmKeeper)
 	app.WasmPermissionKeeper = wasmModule.GetPermissionKeeper()
 	app.VMBridgeKeeper = vmbridge.NewKeeper(app.marshal, app.Logger(), app.EvmKeeper, app.WasmPermissionKeeper, app.AccountKeeper, app.BankKeeper)
-
+	app.EvmKeeper.SetCallToCM(vmbridge.PrecompileHooks(app.VMBridgeKeeper))
 	// Set EVM hooks
 	app.EvmKeeper.SetHooks(
 		evm.NewMultiEvmHooks(
@@ -706,6 +707,7 @@ func NewOKBChainApp(
 	app.SetEvmSysContractAddressHandler(NewEvmSysContractAddressHandler(app.EvmKeeper))
 	app.SetEvmWatcherCollector(app.EvmKeeper.Watcher.Collect)
 	app.SetUpdateCMTxNonceHandler(NewUpdateCMTxNonceHandler())
+	app.SetGetGasConfigHandler(NewGetGasConfigHandler(app.ParamsKeeper))
 	mpt.AccountStateRootRetriever = app.AccountKeeper
 	if loadLatest {
 		err := app.LoadLatestVersion(app.keys[bam.MainStoreKey])
@@ -951,5 +953,11 @@ func NewUpdateCMTxNonceHandler() sdk.UpdateCMTxNonceHandler {
 		if ok && nonce != 0 {
 			stdtx.Nonce = nonce
 		}
+	}
+}
+
+func NewGetGasConfigHandler(pk params.Keeper) sdk.GetGasConfigHandler {
+	return func(ctx sdk.Context) *stypes.GasConfig {
+		return pk.GetGasConfig(ctx)
 	}
 }

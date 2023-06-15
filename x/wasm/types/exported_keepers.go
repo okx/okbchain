@@ -71,6 +71,9 @@ type ContractOpsKeeper interface {
 	// GetParams get params from paramsubspace.
 	GetParams(ctx sdk.Context) Params
 
+	NewQueryHandler(ctx sdk.Context, contractAddress sdk.WasmAddress) wasmvmtypes.Querier
+	RuntimeGasForContract(ctx sdk.Context) uint64
+
 	// InvokeExtraProposal invoke extra proposal
 	InvokeExtraProposal(ctx sdk.Context, action string, extra string) error
 }

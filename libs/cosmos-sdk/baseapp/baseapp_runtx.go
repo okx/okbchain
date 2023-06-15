@@ -294,20 +294,22 @@ func (app *BaseApp) DeliverTx(req abci.RequestDeliverTx) abci.ResponseDeliverTx 
 		}
 	}
 
+	var deliverTx abci.ResponseDeliverTx
 	info, err := app.runTx(runTxModeDeliver, req.Tx, realTx, LatestSimulateTxHeight)
 	if err != nil {
-		return sdkerrors.ResponseDeliverTx(err, info.gInfo.GasWanted, info.gInfo.GasUsed, app.trace)
-	}
-
-	deliverTx := abci.ResponseDeliverTx{
-		GasWanted: int64(info.gInfo.GasWanted), // TODO: Should type accept unsigned ints?
-		GasUsed:   int64(info.gInfo.GasUsed),   // TODO: Should type accept unsigned ints?
-		Log:       info.result.Log,
-		Data:      info.result.Data,
-		Events:    info.result.Events.ToABCIEvents(),
+		deliverTx = sdkerrors.ResponseDeliverTx(err, info.gInfo.GasWanted, info.gInfo.GasUsed, app.trace)
+	} else {
+		deliverTx = abci.ResponseDeliverTx{
+			GasWanted: int64(info.gInfo.GasWanted), // TODO: Should type accept unsigned ints?
+			GasUsed:   int64(info.gInfo.GasUsed),   // TODO: Should type accept unsigned ints?
+			Log:       info.result.Log,
+			Data:      info.result.Data,
+			Events:    info.result.Events.ToABCIEvents(),
+		}
 	}
 	deliverTx.SetHash(realTx.TxHash())
 	deliverTx.SetType(int(realTx.GetType()))
+
 	return deliverTx
 }
 
@@ -345,19 +347,22 @@ func (app *BaseApp) DeliverRealTx(txes abci.TxEssentials) abci.ResponseDeliverTx
 			return sdkerrors.ResponseDeliverTx(err, 0, 0, app.trace)
 		}
 	}
+	var deliverTx abci.ResponseDeliverTx
 	info, err := app.runTx(runTxModeDeliver, realTx.GetRaw(), realTx, LatestSimulateTxHeight)
 	if err != nil {
-		return sdkerrors.ResponseDeliverTx(err, info.gInfo.GasWanted, info.gInfo.GasUsed, app.trace)
-	}
-	deliverTx := abci.ResponseDeliverTx{
-		GasWanted: int64(info.gInfo.GasWanted), // TODO: Should type accept unsigned ints?
-		GasUsed:   int64(info.gInfo.GasUsed),   // TODO: Should type accept unsigned ints?
-		Log:       info.result.Log,
-		Data:      info.result.Data,
-		Events:    info.result.Events.ToABCIEvents(),
+		deliverTx = sdkerrors.ResponseDeliverTx(err, info.gInfo.GasWanted, info.gInfo.GasUsed, app.trace)
+	} else {
+		deliverTx = abci.ResponseDeliverTx{
+			GasWanted: int64(info.gInfo.GasWanted), // TODO: Should type accept unsigned ints?
+			GasUsed:   int64(info.gInfo.GasUsed),   // TODO: Should type accept unsigned ints?
+			Log:       info.result.Log,
+			Data:      info.result.Data,
+			Events:    info.result.Events.ToABCIEvents(),
+		}
 	}
 	deliverTx.SetHash(realTx.TxHash())
 	deliverTx.SetType(int(realTx.GetType()))
+
 	return deliverTx
 }
 
@@ -427,9 +432,9 @@ func (app *BaseApp) asyncDeliverTx(txIndex int) *executeResult {
 			Data:      info.result.Data,
 			Events:    info.result.Events.ToABCIEvents(),
 		}
-		resp.SetHash(txStatus.stdTx.TxHash())
-		resp.SetType(int(txStatus.stdTx.GetType()))
 	}
+	resp.SetHash(txStatus.stdTx.TxHash())
+	resp.SetType(int(txStatus.stdTx.GetType()))
 
 	asyncExe := newExecuteResult(resp, info.msCacheAnte, uint32(txIndex), info.ctx.ParaMsg(),
 		blockHeight, info.runMsgCtx.GetWatcher(), info.tx.GetMsgs(), app.parallelTxManage, info.ctx.GetFeeSplitInfo())
