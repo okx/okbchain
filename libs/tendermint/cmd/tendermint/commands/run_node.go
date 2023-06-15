@@ -122,7 +122,7 @@ func AddNodeFlags(cmd *cobra.Command) {
 		"Enable delete the minimum gas price tx from mempool when mempool is full",
 	)
 	cmd.Flags().String(
-		"mempool.mempool.pending-pool-blacklist",
+		"mempool.pending-pool-blacklist",
 		"",
 		"Set the address blacklist of the pending pool, separated by commas",
 	)
