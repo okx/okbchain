@@ -187,18 +187,6 @@ func (app *BaseApp) UpdateGlobalGasConfig(ctx sdk.Context) {
 	stypes.UpdateGlobalGasConfig(app.getGasConfigHandler(ctx))
 }
 
-func (app *BaseApp) UpdateFeeCollector(fee sdk.Coins, add bool) {
-	if fee.IsZero() {
-		return
-	}
-	app.feeChanged = true
-	if add {
-		app.feeCollector = app.feeCollector.Add(fee...)
-	} else {
-		app.feeCollector = app.feeCollector.Sub(fee)
-	}
-}
-
 func (app *BaseApp) updateFeeCollectorAccount(isEndBlock bool) {
 	if app.updateFeeCollectorAccHandler == nil {
 		return
