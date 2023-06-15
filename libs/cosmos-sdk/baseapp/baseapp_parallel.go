@@ -263,11 +263,6 @@ func (app *BaseApp) runTxs() []*abci.ResponseDeliverTx {
 			pm.blockGasMeterMu.Unlock()
 
 			pm.SetCurrentIndex(pm.upComingTxIndex, res)
-
-			if !res.msIsNil {
-				pm.currTxFee = pm.currTxFee.Add(pm.extraTxsInfo[pm.upComingTxIndex].fee.Sub(pm.finalResult[pm.upComingTxIndex].paraMsg.RefundFee)...)
-			}
-
 			currentGas += uint64(res.resp.GasUsed)
 
 			if isReRun {
