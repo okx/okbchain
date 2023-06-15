@@ -4,13 +4,14 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
+	"math/big"
+
 	"github.com/ethereum/go-ethereum/common"
 	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
 	sdkerrors "github.com/okx/okbchain/libs/cosmos-sdk/types/errors"
 	"github.com/okx/okbchain/x/vmbridge/keeper"
 	"github.com/okx/okbchain/x/vmbridge/types"
 	wasmtypes "github.com/okx/okbchain/x/wasm/types"
-	"math/big"
 )
 
 func (suite *KeeperTestSuite) TestKeeper_SendToWasm() {
@@ -576,7 +577,7 @@ func (suite *KeeperTestSuite) TestKeeper_CallToWasm() {
 			suite.SetupTest()
 			reset()
 			tc.malleate()
-			err := suite.keeper.CallToWasm(suite.ctx, caller, wasmContractAddr, value, calldata)
+			_, err := suite.keeper.CallToWasm(suite.ctx, caller, wasmContractAddr, value, calldata)
 			if tc.error != nil {
 				suite.Require().EqualError(err, tc.error.Error())
 			} else {
