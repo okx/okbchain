@@ -29,7 +29,7 @@ Refer to the [document](https://www.okx.com/cn/okbc/docs/dev/quick-start/introdu
 * [Join the testnet](https://www.okx.com/cn/okbc/docs/dev/quick-start/build-on-okbc/join-public-testnet)
 
 
-* [Testnet faucet](https://www.okx.com/cn/okbc/faucet)
+* [Testnet faucet](https://www.okx.com/okbc/faucet)
 
 -------------------
 
