@@ -15,7 +15,7 @@ set -m
 
 set -x # activate debugging
 
-source okc.profile
+source okb.profile
 WRAPPEDTX=false
 PRERUN=false
 NUM_RPC=0
