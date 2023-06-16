@@ -14,7 +14,6 @@ import (
 
 	"github.com/VictoriaMetrics/fastcache"
 
-	lru "github.com/hashicorp/golang-lru"
 	"github.com/tendermint/go-amino"
 
 	"github.com/okx/okbchain/libs/system/trace"
@@ -104,8 +103,6 @@ type CListMempool struct {
 
 	simQueue chan *mempoolTx
 
-	gasCache *lru.Cache
-
 	rmPendingTxChan chan types.EventDataRmPendingTx
 
 	gpo *Oracle
@@ -142,10 +139,6 @@ func NewCListMempool(
 		txQueue = NewBaseTxQueue()
 	}
 
-	gasCache, err := lru.New(1000000)
-	if err != nil {
-		panic(err)
-	}
 	gpoConfig := NewGPOConfig(cfg.DynamicConfig.GetDynamicGpWeight(), cfg.DynamicConfig.GetDynamicGpCheckBlocks())
 	gpo := NewOracle(gpoConfig)
 	mempool := &CListMempool{
@@ -160,7 +153,6 @@ func NewCListMempool(
 		metrics:       NopMetrics(),
 		txs:           txQueue,
 		simQueue:      make(chan *mempoolTx, 100000),
-		gasCache:      gasCache,
 		gpo:           gpo,
 	}
 
@@ -726,6 +718,7 @@ func (mem *CListMempool) resCbFirstTime(
 			if txInfo.isGasPrecise {
 				// gas for hgu is precise, just mark it simulated, so it will not be simulated again
 				memTx.isSim = 1
+				memTx.hguPrecise = true
 			}
 
 			if txInfo.wrapCMTx != nil {
@@ -1276,6 +1269,9 @@ type mempoolTx struct {
 	outdated uint32
 	isSim    uint32
 
+	// `hguPrecise` is true means hgu for this tx is precise and simulation is not necessary
+	hguPrecise bool
+
 	isWrapCMTx  bool
 	wrapCMNonce uint64
 
@@ -1479,7 +1475,6 @@ func (mem *CListMempool) simulationJob(memTx *mempoolTx) {
 	}
 	atomic.StoreInt64(&memTx.gasWanted, gas)
 	atomic.AddUint32(&memTx.isSim, 1)
-	mem.gasCache.Add(hex.EncodeToString(memTx.realTx.TxHash()), gas)
 }
 
 func (mem *CListMempool) twiceSimulation() {
@@ -1503,14 +1498,19 @@ func (mem *CListMempool) twiceSimulation() {
 
 	for ; ele != nil && gu < maxGu; ele = ele.Next() {
 		memTx := ele.Value.(*mempoolTx)
-		gas, err := mem.simulateTx(memTx.tx, memTx.gasLimit)
-		if err != nil {
-			mem.logger.Error("twiceSimulation", "error", err, "txHash", memTx.tx.Hash())
-			return
+		var gas int64
+		var err error
+		if !memTx.hguPrecise {
+			gas, err = mem.simulateTx(memTx.tx, memTx.gasLimit)
+			if err != nil {
+				mem.logger.Error("twiceSimulation", "error", err, "txHash", memTx.tx.Hash())
+				return
+			}
+			atomic.StoreInt64(&memTx.gasWanted, gas)
+			atomic.AddUint32(&memTx.isSim, 1)
+		} else {
+			gas = memTx.gasWanted
 		}
-		atomic.StoreInt64(&memTx.gasWanted, gas)
-		atomic.AddUint32(&memTx.isSim, 1)
-		mem.gasCache.Add(hex.EncodeToString(memTx.realTx.TxHash()), gas)
 
 		gu += gas
 	}
