@@ -1132,6 +1132,8 @@ func (mem *CListMempool) Update(
 	if cfg.DynamicConfig.GetEnableDeleteMinGPTx() {
 		mem.deleteMinGPTxOnlyFull()
 	}
+
+	go mem.twiceSimulation()
 	// WARNING: The txs inserted between [ReapMaxBytesMaxGas, Update) is insert-sorted in the mempool.txs,
 	// but they are not included in the latest block, after remove the latest block txs, these txs may
 	// in unsorted state. We need to resort them again for the the purpose of absolute order, or just let it go for they are
@@ -1478,6 +1480,41 @@ func (mem *CListMempool) simulationJob(memTx *mempoolTx) {
 	atomic.StoreInt64(&memTx.gasWanted, gas)
 	atomic.AddUint32(&memTx.isSim, 1)
 	mem.gasCache.Add(hex.EncodeToString(memTx.realTx.TxHash()), gas)
+}
+
+func (mem *CListMempool) twiceSimulation() {
+	maxGu := cfg.DynamicConfig.GetMaxGasUsedPerBlock()
+	if maxGu < 0 || !cfg.DynamicConfig.GetEnablePGU() {
+		return
+	}
+
+	var gu int64
+	var ele *clist.CElement
+	// skip the txs that will be packed into next block
+	for ele = mem.txs.Front(); ele != nil; ele = ele.Next() {
+		gu += ele.Value.(*mempoolTx).gasWanted
+		if gu > maxGu {
+			break
+		}
+	}
+
+	// reset gu for next cycle
+	gu = 0
+
+	for ; ele != nil && gu < maxGu; ele = ele.Next() {
+		memTx := ele.Value.(*mempoolTx)
+		gas, err := mem.simulateTx(memTx.tx, memTx.gasLimit)
+		if err != nil {
+			mem.logger.Error("twiceSimulation", "error", err, "txHash", memTx.tx.Hash())
+			return
+		}
+		atomic.StoreInt64(&memTx.gasWanted, gas)
+		atomic.AddUint32(&memTx.isSim, 1)
+		mem.gasCache.Add(hex.EncodeToString(memTx.realTx.TxHash()), gas)
+
+		gu += gas
+	}
+
 }
 
 func (mem *CListMempool) deleteMinGPTxOnlyFull() {
