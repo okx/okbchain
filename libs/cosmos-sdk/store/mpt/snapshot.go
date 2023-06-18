@@ -12,6 +12,10 @@ import (
 var (
 	gDisableSnapshot = false
 	gSnapshotRebuild = false
+
+	// gEnableSnapshotJournal enable snapshot journal.
+	// so snapshot can be repaired within snapshotMemoryLayerCount.
+	gEnableSnapshotJournal = false
 )
 
 const (
@@ -28,6 +32,14 @@ func DisableSnapshot() {
 
 func SetSnapshotRebuild(rebuild bool) {
 	gSnapshotRebuild = rebuild
+}
+
+func SetSnapshotJournal(enable bool) {
+	gEnableSnapshotJournal = enable
+}
+
+func checkSnapshotJournal() bool {
+	return gEnableSnapshotJournal
 }
 
 func (ms *MptStore) openSnapshot() error {
@@ -102,8 +114,12 @@ func (ms *MptStore) commitSnap(root common.Hash) {
 		if err := ms.snaps.Cap(root, snapshotMemoryLayerCount); err != nil {
 			ms.logger.Error("Failed to cap snapshot tree", "root", root, "layers", snapshotMemoryLayerCount, "err", err)
 		}
-		if _, err := ms.snaps.Journal(root); err != nil {
-			ms.logger.Error("Failed to journal snapshot tree", "root", root, "err", err)
+
+		// record snapshot journal
+		if checkSnapshotJournal() {
+			if _, err := ms.snaps.Journal(root); err != nil {
+				ms.logger.Error("Failed to journal snapshot tree", "root", root, "err", err)
+			}
 		}
 	}
 	ms.snap, ms.snapDestructs, ms.snapAccounts, ms.snapStorage = nil, nil, nil, nil
