@@ -93,6 +93,7 @@ func main() {
 		displayStateCmd(ctx),
 		mpt.MptCmd(ctx),
 		fss.Command(ctx),
+		BlockInfoCommand(ctx),
 		// AddGenesisAccountCmd allows users to add accounts to the genesis file
 		AddGenesisAccountCmd(ctx, codecProxy.GetCdc(), app.DefaultNodeHome, app.DefaultCLIHome),
 		flags.NewCompletionCmd(rootCmd, true),

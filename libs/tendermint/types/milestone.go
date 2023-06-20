@@ -19,6 +19,10 @@ var (
 	nodePruneHeight int64
 )
 
+func init() {
+	milestoneEarthHeight = 1
+}
+
 const (
 	MainNet = system.Chain + "-196"
 	TestNet = system.TestnetPrefix + "-195"

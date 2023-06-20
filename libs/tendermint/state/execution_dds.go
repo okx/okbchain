@@ -306,6 +306,7 @@ func (dc *DeltaContext) prepareStateDelta(height int64) *DeltaInfo {
 		return nil
 	}
 
+	//	time.Sleep(time.Second)
 	deltaInfo, mrh := dc.dataMap.fetch(height)
 
 	atomic.StoreInt64(&dc.lastFetchedHeight, height)
