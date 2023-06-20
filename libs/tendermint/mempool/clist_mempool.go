@@ -1126,7 +1126,7 @@ func (mem *CListMempool) Update(
 		mem.deleteMinGPTxOnlyFull()
 	}
 
-	go mem.twiceSimulation()
+	go mem.trySimulate4NextBlock()
 	// WARNING: The txs inserted between [ReapMaxBytesMaxGas, Update) is insert-sorted in the mempool.txs,
 	// but they are not included in the latest block, after remove the latest block txs, these txs may
 	// in unsorted state. We need to resort them again for the the purpose of absolute order, or just let it go for they are
@@ -1477,7 +1477,11 @@ func (mem *CListMempool) simulationJob(memTx *mempoolTx) {
 	atomic.AddUint32(&memTx.isSim, 1)
 }
 
-func (mem *CListMempool) twiceSimulation() {
+// trySimulate4BlockAfterNext will be called during Update()
+// assume that next step is to proposal a block of height `n` through ReapMaxBytesMaxGas
+// trySimulate4NextBlock will skip those txs which would be packed into that block,
+// and simulate txs to be packed into block of height `n+1`
+func (mem *CListMempool) trySimulate4NextBlock() {
 	maxGu := cfg.DynamicConfig.GetMaxGasUsedPerBlock()
 	if maxGu < 0 || !cfg.DynamicConfig.GetEnablePGU() {
 		return
@@ -1503,7 +1507,7 @@ func (mem *CListMempool) twiceSimulation() {
 		if !memTx.hguPrecise {
 			gas, err = mem.simulateTx(memTx.tx, memTx.gasLimit)
 			if err != nil {
-				mem.logger.Error("twiceSimulation", "error", err, "txHash", memTx.tx.Hash())
+				mem.logger.Error("trySimulate4BlockAfterNext", "error", err, "txHash", memTx.tx.Hash())
 				return
 			}
 			atomic.StoreInt64(&memTx.gasWanted, gas)
