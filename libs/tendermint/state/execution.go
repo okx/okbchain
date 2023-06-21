@@ -224,6 +224,7 @@ func (blockExec *BlockExecutor) ApplyBlock(
 		now := time.Now().UnixNano()
 		blockExec.metrics.IntervalTime.Set(float64(now-blockExec.metrics.lastBlockTime) / 1e6)
 		blockExec.metrics.lastBlockTime = now
+		blockExec.metrics.CommittedHeight.Set(float64(block.Height))
 	}()
 
 	if err := blockExec.ValidateBlock(state, block); err != nil {

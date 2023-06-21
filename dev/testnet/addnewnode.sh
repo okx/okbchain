@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-source okc.profile
+source okb.profile
 
 set -e
 set -o errexit

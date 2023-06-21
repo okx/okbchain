@@ -9,6 +9,7 @@ import (
 	"github.com/ethereum/go-ethereum/common/prque"
 	ethstate "github.com/ethereum/go-ethereum/core/state"
 	ethtypes "github.com/ethereum/go-ethereum/core/types"
+	"github.com/ethereum/go-ethereum/core/vm"
 	lru "github.com/hashicorp/golang-lru"
 
 	app "github.com/okx/okbchain/app/types"
@@ -79,6 +80,7 @@ type Keeper struct {
 
 	heightCache *lru.Cache // Cache for the most recent block heights
 	hashCache   *lru.Cache // Cache for the most recent block hash
+	callToCM    vm.CallToWasmByPrecompile
 }
 
 type chainConfigInfo struct {
@@ -473,4 +475,16 @@ func (k *Keeper) CallEvmHooks(ctx sdk.Context, st *types.StateTransition, receip
 func (k *Keeper) AddHeightHashToCache(height int64, hash string) {
 	k.heightCache.Add(hash, height)
 	k.hashCache.Add(height, hash)
+}
+
+func (k *Keeper) SetCallToCM(callToCM vm.CallToWasmByPrecompile) {
+	k.callToCM = callToCM
+}
+
+func (k *Keeper) GetCallToCM() vm.CallToWasmByPrecompile {
+	return k.callToCM
+}
+
+func (k *Keeper) GetBlockHash() ethcmn.Hash {
+	return k.Bhash
 }
