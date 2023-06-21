@@ -208,7 +208,7 @@ func NewContext(ms MultiStore, header abci.Header, isCheckTx bool, logger log.Lo
 	}
 }
 
-func (c *Context) SetDeliver() *Context {
+func (c *Context) SetDeliverSerial() *Context {
 	c.isDeliverWithSerial = true
 	return c
 }
