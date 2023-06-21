@@ -16,7 +16,7 @@ func NewHandler(k *Keeper) sdk.Handler {
 	return func(ctx sdk.Context, msg sdk.Msg) (result *sdk.Result, err error) {
 		ctx.SetEventManager(sdk.NewEventManager())
 
-		if ctx.IsDeliver() {
+		if ctx.IsDeliverWithSerial() {
 			k.UpdatedAccount = k.UpdatedAccount[:0]
 		}
 
