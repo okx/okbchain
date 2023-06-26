@@ -108,7 +108,7 @@ func extractTarGz(tarGzFile, destinationDir string) error {
 	defer file.Close()
 
 	// use gzip.Reader
-	gzReader, err := pgzip.NewReader(file)
+	gzReader, err := pgzip.NewReaderN(file, 1<<22, runtime.NumCPU())
 	if err != nil {
 		return err
 	}
