@@ -88,11 +88,8 @@ func (p *PendingPool) addTx(pendingTx *mempoolTx) {
 	blacklist := strings.Split(cfg.DynamicConfig.GetPendingPoolBlacklist(), ",")
 	// When cfg.DynamicConfig.GetPendingPoolBlacklist() == "", blacklist == []string{""} and len(blacklist) == 1.
 	// Above case should be avoided.
-	if len(blacklist) == 1 && blacklist[0] == "" {
-		blacklist = []string{}
-	}
 	for _, address := range blacklist {
-		if pendingTx.from == address {
+		if address != "" && pendingTx.from == address {
 			return
 		}
 	}
