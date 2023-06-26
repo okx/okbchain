@@ -18,7 +18,3 @@ func TestExtractTarGz(t *testing.T) {
 	err := extractTarGz(file, "/tmp")
 	assert.Nil(t, err)
 }
-
-func TestPrepareSnapshotDataIfNeed(t *testing.T) {
-	prepareSnapshotDataIfNeed("https://okg-pub-hk.oss-cn-hongkong.aliyuncs.com/cdn/okbc/snapshot/testnet-s0-20230626-2402812-rocksdb.tar.gz", "/data/tmp", log.NewTMLogger(log.NewSyncWriter(os.Stdout)))
-}

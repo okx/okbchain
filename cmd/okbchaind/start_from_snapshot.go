@@ -77,7 +77,7 @@ func prepareSnapshotDataIfNeed(snapshotURL string, home string, logger log.Logge
 
 	// move snapshot data
 	logger.Info("start to move snapshot data")
-	if err := moveDir(filepath.Join(snapshotHome, "data"), home); err != nil {
+	if err := moveDir(filepath.Join(snapshotHome, "data"), filepath.Join(home, "data")); err != nil {
 		panic(err)
 	}
 
