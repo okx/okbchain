@@ -24,6 +24,8 @@ const (
 	FlagTrieAsyncDBInitCap        = "trie.asyncdb.init-cap"
 	FlagTrieAsyncDBAutoPruningOff = "trie.asyncdb.auto-pruning-off"
 	FlagTrieAsyncDBSyncPruning    = "trie.asyncdb.sync-pruning"
+
+	FlagTrieEnableSnapshotJournal = "trie.enable-snapshot-journal"
 )
 
 var (
