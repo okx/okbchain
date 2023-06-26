@@ -1,4 +1,4 @@
-package main
+package app
 
 import (
 	"github.com/okx/okbchain/libs/tendermint/libs/log"
@@ -8,7 +8,7 @@ import (
 )
 
 func TestDownloadSnapshot(t *testing.T) {
-	url := "https://download.redis.io/releases/redis-6.2.6.tar.gz"
+	url := "https://okg-pub-hk.oss-cn-hongkong.aliyuncs.com/cdn/okbc/snapshot/testnet-s0-20230626-2402812-rocksdb.tar.gz"
 	_, err := downloadSnapshot(url, "/tmp", log.NewTMLogger(log.NewSyncWriter(os.Stdout)))
 	assert.Nil(t, err)
 }

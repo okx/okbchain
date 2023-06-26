@@ -105,6 +105,7 @@ func main() {
 	subFunc := func(logger log.Logger) log.Subscriber {
 		return logevents.NewProvider(logger)
 	}
+
 	// Tendermint node base commands
 	server.AddCommands(ctx, codecProxy, registry, rootCmd, newApp, closeApp, exportAppStateAndTMValidators,
 		registerRoutes, client.RegisterAppFlag, app.PreRun, subFunc)
@@ -155,8 +156,6 @@ func newApp(logger log.Logger, db dbm.DB, traceStore io.Writer) abci.Application
 	if err != nil {
 		panic(err)
 	}
-
-	prepareSnapshotDataIfNeed(viper.GetString(server.FlagStartFromSnapshot), viper.GetString(flags.FlagHome), logger)
 
 	return app.NewOKBChainApp(
 		logger,
