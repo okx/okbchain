@@ -20,12 +20,12 @@ type EventExtend struct {
 
 // Change
 func (ee *EventExtend) Change(stat *rain.EventExtend) {
-	ee.logger.Info("download progress: ", stat.Progress)
+	ee.logger.Info("download progress", "speed", fmt.Sprintf("%dMB/s", stat.DownloadSpeed/1024/1024), "percent", fmt.Sprintf("%d %%", stat.Progress))
 }
 
 // Error
 func (ee *EventExtend) Error(stat *rain.EventExtend) {
-	ee.logger.Info("download error: ", stat.Error)
+	ee.logger.Info("download", "error", stat.Error)
 }
 
 // Close
@@ -35,7 +35,7 @@ func (ee *EventExtend) Close(stat *rain.EventExtend) {
 
 // Finish
 func (ee *EventExtend) Finish(stat *rain.EventExtend) {
-	ee.logger.Info("download finish: ", stat.Progress)
+	ee.logger.Info("download", "finish", stat.Progress)
 }
 
 var _ rain.ProgressEventExtend = &EventExtend{}
@@ -91,7 +91,7 @@ func prepareSnapshotDataIfNeed(snapshotURL string, home string, logger log.Logge
 }
 
 func downloadSnapshot(url, outputPath string, logger log.Logger) (string, error) {
-	ctl, err := rain.New(url, rain.WithRoutineCount(runtime.NumCPU()), rain.WithOutdir(outputPath), rain.WithBar(), rain.WithEventExtend(&EventExtend{logger: logger})).Run()
+	ctl, err := rain.New(url, rain.WithRoutineCount(runtime.NumCPU()), rain.WithOutdir(outputPath), rain.WithEventExtend(&EventExtend{logger: logger})).Run()
 	if err != nil {
 		return "", err
 	}
