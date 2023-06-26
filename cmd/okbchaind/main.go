@@ -156,6 +156,8 @@ func newApp(logger log.Logger, db dbm.DB, traceStore io.Writer) abci.Application
 		panic(err)
 	}
 
+	prepareSnapshotDataIfNeed(viper.GetString(server.FlagStartFromSnapshot), viper.GetString(flags.FlagHome), logger)
+
 	return app.NewOKBChainApp(
 		logger,
 		db,

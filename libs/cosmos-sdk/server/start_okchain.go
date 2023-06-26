@@ -237,6 +237,7 @@ func RegisterServerFlags(cmd *cobra.Command) *cobra.Command {
 	viper.BindPFlag(FlagEvmImportMode, cmd.Flags().Lookup(FlagEvmImportMode))
 	viper.BindPFlag(FlagEvmImportPath, cmd.Flags().Lookup(FlagEvmImportPath))
 	viper.BindPFlag(FlagGoroutineNum, cmd.Flags().Lookup(FlagGoroutineNum))
+	viper.BindPFlag(FlagStartFromSnapshot, cmd.Flags().Lookup(FlagStartFromSnapshot))
 
 	cmd.Flags().Int(state.FlagDeliverTxsExecMode, 0, "Execution mode for deliver txs, (0:serial[default], 1:deprecated, 2:parallel)")
 	cmd.Flags().Bool(state.FlagEnableConcurrency, false, "Enable concurrency for deliver txs")
@@ -264,6 +265,7 @@ func RegisterServerFlags(cmd *cobra.Command) *cobra.Command {
 
 	cmd.Flags().Int64(FlagCommitGapHeight, 10, "Block interval to commit cached data into db, affects iavl & mpt")
 	cmd.Flags().Int64(FlagFastSyncGap, 20, "Block height interval to switch fast-sync mode")
+	cmd.Flags().String(FlagStartFromSnapshot, "", "Snapshot URL which uses to start node")
 
 	return cmd
 }
