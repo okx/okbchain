@@ -77,7 +77,7 @@ func (ak AccountKeeper) SetAccount(ctx sdk.Context, acc exported.Account) {
 	storeAccKey := types.AddressStoreKey(addr)
 	store.Set(storeAccKey, bz)
 
-	if ctx.IsDeliver() {
+	if ctx.IsDeliverWithSerial() {
 		mpt.GAccToPrefetchChannel <- [][]byte{storeAccKey}
 	}
 
@@ -119,7 +119,7 @@ func (ak AccountKeeper) RemoveAccount(ctx sdk.Context, acc exported.Account) {
 	storeAccKey := types.AddressStoreKey(addr)
 	store.Delete(storeAccKey)
 
-	if ctx.IsDeliver() {
+	if ctx.IsDeliverWithSerial() {
 		mpt.GAccToPrefetchChannel <- [][]byte{storeAccKey}
 	}
 }
@@ -141,7 +141,8 @@ func (ak AccountKeeper) IterateAccounts(ctx sdk.Context, cb func(account exporte
 }
 
 // IterateAccounts iterates over all the stored accounts and performs a callback function
-// 	TODO by yxq: deprecated
+//
+//	TODO by yxq: deprecated
 func (ak AccountKeeper) MigrateAccounts(ctx sdk.Context, cb func(account exported.Account, key, value []byte) (stop bool)) {
 
 	store := ctx.KVStore(ak.mptKey)
