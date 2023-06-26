@@ -43,7 +43,7 @@ func (suite *UpgradeKeeperSuite) SetupTest() {
 
 func (suite *UpgradeKeeperSuite) Context(height int64) sdk.Context {
 	ctx := sdk.NewContext(suite.ms, abci.Header{Height: height}, false, suite.logger)
-	ctx.SetDeliver()
+	ctx.SetDeliverSerial()
 	return ctx
 }
 
