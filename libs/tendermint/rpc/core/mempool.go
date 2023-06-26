@@ -8,6 +8,7 @@ import (
 
 	"github.com/pkg/errors"
 
+	"github.com/okx/okbchain/libs/cosmos-sdk/baseapp"
 	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
 	"github.com/okx/okbchain/libs/tendermint/config"
 	mempl "github.com/okx/okbchain/libs/tendermint/mempool"
@@ -200,4 +201,12 @@ func GetPendingNonce(address string) (*ctypes.ResultPendingNonce, bool) {
 func GetEnableDeleteMinGPTx(ctx *rpctypes.Context) (*ctypes.ResultEnableDeleteMinGPTx, error) {
 	status := env.Mempool.GetEnableDeleteMinGPTx()
 	return &ctypes.ResultEnableDeleteMinGPTx{Enable: status}, nil
+}
+
+func GetPendingTxs(ctx *rpctypes.Context) (*ctypes.ResultPendingTxs, error) {
+	pendingTx := make(map[string]map[string]types.WrappedMempoolTx)
+	if baseapp.IsMempoolEnablePendingPool() {
+		pendingTx = env.Mempool.GetPendingPoolTxsBytes()
+	}
+	return &ctypes.ResultPendingTxs{Txs: pendingTx}, nil
 }
