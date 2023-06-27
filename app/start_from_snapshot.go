@@ -3,11 +3,12 @@ package app
 import (
 	"archive/tar"
 	"fmt"
-	"github.com/cavaliergopher/grab/v3"
 	"github.com/klauspost/pgzip"
+	"github.com/okx/okbchain/libs/cosmos-sdk/server"
 	"github.com/okx/okbchain/libs/cosmos-sdk/types/errors"
 	"github.com/okx/okbchain/libs/tendermint/libs/log"
 	"github.com/rock-rabbit/rain"
+	"github.com/spf13/viper"
 	"io"
 	"net/url"
 	"os"
@@ -94,43 +95,12 @@ func prepareSnapshotDataIfNeed(snapshotURL string, home string, logger log.Logge
 }
 
 func downloadSnapshot(url, outputPath string, logger log.Logger) (string, error) {
-	client := grab.NewClient()
-	req, _ := grab.NewRequest(outputPath, url)
-
-	// start download
-	logger.Info("download start", "url", req.URL())
-	resp := client.Do(req)
-	// start progress loop
-	ticker := time.NewTicker(1 * time.Second)
-	defer ticker.Stop()
-
-Loop:
-	for {
-		select {
-		case <-ticker.C:
-			logger.Info(fmt.Sprintf("download progress %.2f%% MB/s (%.2f%%)", resp.BytesPerSecond()/1024/1204, 100*resp.Progress()))
-		case <-resp.Done:
-			// download is complete
-			break Loop
-		}
-	}
-
-	// check for errors
-	if err := resp.Err(); err != nil {
-		logger.Info(fmt.Sprintf("Download failed: %v", err))
+	ctl, err := rain.New(url, rain.WithRoutineCount(runtime.NumCPU()), rain.WithDebug(true), rain.WithOutdir(outputPath), rain.WithSpeedLimit(1024*1024*viper.GetInt(server.FlagMaxDownloadSnapshotSpeed)), rain.WithRetryNumber(20), rain.WithRetryTime(time.Second*10), rain.WithEventExtend(&EventExtend{logger: logger})).Run()
+	if err != nil {
 		return "", err
 	}
 
-	logger.Info(fmt.Sprintf("Download saved to ./%v", resp.Filename))
-
-	return filepath.Join(outputPath, resp.Filename), nil
-
-	//ctl, err := rain.New(url, rain.WithRoutineCount(runtime.NumCPU()), rain.WithOutdir(outputPath), rain.WithSpeedLimit(1024*1024*viper.GetInt(server.FlagMaxDownloadSnapshotSpeed)), rain.WithRetryNumber(20), rain.WithRetryTime(time.Second*10), rain.WithEventExtend(&EventExtend{logger: logger})).Run()
-	//if err != nil {
-	//	return "", err
-	//}
-	//
-	//return ctl.Outpath(), nil
+	return ctl.Outpath(), nil
 }
 
 func extractTarGz(tarGzFile, destinationDir string) error {
