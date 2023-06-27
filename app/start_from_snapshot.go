@@ -4,6 +4,7 @@ import (
 	"archive/tar"
 	"fmt"
 	"github.com/klauspost/pgzip"
+	"github.com/okx/okbchain/libs/cosmos-sdk/types/errors"
 	"github.com/okx/okbchain/libs/tendermint/libs/log"
 	"github.com/rock-rabbit/rain"
 	"io"
@@ -18,22 +19,22 @@ type EventExtend struct {
 	logger log.Logger
 }
 
-// Change
+// Change event change
 func (ee *EventExtend) Change(stat *rain.EventExtend) {
 	ee.logger.Info("download progress", "speed", fmt.Sprintf("%dMB/s", stat.DownloadSpeed/1024/1024), "percent", fmt.Sprintf("%d %%", stat.Progress))
 }
 
-// Error
+// Error event error
 func (ee *EventExtend) Error(stat *rain.EventExtend) {
 	ee.logger.Info("download", "error", stat.Error)
 }
 
-// Close
+// Close event close
 func (ee *EventExtend) Close(stat *rain.EventExtend) {
 	ee.logger.Info("download close")
 }
 
-// Finish
+// Finish event finish
 func (ee *EventExtend) Finish(stat *rain.EventExtend) {
 	ee.logger.Info("download", "finish", stat.Progress)
 }
@@ -54,7 +55,7 @@ func prepareSnapshotDataIfNeed(snapshotURL string, home string, logger log.Logge
 	}
 
 	if _, err := url.Parse(snapshotURL); err != nil {
-		panic(err)
+		panic(errors.Wrap(err, "invalid snapshot URL"))
 	}
 
 	// download snapshot
@@ -83,9 +84,7 @@ func prepareSnapshotDataIfNeed(snapshotURL string, home string, logger log.Logge
 
 	os.Remove(snapshotFile)
 
-	defer func() {
-		os.WriteFile(filepath.Join(snapshotHome, ".record"), []byte(snapshotURL+"\n"), 0644)
-	}()
+	os.WriteFile(filepath.Join(snapshotHome, ".record"), []byte(snapshotURL+"\n"), 0644)
 
 	logger.Info("snapshot data is ready, start node soon!")
 }
