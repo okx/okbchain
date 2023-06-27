@@ -4,9 +4,11 @@ import (
 	"archive/tar"
 	"fmt"
 	"github.com/klauspost/pgzip"
+	"github.com/okx/okbchain/libs/cosmos-sdk/server"
 	"github.com/okx/okbchain/libs/cosmos-sdk/types/errors"
 	"github.com/okx/okbchain/libs/tendermint/libs/log"
 	"github.com/rock-rabbit/rain"
+	"github.com/spf13/viper"
 	"io"
 	"net/url"
 	"os"
@@ -91,7 +93,7 @@ func prepareSnapshotDataIfNeed(snapshotURL string, home string, logger log.Logge
 }
 
 func downloadSnapshot(url, outputPath string, logger log.Logger) (string, error) {
-	ctl, err := rain.New(url, rain.WithRoutineCount(runtime.NumCPU()), rain.WithOutdir(outputPath), rain.WithSpeedLimit(1024*1024*300), rain.WithRetryNumber(20), rain.WithRetryTime(time.Second*10), rain.WithEventExtend(&EventExtend{logger: logger})).Run()
+	ctl, err := rain.New(url, rain.WithRoutineCount(runtime.NumCPU()), rain.WithOutdir(outputPath), rain.WithSpeedLimit(1024*1024*viper.GetInt(server.FlagMaxDownloadSnapshotSpeed)), rain.WithRetryNumber(20), rain.WithRetryTime(time.Second*10), rain.WithEventExtend(&EventExtend{logger: logger})).Run()
 	if err != nil {
 		return "", err
 	}

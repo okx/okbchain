@@ -74,7 +74,8 @@ const (
 
 	FlagEventBlockTime = "event-block-time"
 
-	FlagStartFromSnapshot = "start-from-snapshot"
+	FlagStartFromSnapshot        = "start-from-snapshot"
+	FlagMaxDownloadSnapshotSpeed = "max-download-snapshot-speed"
 )
 
 // StartCmd runs the service passed in, either stand-alone or in-process with
