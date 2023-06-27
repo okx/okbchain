@@ -261,6 +261,7 @@ func RegisterServerFlags(cmd *cobra.Command) *cobra.Command {
 	cmd.Flags().Bool(mpt.FlagTrieAsyncDBAutoPruningOff, false, "Disable auto prune of trie async db")
 	cmd.Flags().Bool(mpt.FlagTrieAsyncDBSyncPruning, false, "if auto pruning is off and this is on, trie async db will be pruned every block in sync mode")
 	cmd.Flags().Bool(mpt.FlagTrieAsyncPushDB, false, "Enable to Async PushData2DB")
+	cmd.Flags().Bool(mpt.FlagTrieEnableSnapshotJournal, false, "Enable record snapshot's journal. So that snapshot can be repaired within certain version")
 
 	cmd.Flags().Int64(FlagCommitGapHeight, 10, "Block interval to commit cached data into db, affects iavl & mpt")
 	cmd.Flags().Int64(FlagFastSyncGap, 20, "Block height interval to switch fast-sync mode")

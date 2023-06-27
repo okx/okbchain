@@ -14,7 +14,6 @@ import (
 
 	"github.com/VictoriaMetrics/fastcache"
 
-	lru "github.com/hashicorp/golang-lru"
 	"github.com/tendermint/go-amino"
 
 	"github.com/okx/okbchain/libs/system/trace"
@@ -104,8 +103,6 @@ type CListMempool struct {
 
 	simQueue chan *mempoolTx
 
-	gasCache *lru.Cache
-
 	rmPendingTxChan chan types.EventDataRmPendingTx
 
 	gpo *Oracle
@@ -142,10 +139,6 @@ func NewCListMempool(
 		txQueue = NewBaseTxQueue()
 	}
 
-	gasCache, err := lru.New(1000000)
-	if err != nil {
-		panic(err)
-	}
 	gpoConfig := NewGPOConfig(cfg.DynamicConfig.GetDynamicGpWeight(), cfg.DynamicConfig.GetDynamicGpCheckBlocks())
 	gpo := NewOracle(gpoConfig)
 	mempool := &CListMempool{
@@ -160,7 +153,6 @@ func NewCListMempool(
 		metrics:       NopMetrics(),
 		txs:           txQueue,
 		simQueue:      make(chan *mempoolTx, 100000),
-		gasCache:      gasCache,
 		gpo:           gpo,
 	}
 
@@ -726,6 +718,7 @@ func (mem *CListMempool) resCbFirstTime(
 			if txInfo.isGasPrecise {
 				// gas for hgu is precise, just mark it simulated, so it will not be simulated again
 				memTx.isSim = 1
+				memTx.hguPrecise = true
 			}
 
 			if txInfo.wrapCMTx != nil {
@@ -1132,6 +1125,8 @@ func (mem *CListMempool) Update(
 	if cfg.DynamicConfig.GetEnableDeleteMinGPTx() {
 		mem.deleteMinGPTxOnlyFull()
 	}
+
+	go mem.trySimulate4NextBlock()
 	// WARNING: The txs inserted between [ReapMaxBytesMaxGas, Update) is insert-sorted in the mempool.txs,
 	// but they are not included in the latest block, after remove the latest block txs, these txs may
 	// in unsorted state. We need to resort them again for the the purpose of absolute order, or just let it go for they are
@@ -1274,6 +1269,9 @@ type mempoolTx struct {
 	outdated uint32
 	isSim    uint32
 
+	// `hguPrecise` is true means hgu for this tx is precise and simulation is not necessary
+	hguPrecise bool
+
 	isWrapCMTx  bool
 	wrapCMNonce uint64
 
@@ -1286,6 +1284,23 @@ type mempoolTx struct {
 // Height returns the height for this transaction
 func (memTx *mempoolTx) Height() int64 {
 	return atomic.LoadInt64(&memTx.height)
+}
+
+func (memTx *mempoolTx) ToWrappedMempoolTx() types.WrappedMempoolTx {
+	return types.WrappedMempoolTx{
+		Height:      memTx.height,
+		GasWanted:   memTx.gasWanted,
+		GasLimit:    memTx.gasLimit,
+		Tx:          memTx.tx,
+		NodeKey:     memTx.nodeKey,
+		Signature:   memTx.signature,
+		From:        memTx.from,
+		SenderNonce: memTx.senderNonce,
+		Outdated:    memTx.outdated,
+		IsSim:       memTx.isSim,
+		IsWrapCMTx:  memTx.isWrapCMTx,
+		WrapCMNonce: memTx.wrapCMNonce,
+	}
 }
 
 //--------------------------------------------------------------------------------
@@ -1477,7 +1492,50 @@ func (mem *CListMempool) simulationJob(memTx *mempoolTx) {
 	}
 	atomic.StoreInt64(&memTx.gasWanted, gas)
 	atomic.AddUint32(&memTx.isSim, 1)
-	mem.gasCache.Add(hex.EncodeToString(memTx.realTx.TxHash()), gas)
+}
+
+// trySimulate4BlockAfterNext will be called during Update()
+// assume that next step is to proposal a block of height `n` through ReapMaxBytesMaxGas
+// trySimulate4NextBlock will skip those txs which would be packed into that block,
+// and simulate txs to be packed into block of height `n+1`
+func (mem *CListMempool) trySimulate4NextBlock() {
+	maxGu := cfg.DynamicConfig.GetMaxGasUsedPerBlock()
+	if maxGu < 0 || !cfg.DynamicConfig.GetEnablePGU() {
+		return
+	}
+
+	var gu int64
+	var ele *clist.CElement
+	// skip the txs that will be packed into next block
+	for ele = mem.txs.Front(); ele != nil; ele = ele.Next() {
+		gu += ele.Value.(*mempoolTx).gasWanted
+		if gu > maxGu {
+			break
+		}
+	}
+
+	// reset gu for next cycle
+	gu = 0
+
+	for ; ele != nil && gu < maxGu; ele = ele.Next() {
+		memTx := ele.Value.(*mempoolTx)
+		var gas int64
+		var err error
+		if !memTx.hguPrecise {
+			gas, err = mem.simulateTx(memTx.tx, memTx.gasLimit)
+			if err != nil {
+				mem.logger.Error("trySimulate4BlockAfterNext", "error", err, "txHash", memTx.tx.Hash())
+				return
+			}
+			atomic.StoreInt64(&memTx.gasWanted, gas)
+			atomic.AddUint32(&memTx.isSim, 1)
+		} else {
+			gas = memTx.gasWanted
+		}
+
+		gu += gas
+	}
+
 }
 
 func (mem *CListMempool) deleteMinGPTxOnlyFull() {
@@ -1502,4 +1560,8 @@ func (mem *CListMempool) deleteMinGPTxOnlyFull() {
 
 func (mem *CListMempool) GetEnableDeleteMinGPTx() bool {
 	return cfg.DynamicConfig.GetEnableDeleteMinGPTx()
+}
+
+func (mem *CListMempool) GetPendingPoolTxsBytes() map[string]map[string]types.WrappedMempoolTx {
+	return mem.pendingPool.GetWrappedAddressTxsMap()
 }

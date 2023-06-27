@@ -6,17 +6,24 @@ import (
 	"github.com/ethereum/go-ethereum/core/rawdb"
 	"github.com/ethereum/go-ethereum/core/state/snapshot"
 	mpttypes "github.com/okx/okbchain/libs/cosmos-sdk/store/mpt/types"
+	"github.com/okx/okbchain/libs/tendermint/global"
 )
 
 var (
 	gDisableSnapshot = false
 	gSnapshotRebuild = false
+
+	// gEnableSnapshotJournal enable snapshot journal.
+	// so snapshot can be repaired within snapshotMemoryLayerCount.
+	gEnableSnapshotJournal = false
 )
 
 const (
 	// snapshotMemoryLayerCount snapshot memory layer count
-	// as we dont rollback transactions so we only keep 1 memory layer
-	snapshotMemoryLayerCount = 1
+	// snapshotMemoryLayerCount controls the snapshot Journal height,
+	// if repair start-height is lower than snapshot Journal height,
+	// snapshot will not be repaired anymore
+	snapshotMemoryLayerCount = 10
 )
 
 func DisableSnapshot() {
@@ -25,6 +32,14 @@ func DisableSnapshot() {
 
 func SetSnapshotRebuild(rebuild bool) {
 	gSnapshotRebuild = rebuild
+}
+
+func SetSnapshotJournal(enable bool) {
+	gEnableSnapshotJournal = enable
+}
+
+func checkSnapshotJournal() bool {
+	return gEnableSnapshotJournal
 }
 
 func (ms *MptStore) openSnapshot() error {
@@ -40,6 +55,9 @@ func (ms *MptStore) openSnapshot() error {
 	version := ms.CurrentVersion()
 	if layer := rawdb.ReadSnapshotRecoveryNumber(ms.db.TrieDB().DiskDB()); layer != nil && *layer > uint64(version) {
 		ms.logger.Error("Enabling snapshot recovery", "chainhead", version, "diskbase", *layer)
+		recovery = true
+	}
+	if global.GetRepairState() {
 		recovery = true
 	}
 	var err error
@@ -74,6 +92,8 @@ func (ms *MptStore) prepareSnap(root common.Hash) {
 		ms.snapDestructs = make(map[common.Hash]struct{})
 		ms.snapAccounts = make(map[common.Hash][]byte)
 		ms.snapStorage = make(map[common.Hash]map[common.Hash][]byte)
+	} else {
+		ms.logger.Error("prepare snapshot error", "root", root)
 	}
 }
 
@@ -95,6 +115,13 @@ func (ms *MptStore) commitSnap(root common.Hash) {
 		// - head-1 layer is paired with HEAD-1 state
 		if err := ms.snaps.Cap(root, snapshotMemoryLayerCount); err != nil {
 			ms.logger.Error("Failed to cap snapshot tree", "root", root, "layers", snapshotMemoryLayerCount, "err", err)
+		}
+
+		// record snapshot journal
+		if checkSnapshotJournal() {
+			if _, err := ms.snaps.Journal(root); err != nil {
+				ms.logger.Error("Failed to journal snapshot tree", "root", root, "err", err)
+			}
 		}
 	}
 	ms.snap, ms.snapDestructs, ms.snapAccounts, ms.snapStorage = nil, nil, nil, nil

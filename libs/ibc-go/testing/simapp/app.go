@@ -10,38 +10,9 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/store/mpt"
-
 	"github.com/spf13/viper"
 	"google.golang.org/grpc/encoding"
 	"google.golang.org/grpc/encoding/proto"
-
-	authante "github.com/okx/okbchain/libs/cosmos-sdk/x/auth/ante"
-	icacontroller "github.com/okx/okbchain/libs/ibc-go/modules/apps/27-interchain-accounts/controller"
-	icacontrollerkeeper "github.com/okx/okbchain/libs/ibc-go/modules/apps/27-interchain-accounts/controller/keeper"
-	icacontrollertypes "github.com/okx/okbchain/libs/ibc-go/modules/apps/27-interchain-accounts/controller/types"
-	icahost "github.com/okx/okbchain/libs/ibc-go/modules/apps/27-interchain-accounts/host"
-	icahostkeeper "github.com/okx/okbchain/libs/ibc-go/modules/apps/27-interchain-accounts/host/keeper"
-	icahosttypes "github.com/okx/okbchain/libs/ibc-go/modules/apps/27-interchain-accounts/host/types"
-	icatypes "github.com/okx/okbchain/libs/ibc-go/modules/apps/27-interchain-accounts/types"
-	ibcfee "github.com/okx/okbchain/libs/ibc-go/modules/apps/29-fee"
-	ibcfeekeeper "github.com/okx/okbchain/libs/ibc-go/modules/apps/29-fee/keeper"
-	ibcfeetypes "github.com/okx/okbchain/libs/ibc-go/modules/apps/29-fee/types"
-	ibctransfer "github.com/okx/okbchain/libs/ibc-go/modules/apps/transfer"
-	ibcclienttypes "github.com/okx/okbchain/libs/ibc-go/modules/core/02-client/types"
-	ibccommon "github.com/okx/okbchain/libs/ibc-go/modules/core/common"
-	ibckeeper "github.com/okx/okbchain/libs/ibc-go/modules/core/keeper"
-	evm2 "github.com/okx/okbchain/libs/ibc-go/testing/simapp/adapter/evm"
-	"github.com/okx/okbchain/libs/ibc-go/testing/simapp/adapter/fee"
-	ica2 "github.com/okx/okbchain/libs/ibc-go/testing/simapp/adapter/ica"
-	"github.com/okx/okbchain/libs/system"
-	"github.com/okx/okbchain/libs/system/trace"
-	"github.com/okx/okbchain/libs/tendermint/libs/cli"
-	"github.com/okx/okbchain/x/icamauth"
-	icamauthkeeper "github.com/okx/okbchain/x/icamauth/keeper"
-	icamauthtypes "github.com/okx/okbchain/x/icamauth/types"
-	"github.com/okx/okbchain/x/wasm"
-	wasmkeeper "github.com/okx/okbchain/x/wasm/keeper"
 
 	appante "github.com/okx/okbchain/app/ante"
 	chaincodec "github.com/okx/okbchain/app/codec"
@@ -50,17 +21,20 @@ import (
 	chain "github.com/okx/okbchain/app/types"
 	ethermint "github.com/okx/okbchain/app/types"
 	"github.com/okx/okbchain/app/utils/sanity"
+	"github.com/okx/okbchain/libs/cosmos-sdk/baseapp"
 	bam "github.com/okx/okbchain/libs/cosmos-sdk/baseapp"
 	"github.com/okx/okbchain/libs/cosmos-sdk/client"
 	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
 	"github.com/okx/okbchain/libs/cosmos-sdk/server"
 	"github.com/okx/okbchain/libs/cosmos-sdk/simapp"
+	"github.com/okx/okbchain/libs/cosmos-sdk/store/mpt"
 	"github.com/okx/okbchain/libs/cosmos-sdk/store/types"
 	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
 	"github.com/okx/okbchain/libs/cosmos-sdk/types/module"
 	upgradetypes "github.com/okx/okbchain/libs/cosmos-sdk/types/upgrade"
 	"github.com/okx/okbchain/libs/cosmos-sdk/version"
 	"github.com/okx/okbchain/libs/cosmos-sdk/x/auth"
+	authante "github.com/okx/okbchain/libs/cosmos-sdk/x/auth/ante"
 	authtypes "github.com/okx/okbchain/libs/cosmos-sdk/x/auth/types"
 	"github.com/okx/okbchain/libs/cosmos-sdk/x/bank"
 	capabilityModule "github.com/okx/okbchain/libs/cosmos-sdk/x/capability"
@@ -72,18 +46,38 @@ import (
 	"github.com/okx/okbchain/libs/cosmos-sdk/x/params/subspace"
 	"github.com/okx/okbchain/libs/cosmos-sdk/x/supply"
 	"github.com/okx/okbchain/libs/cosmos-sdk/x/upgrade"
+	icacontroller "github.com/okx/okbchain/libs/ibc-go/modules/apps/27-interchain-accounts/controller"
+	icacontrollerkeeper "github.com/okx/okbchain/libs/ibc-go/modules/apps/27-interchain-accounts/controller/keeper"
+	icacontrollertypes "github.com/okx/okbchain/libs/ibc-go/modules/apps/27-interchain-accounts/controller/types"
+	icahost "github.com/okx/okbchain/libs/ibc-go/modules/apps/27-interchain-accounts/host"
+	icahostkeeper "github.com/okx/okbchain/libs/ibc-go/modules/apps/27-interchain-accounts/host/keeper"
+	icahosttypes "github.com/okx/okbchain/libs/ibc-go/modules/apps/27-interchain-accounts/host/types"
+	icatypes "github.com/okx/okbchain/libs/ibc-go/modules/apps/27-interchain-accounts/types"
+	ibcfee "github.com/okx/okbchain/libs/ibc-go/modules/apps/29-fee"
+	ibcfeekeeper "github.com/okx/okbchain/libs/ibc-go/modules/apps/29-fee/keeper"
+	ibcfeetypes "github.com/okx/okbchain/libs/ibc-go/modules/apps/29-fee/types"
+	ibctransfer "github.com/okx/okbchain/libs/ibc-go/modules/apps/transfer"
 	ibctransferkeeper "github.com/okx/okbchain/libs/ibc-go/modules/apps/transfer/keeper"
 	ibctransfertypes "github.com/okx/okbchain/libs/ibc-go/modules/apps/transfer/types"
 	ibc "github.com/okx/okbchain/libs/ibc-go/modules/core"
 	ibcclient "github.com/okx/okbchain/libs/ibc-go/modules/core/02-client"
+	ibcclienttypes "github.com/okx/okbchain/libs/ibc-go/modules/core/02-client/types"
 	ibcporttypes "github.com/okx/okbchain/libs/ibc-go/modules/core/05-port/types"
 	ibchost "github.com/okx/okbchain/libs/ibc-go/modules/core/24-host"
+	ibccommon "github.com/okx/okbchain/libs/ibc-go/modules/core/common"
+	ibckeeper "github.com/okx/okbchain/libs/ibc-go/modules/core/keeper"
 	"github.com/okx/okbchain/libs/ibc-go/testing/mock"
 	"github.com/okx/okbchain/libs/ibc-go/testing/simapp/adapter/capability"
 	"github.com/okx/okbchain/libs/ibc-go/testing/simapp/adapter/core"
+	evm2 "github.com/okx/okbchain/libs/ibc-go/testing/simapp/adapter/evm"
+	"github.com/okx/okbchain/libs/ibc-go/testing/simapp/adapter/fee"
+	ica2 "github.com/okx/okbchain/libs/ibc-go/testing/simapp/adapter/ica"
 	staking2 "github.com/okx/okbchain/libs/ibc-go/testing/simapp/adapter/staking"
 	"github.com/okx/okbchain/libs/ibc-go/testing/simapp/adapter/transfer"
+	"github.com/okx/okbchain/libs/system"
+	"github.com/okx/okbchain/libs/system/trace"
 	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
+	"github.com/okx/okbchain/libs/tendermint/libs/cli"
 	"github.com/okx/okbchain/libs/tendermint/libs/log"
 	tmos "github.com/okx/okbchain/libs/tendermint/libs/os"
 	tmtypes "github.com/okx/okbchain/libs/tendermint/types"
@@ -99,13 +93,18 @@ import (
 	"github.com/okx/okbchain/x/genutil"
 	"github.com/okx/okbchain/x/gov"
 	"github.com/okx/okbchain/x/gov/keeper"
+	"github.com/okx/okbchain/x/icamauth"
+	icamauthkeeper "github.com/okx/okbchain/x/icamauth/keeper"
+	icamauthtypes "github.com/okx/okbchain/x/icamauth/types"
 	"github.com/okx/okbchain/x/params"
 	paramsclient "github.com/okx/okbchain/x/params/client"
 	"github.com/okx/okbchain/x/slashing"
 	"github.com/okx/okbchain/x/staking"
 	stakingclient "github.com/okx/okbchain/x/staking/client"
 	"github.com/okx/okbchain/x/token"
+	"github.com/okx/okbchain/x/wasm"
 	wasmclient "github.com/okx/okbchain/x/wasm/client"
+	wasmkeeper "github.com/okx/okbchain/x/wasm/keeper"
 )
 
 func init() {
@@ -751,7 +750,11 @@ func getTxFeeAndFromHandler(ek appante.EVMKeeper) sdk.GetTxFeeAndFromHandler {
 			supportPara = true
 			if appante.IsE2CTx(ek, &ctx, evmTx) {
 				isE2C = true
-				// supportPara = false
+				// E2C will include cosmos Msg in the Payload.
+				// Sometimes, this Msg do not support parallel execution.
+				if !isParaSupportedE2CMsg(evmTx.Data.Payload) {
+					supportPara = false
+				}
 			}
 			err = evmTxVerifySigHandler(ctx.ChainID(), ctx.BlockHeight(), evmTx)
 			if err != nil {
@@ -778,6 +781,28 @@ func getTxFeeAndFromHandler(ek appante.EVMKeeper) sdk.GetTxFeeAndFromHandler {
 		}
 
 		return
+	}
+}
+
+func isParaSupportedE2CMsg(payload []byte) bool {
+	// Here, payload must be E2C's Data.Payload
+	p, err := evm.ParseContractParam(payload)
+	if err != nil {
+		return false
+	}
+	mw, err := baseapp.ParseMsgWrapper(p)
+	if err != nil {
+		return false
+	}
+	switch mw.Name {
+	case "wasm/MsgInstantiateContract":
+		return false
+	case "wasm/MsgMigrateContract":
+		return false
+	case "wasm/MsgUpdateAdmin":
+		return false
+	default:
+		return true
 	}
 }
 
