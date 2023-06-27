@@ -10,6 +10,7 @@ import (
 	"github.com/okx/okbchain/app/utils/appstatus"
 	"github.com/okx/okbchain/libs/cosmos-sdk/server"
 	"github.com/okx/okbchain/libs/cosmos-sdk/store/flatkv"
+	"github.com/okx/okbchain/libs/cosmos-sdk/store/mpt"
 	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
 	tmiavl "github.com/okx/okbchain/libs/iavl"
 	"github.com/okx/okbchain/libs/system/trace"
