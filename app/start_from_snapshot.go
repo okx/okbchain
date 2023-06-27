@@ -13,6 +13,7 @@ import (
 	"path/filepath"
 	"runtime"
 	"strings"
+	"time"
 )
 
 type EventExtend struct {
@@ -90,7 +91,7 @@ func prepareSnapshotDataIfNeed(snapshotURL string, home string, logger log.Logge
 }
 
 func downloadSnapshot(url, outputPath string, logger log.Logger) (string, error) {
-	ctl, err := rain.New(url, rain.WithRoutineCount(runtime.NumCPU()), rain.WithOutdir(outputPath), rain.WithEventExtend(&EventExtend{logger: logger})).Run()
+	ctl, err := rain.New(url, rain.WithRoutineCount(runtime.NumCPU()), rain.WithOutdir(outputPath), rain.WithSpeedLimit(1024*1024*300), rain.WithRetryNumber(20), rain.WithRetryTime(time.Second*10), rain.WithEventExtend(&EventExtend{logger: logger})).Run()
 	if err != nil {
 		return "", err
 	}
