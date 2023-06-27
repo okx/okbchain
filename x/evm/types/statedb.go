@@ -9,22 +9,21 @@ import (
 	"sync"
 
 	"github.com/VictoriaMetrics/fastcache"
-	ethermint "github.com/okx/okbchain/app/types"
-	"github.com/tendermint/go-amino"
-
-	"github.com/okx/okbchain/libs/system/trace"
-
 	"github.com/ethereum/go-ethereum/common"
 	ethcmn "github.com/ethereum/go-ethereum/common"
 	ethstate "github.com/ethereum/go-ethereum/core/state"
 	ethtypes "github.com/ethereum/go-ethereum/core/types"
 	ethvm "github.com/ethereum/go-ethereum/core/vm"
+	"github.com/ethereum/go-ethereum/params"
+	ethermint "github.com/okx/okbchain/app/types"
 	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
 	"github.com/okx/okbchain/libs/cosmos-sdk/store/mpt"
 	"github.com/okx/okbchain/libs/cosmos-sdk/store/prefix"
 	"github.com/okx/okbchain/libs/cosmos-sdk/store/types"
 	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
 	"github.com/okx/okbchain/libs/cosmos-sdk/x/auth"
+	"github.com/okx/okbchain/libs/system/trace"
+	"github.com/tendermint/go-amino"
 )
 
 var (
@@ -1139,9 +1138,9 @@ func (csdb *CommitStateDB) clearJournalAndRefund() {
 	csdb.validRevisions = csdb.validRevisions[:0] // Snapshots can be created without journal entires
 }
 
-// Prepare sets the current transaction hash and index and block hash which is
+// PrepareBlockTx sets the current transaction hash and index and block hash which is
 // used when the EVM emits new state logs.
-func (csdb *CommitStateDB) Prepare(thash, bhash ethcmn.Hash, txi int) {
+func (csdb *CommitStateDB) PrepareBlockTx(thash, bhash ethcmn.Hash, txi int) {
 	csdb.thash = thash
 	csdb.bhash = bhash
 	csdb.txIndex = txi
@@ -1610,4 +1609,16 @@ func (csdb *CommitStateDB) getInitContractCodeHash(addr sdk.AccAddress) []byte {
 	store := csdb.paramSpace.CustomKVStore(csdb.ctx)
 	key := GetInitContractCodeHashKey(addr)
 	return store.Get(key)
+}
+
+func (csdb *CommitStateDB) Prepare(rules params.Rules, sender, coinbase ethcmn.Address, dest *ethcmn.Address, precompiles []ethcmn.Address, txAccesses ethtypes.AccessList) {
+	panic("not support 'Prepare'")
+}
+
+func (csdb *CommitStateDB) GetTransientState(addr ethcmn.Address, key ethcmn.Hash) ethcmn.Hash {
+	panic("not support 'GetTransientState'")
+}
+
+func (csdb *CommitStateDB) SetTransientState(addr ethcmn.Address, key, value ethcmn.Hash) {
+	panic("not support 'SetTransientState'")
 }

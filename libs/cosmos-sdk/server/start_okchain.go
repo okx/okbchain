@@ -253,6 +253,7 @@ func RegisterServerFlags(cmd *cobra.Command) *cobra.Command {
 	cmd.Flags().String(flags.FlagChainID, ChainID, "Chain ID of tendermint node for web3")
 	cmd.Flags().StringP(flags.FlagBroadcastMode, "b", flags.BroadcastSync, "Transaction broadcasting mode (sync|async|block) for web3")
 
+	cmd.Flags().Bool(mpt.FlagTriePbss, false, "Enable pbss")
 	cmd.Flags().Bool(mpt.FlagTrieDirtyDisabled, false, "Disable cache dirty trie nodes")
 	cmd.Flags().Uint(mpt.FlagTrieCacheSize, 2048, "Size (MB) to cache trie nodes")
 	cmd.Flags().Uint(mpt.FlagTrieInMemory, 100, "Max cache tire count in Memory")

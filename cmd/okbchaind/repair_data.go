@@ -10,6 +10,7 @@ import (
 	"github.com/okx/okbchain/app/utils/appstatus"
 	"github.com/okx/okbchain/libs/cosmos-sdk/server"
 	"github.com/okx/okbchain/libs/cosmos-sdk/store/flatkv"
+	"github.com/okx/okbchain/libs/cosmos-sdk/store/mpt"
 	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
 	tmiavl "github.com/okx/okbchain/libs/iavl"
 	"github.com/okx/okbchain/libs/system/trace"
@@ -49,6 +50,7 @@ func repairStateCmd(ctx *server.Context) *cobra.Command {
 	cmd.Flags().StringP(pprofAddrFlag, "p", "0.0.0.0:6060", "Address and port of pprof HTTP server listening")
 	cmd.Flags().Bool(tmiavl.FlagIavlDiscardFastStorage, false, "Discard fast storage")
 	cmd.Flags().MarkHidden(tmiavl.FlagIavlDiscardFastStorage)
+	cmd.Flags().Bool(mpt.FlagTriePbss, false, "Enable pbss")
 
 	return cmd
 }
@@ -63,4 +65,5 @@ func setExternalPackageValue() {
 		tmiavl.SetEnableFastStorage(true)
 		tmiavl.SetIgnoreAutoUpgrade(true)
 	}
+	mpt.TriePbss = viper.GetBool(mpt.FlagTriePbss)
 }

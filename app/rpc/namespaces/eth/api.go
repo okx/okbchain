@@ -12,16 +12,16 @@ import (
 	"sync"
 	"time"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/store/mpt"
-
 	"github.com/ethereum/go-ethereum/accounts"
 	"github.com/ethereum/go-ethereum/accounts/keystore"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
+	"github.com/ethereum/go-ethereum/common/math"
 	ethtypes "github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/rpc"
 	lru "github.com/hashicorp/golang-lru"
+	"github.com/okx/okbchain/libs/cosmos-sdk/store/mpt"
 	"github.com/spf13/viper"
 
 	appconfig "github.com/okx/okbchain/app/config"
@@ -1667,7 +1667,7 @@ func (api *PublicEthereumAPI) saveZeroAccount(address common.Address) {
 	api.watcherBackend.CommitAccountToRpcDb(zeroAccount)
 }
 
-func (api *PublicEthereumAPI) FeeHistory(blockCount rpc.DecimalOrHex, lastBlock rpc.BlockNumber, rewardPercentiles []float64) (*rpctypes.FeeHistoryResult, error) {
+func (api *PublicEthereumAPI) FeeHistory(blockCount math.HexOrDecimal64, lastBlock rpc.BlockNumber, rewardPercentiles []float64) (*rpctypes.FeeHistoryResult, error) {
 	api.logger.Debug("eth_feeHistory")
 	return nil, fmt.Errorf("unsupported rpc function: eth_FeeHistory")
 }

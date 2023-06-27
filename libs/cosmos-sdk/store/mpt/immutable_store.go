@@ -49,20 +49,21 @@ func (ms *ImmutableMptStore) Get(key []byte) []byte {
 
 	switch mptKeyType(key) {
 	case storageType:
-		_, stateRoot, realKey := decodeAddressStorageInfo(key)
+		addr, stateRoot, realKey := decodeAddressStorageInfo(key)
+		addrHash := mpttype.Keccak256HashWithSyncPool(addr[:])
 
-		t, err := ms.db.OpenStorageTrie(ethcmn.Hash{}, stateRoot)
+		t, err := ms.db.OpenStorageTrie(ms.root, addrHash, stateRoot)
 		if err != nil {
-			return nil
+			panic(err)
 		}
 
-		value, err := t.TryGet(realKey)
+		value, err := t.GetStorage(addr, realKey)
 		if err != nil {
-			return nil
+			panic(err)
 		}
 		return value
 	case addressType:
-		value, err := ms.trie.TryGet(key)
+		value, err := ms.trie.GetStorage(ethcmn.Address{}, key)
 		if err != nil {
 			return nil
 		}
@@ -94,9 +95,9 @@ func (ms *ImmutableMptStore) getStorageTrie(addr ethcmn.Address, stateRoot ethcm
 	addrHash := mpttype.Keccak256HashWithSyncPool(addr[:])
 	var t ethstate.Trie
 	var err error
-	t, err = ms.db.OpenStorageTrie(addrHash, stateRoot)
+	t, err = ms.db.OpenStorageTrie(ms.root, addrHash, stateRoot)
 	if err != nil {
-		t, err = ms.db.OpenStorageTrie(addrHash, ethcmn.Hash{})
+		t, err = ms.db.OpenStorageTrie(ms.root, addrHash, ethcmn.Hash{})
 		if err != nil {
 			panic("unexpected err")
 		}

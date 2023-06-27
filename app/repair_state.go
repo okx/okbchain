@@ -364,6 +364,8 @@ func createAndStartProxyAppConns(clientCreator proxy.ClientCreator) (proxy.AppCo
 }
 
 func (app *repairApp) Close() {
+	app.StopBaseApp()
+
 	indexer := evmtypes.GetIndexer()
 	if indexer != nil {
 		for indexer.IsProcessing() {

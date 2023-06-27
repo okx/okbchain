@@ -3,6 +3,7 @@ package mpt
 import (
 	"encoding/binary"
 	"github.com/ethereum/go-ethereum/ethdb"
+	"github.com/ethereum/go-ethereum/trie/snap"
 	"path/filepath"
 	"sync"
 
@@ -13,6 +14,7 @@ import (
 	"github.com/okx/okbchain/libs/cosmos-sdk/client/flags"
 	"github.com/okx/okbchain/libs/cosmos-sdk/store/mpt/types"
 	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
+	"github.com/okx/okbchain/libs/iavl/config"
 	"github.com/spf13/viper"
 )
 
@@ -55,10 +57,27 @@ func InstanceOfMptStore() ethstate.Database {
 
 		db := rawdb.NewDatabase(nkvstore)
 		gEthDB = db
+
+		var pbssConfig *snap.Config
+		if TriePbss {
+			pbssConfig = snap.Defaults
+			if MaxDiffLayers == -1 {
+				panic("not support pbss when pruning nothing")
+			}
+
+			if EnableAsyncCommit {
+				// when enable ac, ensure maxDiffLayers > gap
+				pbssConfig.MaxDiffLayers = int(config.DynamicConfig.GetCommitGapHeight())*2 + 1
+			} else {
+				// when disable ac, ensure maxDiffLayers = pruning keep recent
+				pbssConfig.MaxDiffLayers = MaxDiffLayers
+			}
+		}
 		gMptDatabase = ethstate.NewDatabaseWithConfig(db, &trie.Config{
 			Cache:     int(TrieCacheSize),
 			Journal:   "",
 			Preimages: true,
+			Snap:      pbssConfig,
 		})
 	})
 

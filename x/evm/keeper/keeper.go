@@ -69,7 +69,7 @@ type Keeper struct {
 	db ethstate.Database
 
 	startHeight uint64
-	triegc      *prque.Prque
+	triegc      *prque.Prque[int64, ethcmn.Hash]
 
 	// cache chain config
 	cci *chainConfigInfo
@@ -131,7 +131,7 @@ func NewKeeper(
 		innerBlockData: defaultBlockInnerData(),
 
 		db:             mpt.InstanceOfMptStore(),
-		triegc:         prque.New(nil),
+		triegc:         prque.New[int64, ethcmn.Hash](nil),
 		UpdatedAccount: make([]ethcmn.Address, 0),
 		cci:            &chainConfigInfo{},
 		LogsManages:    NewLogManager(),

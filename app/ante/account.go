@@ -156,7 +156,7 @@ func ethGasConsume(ek EVMKeeper, ak accountKeeperInterface, sk types.SupplyKeepe
 	gasLimit := msgEthTx.GetGas()
 
 	if shouldIntrinsicGas(ek, ctx, msgEthTx) {
-		gas, err := ethcore.IntrinsicGas(msgEthTx.Data.Payload, []ethtypes.AccessTuple{}, msgEthTx.To() == nil, true, false)
+		gas, err := ethcore.IntrinsicGas(msgEthTx.Data.Payload, []ethtypes.AccessTuple{}, msgEthTx.To() == nil, true, false, false)
 		if err != nil {
 			return sdkerrors.Wrap(err, "failed to compute intrinsic gas cost")
 		}

@@ -3,9 +3,6 @@ package types
 import (
 	json2 "encoding/json"
 	"fmt"
-	"math/big"
-	"time"
-
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core"
 	"github.com/ethereum/go-ethereum/core/vm"
@@ -13,6 +10,7 @@ import (
 	"github.com/ethereum/go-ethereum/eth/tracers/logger"
 	json "github.com/json-iterator/go"
 	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
+	"math/big"
 )
 
 type TraceConfig struct {
@@ -112,7 +110,6 @@ func (dt NoOpTracer) CaptureExit(output []byte, gasUsed uint64, err error) {}
 func (dt NoOpTracer) CaptureEnd(
 	output []byte,
 	gasUsed uint64,
-	t time.Duration,
 	err error,
 ) {
 }
@@ -128,7 +125,7 @@ func defaultTracerConfig() *TraceConfig {
 }
 func TestTracerConfig(traceConfig *TraceConfig) error {
 	if traceConfig.Tracer != "" {
-		_, err := tracers.New(traceConfig.Tracer, &tracers.Context{}, nil)
+		_, err := tracers.DefaultDirectory.New(traceConfig.Tracer, &tracers.Context{}, nil)
 		if err != nil {
 			return err
 		}
@@ -163,7 +160,7 @@ func newTracer(ctx sdk.Context, txHash *common.Hash) (tracer tracers.Tracer) {
 		tCtx := &tracers.Context{
 			TxHash: *txHash,
 		}
-		tracer, err = tracers.New(traceConfig.Tracer, tCtx, nil)
+		tracer, err = tracers.DefaultDirectory.New(traceConfig.Tracer, tCtx, nil)
 		if err != nil {
 			return NewNoOpTracer()
 		}

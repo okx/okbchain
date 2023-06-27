@@ -25,21 +25,25 @@ const (
 	FlagTrieAsyncDBAutoPruningOff = "trie.asyncdb.auto-pruning-off"
 	FlagTrieAsyncDBSyncPruning    = "trie.asyncdb.sync-pruning"
 
+	FlagTriePbss = "trie.pbss"
+
 	FlagTrieEnableSnapshotJournal = "trie.enable-snapshot-journal"
 )
 
 var (
-	TrieDirtyDisabled       = false
-	TrieCacheSize     uint  = 2048 // MB
-	TrieCommitGap     int64 = 100
-	TriesInMemory     uint  = 100
-
-	TrieAsyncDB               = true
-	TrieAsyncDBInitCap        = 200_0000
-	TrieAsyncDBAutoPruningOff = false
-	TrieAsyncDBSyncPruning    = false
+	TrieDirtyDisabled               = false
+	TrieCacheSize             uint  = 2048 // MB
+	TrieCommitGap             int64 = 100
+	TriesInMemory             uint  = 100
+	TriePbss                        = false
+	TrieAsyncDB                     = true
+	TrieAsyncDBInitCap              = 200_0000
+	TrieAsyncDBAutoPruningOff       = false
+	TrieAsyncDBSyncPruning          = false
 
 	EnableAsyncCommit = false
+
+	MaxDiffLayers = 128
 )
 
 var (

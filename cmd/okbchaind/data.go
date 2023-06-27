@@ -597,7 +597,12 @@ func pruneMpt() {
 	hhash := sdk.Uint64ToBigEndian(latestHeight)
 	rootHashValue, err := accMptDb.TrieDB().DiskDB().Get(append(mpt.KeyPrefixAccRootMptHash, hhash...))
 	rootHash := ethcmn.BytesToHash(rootHashValue)
-	p, err := pruner.NewPrunerCustom(mpt.GetEthDB(), "", "", 256, rootHash, base.AccountStateRootRetriever{})
+	prunerconfig := pruner.Config{
+		Datadir:   "",
+		Cachedir:  "",
+		BloomSize: 256,
+	}
+	p, err := pruner.NewPrunerCustom(mpt.GetEthDB(), prunerconfig, rootHash, base.AccountStateRootRetriever{})
 	panicError(err)
 	log.Printf("Prune mpt %v...\n", rootHash.String())
 	err = p.Prune(rootHash)

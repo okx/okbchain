@@ -77,7 +77,7 @@ func openApplicationDb(rootdir string) tmdb.DB {
  */
 // getStorageTrie returns the trie of the given address and stateRoot
 func getStorageTrie(db ethstate.Database, addrHash, stateRoot ethcmn.Hash) ethstate.Trie {
-	tr, err := db.OpenStorageTrie(addrHash, stateRoot)
+	tr, err := db.OpenStorageTrie(ethcmn.Hash{}, addrHash, stateRoot)
 	panicError(err)
 	return tr
 }
@@ -85,15 +85,14 @@ func getStorageTrie(db ethstate.Database, addrHash, stateRoot ethcmn.Hash) ethst
 // pushData2Database commit the data to the database
 func pushData2Database(db ethstate.Database, tree ethstate.Trie, height int64, isEvm bool, nodes *trie.MergedNodeSet) {
 
-	root, set, err := tree.Commit(true)
+	root, set := tree.Commit(true)
+
+	err := nodes.Merge(set)
 	panicError(err)
 
-	err = nodes.Merge(set)
+	err = db.TrieDB().UpdateForOK(root, ethcmn.Hash{}, nodes, mpt.AccountStateRootRetriever.RetrieveStateRoot)
 	panicError(err)
-
-	err = db.TrieDB().UpdateForOK(nodes, mpt.AccountStateRootRetriever.RetrieveStateRoot)
-	panicError(err)
-	err = db.TrieDB().Commit(root, false, nil)
+	err = db.TrieDB().Commit(root, false)
 	panicError(err)
 
 	setMptRootHash(db, uint64(height), root, isEvm)

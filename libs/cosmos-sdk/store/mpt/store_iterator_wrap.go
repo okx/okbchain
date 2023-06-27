@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"sort"
 
+	"github.com/ethereum/go-ethereum/common"
 	ethstate "github.com/ethereum/go-ethereum/core/state"
 )
 
@@ -152,7 +153,7 @@ func (it *wrapIterator) Value() []byte {
 	if it.isStorage {
 		_, _, key = decodeAddressStorageInfo(key)
 	}
-	value, err := it.trie.TryGet(key)
+	value, err := it.trie.GetStorage(common.Address{}, key)
 	if err != nil {
 		return nil
 	}

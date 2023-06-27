@@ -355,6 +355,7 @@ func SetExternalPackageValue(cmd *cobra.Command) {
 
 	tmtypes.EnableEventBlockTime = viper.GetBool(FlagEventBlockTime)
 
+	mptstore.TriePbss = viper.GetBool(mptstore.FlagTriePbss)
 	mptstore.TrieDirtyDisabled = viper.GetBool(mptstore.FlagTrieDirtyDisabled)
 	mptstore.TrieCacheSize = viper.GetUint(mptstore.FlagTrieCacheSize)
 	mptstore.TriesInMemory = viper.GetUint(mptstore.FlagTrieInMemory)

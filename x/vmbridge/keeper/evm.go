@@ -221,7 +221,7 @@ func (k Keeper) CallEvm(ctx sdk.Context, callerAddr common.Address, to *common.A
 		TraceTx:      false,
 		TraceTxLog:   false,
 	}
-	st.Csdb.Prepare(ethTxHash, k.evmKeeper.GetBlockHash(), 0)
+	st.Csdb.PrepareBlockTx(ethTxHash, k.evmKeeper.GetBlockHash(), 0)
 
 	st.SetCallToCM(k.evmKeeper.GetCallToCM())
 	addVMBridgeInnertx(ctx, k.evmKeeper, callerAddr.String(), to, VMBRIDGE_START_INNERTX, value)

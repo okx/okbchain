@@ -51,12 +51,12 @@ type ChainConfig struct {
 // All the negative or nil values are converted to nil
 func (cc ChainConfig) EthereumConfig(chainID *big.Int) *params.ChainConfig {
 	return &params.ChainConfig{
-		ChainID:             chainID,
-		HomesteadBlock:      getBlockValue(cc.HomesteadBlock),
-		DAOForkBlock:        getBlockValue(cc.DAOForkBlock),
-		DAOForkSupport:      cc.DAOForkSupport,
-		EIP150Block:         getBlockValue(cc.EIP150Block),
-		EIP150Hash:          common.HexToHash(cc.EIP150Hash),
+		ChainID:        chainID,
+		HomesteadBlock: getBlockValue(cc.HomesteadBlock),
+		DAOForkBlock:   getBlockValue(cc.DAOForkBlock),
+		DAOForkSupport: cc.DAOForkSupport,
+		EIP150Block:    getBlockValue(cc.EIP150Block),
+		//EIP150Hash:          common.HexToHash(cc.EIP150Hash),
 		EIP155Block:         getBlockValue(cc.EIP155Block),
 		EIP158Block:         getBlockValue(cc.EIP158Block),
 		ByzantiumBlock:      getBlockValue(cc.ByzantiumBlock),

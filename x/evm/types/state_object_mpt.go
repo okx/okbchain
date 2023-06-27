@@ -107,11 +107,11 @@ func (so *stateObject) getTrie(db ethstate.Database) ethstate.Trie {
 
 		if so.trie == nil {
 			var err error
-			so.trie, err = db.OpenStorageTrie(so.addrHash, so.account.StateRoot)
+			so.trie, err = db.OpenStorageTrie(ethcmn.Hash{}, so.addrHash, so.account.StateRoot)
 			if err != nil {
 				so.setError(fmt.Errorf("failed to open storage trie: %v for addr: %s", err, so.account.EthAddress().String()))
 
-				so.trie, _ = db.OpenStorageTrie(so.addrHash, ethcmn.Hash{})
+				so.trie, _ = db.OpenStorageTrie(ethcmn.Hash{}, so.addrHash, ethcmn.Hash{})
 				so.setError(fmt.Errorf("can't create storage trie: %v", err))
 			}
 		}
