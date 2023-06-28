@@ -127,7 +127,7 @@ func downloadSnapshot(url, outputPath string, logger log.Logger) (string, error)
 		}
 	}()
 
-	err := axel.Run()
+	err = axel.Run()
 	if err != nil {
 		return "", err
 	}
