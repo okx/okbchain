@@ -112,17 +112,16 @@ func downloadSnapshot(url, outputPath string, logger log.Logger) (string, error)
 	defer close(done)
 
 	go func() {
-		tick := time.NewTicker(time.Millisecond * 200)
+		tick := time.NewTicker(time.Millisecond * 50)
 		defer tick.Stop()
 		for {
 			select {
 			case <-done:
 				return
 			case <-tick.C:
-				bts := make([]byte, 4096)
+				bts := make([]byte, 1024)
 				stdoutProcessStatus.Read(bts)
 				logger.Info(string(bts))
-				//stdoutProcessStatus.Next(1024)
 			}
 		}
 	}()
