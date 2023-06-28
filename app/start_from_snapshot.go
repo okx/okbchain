@@ -4,7 +4,7 @@ import (
 	"archive/tar"
 	"context"
 	"fmt"
-	"github.com/Code-Hex/pget"
+	"github.com/FineKe/pget"
 	"github.com/klauspost/pgzip"
 	"github.com/okx/okbchain/libs/cosmos-sdk/types/errors"
 	"github.com/okx/okbchain/libs/tendermint/libs/log"
@@ -95,7 +95,9 @@ func prepareSnapshotDataIfNeed(snapshotURL string, home string, logger log.Logge
 
 func downloadSnapshot(url, outputPath string, logger log.Logger) (string, error) {
 	cli := pget.New()
-	if err := cli.Run(context.Background(), "v0.1.1", []string{url, "-o", outputPath, "--trace"}); err != nil {
+	filename := url[strings.LastIndex(url, "/")+1:]
+	outputFilePath := filepath.Join(outputPath, filename)
+	if err := cli.Run(context.Background(), "v0.1.2", []string{"-p", fmt.Sprintf("%d", runtime.NumCPU()), url, "-o", outputFilePath, "--trace"}); err != nil {
 		if cli.Trace {
 			logger.Error(fmt.Sprintf("Error:\n%+v\n", err))
 		} else {
@@ -105,7 +107,7 @@ func downloadSnapshot(url, outputPath string, logger log.Logger) (string, error)
 		return "", err
 	}
 
-	return filepath.Join(outputPath, url[strings.LastIndex(url, "/")+1:]), nil
+	return outputFilePath, nil
 	//ctl, err := rain.New(url, rain.WithRoutineCount(runtime.NumCPU()), rain.WithDebug(true), rain.WithOutdir(outputPath), rain.WithSpeedLimit(1024*1024*viper.GetInt(server.FlagMaxDownloadSnapshotSpeed)), rain.WithRetryNumber(20), rain.WithRetryTime(time.Second*10), rain.WithEventExtend(&EventExtend{logger: logger})).Run()
 	//if err != nil {
 	//	return "", err
