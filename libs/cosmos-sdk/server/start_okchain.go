@@ -267,7 +267,7 @@ func RegisterServerFlags(cmd *cobra.Command) *cobra.Command {
 	cmd.Flags().Int64(FlagCommitGapHeight, 10, "Block interval to commit cached data into db, affects iavl & mpt")
 	cmd.Flags().Int64(FlagFastSyncGap, 20, "Block height interval to switch fast-sync mode")
 	cmd.Flags().String(FlagStartFromSnapshot, "", "Snapshot URL which uses to start node")
-	cmd.Flags().Int64(FlagMaxDownloadSnapshotSpeed, 200, "Max Speed for downloading snapshot, MB/s")
+	cmd.Flags().Int64(FlagMaxDownloadSnapshotSpeed, 300, "Max Speed for downloading snapshot, MB/s")
 
 	return cmd
 }
