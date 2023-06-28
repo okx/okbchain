@@ -98,14 +98,14 @@ func prepareSnapshotDataIfNeed(snapshotURL string, home string, logger log.Logge
 }
 
 func downloadSnapshot(url, outputPath string, logger log.Logger) (string, error) {
-
 	fileName := url[strings.LastIndex(url, "/")+1:]
 	maxSpeed := fmt.Sprintf("%d", viper.GetInt(server.FlagMaxDownloadSnapshotSpeed)*1024*1024)
-	//maxSpeed := "314572800"
 	axel := exec.Command("axel", "-s", maxSpeed, "-n", fmt.Sprintf("%d", runtime.NumCPU()), "-o", filepath.Join(outputPath, fileName), "-a", url)
 	var stdoutProcessStatus bytes.Buffer
 	axel.Stdout = io.MultiWriter(ioutil.Discard, &stdoutProcessStatus)
 	done := make(chan struct{})
+	defer close(done)
+
 	go func() {
 		tick := time.NewTicker(time.Second)
 		defer tick.Stop()
@@ -121,10 +121,8 @@ func downloadSnapshot(url, outputPath string, logger log.Logger) (string, error)
 
 	err := axel.Run()
 	if err != nil {
-
+		return "", err
 	}
-
-	close(done)
 
 	return filepath.Join(outputPath, fileName), nil
 	//ctl, err := rain.New(url, rain.WithRoutineCount(runtime.NumCPU()), rain.WithDebug(true), rain.WithOutdir(outputPath), rain.WithSpeedLimit(1024*1024*viper.GetInt(server.FlagMaxDownloadSnapshotSpeed)), rain.WithRetryNumber(20), rain.WithRetryTime(time.Second*10), rain.WithEventExtend(&EventExtend{logger: logger})).Run()
