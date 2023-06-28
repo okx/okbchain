@@ -98,6 +98,11 @@ func prepareSnapshotDataIfNeed(snapshotURL string, home string, logger log.Logge
 }
 
 func downloadSnapshot(url, outputPath string, logger log.Logger) (string, error) {
+	_, err := os.Stat(outputPath)
+	if err != nil {
+		os.MkdirAll(outputPath, 0755)
+	}
+
 	fileName := url[strings.LastIndex(url, "/")+1:]
 	maxSpeed := fmt.Sprintf("%d", viper.GetInt(server.FlagMaxDownloadSnapshotSpeed)*1024*1024)
 	axel := exec.Command("axel", "-s", maxSpeed, "-n", fmt.Sprintf("%d", runtime.NumCPU()), "-o", filepath.Join(outputPath, fileName), "-a", url)
@@ -107,7 +112,7 @@ func downloadSnapshot(url, outputPath string, logger log.Logger) (string, error)
 	defer close(done)
 
 	go func() {
-		tick := time.NewTicker(time.Second)
+		tick := time.NewTicker(time.Millisecond * 200)
 		defer tick.Stop()
 		for {
 			select {
