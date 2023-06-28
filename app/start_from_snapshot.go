@@ -2,20 +2,19 @@ package app
 
 import (
 	"archive/tar"
+	"context"
 	"fmt"
+	"github.com/Code-Hex/pget"
 	"github.com/klauspost/pgzip"
-	"github.com/okx/okbchain/libs/cosmos-sdk/server"
 	"github.com/okx/okbchain/libs/cosmos-sdk/types/errors"
 	"github.com/okx/okbchain/libs/tendermint/libs/log"
 	"github.com/rock-rabbit/rain"
-	"github.com/spf13/viper"
 	"io"
 	"net/url"
 	"os"
 	"path/filepath"
 	"runtime"
 	"strings"
-	"time"
 )
 
 const SpaceName = "StartFromSnapshot"
@@ -95,12 +94,24 @@ func prepareSnapshotDataIfNeed(snapshotURL string, home string, logger log.Logge
 }
 
 func downloadSnapshot(url, outputPath string, logger log.Logger) (string, error) {
-	ctl, err := rain.New(url, rain.WithRoutineCount(runtime.NumCPU()), rain.WithDebug(true), rain.WithOutdir(outputPath), rain.WithSpeedLimit(1024*1024*viper.GetInt(server.FlagMaxDownloadSnapshotSpeed)), rain.WithRetryNumber(20), rain.WithRetryTime(time.Second*10), rain.WithEventExtend(&EventExtend{logger: logger})).Run()
-	if err != nil {
+	cli := pget.New()
+	if err := cli.Run(context.Background(), "v0.1.1", []string{url, "-o", outputPath, "--trace"}); err != nil {
+		if cli.Trace {
+			logger.Error(fmt.Sprintf("Error:\n%+v\n", err))
+		} else {
+			logger.Error(fmt.Sprintf("Error:\n  %v\n", err))
+		}
+
 		return "", err
 	}
 
-	return ctl.Outpath(), nil
+	return filepath.Join(outputPath, url[strings.LastIndex(url, "/")+1:]), nil
+	//ctl, err := rain.New(url, rain.WithRoutineCount(runtime.NumCPU()), rain.WithDebug(true), rain.WithOutdir(outputPath), rain.WithSpeedLimit(1024*1024*viper.GetInt(server.FlagMaxDownloadSnapshotSpeed)), rain.WithRetryNumber(20), rain.WithRetryTime(time.Second*10), rain.WithEventExtend(&EventExtend{logger: logger})).Run()
+	//if err != nil {
+	//	return "", err
+	//}
+	//
+	//return ctl.Outpath(), nil
 }
 
 func extractTarGz(tarGzFile, destinationDir string) error {
