@@ -5,11 +5,9 @@ import (
 	"bytes"
 	"fmt"
 	"github.com/klauspost/pgzip"
-	"github.com/okx/okbchain/libs/cosmos-sdk/server"
 	"github.com/okx/okbchain/libs/cosmos-sdk/types/errors"
 	"github.com/okx/okbchain/libs/tendermint/libs/log"
 	"github.com/rock-rabbit/rain"
-	"github.com/spf13/viper"
 	"io"
 	"io/ioutil"
 	"net/url"
@@ -20,8 +18,6 @@ import (
 	"strings"
 	"time"
 )
-
-const SpaceName = "StartFromSnapshot"
 
 type EventExtend struct {
 	logger log.Logger
@@ -112,10 +108,10 @@ func downloadSnapshot(url, outputPath string, logger log.Logger) (string, error)
 		os.Remove(targetFile)
 	}
 
-	maxSpeed := fmt.Sprintf("%d", viper.GetInt(server.FlagMaxDownloadSnapshotSpeed)*1024*1024)
+	//maxSpeed := fmt.Sprintf("%d", viper.GetInt(server.FlagMaxDownloadSnapshotSpeed)*1024*1024)
 	var stdoutProcessStatus bytes.Buffer
 
-	axel := exec.Command("axel", "-s", maxSpeed, "-n", fmt.Sprintf("%d", runtime.NumCPU()), "-o", targetFile, "-a", url)
+	axel := exec.Command("axel", "-n", fmt.Sprintf("%d", runtime.NumCPU()), "-o", targetFile, url)
 	axel.Stdout = io.MultiWriter(ioutil.Discard, &stdoutProcessStatus)
 	done := make(chan struct{})
 	defer close(done)
