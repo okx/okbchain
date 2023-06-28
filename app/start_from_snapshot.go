@@ -7,7 +7,6 @@ import (
 	"github.com/klauspost/pgzip"
 	"github.com/okx/okbchain/libs/cosmos-sdk/types/errors"
 	"github.com/okx/okbchain/libs/tendermint/libs/log"
-	"github.com/rock-rabbit/rain"
 	"io"
 	"io/ioutil"
 	"net/url"
@@ -18,32 +17,6 @@ import (
 	"strings"
 	"time"
 )
-
-type EventExtend struct {
-	logger log.Logger
-}
-
-// Change event change
-func (ee *EventExtend) Change(stat *rain.EventExtend) {
-	ee.logger.Info("download progress", "speed", fmt.Sprintf("%dMB/s", stat.DownloadSpeed/1024/1024), "percent", fmt.Sprintf("%d %%", stat.Progress))
-}
-
-// Error event error
-func (ee *EventExtend) Error(stat *rain.EventExtend) {
-	ee.logger.Info("download", "error", stat.Error)
-}
-
-// Close event close
-func (ee *EventExtend) Close(stat *rain.EventExtend) {
-	ee.logger.Info("download close")
-}
-
-// Finish event finish
-func (ee *EventExtend) Finish(stat *rain.EventExtend) {
-	ee.logger.Info("download", "finish", stat.Progress)
-}
-
-var _ rain.ProgressEventExtend = &EventExtend{}
 
 func prepareSnapshotDataIfNeed(snapshotURL string, home string, logger log.Logger) {
 	if snapshotURL == "" {
@@ -124,7 +97,7 @@ func downloadSnapshot(url, outputPath string, logger log.Logger) (string, error)
 			case <-done:
 				return
 			case <-tick.C:
-				bts := make([]byte, 1024)
+				bts := make([]byte, stdoutProcessStatus.Len())
 				stdoutProcessStatus.Read(bts)
 				logger.Info(string(bts))
 			}
