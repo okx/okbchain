@@ -114,7 +114,10 @@ func downloadSnapshot(url, outputPath string, logger log.Logger) (string, error)
 			case <-done:
 				return
 			case <-tick.C:
-				logger.Info(stdoutProcessStatus.String())
+				bts := make([]byte, 4096)
+				stdoutProcessStatus.Read(bts)
+				logger.Info(string(bts))
+				//stdoutProcessStatus.Next(1024)
 			}
 		}
 	}()
