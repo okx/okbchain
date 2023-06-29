@@ -77,11 +77,10 @@ func downloadSnapshot(url, outputPath string, logger log.Logger) (string, error)
 	targetFile := filepath.Join(outputPath, fileName)
 
 	// check file exists
-	if _, err := os.Open(targetFile); err == nil {
+	if _, err := os.Stat(targetFile); err == nil {
 		os.Remove(targetFile)
 	}
 
-	//maxSpeed := fmt.Sprintf("%d", viper.GetInt(server.FlagMaxDownloadSnapshotSpeed)*1024*1024)
 	var stdoutProcessStatus bytes.Buffer
 
 	axel := exec.Command("axel", "-n", fmt.Sprintf("%d", runtime.NumCPU()), "-o", targetFile, url)
@@ -89,6 +88,7 @@ func downloadSnapshot(url, outputPath string, logger log.Logger) (string, error)
 	done := make(chan struct{})
 	defer close(done)
 
+	// print download detail
 	go func() {
 		tick := time.NewTicker(time.Millisecond * 50)
 		defer tick.Stop()
@@ -104,6 +104,7 @@ func downloadSnapshot(url, outputPath string, logger log.Logger) (string, error)
 		}
 	}()
 
+	// run and wait
 	err = axel.Run()
 	if err != nil {
 		return "", err
