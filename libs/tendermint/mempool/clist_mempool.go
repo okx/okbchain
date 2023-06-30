@@ -711,7 +711,7 @@ func (mem *CListMempool) resCbFirstTime(
 				realTx:      r.CheckTx.Tx,
 				nodeKey:     txInfo.wtx.GetNodeKey(),
 				signature:   txInfo.wtx.GetSignature(),
-				from:        r.CheckTx.Tx.GetFrom(),
+				from:        r.CheckTx.Tx.GetEthAddr(),
 				senderNonce: r.CheckTx.SenderNonce,
 			}
 
@@ -794,7 +794,7 @@ func (mem *CListMempool) resCbRecheck(req *abci.Request, res *abci.Response) {
 			if mem.config.PendingRemoveEvent {
 				mem.rmPendingTxChan <- types.EventDataRmPendingTx{
 					memTx.realTx.TxHash(),
-					memTx.realTx.GetFrom(),
+					memTx.realTx.GetEthAddr(),
 					memTx.realTx.GetNonce(),
 					types.Recheck,
 				}
@@ -947,6 +947,7 @@ func (mem *CListMempool) ReapUserTxsCnt(address string) int {
 
 func (mem *CListMempool) ReapUserTxs(address string, max int) types.Txs {
 	max = tmmath.MinInt(mem.txs.Len(), max)
+
 	return mem.txs.GetAddressTxs(address, max)
 }
 
@@ -1553,7 +1554,7 @@ func (mem *CListMempool) deleteMinGPTxOnlyFull() {
 		mem.cache.RemoveKey(txOrTxHashToKey(removeMemTx.tx, removeMemTxHash))
 
 		if mem.config.PendingRemoveEvent {
-			mem.rmPendingTxChan <- types.EventDataRmPendingTx{removeMemTxHash, removeMemTx.realTx.GetFrom(), removeMemTx.realTx.GetNonce(), types.MinGasPrice}
+			mem.rmPendingTxChan <- types.EventDataRmPendingTx{removeMemTxHash, removeMemTx.realTx.GetEthAddr(), removeMemTx.realTx.GetNonce(), types.MinGasPrice}
 		}
 	}
 }
