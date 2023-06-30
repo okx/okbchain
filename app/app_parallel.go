@@ -172,4 +172,3 @@ func isParaSupportedE2CMsg(payload []byte) bool {
 		return false
 	}
 }
-}
