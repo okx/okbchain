@@ -26,7 +26,7 @@ func (tx MockTx) TxHash() []byte {
 	return tx.Hash
 }
 
-func (tx MockTx) GetFrom() string {
+func (tx MockTx) GetEthAddr() string {
 	return tx.From
 }
 
