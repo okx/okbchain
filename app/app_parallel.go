@@ -90,15 +90,15 @@ func getTxFeeHandler() sdk.GetTxFeeHandler {
 
 // getTxFeeAndFromHandler get tx fee and from
 func getTxFeeAndFromHandler(ek appante.EVMKeeper) sdk.GetTxFeeAndFromHandler {
-	return func(ctx sdk.Context, tx sdk.Tx) (fee sdk.Coins, isEvm bool, isE2C bool, from string, to string, err error, supportPara bool) {
+	return func(ctx sdk.Context, tx sdk.Tx) (fee sdk.Coins, isEvm bool, needUpdateTXCounter bool, from string, to string, err error, supportPara bool) {
 		if evmTx, ok := tx.(*evmtypes.MsgEthereumTx); ok {
 			isEvm = true
 			supportPara = true
 			if appante.IsE2CTx(ek, &ctx, evmTx) {
-				isE2C = true
+				needUpdateTXCounter = true
 				// E2C will include cosmos Msg in the Payload.
 				// Sometimes, this Msg do not support parallel execution.
-				if !isParaSupportedE2CMsg(evmTx.Data.Payload) {
+				if !types.HigherThanMercury(ctx.BlockHeight()) || !isParaSupportedE2CMsg(evmTx.Data.Payload) {
 					supportPara = false
 				}
 			}
@@ -116,11 +116,17 @@ func getTxFeeAndFromHandler(ek appante.EVMKeeper) sdk.GetTxFeeAndFromHandler {
 			}
 		} else if feeTx, ok := tx.(authante.FeeTx); ok {
 			fee = feeTx.GetFee()
-			if stdTx, ok := tx.(*auth.StdTx); ok && len(stdTx.Msgs) == 1 { // only support one message
-				if msg, ok := stdTx.Msgs[0].(interface{ CalFromAndToForPara() (string, string) }); ok {
-					from, to = msg.CalFromAndToForPara()
-					if types.HigherThanMercury(ctx.BlockHeight()) {
-						supportPara = true
+			if stdTx, ok := tx.(*auth.StdTx); ok {
+				if types.HigherThanEarth(ctx.BlockHeight()) {
+					needUpdateTXCounter = true
+				}
+				// only support one message
+				if len(stdTx.Msgs) == 1 {
+					if msg, ok := stdTx.Msgs[0].(interface{ CalFromAndToForPara() (string, string) }); ok {
+						from, to = msg.CalFromAndToForPara()
+						if types.HigherThanMercury(ctx.BlockHeight()) {
+							supportPara = true
+						}
 					}
 				}
 			}
@@ -164,13 +170,11 @@ func isParaSupportedE2CMsg(payload []byte) bool {
 		return false
 	}
 	switch mw.Name {
-	case "wasm/MsgInstantiateContract":
-		return false
-	case "wasm/MsgMigrateContract":
-		return false
-	case "wasm/MsgUpdateAdmin":
-		return false
-	default:
+	case "wasm/MsgExecuteContract":
 		return true
+	case "wasm/MsgStoreCode":
+		return true
+	default:
+		return false
 	}
 }

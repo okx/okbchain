@@ -22,14 +22,14 @@ var (
 )
 
 type extraDataForTx struct {
-	supportPara bool
-	fee         sdk.Coins
-	isEvm       bool
-	isE2C       bool
-	from        string
-	to          string
-	stdTx       sdk.Tx
-	decodeErr   error
+	supportPara         bool
+	fee                 sdk.Coins
+	isEvm               bool
+	needUpdateTXCounter bool
+	from                string
+	to                  string
+	stdTx               sdk.Tx
+	decodeErr           error
 }
 
 type txWithIndex struct {
@@ -69,15 +69,15 @@ func (app *BaseApp) getExtraDataByTxs(txs [][]byte) {
 					app.blockDataCache.SetTx(txBytes, tx)
 				}
 
-				coin, isEvm, isE2C, s, toAddr, _, supportPara := app.getTxFeeAndFromHandler(app.getContextForTx(runTxModeDeliver, txBytes), tx)
+				coin, isEvm, needUpdateTXCounter, s, toAddr, _, supportPara := app.getTxFeeAndFromHandler(app.getContextForTx(runTxModeDeliver, txBytes), tx)
 				para.extraTxsInfo[index] = &extraDataForTx{
-					supportPara: supportPara,
-					fee:         coin,
-					isEvm:       isEvm,
-					isE2C:       isE2C,
-					from:        s,
-					to:          toAddr,
-					stdTx:       tx,
+					supportPara:         supportPara,
+					fee:                 coin,
+					isEvm:               isEvm,
+					needUpdateTXCounter: needUpdateTXCounter,
+					from:                s,
+					to:                  toAddr,
+					stdTx:               tx,
 				}
 				wg.Done()
 			}
@@ -135,16 +135,11 @@ func (app *BaseApp) calGroup() {
 		if tx.supportPara { //evmTx & wasmTx
 			Union(tx.from, tx.to)
 		} else {
-			para.haveCosmosTxInBlock = true
 			app.parallelTxManage.putResult(index, &executeResult{paraMsg: &sdk.ParaMsg{}, msIsNil: true})
 		}
 
-		if (!tx.isEvm && tx.supportPara) || tx.isE2C {
-			// means wasm or e2c tx
-			para.haveCosmosTxInBlock = true
-		}
-
-		if !tx.isEvm || tx.isE2C {
+		if tx.needUpdateTXCounter {
+			para.needUpdateTXCounter = tx.needUpdateTXCounter
 			para.txByteMpCosmosIndex[string(para.txs[index])] = para.cosmosTxIndexInBlock
 			para.cosmosTxIndexInBlock++
 		}
@@ -307,7 +302,7 @@ func (app *BaseApp) runTxs() []*abci.ResponseDeliverTx {
 	ctx, _ := app.cacheTxContext(app.getContextForTx(runTxModeDeliver, []byte{}), []byte{})
 	ctx.SetMultiStore(app.parallelTxManage.cms)
 
-	if app.parallelTxManage.haveCosmosTxInBlock {
+	if app.parallelTxManage.needUpdateTXCounter {
 		app.updateCosmosTxCount(ctx, app.parallelTxManage.cosmosTxIndexInBlock-1)
 	}
 
@@ -446,7 +441,7 @@ type parallelTxManager struct {
 	blockHeight          int64
 	groupTasks           []*groupTask
 	blockGasMeterMu      sync.Mutex
-	haveCosmosTxInBlock  bool
+	needUpdateTXCounter  bool
 	isAsyncDeliverTx     bool
 	txs                  [][]byte
 	txSize               int
@@ -753,7 +748,7 @@ func (pm *parallelTxManager) init(txs [][]byte, blockHeight int64, deliverStateM
 	txSize := len(txs)
 	pm.blockHeight = blockHeight
 	pm.groupTasks = make([]*groupTask, 0)
-	pm.haveCosmosTxInBlock = false
+	pm.needUpdateTXCounter = false
 	pm.isAsyncDeliverTx = true
 	pm.txs = txs
 	pm.txSize = txSize

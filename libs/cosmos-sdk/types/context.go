@@ -7,12 +7,12 @@ import (
 
 	"github.com/ethereum/go-ethereum/core/vm"
 	"github.com/gogo/protobuf/proto"
-	"github.com/okx/okbchain/libs/system/trace"
-	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
-	"github.com/okx/okbchain/libs/tendermint/libs/log"
 
 	"github.com/okx/okbchain/libs/cosmos-sdk/store/gaskv"
 	stypes "github.com/okx/okbchain/libs/cosmos-sdk/store/types"
+	"github.com/okx/okbchain/libs/system/trace"
+	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
+	"github.com/okx/okbchain/libs/tendermint/libs/log"
 )
 
 /*
@@ -88,7 +88,7 @@ func (c *Context) IsDeliverWithSerial() bool {
 }
 
 func (c *Context) UseParamCache() bool {
-	return c.isDeliverWithSerial || (c.paraMsg != nil && !c.paraMsg.HaveCosmosTxInBlock) || c.checkTx
+	return c.isDeliverWithSerial || (c.paraMsg != nil && !c.paraMsg.NeedUpdateTXCounter) || c.checkTx
 }
 
 func (c *Context) IsCheckTx() bool             { return c.checkTx }
