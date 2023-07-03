@@ -72,7 +72,7 @@ func SetMilestoneEarthHeight(h int64) {
 
 func HigherThanEarth(h int64) bool {
 	if milestoneEarthHeight == 0 {
-		return false
+		return true
 	}
 	return h >= milestoneEarthHeight
 }
