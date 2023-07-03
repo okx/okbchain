@@ -691,7 +691,7 @@ func (app *BaseApp) getContextForTx(mode runTxMode, txBytes []byte) sdk.Context 
 	}
 	if app.parallelTxManage.isAsyncDeliverTx && mode == runTxModeDeliverInAsync {
 		ctx.SetParaMsg(&sdk.ParaMsg{
-			NeedUpdateTXCounter: app.parallelTxManage.needUpdateTXCounter,
+			NeedUpdateTXCounter: app.parallelTxManage.NeedUpdateTXCounter(),
 			CosmosIndexInBlock:  app.parallelTxManage.txByteMpCosmosIndex[string(txBytes)],
 		})
 		ctx.SetTxBytes(txBytes)

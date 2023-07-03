@@ -127,11 +127,11 @@ func Union(x string, yString string) {
 // calGroup cal group by txs
 func (app *BaseApp) calGroup() {
 
-	para := app.parallelTxManage
+	pm := app.parallelTxManage
 
 	rootAddr = make(map[string]string, 0)
-	para.cosmosTxIndexInBlock = 0
-	for index, tx := range para.extraTxsInfo {
+	pm.cosmosTxIndexInBlock = 0
+	for index, tx := range pm.extraTxsInfo {
 		if tx.supportPara { //evmTx & wasmTx
 			Union(tx.from, tx.to)
 		} else {
@@ -139,32 +139,32 @@ func (app *BaseApp) calGroup() {
 		}
 
 		if tx.needUpdateTXCounter {
-			para.needUpdateTXCounter = tx.needUpdateTXCounter
-			para.txByteMpCosmosIndex[string(para.txs[index])] = para.cosmosTxIndexInBlock
-			para.cosmosTxIndexInBlock++
+			pm.txIndexMpUpdateTXCounter[index] = true
+			pm.txByteMpCosmosIndex[string(pm.txs[index])] = pm.cosmosTxIndexInBlock
+			pm.cosmosTxIndexInBlock++
 		}
 	}
 
 	addrToID := make(map[string]int, 0)
 
-	for index, txInfo := range para.extraTxsInfo {
+	for index, txInfo := range pm.extraTxsInfo {
 		if !txInfo.supportPara {
 			continue
 		}
 		rootAddr := Find(txInfo.from)
 		id, exist := addrToID[rootAddr]
 		if !exist {
-			id = len(para.groupList)
+			id = len(pm.groupList)
 			addrToID[rootAddr] = id
 
 		}
-		para.groupList[id] = append(para.groupList[id], index)
-		para.txIndexWithGroup[index] = id
+		pm.groupList[id] = append(pm.groupList[id], index)
+		pm.txIndexWithGroup[index] = id
 	}
 
-	groupSize := len(para.groupList)
+	groupSize := len(pm.groupList)
 	for groupIndex := 0; groupIndex < groupSize; groupIndex++ {
-		list := para.groupList[groupIndex]
+		list := pm.groupList[groupIndex]
 		for index := 0; index < len(list); index++ {
 			if index+1 <= len(list)-1 {
 				app.parallelTxManage.nextTxInGroup[list[index]] = list[index+1]
@@ -236,7 +236,7 @@ func (app *BaseApp) runTxs() []*abci.ResponseDeliverTx {
 				break
 			}
 			isReRun := false
-			if pm.isConflict(res) || overFlow(currentGas, res.resp.GasUsed, maxGas) {
+			if pm.isConflict(res) || overFlow(currentGas, res.resp.GasUsed, maxGas) || pm.haveAnteErrTx {
 				rerunIdx++
 				isReRun = true
 				// conflict rerun tx
@@ -245,8 +245,22 @@ func (app *BaseApp) runTxs() []*abci.ResponseDeliverTx {
 				}
 				res = app.deliverTxWithCache(pm.upComingTxIndex)
 			}
+
 			if res.paraMsg.AnteErr != nil {
 				res.msIsNil = true
+
+				pm.haveAnteErrTx = true
+				// When use pm.needUpdateTXCounter, must update it according pm.txIndexMpUpdateTXCounter.
+				pm.txIndexMpUpdateTXCounter[pm.upComingTxIndex] = false
+
+				if res.paraMsg.NeedUpdateTXCounter {
+					pm.cosmosTxIndexInBlock--
+					for index, tx := range pm.txs {
+						if _, ok := pm.txByteMpCosmosIndex[string(tx)]; ok && index > pm.upComingTxIndex {
+							pm.txByteMpCosmosIndex[string(tx)]--
+						}
+					}
+				}
 			}
 
 			pm.deliverTxs[pm.upComingTxIndex] = &res.resp
@@ -257,7 +271,7 @@ func (app *BaseApp) runTxs() []*abci.ResponseDeliverTx {
 			app.deliverState.ctx.BlockGasMeter().ConsumeGas(sdk.Gas(res.resp.GasUsed), "unexpected error")
 			pm.blockGasMeterMu.Unlock()
 
-			pm.SetCurrentIndex(pm.upComingTxIndex, res)
+			pm.SetCurrentIndexTxRes(pm.upComingTxIndex, res)
 			currentGas += uint64(res.resp.GasUsed)
 
 			if isReRun {
@@ -302,7 +316,7 @@ func (app *BaseApp) runTxs() []*abci.ResponseDeliverTx {
 	ctx, _ := app.cacheTxContext(app.getContextForTx(runTxModeDeliver, []byte{}), []byte{})
 	ctx.SetMultiStore(app.parallelTxManage.cms)
 
-	if app.parallelTxManage.needUpdateTXCounter {
+	if app.parallelTxManage.NeedUpdateTXCounter() {
 		app.updateCosmosTxCount(ctx, app.parallelTxManage.cosmosTxIndexInBlock-1)
 	}
 
@@ -438,16 +452,17 @@ func newExecuteResult(r abci.ResponseDeliverTx, ms sdk.CacheMultiStore, counter 
 }
 
 type parallelTxManager struct {
-	blockHeight          int64
-	groupTasks           []*groupTask
-	blockGasMeterMu      sync.Mutex
-	needUpdateTXCounter  bool
-	isAsyncDeliverTx     bool
-	txs                  [][]byte
-	txSize               int
-	alreadyEnd           bool
-	cosmosTxIndexInBlock int
-	txByteMpCosmosIndex  map[string]int
+	blockHeight              int64
+	groupTasks               []*groupTask
+	blockGasMeterMu          sync.Mutex
+	isAsyncDeliverTx         bool
+	txs                      [][]byte
+	txSize                   int
+	alreadyEnd               bool
+	cosmosTxIndexInBlock     int
+	txByteMpCosmosIndex      map[string]int
+	txIndexMpUpdateTXCounter map[int]bool
+	haveAnteErrTx            bool
 
 	resultCh chan int
 	resultCb func(data int)
@@ -748,7 +763,7 @@ func (pm *parallelTxManager) init(txs [][]byte, blockHeight int64, deliverStateM
 	txSize := len(txs)
 	pm.blockHeight = blockHeight
 	pm.groupTasks = make([]*groupTask, 0)
-	pm.needUpdateTXCounter = false
+	//pm.needUpdateTXCounter = false
 	pm.isAsyncDeliverTx = true
 	pm.txs = txs
 	pm.txSize = txSize
@@ -770,6 +785,7 @@ func (pm *parallelTxManager) init(txs [][]byte, blockHeight int64, deliverStateM
 	}
 
 	pm.txByteMpCosmosIndex = make(map[string]int, 0)
+	pm.txIndexMpUpdateTXCounter = make(map[int]bool, 0)
 	pm.nextTxInGroup = make(map[int]int)
 
 	pm.extraTxsInfo = make([]*extraDataForTx, txSize)
@@ -799,7 +815,7 @@ func (pm *parallelTxManager) getParentMsByTxIndex(txIndex int) (sdk.CacheMultiSt
 	return ms, useCurrent
 }
 
-func (pm *parallelTxManager) SetCurrentIndex(txIndex int, res *executeResult) {
+func (pm *parallelTxManager) SetCurrentIndexTxRes(txIndex int, res *executeResult) {
 	if res.msIsNil {
 		return
 	}
@@ -820,4 +836,12 @@ func (pm *parallelTxManager) SetCurrentIndex(txIndex int, res *executeResult) {
 		}
 	}
 	pm.currTxFee = pm.currTxFee.Add(pm.extraTxsInfo[txIndex].fee.Sub(pm.finalResult[txIndex].paraMsg.RefundFee)...)
+}
+
+func (pm *parallelTxManager) NeedUpdateTXCounter() bool {
+	res := false
+	for _, v := range pm.txIndexMpUpdateTXCounter {
+		res = res || v
+	}
+	return res
 }
