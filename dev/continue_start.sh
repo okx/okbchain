@@ -1,0 +1,2 @@
+#!/bin/bash
+okbchaind start --rpc.unsafe --local-rpc-port 26657 --log_level "main:info,iavl:info,*:error,state:info,provider:info" --log_file json --dynamic-gp-mode=2 --consensus.timeout_commit 2000ms --enable-preruntx=1 --tree-enable-async-commit=false --enable-gid --fast-query=true --append-pid=true --iavl-output-modules evm=0,acc=0 --commit-gap-height 3 --trie.dirty-disabled=true --trace --home ./_cache_evm --chain-id okbchain-67 --elapsed Round=1,CommitRound=1,Produce=1
