@@ -2,7 +2,6 @@ package ante
 
 import (
 	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	sdkerrors "github.com/okx/okbchain/libs/cosmos-sdk/types/errors"
 	"github.com/okx/okbchain/libs/cosmos-sdk/types/innertx"
 	types2 "github.com/okx/okbchain/libs/tendermint/types"
 	evmtypes "github.com/okx/okbchain/x/evm/types"
@@ -52,11 +51,11 @@ func (g GasLimitDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool,
 	currentGasMeter := ctx.GasMeter() // avoid race
 	infGasMeter := sdk.GetReusableInfiniteGasMeter()
 	ctx.SetGasMeter(infGasMeter)
-	if tx.GetGas() > g.evm.GetParams(ctx).MaxGasLimitPerTx {
-		ctx.SetGasMeter(currentGasMeter)
-		sdk.ReturnInfiniteGasMeter(infGasMeter)
-		return ctx, sdkerrors.Wrapf(sdkerrors.ErrTxTooLarge, "too large gas limit, it must be less than %d", g.evm.GetParams(ctx).MaxGasLimitPerTx)
-	}
+	//if tx.GetGas() > g.evm.GetParams(ctx).MaxGasLimitPerTx {
+	//	ctx.SetGasMeter(currentGasMeter)
+	//	sdk.ReturnInfiniteGasMeter(infGasMeter)
+	//	return ctx, sdkerrors.Wrapf(sdkerrors.ErrTxTooLarge, "too large gas limit, it must be less than %d", g.evm.GetParams(ctx).MaxGasLimitPerTx)
+	//}
 
 	ctx.SetGasMeter(currentGasMeter)
 	sdk.ReturnInfiniteGasMeter(infGasMeter)
