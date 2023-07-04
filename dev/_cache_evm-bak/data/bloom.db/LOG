@@ -30,3 +30,15 @@
 12:05:27.371460 db@open done T·34.005686ms
 12:05:32.358766 db@close closing
 12:05:32.358841 db@close done T·74.339µs
+=============== Jul 4, 2023 (UTC) ===============
+02:14:35.257219 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+02:14:35.257293 version@stat F·[2] S·352B[352B] Sc·[0.50]
+02:14:35.257304 db@open opening
+02:14:35.257328 journal@recovery F·1
+02:14:35.269042 journal@recovery recovering @6
+02:14:35.271704 memdb@flush created L0@8 N·1 S·176B "count,v5":"count,v5"
+02:14:35.283430 version@stat F·[3] S·528B[528B] Sc·[0.75]
+02:14:35.292455 db@janitor F·5 G·0
+02:14:35.292470 db@open done T·35.162405ms
+02:16:32.373407 db@close closing
+02:16:32.373463 db@close done T·54.637µs
