@@ -1,10 +1,9 @@
 package baseapp
 
 import (
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
-	"github.com/okx/okbchain/app/rpc/simulator"
-	cfg "github.com/okx/okbchain/libs/tendermint/config"
 	"os"
 	"sort"
 	"strconv"
@@ -13,9 +12,10 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/okx/okbchain/libs/system/trace/persist"
 	"github.com/spf13/viper"
+	"github.com/tendermint/go-amino"
 
+	"github.com/okx/okbchain/app/rpc/simulator"
 	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
 	"github.com/okx/okbchain/libs/cosmos-sdk/store/mpt"
 	stypes "github.com/okx/okbchain/libs/cosmos-sdk/store/types"
@@ -23,9 +23,10 @@ import (
 	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
 	sdkerrors "github.com/okx/okbchain/libs/cosmos-sdk/types/errors"
 	"github.com/okx/okbchain/libs/system/trace"
+	"github.com/okx/okbchain/libs/system/trace/persist"
 	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
+	cfg "github.com/okx/okbchain/libs/tendermint/config"
 	tmtypes "github.com/okx/okbchain/libs/tendermint/types"
-	"github.com/tendermint/go-amino"
 )
 
 // InitChain implements the ABCI interface. It runs the initialization logic
@@ -238,6 +239,12 @@ func (app *BaseApp) EndBlock(req abci.RequestEndBlock) (res abci.ResponseEndBloc
 		res = app.endBlocker(app.deliverState.ctx, req)
 	}
 
+	if app.deliverState.ms != nil && req.Height == 2391073 {
+		app.deliverState.ms.IteratorCache(true, func(key string, value []byte, isDirty bool, isDelete bool, storeKey sdk.StoreKey) bool {
+			fmt.Println("dirty", hex.EncodeToString([]byte(key)), hex.EncodeToString(value), isDirty, isDelete)
+			return true
+		}, nil)
+	}
 	return
 }
 
