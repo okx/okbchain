@@ -1,7 +1,6 @@
 package baseapp
 
 import (
-	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -239,12 +238,6 @@ func (app *BaseApp) EndBlock(req abci.RequestEndBlock) (res abci.ResponseEndBloc
 		res = app.endBlocker(app.deliverState.ctx, req)
 	}
 
-	if app.deliverState.ms != nil && req.Height == 2391073 {
-		app.deliverState.ms.IteratorCache(true, func(key string, value []byte, isDirty bool, isDelete bool, storeKey sdk.StoreKey) bool {
-			fmt.Println("dirty", hex.EncodeToString([]byte(key)), hex.EncodeToString(value), isDirty, isDelete)
-			return true
-		}, nil)
-	}
 	return
 }
 

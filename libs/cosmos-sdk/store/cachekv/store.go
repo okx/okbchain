@@ -2,16 +2,20 @@ package cachekv
 
 import (
 	"bytes"
+	"encoding/hex"
+	"fmt"
 	"io"
 	"reflect"
+	"runtime/debug"
 	"sort"
 	"sync"
 	"unsafe"
 
+	"github.com/tendermint/go-amino"
+
 	"github.com/okx/okbchain/libs/iavl"
 	"github.com/okx/okbchain/libs/system/trace"
 	dbm "github.com/okx/okbchain/libs/tm-db"
-	"github.com/tendermint/go-amino"
 
 	"github.com/okx/okbchain/libs/cosmos-sdk/store/tracekv"
 	"github.com/okx/okbchain/libs/cosmos-sdk/store/types"
@@ -447,6 +451,10 @@ func (store *Store) dirtyItems(start, end []byte) {
 
 // Only entrypoint to mutate store.cache.
 func (store *Store) setCacheValue(key, value []byte, deleted bool, dirty bool) {
+	if hex.EncodeToString(key) == "012564231c640cbf3e5528f2d5ffe0bf6e2e654e22" {
+		fmt.Println("value", hex.EncodeToString(key), hex.EncodeToString(value))
+		debug.PrintStack()
+	}
 	keyStr := string(key)
 	if !dirty {
 		store.readList[keyStr] = value
