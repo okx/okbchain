@@ -248,19 +248,7 @@ func (app *BaseApp) runTxs() []*abci.ResponseDeliverTx {
 
 			if res.paraMsg.AnteErr != nil {
 				res.msIsNil = true
-
-				pm.haveAnteErrTx = true
-				// When use pm.needUpdateTXCounter, must update it according pm.txIndexMpUpdateTXCounter.
-				pm.txIndexMpUpdateTXCounter[pm.upComingTxIndex] = false
-
-				if res.paraMsg.NeedUpdateTXCounter {
-					pm.cosmosTxIndexInBlock--
-					for index, tx := range pm.txs {
-						if _, ok := pm.txByteMpCosmosIndex[string(tx)]; ok && index > pm.upComingTxIndex {
-							pm.txByteMpCosmosIndex[string(tx)]--
-						}
-					}
-				}
+				pm.handleAnteErrTx(res.paraMsg.NeedUpdateTXCounter)
 			}
 
 			pm.deliverTxs[pm.upComingTxIndex] = &res.resp
@@ -452,16 +440,18 @@ func newExecuteResult(r abci.ResponseDeliverTx, ms sdk.CacheMultiStore, counter 
 }
 
 type parallelTxManager struct {
-	blockHeight              int64
-	groupTasks               []*groupTask
-	blockGasMeterMu          sync.Mutex
-	isAsyncDeliverTx         bool
-	txs                      [][]byte
-	txSize                   int
-	alreadyEnd               bool
+	blockHeight      int64
+	groupTasks       []*groupTask
+	blockGasMeterMu  sync.Mutex
+	isAsyncDeliverTx bool
+	txs              [][]byte
+	txSize           int
+	alreadyEnd       bool
+
 	cosmosTxIndexInBlock     int
+	txByteMpCMIndexLock      sync.RWMutex
 	txByteMpCosmosIndex      map[string]int
-	txIndexMpUpdateTXCounter map[int]bool
+	txIndexMpUpdateTXCounter []bool
 	haveAnteErrTx            bool
 
 	resultCh chan int
@@ -633,6 +623,8 @@ func newParallelTxManager() *parallelTxManager {
 		txIndexWithGroup: make(map[int]int),
 		resultCh:         make(chan int, maxTxResultInChan),
 
+		txByteMpCMIndexLock: sync.RWMutex{},
+
 		blockMpCache:     newCacheRWSetList(),
 		chainMpCache:     newCacheRWSetList(),
 		blockMultiStores: newCacheMultiStoreList(),
@@ -763,7 +755,6 @@ func (pm *parallelTxManager) init(txs [][]byte, blockHeight int64, deliverStateM
 	txSize := len(txs)
 	pm.blockHeight = blockHeight
 	pm.groupTasks = make([]*groupTask, 0)
-	//pm.needUpdateTXCounter = false
 	pm.isAsyncDeliverTx = true
 	pm.txs = txs
 	pm.txSize = txSize
@@ -785,9 +776,10 @@ func (pm *parallelTxManager) init(txs [][]byte, blockHeight int64, deliverStateM
 	}
 
 	pm.txByteMpCosmosIndex = make(map[string]int, 0)
-	pm.txIndexMpUpdateTXCounter = make(map[int]bool, 0)
 	pm.nextTxInGroup = make(map[int]int)
 
+	pm.haveAnteErrTx = false
+	pm.txIndexMpUpdateTXCounter = make([]bool, txSize)
 	pm.extraTxsInfo = make([]*extraDataForTx, txSize)
 	pm.txReps = make([]*executeResult, txSize)
 	pm.finalResult = make([]*executeResult, txSize)
@@ -844,4 +836,22 @@ func (pm *parallelTxManager) NeedUpdateTXCounter() bool {
 		res = res || v
 	}
 	return res
+}
+
+// When an AnteErr tx is encountered, this tx will be discarded,
+// and the cosmosIndex of the remaining tx needs to be corrected.
+func (pm *parallelTxManager) handleAnteErrTx(needUpdateTXCounter bool) {
+	pm.haveAnteErrTx = true
+	pm.txIndexMpUpdateTXCounter[pm.upComingTxIndex] = false
+
+	if needUpdateTXCounter {
+		pm.cosmosTxIndexInBlock--
+		pm.txByteMpCMIndexLock.Lock()
+		for index, tx := range pm.txs {
+			if _, ok := pm.txByteMpCosmosIndex[string(tx)]; ok && index > pm.upComingTxIndex {
+				pm.txByteMpCosmosIndex[string(tx)]--
+			}
+		}
+		pm.txByteMpCMIndexLock.Unlock()
+	}
 }
