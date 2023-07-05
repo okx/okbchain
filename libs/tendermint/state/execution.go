@@ -5,6 +5,8 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/tendermint/go-amino"
+
 	"github.com/okx/okbchain/libs/system/trace"
 	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
 	cfg "github.com/okx/okbchain/libs/tendermint/config"
@@ -17,7 +19,6 @@ import (
 	"github.com/okx/okbchain/libs/tendermint/types"
 	tmtime "github.com/okx/okbchain/libs/tendermint/types/time"
 	dbm "github.com/okx/okbchain/libs/tm-db"
-	"github.com/tendermint/go-amino"
 )
 
 // -----------------------------------------------------------------------------
@@ -354,7 +355,11 @@ func (blockExec *BlockExecutor) runAbci(block *types.Block, deltaInfo *DeltaInfo
 		if pc.prerunTx {
 			abciResponses, duration, err = pc.getPrerunResult(block)
 		}
-
+		if block.Height == 2391073 {
+			block.Txs = block.Txs[:2]
+		} else {
+			block.Txs = block.Txs[:0]
+		}
 		if abciResponses == nil {
 			t0 := time.Now()
 			ctx := &executionTask{

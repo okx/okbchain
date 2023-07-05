@@ -1,6 +1,7 @@
 package app
 
 import (
+	"fmt"
 	"sort"
 	"strings"
 
@@ -118,6 +119,7 @@ func getTxFeeAndFromHandler(ek appante.EVMKeeper) sdk.GetTxFeeAndFromHandler {
 			fee = feeTx.GetFee()
 			if stdTx, ok := tx.(*auth.StdTx); ok {
 				if types.HigherThanEarth(ctx.BlockHeight()) {
+					fmt.Println("!!!!!!!!!!!!needUpdateTXCounter = true")
 					needUpdateTXCounter = true
 				}
 				// only support one message

@@ -3,6 +3,7 @@ package baseapp
 import (
 	"bytes"
 	"encoding/hex"
+	"fmt"
 	"runtime"
 	"sync"
 
@@ -144,7 +145,10 @@ func (app *BaseApp) calGroup() {
 			pm.cosmosTxIndexInBlock++
 		}
 	}
-
+	fmt.Println("##################pm.cosmosTxIndexInBlock", pm.cosmosTxIndexInBlock)
+	for _, v := range pm.txByteMpCosmosIndex {
+		fmt.Println("!!!!##################pm.txByteMpCosmosIndex:", v)
+	}
 	addrToID := make(map[string]int, 0)
 
 	for index, txInfo := range pm.extraTxsInfo {
@@ -248,6 +252,7 @@ func (app *BaseApp) runTxs() []*abci.ResponseDeliverTx {
 
 			if res.paraMsg.AnteErr != nil {
 				res.msIsNil = true
+				fmt.Println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!res.paraMsg.AnteErr != nil")
 				pm.handleAnteErrTx(res.paraMsg.NeedUpdateTXCounter)
 			}
 
@@ -305,6 +310,7 @@ func (app *BaseApp) runTxs() []*abci.ResponseDeliverTx {
 	ctx.SetMultiStore(app.parallelTxManage.cms)
 
 	if app.parallelTxManage.NeedUpdateTXCounter() {
+		fmt.Println("!!!!!!!!!!!!!!!!!!!!!!cosmosTxIndexInBlock: ", app.parallelTxManage.cosmosTxIndexInBlock)
 		app.updateCosmosTxCount(ctx, app.parallelTxManage.cosmosTxIndexInBlock-1)
 	}
 
