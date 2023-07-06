@@ -46,21 +46,28 @@ func NewHandler(k types.ContractOpsKeeper) sdk.Handler {
 
 		switch msg := msg.(type) {
 		case *MsgStoreCode: //nolint:typecheck
+			fmt.Printf("---------------------zjg--------%s\n", msg)
 			if !ctx.IsCheckTx() {
 				types2.WasmStoreCode = true
 			}
 			res, err = msgServer.StoreCode(sdk.WrapSDKContext(ctx), msg)
 		case *MsgInstantiateContract:
+			fmt.Printf("---------------------zjg--------%s\n", msg)
 			res, err = msgServer.InstantiateContract(sdk.WrapSDKContext(ctx), msg)
 		case *MsgExecuteContract:
+			fmt.Printf("---------------------zjg--------%s\n", msg)
 			res, err = msgServer.ExecuteContract(sdk.WrapSDKContext(ctx), msg)
 		case *MsgMigrateContract:
+			fmt.Printf("---------------------zjg--------%s\n", msg)
 			res, err = msgServer.MigrateContract(sdk.WrapSDKContext(ctx), msg)
 		case *MsgUpdateAdmin:
+			fmt.Printf("---------------------zjg--------%s\n", msg)
 			res, err = msgServer.UpdateAdmin(sdk.WrapSDKContext(ctx), msg)
 		case *MsgClearAdmin:
+			fmt.Printf("---------------------zjg--------%s\n", msg)
 			res, err = msgServer.ClearAdmin(sdk.WrapSDKContext(ctx), msg)
 		default:
+			fmt.Printf("---------------------zjg--------%s\n", msg)
 			errMsg := fmt.Sprintf("unrecognized wasm message type: %T", msg)
 			return nil, sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, errMsg)
 		}
