@@ -8,6 +8,6 @@
     }
   ],
   "name": "earth",
-  "expectHeight": "10",
+  "expectHeight": "50",
   "config": ""
 }
