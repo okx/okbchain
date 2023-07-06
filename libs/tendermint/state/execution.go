@@ -2,6 +2,8 @@ package state
 
 import (
 	"fmt"
+	"os"
+	rtc "runtime/trace"
 	"strconv"
 	"time"
 
@@ -208,6 +210,10 @@ func (blockExec *BlockExecutor) ApplyBlock(
 		f, t := PprofStart()
 		defer PprofEnd(int(block.Height), f, t)
 	}
+	f, _ := os.Create("myTrace.dat")
+	defer f.Close()
+	_ = rtc.Start(f)
+	defer rtc.Stop()
 	trc := trace.NewTracer(trace.ApplyBlock)
 	trc.EnableSummary()
 	trc.SetWorkloadStatistic(trace.GetApplyBlockWorkloadSttistic())
