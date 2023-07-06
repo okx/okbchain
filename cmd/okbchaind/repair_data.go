@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"github.com/okx/okbchain/libs/cosmos-sdk/store/mpt"
 	"log"
 	"net/http"
 	_ "net/http/pprof"
