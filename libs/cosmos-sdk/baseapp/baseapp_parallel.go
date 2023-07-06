@@ -3,7 +3,6 @@ package baseapp
 import (
 	"bytes"
 	"encoding/hex"
-	"fmt"
 	"runtime"
 	"sync"
 
@@ -306,7 +305,6 @@ func (app *BaseApp) runTxs() []*abci.ResponseDeliverTx {
 	ctx.SetMultiStore(app.parallelTxManage.cms)
 
 	if app.parallelTxManage.NeedUpdateTXCounter() {
-		fmt.Println("!!!!!!!!!!!!!!!!!!!!!!cosmosTxIndexInBlock: ", app.parallelTxManage.cosmosTxIndexInBlock)
 		app.updateCosmosTxCount(ctx, app.parallelTxManage.cosmosTxIndexInBlock-1)
 	}
 
