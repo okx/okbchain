@@ -2,6 +2,7 @@ package app
 
 import (
 	"fmt"
+	"reflect"
 	"sort"
 	"strings"
 
@@ -121,6 +122,7 @@ func getTxFeeAndFromHandler(ek appante.EVMKeeper) sdk.GetTxFeeAndFromHandler {
 				fmt.Println("!!!!!!!!!!!!needUpdateTXCounter = true")
 				needUpdateTXCounter = true
 			}
+			fmt.Println("################tx Type: ", reflect.TypeOf(tx))
 			if stdTx, ok := tx.(*auth.StdTx); ok {
 				//if types.HigherThanEarth(ctx.BlockHeight()) {
 				//	fmt.Println("!!!!!!!!!!!!needUpdateTXCounter = true")
