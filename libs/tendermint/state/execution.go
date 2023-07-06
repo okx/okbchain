@@ -355,11 +355,7 @@ func (blockExec *BlockExecutor) runAbci(block *types.Block, deltaInfo *DeltaInfo
 		if pc.prerunTx {
 			abciResponses, duration, err = pc.getPrerunResult(block)
 		}
-		if block.Height == 2391073 {
-			block.Txs = block.Txs[:2]
-		} else {
-			block.Txs = block.Txs[:0]
-		}
+
 		if abciResponses == nil {
 			t0 := time.Now()
 			ctx := &executionTask{

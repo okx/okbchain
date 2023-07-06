@@ -145,10 +145,7 @@ func (app *BaseApp) calGroup() {
 			pm.cosmosTxIndexInBlock++
 		}
 	}
-	fmt.Println("##################pm.cosmosTxIndexInBlock", pm.cosmosTxIndexInBlock)
-	for _, v := range pm.txByteMpCosmosIndex {
-		fmt.Println("!!!!##################pm.txByteMpCosmosIndex:", v)
-	}
+
 	addrToID := make(map[string]int, 0)
 
 	for index, txInfo := range pm.extraTxsInfo {
@@ -252,7 +249,6 @@ func (app *BaseApp) runTxs() []*abci.ResponseDeliverTx {
 
 			if res.paraMsg.AnteErr != nil {
 				res.msIsNil = true
-				fmt.Println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!res.paraMsg.AnteErr != nil")
 				pm.handleAnteErrTx(res.paraMsg.NeedUpdateTXCounter)
 			}
 
