@@ -598,8 +598,11 @@ func (k Keeper) execute(ctx sdk.Context, contractAddress sdk.WasmAddress, caller
 		}
 	}
 
+	fmt.Printf("-------before--%d\n", k.gasMeter(ctx).GasConsumed())
 	res, gasUsed, execErr := k.wasmVM.Execute(codeInfo.CodeHash, env, info, msg, prefixStore, cosmwasmAPI, querier, k.gasMeter(ctx), gas, costJSONDeserialization)
+	fmt.Printf("-------gasUsed--%d\n", gasUsed)
 	k.consumeRuntimeGas(ctx, gasUsed)
+	fmt.Printf("-------after--%d\n", k.gasMeter(ctx).GasConsumed())
 	if !ctx.IsCheckTx() && k.innertxKeeper != nil {
 		k.innertxKeeper.UpdateWasmInnerTx(ctx.TxBytes(), ctx.BlockHeight(), innertx.CosmosDepth, caller, contractAddress, innertx.CosmosCallType, types.ExecuteInnertxName, coins, err, k.gasRegister.FromWasmVMGas(gasUsed), string(msg))
 	}
@@ -617,6 +620,7 @@ func (k Keeper) execute(ctx sdk.Context, contractAddress sdk.WasmAddress, caller
 		return nil, sdkerrors.Wrap(err, "dispatch")
 	}
 
+	fmt.Printf("-------end--\n")
 	return data, nil
 }
 
