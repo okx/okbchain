@@ -2,6 +2,7 @@ package mpt
 
 import (
 	"container/list"
+	"fmt"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -159,6 +160,7 @@ type AsyncKeyValueStore struct {
 }
 
 func NewAsyncKeyValueStoreWithOptions(db ethdb.KeyValueStore, options AsyncKeyValueStoreOptions) *AsyncKeyValueStore {
+	fmt.Println("NewAsyncKeyValueStoreWithOptions")
 	store := &AsyncKeyValueStore{
 		KeyValueStore: db,
 		preCommit: preCommitMap{
@@ -347,6 +349,7 @@ func (store *AsyncKeyValueStore) LogStats() {
 }
 
 func (store *AsyncKeyValueStore) commitRoutine() {
+	fmt.Println("commitRoutine!!!!!!!!!!!!!!")
 	store.logger.Error("commitRoutine!!!!!!!!!!!!!!")
 	defer func() {
 		close(store.pruneCh)
@@ -393,6 +396,7 @@ func (store *AsyncKeyValueStore) commitRoutine() {
 }
 
 func (store *AsyncKeyValueStore) pruneRoutine() {
+	fmt.Println("pruneRoutine!!!!!!!!!!!!!!")
 	for _ = range store.pruneCh {
 		preCommitPtr := store.getPreCommitPtr()
 		for store.waitPrunePtr != preCommitPtr {
