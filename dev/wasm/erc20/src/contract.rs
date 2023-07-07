@@ -86,12 +86,6 @@ pub fn execute(
             recipient,
             amount,
         } => try_send_to_erc20(deps, env,evmContract,recipient,amount,info),
-
-         ExecuteMsg::CallToEvmMsg {
-            evmaddr,
-            calldata,
-            value,
-         } => try_call_to_evm(deps, env,evmaddr,calldata,value,info),
     }
 }
 
@@ -125,11 +119,11 @@ fn try_mint_cw20(
     recipient: String,
     amount: Uint128,
 ) -> Result<Response<SendToEvmMsg>, ContractError> {
-    if info.sender.to_string() != EVM_CONTRACT_ADDR.to_string() {
-        return Err(ContractError::ContractERC20Err {
-           addr:info.sender.to_string()
-        });
-    }
+    // if info.sender.to_string() != EVM_CONTRACT_ADDR.to_string() {
+    //     return Err(ContractError::ContractERC20Err {
+    //         addr:info.sender.to_string()
+    //     });
+    // }
     let amount_raw = amount.u128();
     let recipient_address = deps.api.addr_validate(recipient.as_str())?;
     let mut account_balance = read_balance(deps.storage, &recipient_address)?;
@@ -160,29 +154,7 @@ fn try_mint_cw20(
         .add_attribute("amount", amount.to_string()))
 }
 
-fn try_call_to_evm(
-    deps: DepsMut,
-    _env: Env,
-    evmaddr: String,
-    calldata: String,
-    value: Uint128,
-    info: MessageInfo,
-) -> Result<Response<SendToEvmMsg>, ContractError> {
 
-    let submsg = SendToEvmMsg {
-        sender: _env.contract.address.to_string(),
-        evmaddr: evmaddr.to_string(),
-        calldata: calldata,
-        value: value,
-    };
-
-    Ok(Response::new()
-           .add_attribute("action", "call to evm")
-           .add_attribute("evmaddr", evmaddr.to_string())
-           .add_attribute("value", value.to_string())
-           .add_message(submsg)
-           .set_data(b"the result data"))
-}
 
 fn try_send_to_erc20(
     deps: DepsMut,
@@ -235,10 +207,10 @@ fn try_send_to_erc20(
     };
 
     Ok(Response::new()
-           .add_attribute("action", "call evm")
-           .add_attribute("amount", amount.to_string())
-           .add_message(hehe)
-           .set_data(b"the result data"))
+        .add_attribute("action", "call evm")
+        .add_attribute("amount", amount.to_string())
+        .add_message(hehe)
+        .set_data(b"the result data"))
 }
 
 // fn callevm(
@@ -530,7 +502,7 @@ mod tests {
                     address: "addr0000".to_string(),
                     amount: Uint128::from(11223344u128),
                 }]
-                .to_vec(),
+                    .to_vec(),
             };
             let (env, info) = mock_env_height("creator", 450, 550);
             let res = instantiate(deps.as_mut(), env, info, instantiate_msg).unwrap();
@@ -586,7 +558,7 @@ mod tests {
                         amount: Uint128::from(33u128),
                     },
                 ]
-                .to_vec(),
+                    .to_vec(),
             };
             let (env, info) = mock_env_height("creator", 450, 550);
             let res = instantiate(deps.as_mut(), env, info, instantiate_msg).unwrap();
@@ -621,7 +593,7 @@ mod tests {
                     address: "addr0000".to_string(),
                     amount: Uint128::from(9007199254740993u128),
                 }]
-                .to_vec(),
+                    .to_vec(),
             };
             let (env, info) = mock_env_height("creator", 450, 550);
             let res = instantiate(deps.as_mut(), env, info, instantiate_msg).unwrap();
@@ -645,7 +617,7 @@ mod tests {
                     address: "addr0000".to_string(),
                     amount: Uint128::from(100000000000000000000000000u128),
                 }]
-                .to_vec(),
+                    .to_vec(),
             };
             let (env, info) = mock_env_height("creator", 450, 550);
             let res = instantiate(deps.as_mut(), env, info, instantiate_msg).unwrap();
@@ -1017,9 +989,9 @@ mod tests {
             match transfer_result {
                 Ok(_) => panic!("expected error"),
                 Err(ContractError::InsufficientFunds {
-                    balance: 11,
-                    required: 12,
-                }) => {}
+                        balance: 11,
+                        required: 12,
+                    }) => {}
                 Err(e) => panic!("unexpected error: {:?}", e),
             }
             // New state (unchanged)
@@ -1283,9 +1255,9 @@ mod tests {
             match transfer_result {
                 Ok(_) => panic!("expected error"),
                 Err(ContractError::InsufficientAllowance {
-                    allowance: 2,
-                    required: 3,
-                }) => {}
+                        allowance: 2,
+                        required: 3,
+                    }) => {}
                 Err(e) => panic!("unexpected error: {:?}", e),
             }
         }
@@ -1332,9 +1304,9 @@ mod tests {
             match transfer_result {
                 Ok(_) => panic!("expected error"),
                 Err(ContractError::InsufficientFunds {
-                    balance: 11,
-                    required: 15,
-                }) => {}
+                        balance: 11,
+                        required: 15,
+                    }) => {}
                 Err(e) => panic!("unexpected error: {:?}", e),
             }
         }
@@ -1477,9 +1449,9 @@ mod tests {
             match burn_result {
                 Ok(_) => panic!("expected error"),
                 Err(ContractError::InsufficientFunds {
-                    balance: 11,
-                    required: 12,
-                }) => {}
+                        balance: 11,
+                        required: 12,
+                    }) => {}
                 Err(e) => panic!("unexpected error: {:?}", e),
             }
             // New state (unchanged)
