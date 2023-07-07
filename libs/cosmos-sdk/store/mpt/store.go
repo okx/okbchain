@@ -113,6 +113,7 @@ func (ms *MptStore) GetFlatKVWriteCount() int {
 }
 
 func NewMptStore(logger tmlog.Logger, id types.CommitID) (*MptStore, error) {
+	fmt.Println("==============NewMpt", EnableAsyncCommit, TrieAsyncDB, TrieDirtyDisabled)
 	db := InstanceOfMptStore()
 	return generateMptStore(logger, id, db, AccountStateRootRetriever)
 }

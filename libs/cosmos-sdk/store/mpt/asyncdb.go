@@ -347,6 +347,7 @@ func (store *AsyncKeyValueStore) LogStats() {
 }
 
 func (store *AsyncKeyValueStore) commitRoutine() {
+	store.logger.Error("commitRoutine!!!!!!!!!!!!!!")
 	defer func() {
 		close(store.pruneCh)
 		store.closeWg.Done()

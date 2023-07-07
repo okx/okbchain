@@ -2,6 +2,7 @@ package mpt
 
 import (
 	"encoding/binary"
+	"fmt"
 	"github.com/ethereum/go-ethereum/ethdb"
 	"path/filepath"
 	"sync"
@@ -44,6 +45,7 @@ func InstanceOfMptStore() ethstate.Database {
 			panic("fail to open database: " + e.Error())
 		}
 		nkvstore := NewStatKeyValueStore(kvstore, gStatic)
+		fmt.Printf("==============ac:%v, ad:%v, dd:%v\n", EnableAsyncCommit, TrieAsyncDB, TrieDirtyDisabled)
 		if EnableAsyncCommit && TrieAsyncDB && !TrieDirtyDisabled {
 			gAsyncDB = NewAsyncKeyValueStoreWithOptions(nkvstore, AsyncKeyValueStoreOptions{
 				DisableAutoPrune: TrieAsyncDBAutoPruningOff,
