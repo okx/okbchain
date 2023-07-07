@@ -3,9 +3,9 @@ package ante
 import (
 	"bytes"
 	"encoding/hex"
-	"github.com/okx/okbchain/app/crypto/ethsecp256k1"
-	"github.com/okx/okbchain/libs/tendermint/crypto/etherhash"
 
+	ethcmn "github.com/ethereum/go-ethereum/common"
+	"github.com/okx/okbchain/app/crypto/ethsecp256k1"
 	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
 	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
 	sdkerrors "github.com/okx/okbchain/libs/cosmos-sdk/types/errors"
@@ -14,6 +14,7 @@ import (
 	"github.com/okx/okbchain/libs/cosmos-sdk/x/auth/types"
 	"github.com/okx/okbchain/libs/tendermint/crypto"
 	"github.com/okx/okbchain/libs/tendermint/crypto/ed25519"
+	"github.com/okx/okbchain/libs/tendermint/crypto/etherhash"
 	"github.com/okx/okbchain/libs/tendermint/crypto/multisig"
 	"github.com/okx/okbchain/libs/tendermint/crypto/secp256k1"
 	types2 "github.com/okx/okbchain/libs/tendermint/types"
@@ -243,13 +244,13 @@ func (svd SigVerificationDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simul
 		}
 		if ctx.IsCheckTx() {
 			if txNonce != 0 { // txNonce first
-				err := nonceVerification(ctx, signerAccs[i].GetSequence(), txNonce, signerAddrs[i].String(), simulate)
+				err := nonceVerification(ctx, signerAccs[i].GetSequence(), txNonce, ethcmn.BytesToAddress(signerAddrs[i]).String(), simulate)
 				if err != nil {
 					return ctx, err
 				}
 				signerAccs[i].SetSequence(txNonce)
 			} else { // for adaptive pending tx in mempool just in checkTx but not deliverTx
-				pendingNonce := getCheckTxNonceFromMempool(signerAddrs[i].String())
+				pendingNonce := getCheckTxNonceFromMempool(ethcmn.BytesToAddress(signerAddrs[i]).String())
 				if pendingNonce != 0 {
 					signerAccs[i].SetSequence(pendingNonce)
 				}
@@ -328,7 +329,7 @@ func (isd IncrementSequenceDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, sim
 		acc := isd.ak.GetAccount(ctx, addr)
 		// for adaptive pending tx in mempool just in checkTx but not deliverTx
 		if ctx.IsCheckTx() && !ctx.IsReCheckTx() {
-			pendingNonce := getCheckTxNonceFromMempool(addr.String())
+			pendingNonce := getCheckTxNonceFromMempool(ethcmn.BytesToAddress(addr).String())
 			if pendingNonce != 0 {
 				acc.SetSequence(pendingNonce)
 			}
