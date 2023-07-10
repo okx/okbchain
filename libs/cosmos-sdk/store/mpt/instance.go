@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/ethereum/go-ethereum/ethdb"
 	"path/filepath"
+	"runtime/debug"
 	"sync"
 
 	ethcmn "github.com/ethereum/go-ethereum/common"
@@ -45,6 +46,7 @@ func InstanceOfMptStore() ethstate.Database {
 			panic("fail to open database: " + e.Error())
 		}
 		nkvstore := NewStatKeyValueStore(kvstore, gStatic)
+		debug.PrintStack()
 		fmt.Printf("==============ac:%v, ad:%v, dd:%v\n", EnableAsyncCommit, TrieAsyncDB, TrieDirtyDisabled)
 		if EnableAsyncCommit && TrieAsyncDB && !TrieDirtyDisabled {
 			gAsyncDB = NewAsyncKeyValueStoreWithOptions(nkvstore, AsyncKeyValueStoreOptions{
