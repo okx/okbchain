@@ -13,6 +13,7 @@ import (
 )
 
 const (
+	FlagIavlEnableAsyncCommit       = "iavl-enable-async-commit"
 	minHistoryStateNum              = 30
 	FlagIavlCommitIntervalHeight    = "iavl-commit-interval-height"
 	FlagIavlMinCommitItemCount      = "iavl-min-commit-item-count"

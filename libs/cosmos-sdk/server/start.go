@@ -329,7 +329,8 @@ func SetExternalPackageValue(cmd *cobra.Command) {
 	tmiavl.HeightOrphansCacheSize = viper.GetInt(tmiavl.FlagIavlHeightOrphansCacheSize)
 	tmiavl.MaxCommittedHeightNum = viper.GetInt(tmiavl.FlagIavlMaxCommittedHeightNum)
 	EnableTreeAsyncCommit := viper.GetBool(system.FlagTreeEnableAsyncCommit)
-	tmiavl.EnableAsyncCommit = EnableTreeAsyncCommit
+	//tmiavl.EnableAsyncCommit = EnableTreeAsyncCommit
+	tmiavl.EnableAsyncCommit = viper.GetBool(tmiavl.FlagIavlEnableAsyncCommit)
 	mptstore.EnableAsyncCommit = EnableTreeAsyncCommit
 	if viper.GetBool(tmiavl.FlagIavlDiscardFastStorage) {
 		tmiavl.SetEnableFastStorage(false)
