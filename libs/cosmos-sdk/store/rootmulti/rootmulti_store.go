@@ -883,6 +883,8 @@ func (rs *Store) loadCommitStoreFromParams(key types.StoreKey, id types.CommitID
 		db = dbm.NewPrefixDB(rs.db, []byte(prefix))
 	}
 
+	log.Println("===============store type:", params.typ)
+
 	switch params.typ {
 	case types.StoreTypeMulti:
 		panic("recursive MultiStores not yet supported")
