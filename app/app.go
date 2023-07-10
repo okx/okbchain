@@ -2,6 +2,7 @@ package app
 
 import (
 	"fmt"
+	"github.com/okx/okbchain/libs/cosmos-sdk/client/flags"
 	"io"
 	"os"
 	"runtime/debug"
@@ -889,6 +890,9 @@ func NewAccNonceHandler(ak auth.AccountKeeper) sdk.AccNonceHandler {
 }
 
 func PreRun(ctx *server.Context, cmd *cobra.Command) error {
+
+	prepareSnapshotDataIfNeed(viper.GetString(server.FlagStartFromSnapshot), viper.GetString(flags.FlagHome), ctx.Logger)
+
 	// check start flag conflicts
 	err := sanity.CheckStart()
 	if err != nil {
@@ -948,9 +952,13 @@ func NewEvmSysContractAddressHandler(ak *evm.Keeper) sdk.EvmSysContractAddressHa
 
 func NewUpdateCMTxNonceHandler() sdk.UpdateCMTxNonceHandler {
 	return func(tx sdk.Tx, nonce uint64) {
-		stdtx, ok := tx.(*authtypes.StdTx)
-		if ok && nonce != 0 {
-			stdtx.Nonce = nonce
+		if nonce != 0 {
+			switch v := tx.(type) {
+			case *authtypes.StdTx:
+				v.Nonce = nonce
+			case *authtypes.IbcTx:
+				v.Nonce = nonce
+			}
 		}
 	}
 }

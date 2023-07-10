@@ -38,6 +38,7 @@ type IDynamicConfig interface {
 	GetDynamicGpMaxGasUsed() int64
 	GetGasLimitBuffer() uint64
 	GetMaxSubscriptionClients() int
+	GetPendingPoolBlacklist() string
 }
 
 var DynamicConfig IDynamicConfig = MockDynamicConfig{}
@@ -206,6 +207,10 @@ func (d MockDynamicConfig) GetDynamicGpMaxGasUsed() int64 {
 
 func (d MockDynamicConfig) GetGasLimitBuffer() uint64 {
 	return 0
+}
+
+func (d MockDynamicConfig) GetPendingPoolBlacklist() string {
+	return ""
 }
 
 func (d MockDynamicConfig) GetMaxSubscriptionClients() int {

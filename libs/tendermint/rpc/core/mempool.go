@@ -8,6 +8,7 @@ import (
 
 	"github.com/pkg/errors"
 
+	"github.com/okx/okbchain/libs/cosmos-sdk/baseapp"
 	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
 	"github.com/okx/okbchain/libs/tendermint/config"
 	mempl "github.com/okx/okbchain/libs/tendermint/mempool"
@@ -170,10 +171,18 @@ func UserUnconfirmedTxs(address string, limit int) (*ctypes.ResultUserUnconfirme
 		Txs:   txs}, nil
 }
 
+func TmUserUnconfirmedTxs(ctx *rpctypes.Context, address string, limit int) (*ctypes.ResultUserUnconfirmedTxs, error) {
+	return UserUnconfirmedTxs(address, limit)
+}
+
 func UserNumUnconfirmedTxs(address string) (*ctypes.ResultUserUnconfirmedTxs, error) {
 	nums := env.Mempool.ReapUserTxsCnt(address)
 	return &ctypes.ResultUserUnconfirmedTxs{
 		Count: nums}, nil
+}
+
+func TmUserNumUnconfirmedTxs(ctx *rpctypes.Context, address string) (*ctypes.ResultUserUnconfirmedTxs, error) {
+	return UserNumUnconfirmedTxs(address)
 }
 
 func GetUnconfirmedTxByHash(hash [sha256.Size]byte) (types.Tx, error) {
@@ -185,6 +194,10 @@ func GetAddressList() (*ctypes.ResultUnconfirmedAddresses, error) {
 	return &ctypes.ResultUnconfirmedAddresses{
 		Addresses: addressList,
 	}, nil
+}
+
+func TmGetAddressList(ctx *rpctypes.Context) (*ctypes.ResultUnconfirmedAddresses, error) {
+	return GetAddressList()
 }
 
 func GetPendingNonce(address string) (*ctypes.ResultPendingNonce, bool) {
@@ -200,4 +213,12 @@ func GetPendingNonce(address string) (*ctypes.ResultPendingNonce, bool) {
 func GetEnableDeleteMinGPTx(ctx *rpctypes.Context) (*ctypes.ResultEnableDeleteMinGPTx, error) {
 	status := env.Mempool.GetEnableDeleteMinGPTx()
 	return &ctypes.ResultEnableDeleteMinGPTx{Enable: status}, nil
+}
+
+func GetPendingTxs(ctx *rpctypes.Context) (*ctypes.ResultPendingTxs, error) {
+	pendingTx := make(map[string]map[string]types.WrappedMempoolTx)
+	if baseapp.IsMempoolEnablePendingPool() {
+		pendingTx = env.Mempool.GetPendingPoolTxsBytes()
+	}
+	return &ctypes.ResultPendingTxs{Txs: pendingTx}, nil
 }
