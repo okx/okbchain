@@ -2,7 +2,6 @@ package state
 
 import (
 	"fmt"
-	"log"
 	"strconv"
 	"time"
 
@@ -205,7 +204,7 @@ func (blockExec *BlockExecutor) ValidateBlock(state State, block *types.Block) e
 // It takes a blockID to avoid recomputing the parts hash.
 func (blockExec *BlockExecutor) ApplyBlock(
 	state State, blockID types.BlockID, block *types.Block) (State, int64, error) {
-	log.Println("=========ApplyBlock")
+	fmt.Println("=========ApplyBlock")
 	if ApplyBlockPprofTime >= 0 {
 		f, t := PprofStart()
 		defer PprofEnd(int(block.Height), f, t)
