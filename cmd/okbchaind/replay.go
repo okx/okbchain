@@ -359,6 +359,7 @@ func doReplay(ctx *server.Context, state sm.State, stateStoreDB dbm.DB, blockSto
 	needSaveBlock := viper.GetBool(saveBlock)
 	global.SetGlobalHeight(lastBlockHeight + 1)
 	for height := lastBlockHeight + 1; height <= haltheight; height++ {
+		fmt.Println("=========lrp-applyblock=========")
 		block := originBlockStore.LoadBlock(height)
 		meta := originBlockStore.LoadBlockMeta(height)
 		state, _, err = blockExec.ApplyBlockWithTrace(state, meta.BlockID, block)
@@ -400,7 +401,7 @@ func startDumpPprof() {
 		fmt.Printf("dump pprof StartCPUProfile error:%s\n", err.Error())
 		return
 	}
-	fmt.Printf("start to dump pprof file(%s)\n", fileName)
+	fmt.Printf("test start to dump pprof file(%s)\n", fileName)
 }
 
 func stopDumpPprof() {
