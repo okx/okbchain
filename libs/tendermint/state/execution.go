@@ -335,6 +335,7 @@ func (blockExec *BlockExecutor) ApplyBlock(
 
 func (blockExec *BlockExecutor) ApplyBlockWithTrace(
 	state State, blockID types.BlockID, block *types.Block) (State, int64, error) {
+	fmt.Println("========ApplyBlockWithTrace")
 	s, id, err := blockExec.ApplyBlock(state, blockID, block)
 	trace.GetElapsedInfo().Dump(blockExec.logger.With("module", "main"))
 	return s, id, err
