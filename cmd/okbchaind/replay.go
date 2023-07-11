@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	"github.com/okx/okbchain/libs/system"
+	tmcfg "github.com/okx/okbchain/libs/tendermint/config"
+	mempl "github.com/okx/okbchain/libs/tendermint/mempool"
 	"log"
 	"net/http"
 	_ "net/http/pprof"
@@ -348,7 +350,15 @@ func doReplay(ctx *server.Context, state sm.State, stateStoreDB dbm.DB, blockSto
 		panicError(err)
 	}
 
-	blockExec := sm.NewBlockExecutor(stateStoreDB, ctx.Logger, proxyApp.Consensus(), mock.Mempool{}, sm.MockEvidencePool{})
+	mempool := mempl.NewCListMempool(
+		tmcfg.DefaultMempoolConfig(),
+		proxyApp.Mempool(),
+		state.LastBlockHeight,
+		mempl.WithMetrics(nil),
+		mempl.WithPreCheck(sm.TxPreCheck(state)),
+		mempl.WithPostCheck(sm.TxPostCheck(state)),
+	)
+	blockExec := sm.NewBlockExecutor(stateStoreDB, ctx.Logger, proxyApp.Consensus(), mempool, sm.MockEvidencePool{})
 	if viper.GetBool(runWithPprofFlag) {
 		startDumpPprof()
 		defer stopDumpPprof()
