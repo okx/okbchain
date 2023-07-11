@@ -1181,6 +1181,7 @@ func commitStores(version int64, storeMap map[types.StoreKey]types.CommitKVStore
 		mpt.UpdateCommitGapHeight(gap)
 	}
 	for key, store := range storeMap {
+		fmt.Println("commit-key:", key.Name())
 		if isUseless(key.Name(), version, store, filters) {
 			continue
 		}
