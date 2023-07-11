@@ -5,6 +5,8 @@ import (
 	"github.com/okx/okbchain/libs/system"
 	tmcfg "github.com/okx/okbchain/libs/tendermint/config"
 	mempl "github.com/okx/okbchain/libs/tendermint/mempool"
+	evmtypes "github.com/okx/okbchain/x/evm/types"
+	"github.com/okx/okbchain/x/evm/watcher"
 	"log"
 	"net/http"
 	_ "net/http/pprof"
@@ -13,9 +15,6 @@ import (
 	"runtime"
 	"runtime/pprof"
 	"time"
-
-	evmtypes "github.com/okx/okbchain/x/evm/types"
-	"github.com/okx/okbchain/x/evm/watcher"
 
 	"github.com/gogo/protobuf/jsonpb"
 	"github.com/okx/okbchain/app/config"
@@ -358,6 +357,8 @@ func doReplay(ctx *server.Context, state sm.State, stateStoreDB dbm.DB, blockSto
 		mempl.WithPreCheck(sm.TxPreCheck(state)),
 		mempl.WithPostCheck(sm.TxPostCheck(state)),
 	)
+	mempoolReactor := mempl.NewReactor(tmcfg.DefaultMempoolConfig(), mempool)
+	mempoolReactor.OnStart()
 	blockExec := sm.NewBlockExecutor(stateStoreDB, ctx.Logger, proxyApp.Consensus(), mempool, sm.MockEvidencePool{})
 	if viper.GetBool(runWithPprofFlag) {
 		startDumpPprof()
