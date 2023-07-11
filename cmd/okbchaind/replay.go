@@ -353,7 +353,7 @@ func doReplay(ctx *server.Context, state sm.State, stateStoreDB dbm.DB, blockSto
 		tmcfg.DefaultMempoolConfig(),
 		proxyApp.Mempool(),
 		state.LastBlockHeight,
-		mempl.WithMetrics(nil),
+		mempl.WithMetrics(mempl.NopMetrics()),
 		mempl.WithPreCheck(sm.TxPreCheck(state)),
 		mempl.WithPostCheck(sm.TxPostCheck(state)),
 	)
