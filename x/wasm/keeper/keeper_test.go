@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"github.com/okx/okbchain/libs/cosmos-sdk/x/auth"
 	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
 	"io/ioutil"
@@ -576,12 +577,15 @@ func TestInstantiateWithContractDataResponse(t *testing.T) {
 
 func TestExecute(t *testing.T) {
 	ctx, keepers := CreateTestInput(t, false, SupportedFeatures)
+	fmt.Printf("-------TestExecute -0--%d\n", ctx.GasMeter().GasConsumed())
 	accKeeper, keeper, bankKeeper := keepers.AccountKeeper, keepers.ContractKeeper, keepers.BankKeeper
 
 	deposit := sdk.NewCoins(sdk.NewInt64Coin("denom", 100000))
 	topUp := sdk.NewCoins(sdk.NewInt64Coin("denom", 5000))
 	creator := keepers.Faucet.NewFundedAccount(ctx, deposit.Add(deposit...)...)
+	fmt.Printf("-------TestExecute -1--%d\n", ctx.GasMeter().GasConsumed())
 	fred := keepers.Faucet.NewFundedAccount(ctx, topUp...)
+	fmt.Printf("-------TestExecute -2--%d\n", ctx.GasMeter().GasConsumed())
 
 	contractID, err := keeper.Create(ctx, creator, hackatomWasm, nil)
 	require.NoError(t, err)
@@ -593,8 +597,9 @@ func TestExecute(t *testing.T) {
 	}
 	initMsgBz, err := json.Marshal(initMsg)
 	require.NoError(t, err)
-
+	fmt.Printf("-------TestExecute -3--%d\n", ctx.GasMeter().GasConsumed())
 	addr, _, err := keepers.ContractKeeper.Instantiate(ctx, contractID, creator, nil, initMsgBz, "demo contract 3", deposit)
+	fmt.Printf("-------TestExecute -3-0--%d\n", ctx.GasMeter().GasConsumed())
 	require.NoError(t, err)
 	require.Equal(t, "0x5A8D648DEE57b2fc90D98DC17fa887159b69638b", addr.String())
 
@@ -616,7 +621,9 @@ func TestExecute(t *testing.T) {
 	// unauthorized - trialCtx so we don't change state
 	trialCtx := ctx
 	trialCtx.SetMultiStore(ctx.MultiStore().CacheWrap().(sdk.MultiStore))
+	fmt.Printf("-------TestExecute -4--%d\n", ctx.GasMeter().GasConsumed())
 	res, err := keepers.ContractKeeper.Execute(trialCtx, addr, creator, []byte(`{"release":{}}`), nil)
+	fmt.Printf("-------TestExecute -5--%d\n", ctx.GasMeter().GasConsumed())
 	require.Error(t, err)
 	require.True(t, errors.Is(err, types.ErrExecuteFailed))
 	require.Equal(t, "execute wasm contract failed: Unauthorized", err.Error())
@@ -627,7 +634,9 @@ func TestExecute(t *testing.T) {
 	em := sdk.NewEventManager()
 	// when
 	ctx.SetEventManager(em)
+	fmt.Printf("-------TestExecute -6--%d\n", ctx.GasMeter().GasConsumed())
 	res, err = keepers.ContractKeeper.Execute(ctx, addr, fred, []byte(`{"release":{}}`), topUp)
+	fmt.Printf("-------TestExecute -7--%d\n", ctx.GasMeter().GasConsumed())
 	diff := time.Now().Sub(start)
 	require.NoError(t, err)
 	require.NotNil(t, res)
