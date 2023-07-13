@@ -1384,7 +1384,7 @@ func (api *PublicEthereumAPI) GetTransactionReceipt(hash common.Hash) (*watcher.
 		gasUsed = 0
 	}
 
-	receipt := &watcher.TransactionReceipt{
+	receipt := watcher.TransactionReceipt{
 		Status:            status,
 		CumulativeGasUsed: hexutil.Uint64(cumulativeGasUsed),
 		LogsBloom:         data.Bloom,
@@ -1398,8 +1398,11 @@ func (api *PublicEthereumAPI) GetTransactionReceipt(hash common.Hash) (*watcher.
 		From:              ethTx.GetFrom(),
 		To:                ethTx.To(),
 	}
+	if api.watcherBackend.Enabled() {
+		api.watcherBackend.CommitReceiptToDb(hash, receipt)
+	}
 
-	return receipt, nil
+	return &receipt, nil
 }
 
 // PendingTransactions returns the transactions that are in the transaction pool
