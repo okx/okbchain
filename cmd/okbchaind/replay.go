@@ -5,6 +5,7 @@ import (
 	"github.com/okx/okbchain/libs/system"
 	tmcfg "github.com/okx/okbchain/libs/tendermint/config"
 	mempl "github.com/okx/okbchain/libs/tendermint/mempool"
+	p2pm "github.com/okx/okbchain/libs/tendermint/p2p/mock"
 	evmtypes "github.com/okx/okbchain/x/evm/types"
 	"github.com/okx/okbchain/x/evm/watcher"
 	"log"
@@ -358,7 +359,43 @@ func doReplay(ctx *server.Context, state sm.State, stateStoreDB dbm.DB, blockSto
 		mempl.WithPostCheck(sm.TxPostCheck(state)),
 	)
 	mempoolReactor := mempl.NewReactor(tmcfg.DefaultMempoolConfig(), mempool)
+	peer := p2pm.NewPeer(nil)
+	mempoolReactor.AddPeer(peer)
+	mempoolReactor.AddPeer(peer)
+	mempoolReactor.AddPeer(peer)
+	mempoolReactor.AddPeer(peer)
+	mempoolReactor.AddPeer(peer)
+	mempoolReactor.AddPeer(peer)
+	mempoolReactor.AddPeer(peer)
+	mempoolReactor.AddPeer(peer)
+	mempoolReactor.AddPeer(peer)
 	mempoolReactor.OnStart()
+	go func() {
+		for {
+			system.Sleep(time.Millisecond * 100)
+		}
+	}()
+	go func() {
+		for {
+			system.Sleep(time.Millisecond * 100)
+		}
+	}()
+	go func() {
+		for {
+			system.Sleep(time.Millisecond * 100)
+		}
+	}()
+	go func() {
+		for {
+			system.Sleep(time.Millisecond * 100)
+		}
+	}()
+	go func() {
+		for {
+			system.Sleep(time.Millisecond * 100)
+		}
+	}()
+
 	blockExec := sm.NewBlockExecutor(stateStoreDB, ctx.Logger, proxyApp.Consensus(), mempool, sm.MockEvidencePool{})
 	if viper.GetBool(runWithPprofFlag) {
 		startDumpPprof()

@@ -2,7 +2,9 @@ package consensus
 
 import (
 	"bytes"
+	"context"
 	"fmt"
+	cfg "github.com/okx/okbchain/libs/tendermint/config"
 	"github.com/okx/okbchain/libs/tendermint/crypto"
 	"github.com/okx/okbchain/libs/tendermint/libs/automation"
 	"reflect"
@@ -281,6 +283,50 @@ func (conR *Reactor) GetChannels() []*p2p.ChannelDescriptor {
 			RecvMessageCapacity: maxMsgSize,
 		},
 	}
+}
+
+func StartTest(css []*State, n int) (
+	[]*Reactor,
+	[]types.Subscription,
+	[]*types.EventBus,
+) {
+	reactors := make([]*Reactor, n)
+	blocksSubs := make([]types.Subscription, 0)
+	eventBuses := make([]*types.EventBus, n)
+	for i := 0; i < n; i++ {
+		/*logger, err := tmflags.ParseLogLevel("consensus:info,*:error", logger, "info")
+		if err != nil {	t.Fatal(err)}*/
+		reactors[i] = NewReactor(css[i], true, false) // so we dont start the consensus states
+		reactors[i].SetLogger(css[i].Logger)
+
+		// eventBus is already started with the cs
+		eventBuses[i] = css[i].eventBus
+		reactors[i].SetEventBus(eventBuses[i])
+
+		blocksSub, _ := eventBuses[i].Subscribe(context.Background(), "test-client", types.EventQueryNewBlock)
+		//require.NoError(t, err)
+		blocksSubs = append(blocksSubs, blocksSub)
+
+		if css[i].state.LastBlockHeight == 0 { //simulate handle initChain in handshake
+			sm.SaveState(css[i].blockExec.DB(), css[i].state)
+		}
+	}
+	// make connected switches and start all reactors
+	p2p.MakeConnectedSwitches(cfg.DefaultP2PConfig(), n, func(i int, s *p2p.Switch) *p2p.Switch {
+		s.AddReactor("CONSENSUS", reactors[i])
+		s.SetLogger(reactors[i].conS.Logger.With("module", "p2p"))
+		return s
+	}, p2p.Connect2Switches)
+
+	// now that everyone is connected,  start the state machines
+	// If we started the state machines before everyone was connected,
+	// we'd block when the cs fires NewBlockEvent and the peers are trying to start their reactors
+	// TODO: is this still true with new pubsub?
+	for i := 0; i < n; i++ {
+		s := reactors[i].conS.GetState()
+		reactors[i].SwitchToConsensus(s, 0)
+	}
+	return reactors, blocksSubs, eventBuses
 }
 
 // InitPeer implements Reactor by creating a state for the peer.
@@ -689,6 +735,10 @@ func (conR *Reactor) sendNewRoundStepMessage(peer p2p.Peer) {
 	rs := conR.getRoundState()
 	nrsMsg := makeRoundStepMessage(rs)
 	peer.Send(StateChannel, cdc.MustMarshalBinaryBare(nrsMsg))
+}
+
+func (conR *Reactor) GossipTest(peer p2p.Peer, ps *PeerState) {
+	conR.gossipDataRoutine(peer, ps)
 }
 
 func (conR *Reactor) gossipDataRoutine(peer p2p.Peer, ps *PeerState) {
