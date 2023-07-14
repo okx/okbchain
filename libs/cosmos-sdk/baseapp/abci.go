@@ -3,8 +3,6 @@ package baseapp
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/okx/okbchain/app/rpc/simulator"
-	cfg "github.com/okx/okbchain/libs/tendermint/config"
 	"os"
 	"sort"
 	"strconv"
@@ -13,9 +11,10 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/okx/okbchain/libs/system/trace/persist"
 	"github.com/spf13/viper"
+	"github.com/tendermint/go-amino"
 
+	"github.com/okx/okbchain/app/rpc/simulator"
 	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
 	"github.com/okx/okbchain/libs/cosmos-sdk/store/mpt"
 	stypes "github.com/okx/okbchain/libs/cosmos-sdk/store/types"
@@ -23,9 +22,10 @@ import (
 	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
 	sdkerrors "github.com/okx/okbchain/libs/cosmos-sdk/types/errors"
 	"github.com/okx/okbchain/libs/system/trace"
+	"github.com/okx/okbchain/libs/system/trace/persist"
 	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
+	cfg "github.com/okx/okbchain/libs/tendermint/config"
 	tmtypes "github.com/okx/okbchain/libs/tendermint/types"
-	"github.com/tendermint/go-amino"
 )
 
 // InitChain implements the ABCI interface. It runs the initialization logic
