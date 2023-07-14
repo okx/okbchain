@@ -13,12 +13,12 @@ import (
 	"github.com/ethereum/go-ethereum/core"
 	ethtypes "github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/core/vm"
-	"github.com/okx/okbchain/libs/system/trace"
 
 	types2 "github.com/okx/okbchain/libs/cosmos-sdk/store/types"
 	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
 	sdkerrors "github.com/okx/okbchain/libs/cosmos-sdk/types/errors"
 	"github.com/okx/okbchain/libs/cosmos-sdk/types/innertx"
+	"github.com/okx/okbchain/libs/system/trace"
 )
 
 // StateTransition defines data to transitionDB in evm
@@ -326,19 +326,20 @@ func (st StateTransition) TransitionDb(ctx sdk.Context, config ChainConfig) (exe
 	// return trace log if tracetxlog no matter err = nil  or not nil
 	defer func() {
 		var traceLogs []byte
+		var traceErr error
 		if st.TraceTxLog {
 			result := &core.ExecutionResult{
 				UsedGas:    gasConsumed,
 				Err:        err,
 				ReturnData: ret,
 			}
-			traceLogs, err = GetTracerResult(tracer, result)
-			if err != nil {
-				traceLogs = []byte(err.Error())
+			traceLogs, traceErr = GetTracerResult(tracer, result)
+			if traceErr != nil {
+				traceLogs = []byte(traceErr.Error())
 			} else {
-				traceLogs, err = integratePreimage(csdb, traceLogs)
-				if err != nil {
-					traceLogs = []byte(err.Error())
+				traceLogs, traceErr = integratePreimage(csdb, traceLogs)
+				if traceErr != nil {
+					traceLogs = []byte(traceErr.Error())
 				}
 			}
 			if exeRes == nil {
