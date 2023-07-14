@@ -6,17 +6,19 @@ import (
 	"net/http"
 	_ "net/http/pprof"
 
+	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
+
 	"github.com/okx/okbchain/app"
 	"github.com/okx/okbchain/app/utils/appstatus"
 	"github.com/okx/okbchain/libs/cosmos-sdk/server"
 	"github.com/okx/okbchain/libs/cosmos-sdk/store/flatkv"
+	"github.com/okx/okbchain/libs/cosmos-sdk/store/mpt"
 	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
 	tmiavl "github.com/okx/okbchain/libs/iavl"
 	"github.com/okx/okbchain/libs/system/trace"
 	sm "github.com/okx/okbchain/libs/tendermint/state"
 	tmtypes "github.com/okx/okbchain/libs/tendermint/types"
-	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
 func repairStateCmd(ctx *server.Context) *cobra.Command {
@@ -62,5 +64,8 @@ func setExternalPackageValue() {
 		appstatus.GetFastStorageVersion() >= viper.GetInt64(app.FlagStartHeight) {
 		tmiavl.SetEnableFastStorage(true)
 		tmiavl.SetIgnoreAutoUpgrade(true)
+	}
+	if viper.GetBool(tmiavl.FlagIavlDiscardFastStorage) {
+		mpt.DisableSnapshot()
 	}
 }
