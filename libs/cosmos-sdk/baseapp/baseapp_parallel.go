@@ -265,11 +265,12 @@ func (app *BaseApp) runTxs() []*abci.ResponseDeliverTx {
 			app.deliverState.ctx.BlockGasMeter().ConsumeGas(sdk.Gas(res.resp.GasUsed), "unexpected error")
 			pm.blockGasMeterMu.Unlock()
 
+			pm.SetCurrentIndexTxRes(pm.upComingTxIndex, res)
+
 			if !res.msIsNil {
 				pm.currTxFee = pm.currTxFee.Add(pm.extraTxsInfo[pm.upComingTxIndex].fee.Sub(pm.finalResult[pm.upComingTxIndex].paraMsg.RefundFee)...)
 			}
 
-			pm.SetCurrentIndexTxRes(pm.upComingTxIndex, res)
 			currentGas += uint64(res.resp.GasUsed)
 
 			if isReRun {
