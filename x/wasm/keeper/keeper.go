@@ -190,7 +190,7 @@ func newKeeper(cdc *codec.CodecProxy,
 	ada types.DBAdapter,
 	opts ...Option,
 ) Keeper {
-	wasmer, err := wasmvm.NewVM(filepath.Join(homeDir, "wasm"), supportedFeatures, ContractMemoryLimit, wasmConfig.ContractDebugMode, wasmConfig.MemoryCacheSize)
+	wasmer, err := wasmvm.NewVM(filepath.Join(homeDir, "wasm"), supportedFeatures, ContractMemoryLimit, wasmConfig.ContractDebugMode, wasmConfig.MemoryCacheSize, "v2:300,v3:400")
 	if err != nil {
 		panic(err)
 	}
