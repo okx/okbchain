@@ -33,7 +33,7 @@ import (
 const ContractMemoryLimit = 32
 const SupportedFeatures = "iterator,staking,stargate"
 
-const WASM_VERSION = 1
+var WASM_VERSION = 1
 
 type contextKey int
 
@@ -138,7 +138,6 @@ func NewKeeper(
 	k := newKeeper(cdc, storeKey, storageKey, paramSpace, accountKeeper, bankKeeper, channelKeeper, portKeeper, capabilityKeeper, portSource, router, queryRouter, homeDir, wasmConfig, supportedFeatures, defaultAdapter{}, opts...)
 	*wasmGasRegister = k.gasRegister
 	accountKeeper.SetObserverKeeper(k)
-
 	return k
 }
 
@@ -220,6 +219,10 @@ func newKeeper(cdc *codec.CodecProxy,
 	// not updateable, yet
 	keeper.wasmVMResponseHandler = NewDefaultWasmVMContractResponseHandler(NewMessageDispatcher(keeper.messenger, keeper))
 	return *keeper
+}
+
+func (k *Keeper) SetVersion(version int) {
+	WASM_VERSION = version
 }
 
 func (k Keeper) GetStoreKey() sdk.StoreKey {
@@ -571,6 +574,9 @@ func (k Keeper) instantiate(ctx sdk.Context, codeID uint64, creator, admin sdk.W
 func (k Keeper) execute(ctx sdk.Context, contractAddress sdk.WasmAddress, caller sdk.WasmAddress, msg []byte, coins sdk.Coins) ([]byte, error) {
 	//defer telemetry.MeasureSince(time.Now(), "wasm", "contract", "execute")
 	//fmt.Printf("-------gas consumed -0--%d\n", k.gasMeter(ctx).GasConsumed())
+
+	k.CheckAndSetVersion(ctx)
+
 	contractInfo, codeInfo, prefixStore, err := k.contractInstance(ctx, contractAddress)
 	if err != nil {
 		return nil, err
@@ -1289,6 +1295,12 @@ func (k Keeper) importContract(ctx sdk.Context, contractAddr sdk.WasmAddress, c 
 
 func (k Keeper) newQueryHandler(ctx sdk.Context, contractAddress sdk.WasmAddress) QueryHandler {
 	return NewQueryHandler(ctx, k.wasmVMQueryHandler, contractAddress, k.gasRegister)
+}
+
+func (k *Keeper) CheckAndSetVersion(ctx sdk.Context) {
+	if ctx.BlockHeight() > 500 {
+		k.SetVersion(2)
+	}
 }
 
 // MultipliedGasMeter wraps the GasMeter from context and multiplies all reads by out defined multiplier
