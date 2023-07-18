@@ -1298,7 +1298,7 @@ func (k Keeper) newQueryHandler(ctx sdk.Context, contractAddress sdk.WasmAddress
 }
 
 func (k *Keeper) CheckAndSetVersion(ctx sdk.Context) {
-	if ctx.BlockHeight() > 500 {
+	if ctx.BlockHeight() > 300 {
 		k.SetVersion(2)
 	}
 }
