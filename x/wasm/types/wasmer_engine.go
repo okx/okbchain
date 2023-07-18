@@ -18,11 +18,11 @@ type WasmerEngine interface {
 	// For example, the code for all ERC-20 contracts should be the same.
 	// This function stores the code for that contract only once, but it can
 	// be instantiated with custom inputs in the future.
-	Create(code wasmvm.WasmCode) (wasmvm.Checksum, error)
+	Create(code wasmvm.WasmCode, version int) (wasmvm.Checksum, error)
 
 	// AnalyzeCode will statically analyze the code.
 	// Currently just reports if it exposes all IBC entry points.
-	AnalyzeCode(checksum wasmvm.Checksum) (*wasmvmtypes.AnalysisReport, error)
+	AnalyzeCode(checksum wasmvm.Checksum, version int) (*wasmvmtypes.AnalysisReport, error)
 
 	// Instantiate will create a new contract based on the given codeID.
 	// We can set the initMsg (contract "genesis") here, and it then receives
@@ -43,6 +43,7 @@ type WasmerEngine interface {
 		gasMeter wasmvm.GasMeter,
 		gasLimit uint64,
 		deserCost wasmvmtypes.UFraction,
+		version int,
 	) (*wasmvmtypes.Response, uint64, error)
 
 	// Execute calls a given contract. Since the only difference between contracts with the same CodeID is the
@@ -62,6 +63,7 @@ type WasmerEngine interface {
 		gasMeter wasmvm.GasMeter,
 		gasLimit uint64,
 		deserCost wasmvmtypes.UFraction,
+		version int,
 	) (*wasmvmtypes.Response, uint64, error)
 
 	// Query allows a client to execute a contract-specific query. If the result is not empty, it should be
@@ -77,6 +79,7 @@ type WasmerEngine interface {
 		gasMeter wasmvm.GasMeter,
 		gasLimit uint64,
 		deserCost wasmvmtypes.UFraction,
+		version int,
 	) ([]byte, uint64, error)
 
 	// Migrate will migrate an existing contract to a new code binary.
@@ -95,6 +98,7 @@ type WasmerEngine interface {
 		gasMeter wasmvm.GasMeter,
 		gasLimit uint64,
 		deserCost wasmvmtypes.UFraction,
+		version int,
 	) (*wasmvmtypes.Response, uint64, error)
 
 	// Sudo runs an existing contract in read/write mode (like Execute), but is never exposed to external callers
@@ -112,6 +116,7 @@ type WasmerEngine interface {
 		gasMeter wasmvm.GasMeter,
 		gasLimit uint64,
 		deserCost wasmvmtypes.UFraction,
+		version int,
 	) (*wasmvmtypes.Response, uint64, error)
 
 	// Reply is called on the original dispatching contract after running a submessage
@@ -125,6 +130,7 @@ type WasmerEngine interface {
 		gasMeter wasmvm.GasMeter,
 		gasLimit uint64,
 		deserCost wasmvmtypes.UFraction,
+		version int,
 	) (*wasmvmtypes.Response, uint64, error)
 
 	// GetCode will load the original wasm code for the given code id.
@@ -134,10 +140,10 @@ type WasmerEngine interface {
 	// This can be used so that the (short) code id (hash) is stored in the iavl tree
 	// and the larger binary blobs (wasm and pre-compiles) are all managed by the
 	// rust library
-	GetCode(code wasmvm.Checksum) (wasmvm.WasmCode, error)
+	GetCode(code wasmvm.Checksum, version int) (wasmvm.WasmCode, error)
 
 	// Cleanup should be called when no longer using this to free resources on the rust-side
-	Cleanup()
+	Cleanup(version int)
 
 	// IBCChannelOpen is available on IBC-enabled contracts and is a hook to call into
 	// during the handshake pahse
@@ -151,6 +157,7 @@ type WasmerEngine interface {
 		gasMeter wasmvm.GasMeter,
 		gasLimit uint64,
 		deserCost wasmvmtypes.UFraction,
+		version int,
 	) (*wasmvmtypes.IBC3ChannelOpenResponse, uint64, error)
 
 	// IBCChannelConnect is available on IBC-enabled contracts and is a hook to call into
@@ -165,6 +172,7 @@ type WasmerEngine interface {
 		gasMeter wasmvm.GasMeter,
 		gasLimit uint64,
 		deserCost wasmvmtypes.UFraction,
+		version int,
 	) (*wasmvmtypes.IBCBasicResponse, uint64, error)
 
 	// IBCChannelClose is available on IBC-enabled contracts and is a hook to call into
@@ -179,6 +187,7 @@ type WasmerEngine interface {
 		gasMeter wasmvm.GasMeter,
 		gasLimit uint64,
 		deserCost wasmvmtypes.UFraction,
+		version int,
 	) (*wasmvmtypes.IBCBasicResponse, uint64, error)
 
 	// IBCPacketReceive is available on IBC-enabled contracts and is called when an incoming
@@ -193,6 +202,7 @@ type WasmerEngine interface {
 		gasMeter wasmvm.GasMeter,
 		gasLimit uint64,
 		deserCost wasmvmtypes.UFraction,
+		version int,
 	) (*wasmvmtypes.IBCReceiveResult, uint64, error)
 
 	// IBCPacketAck is available on IBC-enabled contracts and is called when an
@@ -208,6 +218,7 @@ type WasmerEngine interface {
 		gasMeter wasmvm.GasMeter,
 		gasLimit uint64,
 		deserCost wasmvmtypes.UFraction,
+		version int,
 	) (*wasmvmtypes.IBCBasicResponse, uint64, error)
 
 	// IBCPacketTimeout is available on IBC-enabled contracts and is called when an
@@ -223,19 +234,20 @@ type WasmerEngine interface {
 		gasMeter wasmvm.GasMeter,
 		gasLimit uint64,
 		deserCost wasmvmtypes.UFraction,
+		version int,
 	) (*wasmvmtypes.IBCBasicResponse, uint64, error)
 
 	// Pin pins a code to an in-memory cache, such that is
 	// always loaded quickly when executed.
 	// Pin is idempotent.
-	Pin(checksum wasmvm.Checksum) error
+	Pin(checksum wasmvm.Checksum, version int) error
 
 	// Unpin removes the guarantee of a contract to be pinned (see Pin).
 	// After calling this, the code may or may not remain in memory depending on
 	// the implementor's choice.
 	// Unpin is idempotent.
-	Unpin(checksum wasmvm.Checksum) error
+	Unpin(checksum wasmvm.Checksum, version int) error
 
 	// GetMetrics some internal metrics for monitoring purposes.
-	GetMetrics() (*wasmvmtypes.Metrics, error)
+	GetMetrics(version int) (*wasmvmtypes.Metrics, error)
 }

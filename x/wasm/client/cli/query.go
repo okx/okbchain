@@ -28,6 +28,8 @@ import (
 	"github.com/okx/okbchain/x/wasm/types"
 )
 
+const WASM_VERSION = 1
+
 // NewQueryCmd returns the query commands for wasm
 func NewQueryCmd(cdc *codec.CodecProxy, reg codectypes.InterfaceRegistry) *cobra.Command {
 	queryCmd := &cobra.Command{
@@ -66,7 +68,7 @@ func NewCmdLibVersion(m *codec.CodecProxy, reg codectypes.InterfaceRegistry) *co
 		Aliases: []string{"lib-version"},
 		Args:    cobra.ExactArgs(0),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			version, err := wasmvm.LibwasmvmVersion()
+			version, err := wasmvm.LibwasmvmVersion(WASM_VERSION)
 			if err != nil {
 				return fmt.Errorf("error retrieving libwasmvm version: %w", err)
 			}
