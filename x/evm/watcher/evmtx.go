@@ -45,8 +45,8 @@ func (etx *evmTx) GetFailedReceipts(cumulativeGas, gasUsed uint64) *TransactionR
 	if etx == nil {
 		return nil
 	}
-	tr := newTransactionReceipt(TransactionFailed, etx.msgEvmTx, etx.txHash, etx.blockHash, etx.index, etx.height, &types.ResultData{}, cumulativeGas, gasUsed)
-	return &tr
+	tr := NewTransactionReceipt(TransactionFailed, etx.msgEvmTx, etx.txHash, etx.blockHash, etx.index, etx.height, &types.ResultData{}, cumulativeGas, gasUsed)
+	return tr
 }
 
 func (etx *evmTx) GetIndex() uint64 {

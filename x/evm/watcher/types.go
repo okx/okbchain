@@ -521,8 +521,8 @@ func (tr *TransactionReceipt) GetTo() *common.Address {
 	return tr.tx.To()
 }
 
-func newTransactionReceipt(status uint32, tx *types.MsgEthereumTx, txHash, blockHash common.Hash, txIndex, height uint64, data *types.ResultData, cumulativeGas, GasUsed uint64) TransactionReceipt {
-	tr := TransactionReceipt{
+func NewTransactionReceipt(status uint32, tx *types.MsgEthereumTx, txHash, blockHash common.Hash, txIndex, height uint64, data *types.ResultData, cumulativeGas, GasUsed uint64) *TransactionReceipt {
+	return &TransactionReceipt{
 		Status:                hexutil.Uint64(status),
 		CumulativeGasUsed:     hexutil.Uint64(cumulativeGas),
 		LogsBloom:             data.Bloom,
@@ -535,11 +535,10 @@ func newTransactionReceipt(status uint32, tx *types.MsgEthereumTx, txHash, block
 		TransactionIndex:      hexutil.Uint64(txIndex),
 		tx:                    tx,
 	}
-	return tr
 }
 
-func NewMsgTransactionReceipt(tr TransactionReceipt, txHash common.Hash) *MsgTransactionReceipt {
-	return &MsgTransactionReceipt{txHash: txHash.Bytes(), TransactionReceipt: &tr}
+func NewMsgTransactionReceipt(tr *TransactionReceipt, txHash common.Hash) *MsgTransactionReceipt {
+	return &MsgTransactionReceipt{txHash: txHash.Bytes(), TransactionReceipt: tr}
 }
 
 func (m MsgTransactionReceipt) GetKey() []byte {

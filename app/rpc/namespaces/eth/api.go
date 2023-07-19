@@ -1337,11 +1337,11 @@ func (api *PublicEthereumAPI) GetTransactionReceipt(hash common.Hash) (*watcher.
 	}
 
 	// Set status codes based on tx result
-	var status hexutil.Uint64
+	var status uint32
 	if tx.TxResult.IsOK() {
-		status = hexutil.Uint64(1)
+		status = 1
 	} else {
-		status = hexutil.Uint64(0)
+		status = 0
 	}
 
 	txData := tx.TxResult.GetData()
@@ -1359,11 +1359,6 @@ func (api *PublicEthereumAPI) GetTransactionReceipt(hash common.Hash) (*watcher.
 		if len(log.Topics) == 0 {
 			data.Logs[k].Topics = make([]common.Hash, 0)
 		}
-	}
-
-	contractAddr := &data.ContractAddress
-	if data.ContractAddress == common.HexToAddress("0x00000000000000000000") {
-		contractAddr = nil
 	}
 
 	// evm2cm tx logs
@@ -1384,27 +1379,14 @@ func (api *PublicEthereumAPI) GetTransactionReceipt(hash common.Hash) (*watcher.
 		gasUsed = 0
 	}
 
-	receipt := watcher.TransactionReceipt{
-		Status:            status,
-		CumulativeGasUsed: hexutil.Uint64(cumulativeGasUsed),
-		LogsBloom:         data.Bloom,
-		Logs:              data.Logs,
-		TransactionHash:   hash.String(),
-		ContractAddress:   contractAddr,
-		GasUsed:           hexutil.Uint64(gasUsed),
-		BlockHash:         blockHash.String(),
-		BlockNumber:       hexutil.Uint64(tx.Height),
-		TransactionIndex:  hexutil.Uint64(tx.Index),
-		From:              ethTx.GetFrom(),
-		To:                ethTx.To(),
-	}
-
 	// write transaction receipt to watchdb
+	receipt := watcher.NewTransactionReceipt(status, ethTx, hash, blockHash, uint64(tx.Index),
+		uint64(tx.Height), &data, cumulativeGasUsed, uint64(gasUsed))
 	if api.watcherBackend.Enabled() {
 		api.watcherBackend.CommitReceiptToDb(hash, receipt)
 	}
 
-	return &receipt, nil
+	return receipt, nil
 }
 
 // PendingTransactions returns the transactions that are in the transaction pool

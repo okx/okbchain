@@ -146,7 +146,7 @@ func (w *Watcher) SaveTransactionReceipt(status uint32, msg *evmtypes.MsgEthereu
 		return
 	}
 	w.UpdateCumulativeGas(txIndex, gasUsed)
-	tr := newTransactionReceipt(status, msg, txHash, w.blockHash, txIndex, w.height, data, w.cumulativeGas[txIndex], gasUsed)
+	tr := NewTransactionReceipt(status, msg, txHash, w.blockHash, txIndex, w.height, data, w.cumulativeGas[txIndex], gasUsed)
 	if w.InfuraKeeper != nil {
 		w.InfuraKeeper.OnSaveTransactionReceipt(tr)
 	}
@@ -322,7 +322,7 @@ func (w *Watcher) CommitAccountToRpcDb(account auth.Account) {
 	}
 }
 
-func (w *Watcher) CommitReceiptToDb(txHash common.Hash, receipt TransactionReceipt) {
+func (w *Watcher) CommitReceiptToDb(txHash common.Hash, receipt *TransactionReceipt) {
 	if !w.Enabled() {
 		return
 	}
