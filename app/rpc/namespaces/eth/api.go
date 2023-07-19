@@ -1380,7 +1380,7 @@ func (api *PublicEthereumAPI) GetTransactionReceipt(hash common.Hash) (*watcher.
 	}
 
 	// write transaction receipt to watchdb
-	receipt := watcher.NewTransactionReceipt(status, ethTx, hash, blockHash, uint64(tx.Index),
+	receipt := watcher.NewTransactionReceiptResponse(status, ethTx, hash, blockHash, uint64(tx.Index),
 		uint64(tx.Height), &data, cumulativeGasUsed, uint64(gasUsed))
 	if api.watcherBackend.Enabled() {
 		api.watcherBackend.CommitReceiptToDb(hash, receipt)
