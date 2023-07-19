@@ -526,7 +526,7 @@ func (tr *TransactionReceipt) GetTo() *common.Address {
 	return tr.tx.To()
 }
 
-func NewTransactionReceipt(status uint32, tx *types.MsgEthereumTx, txHash, blockHash common.Hash, txIndex, height uint64, data *types.ResultData, cumulativeGas, GasUsed uint64) *TransactionReceipt {
+func newTransactionReceipt(status uint32, tx *types.MsgEthereumTx, txHash, blockHash common.Hash, txIndex, height uint64, data *types.ResultData, cumulativeGas, GasUsed uint64) *TransactionReceipt {
 	return &TransactionReceipt{
 		Status:                hexutil.Uint64(status),
 		CumulativeGasUsed:     hexutil.Uint64(cumulativeGas),
@@ -544,7 +544,7 @@ func NewTransactionReceipt(status uint32, tx *types.MsgEthereumTx, txHash, block
 
 func NewTransactionReceiptResponse(status uint32, tx *types.MsgEthereumTx, txHash, blockHash common.Hash, txIndex, height uint64,
 	data *types.ResultData, cumulativeGas, gasUsed uint64) *TransactionReceipt {
-	receipt := NewTransactionReceipt(status, tx, txHash, blockHash, txIndex, height, data, cumulativeGas, gasUsed)
+	receipt := newTransactionReceipt(status, tx, txHash, blockHash, txIndex, height, data, cumulativeGas, gasUsed)
 	//
 	receipt.fillInfoForMarshal()
 	return receipt

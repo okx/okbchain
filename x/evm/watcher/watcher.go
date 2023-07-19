@@ -146,7 +146,7 @@ func (w *Watcher) SaveTransactionReceipt(status uint32, msg *evmtypes.MsgEthereu
 		return
 	}
 	w.UpdateCumulativeGas(txIndex, gasUsed)
-	tr := NewTransactionReceipt(status, msg, txHash, w.blockHash, txIndex, w.height, data, w.cumulativeGas[txIndex], gasUsed)
+	tr := newTransactionReceipt(status, msg, txHash, w.blockHash, txIndex, w.height, data, w.cumulativeGas[txIndex], gasUsed)
 	if w.InfuraKeeper != nil {
 		w.InfuraKeeper.OnSaveTransactionReceipt(tr)
 	}
