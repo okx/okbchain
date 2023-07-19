@@ -8,10 +8,11 @@ import (
 	"sync"
 	"unsafe"
 
+	"github.com/tendermint/go-amino"
+
 	"github.com/okx/okbchain/libs/iavl"
 	"github.com/okx/okbchain/libs/system/trace"
 	dbm "github.com/okx/okbchain/libs/tm-db"
-	"github.com/tendermint/go-amino"
 
 	"github.com/okx/okbchain/libs/cosmos-sdk/store/tracekv"
 	"github.com/okx/okbchain/libs/cosmos-sdk/store/types"

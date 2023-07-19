@@ -5,6 +5,8 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/tendermint/go-amino"
+
 	"github.com/okx/okbchain/libs/system/trace"
 	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
 	cfg "github.com/okx/okbchain/libs/tendermint/config"
@@ -17,7 +19,6 @@ import (
 	"github.com/okx/okbchain/libs/tendermint/types"
 	tmtime "github.com/okx/okbchain/libs/tendermint/types/time"
 	dbm "github.com/okx/okbchain/libs/tm-db"
-	"github.com/tendermint/go-amino"
 )
 
 // -----------------------------------------------------------------------------
