@@ -150,6 +150,7 @@ type BaseApp struct { // nolint: maligned
 	fauxMerkleMode bool             // if true, IAVL MountStores uses MountStoresDB for simulation speed.
 
 	updateFeeCollectorAccHandler sdk.UpdateFeeCollectorAccHandler
+	getFeeCollectorInfoHandler   sdk.GetFeeCollectorInfo
 	logFix                       sdk.LogFix
 	updateCosmosTxCount          sdk.UpdateCosmosTxCount
 
@@ -203,7 +204,6 @@ type BaseApp struct { // nolint: maligned
 	parallelTxManage *parallelTxManager
 
 	feeCollector      sdk.Coins
-	feeChanged        bool // used to judge whether should update the fee-collector account
 	FeeSplitCollector []*sdk.FeeSplitInfo
 
 	checkTxNum        int64
