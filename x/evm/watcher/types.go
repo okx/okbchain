@@ -487,6 +487,18 @@ type TransactionReceipt struct {
 }
 
 func (tr *TransactionReceipt) GetValue() string {
+	tr.fillInfoForMarshal()
+	protoReceipt := receiptToProto(tr)
+	buf, err := proto.Marshal(protoReceipt)
+	if err != nil {
+		panic("cant happen")
+	}
+
+	return string(buf)
+}
+
+// must call this func before marshaling
+func (tr *TransactionReceipt) fillInfoForMarshal() {
 	tr.TransactionHash = tr.GetHash()
 	tr.BlockHash = tr.GetBlockHash()
 	tr.From = tr.GetFrom()
@@ -496,13 +508,6 @@ func (tr *TransactionReceipt) GetValue() string {
 		//set to nil to keep sync with ethereum rpc
 		tr.ContractAddress = nil
 	}
-	protoReceipt := receiptToProto(tr)
-	buf, err := proto.Marshal(protoReceipt)
-	if err != nil {
-		panic("cant happen")
-	}
-
-	return string(buf)
 }
 
 func (tr *TransactionReceipt) GetHash() string {
@@ -521,8 +526,8 @@ func (tr *TransactionReceipt) GetTo() *common.Address {
 	return tr.tx.To()
 }
 
-func newTransactionReceipt(status uint32, tx *types.MsgEthereumTx, txHash, blockHash common.Hash, txIndex, height uint64, data *types.ResultData, cumulativeGas, GasUsed uint64) TransactionReceipt {
-	tr := TransactionReceipt{
+func newTransactionReceipt(status uint32, tx *types.MsgEthereumTx, txHash, blockHash common.Hash, txIndex, height uint64, data *types.ResultData, cumulativeGas, GasUsed uint64) *TransactionReceipt {
+	return &TransactionReceipt{
 		Status:                hexutil.Uint64(status),
 		CumulativeGasUsed:     hexutil.Uint64(cumulativeGas),
 		LogsBloom:             data.Bloom,
@@ -535,11 +540,18 @@ func newTransactionReceipt(status uint32, tx *types.MsgEthereumTx, txHash, block
 		TransactionIndex:      hexutil.Uint64(txIndex),
 		tx:                    tx,
 	}
-	return tr
 }
 
-func NewMsgTransactionReceipt(tr TransactionReceipt, txHash common.Hash) *MsgTransactionReceipt {
-	return &MsgTransactionReceipt{txHash: txHash.Bytes(), TransactionReceipt: &tr}
+func NewTransactionReceiptResponse(status uint32, tx *types.MsgEthereumTx, txHash, blockHash common.Hash, txIndex, height uint64,
+	data *types.ResultData, cumulativeGas, gasUsed uint64) *TransactionReceipt {
+	receipt := newTransactionReceipt(status, tx, txHash, blockHash, txIndex, height, data, cumulativeGas, gasUsed)
+	//
+	receipt.fillInfoForMarshal()
+	return receipt
+}
+
+func NewMsgTransactionReceipt(tr *TransactionReceipt, txHash common.Hash) *MsgTransactionReceipt {
+	return &MsgTransactionReceipt{txHash: txHash.Bytes(), TransactionReceipt: tr}
 }
 
 func (m MsgTransactionReceipt) GetKey() []byte {
