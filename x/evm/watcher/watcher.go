@@ -322,6 +322,16 @@ func (w *Watcher) CommitAccountToRpcDb(account auth.Account) {
 	}
 }
 
+func (w *Watcher) CommitReceiptToDb(txHash common.Hash, receipt *TransactionReceipt) {
+	if !w.Enabled() {
+		return
+	}
+	wMsg := NewMsgTransactionReceipt(receipt, txHash)
+	if wMsg != nil {
+		w.store.Set(wMsg.GetKey(), []byte(wMsg.GetValue()))
+	}
+}
+
 func (w *Watcher) CommitCodeHashToDb(hash []byte, code []byte) {
 	if !w.Enabled() {
 		return

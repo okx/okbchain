@@ -144,9 +144,9 @@ func (w *Watcher) saveFailedReceipts(watchTx WatchTx, gasUsed uint64) {
 	w.UpdateCumulativeGas(watchTx.GetIndex(), gasUsed)
 	receipt := watchTx.GetFailedReceipts(w.cumulativeGas[watchTx.GetIndex()], gasUsed)
 	if w.InfuraKeeper != nil {
-		w.InfuraKeeper.OnSaveTransactionReceipt(*receipt)
+		w.InfuraKeeper.OnSaveTransactionReceipt(receipt)
 	}
-	wMsg := NewMsgTransactionReceipt(*receipt, watchTx.GetTxHash())
+	wMsg := NewMsgTransactionReceipt(receipt, watchTx.GetTxHash())
 	if wMsg != nil {
 		w.batch = append(w.batch, wMsg)
 	}

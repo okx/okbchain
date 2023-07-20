@@ -17,7 +17,7 @@ type EngineData struct {
 }
 
 type StreamData struct {
-	TransactionReceipts []evm.TransactionReceipt
+	TransactionReceipts []*evm.TransactionReceipt
 	Block               evmtypes.Block
 	Transactions        []evm.Transaction
 	ContractCodes       map[string][]byte
@@ -31,7 +31,7 @@ func (sd StreamData) ConvertEngineData() EngineData {
 	}
 }
 
-func convertTransactionReceipts(trs []evm.TransactionReceipt) []*TransactionReceipt {
+func convertTransactionReceipts(trs []*evm.TransactionReceipt) []*TransactionReceipt {
 	transactionReceipts := make([]*TransactionReceipt, len(trs))
 	for i, t := range trs {
 		// convert  TransactionReceipt
