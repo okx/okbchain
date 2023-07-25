@@ -337,6 +337,10 @@ func (k *Keeper) UpdateCurBlockNum(ctx sdk.Context) {
 	k.wasmVM.UpdateCurBlockNum(uint64(ctx.BlockHeight()))
 }
 
+func (k *Keeper) UpdateMilestone(ctx sdk.Context, milestone string, blockNum uint64) {
+	k.wasmVM.UpdateMilestone(milestone, blockNum)
+}
+
 func (k *Keeper) modifyGasFactor(ctx sdk.Context, extra string) error {
 	result, err := types.NewActionModifyGasFactor(extra)
 	if err != nil {

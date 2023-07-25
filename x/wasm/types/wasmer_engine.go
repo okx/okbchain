@@ -26,6 +26,8 @@ type WasmerEngine interface {
 
 	UpdateCurBlockNum(_ uint64) error
 
+	UpdateMilestone(milestone string, blockNum uint64) error
+
 	// Instantiate will create a new contract based on the given codeID.
 	// We can set the initMsg (contract "genesis") here, and it then receives
 	// an account and address and can be invoked (Execute) many times.

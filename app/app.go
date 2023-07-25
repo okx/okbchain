@@ -741,6 +741,7 @@ func (app *OKBChainApp) InitUpgrade(ctx sdk.Context) {
 	// Claim before ApplyEffectiveUpgrade
 	app.ParamsKeeper.ClaimReadyForUpgrade(tmtypes.MILESTONE_EARTH, func(info paramstypes.UpgradeInfo) {
 		tmtypes.InitMilestoneEarthHeight(int64(info.EffectiveHeight))
+		app.WasmKeeper.UpdateMilestone(ctx, "wasm_v1", info.EffectiveHeight)
 	})
 	app.ParamsKeeper.ClaimReadyForUpgrade(tmtypes.MILESTONE_MERCURY, func(info paramstypes.UpgradeInfo) {
 		tmtypes.InitMilestoneMercuryHeight(int64(info.EffectiveHeight))
