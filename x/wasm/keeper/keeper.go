@@ -333,6 +333,10 @@ func (k *Keeper) UpdateGasRegister(ctx sdk.Context) {
 	return
 }
 
+func (k *Keeper) UpdateCurBlockNum(ctx sdk.Context) {
+	k.wasmVM.SetCurBlockNum(uint64(ctx.BlockHeight()))
+}
+
 func (k *Keeper) modifyGasFactor(ctx sdk.Context, extra string) error {
 	result, err := types.NewActionModifyGasFactor(extra)
 	if err != nil {
