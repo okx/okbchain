@@ -337,7 +337,7 @@ func (k *Keeper) UpdateCurBlockNum(ctx sdk.Context) {
 	k.wasmVM.UpdateCurBlockNum(uint64(ctx.BlockHeight()))
 }
 
-func (k *Keeper) UpdateMilestone(ctx sdk.Context, milestone string, blockNum uint64) {
+func (k *Keeper) UpdateMilestone(_ sdk.Context, milestone string, blockNum uint64) {
 	k.wasmVM.UpdateMilestone(milestone, blockNum)
 }
 
