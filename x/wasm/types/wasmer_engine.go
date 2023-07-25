@@ -24,7 +24,7 @@ type WasmerEngine interface {
 	// Currently just reports if it exposes all IBC entry points.
 	AnalyzeCode(checksum wasmvm.Checksum) (*wasmvmtypes.AnalysisReport, error)
 
-	SetCurBlockNum(_ uint64) error
+	UpdateCurBlockNum(_ uint64) error
 
 	// Instantiate will create a new contract based on the given codeID.
 	// We can set the initMsg (contract "genesis") here, and it then receives

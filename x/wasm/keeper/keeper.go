@@ -190,7 +190,7 @@ func newKeeper(cdc *codec.CodecProxy,
 	ada types.DBAdapter,
 	opts ...Option,
 ) Keeper {
-	wasmer, err := wasmvm.NewVM(filepath.Join(homeDir, "wasm"), supportedFeatures, ContractMemoryLimit, wasmConfig.ContractDebugMode, wasmConfig.MemoryCacheSize, "v2:300,v3:400")
+	wasmer, err := wasmvm.NewVM(filepath.Join(homeDir, "wasm"), supportedFeatures, ContractMemoryLimit, wasmConfig.ContractDebugMode, wasmConfig.MemoryCacheSize)
 	if err != nil {
 		panic(err)
 	}
@@ -334,7 +334,7 @@ func (k *Keeper) UpdateGasRegister(ctx sdk.Context) {
 }
 
 func (k *Keeper) UpdateCurBlockNum(ctx sdk.Context) {
-	k.wasmVM.SetCurBlockNum(uint64(ctx.BlockHeight()))
+	k.wasmVM.UpdateCurBlockNum(uint64(ctx.BlockHeight()))
 }
 
 func (k *Keeper) modifyGasFactor(ctx sdk.Context, extra string) error {

@@ -94,7 +94,7 @@ func (m *MockWasmer) AnalyzeCode(codeID wasmvm.Checksum) (*wasmvmtypes.AnalysisR
 	return m.AnalyzeCodeFn(codeID)
 }
 
-func (m *MockWasmer) SetCurBlockNum(_ uint64) error {
+func (m *MockWasmer) UpdateCurBlockNum(_ uint64) error {
 	panic("UpdateCurBlockNum error ")
 	return nil
 }
