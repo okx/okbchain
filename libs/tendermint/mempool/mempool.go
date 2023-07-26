@@ -93,6 +93,8 @@ type Mempool interface {
 	GetTxSimulateGas(txHash string) int64
 
 	GetEnableDeleteMinGPTx() bool
+
+	GetPendingPoolTxsBytes() map[string]map[string]types.WrappedMempoolTx
 }
 
 //--------------------------------------------------------------------------------
@@ -119,6 +121,11 @@ type TxInfo struct {
 	from      string
 	wtx       *WrappedTx
 	checkType abci.CheckTxType
+
+	isGasPrecise bool
+	gasUsed      int64
+
+	wrapCMTx *types.WrapCMTx
 }
 
 //--------------------------------------------------------------------------------

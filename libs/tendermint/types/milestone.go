@@ -2,8 +2,6 @@ package types
 
 import (
 	"github.com/okx/okbchain/libs/system"
-	"strconv"
-	"sync"
 )
 
 // Disable followings after milestoneMercuryHeight
@@ -13,37 +11,22 @@ import (
 // 4. ibc
 
 var (
-	milestoneEarthHeight  int64
-	milestoneVenus4Height int64
+	milestoneEarthHeight   int64
+	milestoneVenus4Height  int64
+	milestoneMercuryHeight int64
 
 	// note: it stores the earlies height of the node,and it is used by cli
 	nodePruneHeight int64
-
-	once sync.Once
 )
 
 const (
 	MainNet = system.Chain + "-196"
 	TestNet = system.TestnetPrefix + "-195"
 
-	MILESTONE_EARTH  = "earth"
-	MILESTONE_Venus4 = "venus4"
+	MILESTONE_EARTH   = "earth"
+	MILESTONE_Venus4  = "venus4"
+	MILESTONE_MERCURY = "mercury"
 )
-
-func init() {
-	once.Do(func() {})
-}
-
-func string2number(input string) int64 {
-	if len(input) == 0 {
-		input = "0"
-	}
-	res, err := strconv.ParseInt(input, 10, 64)
-	if err != nil {
-		panic(err)
-	}
-	return res
-}
 
 func SetupMainNetEnvironment(pruneH int64) {
 	nodePruneHeight = pruneH
@@ -63,6 +46,10 @@ func IsMainNet() bool {
 func IsTestNet() bool {
 	//return MILESTONE_GENESIS_HEIGHT == "1121818"
 	return false
+}
+
+func IsPrivateNet() bool {
+	return !IsMainNet() && !IsTestNet()
 }
 
 func GetStartBlockHeight() int64 {
@@ -94,6 +81,10 @@ func GetEarthHeight() int64 {
 	return milestoneEarthHeight
 }
 
+func InitMilestoneEarthHeight(h int64) {
+	milestoneEarthHeight = h
+}
+
 // =========== Earth ===============
 // ==================================
 
@@ -119,4 +110,32 @@ func GetVenus4Height() int64 {
 }
 
 // =========== Venus4 ===============
+// ==================================
+
+// ==================================
+// =========== Mercury ===============
+func UnittestOnlySetMilestoneMercuryHeight(h int64) {
+	milestoneEarthHeight = h
+}
+
+func SetMilestoneMercuryHeight(h int64) {
+	milestoneMercuryHeight = h
+}
+
+func HigherThanMercury(h int64) bool {
+	if milestoneMercuryHeight == 0 {
+		return false
+	}
+	return h >= milestoneMercuryHeight
+}
+
+func GetMercuryHeight() int64 {
+	return milestoneMercuryHeight
+}
+
+func InitMilestoneMercuryHeight(h int64) {
+	milestoneMercuryHeight = h
+}
+
+// =========== Mercury ===============
 // ==================================

@@ -220,30 +220,32 @@ func (w *Watcher) ExecuteDelayEraseKey(delayEraseKey [][]byte) {
 	}
 }
 
-func (w *Watcher) SaveBlock(block evmtypes.Block, ethBlockHash common.Hash) {
+func (w *Watcher) SaveBlock(block evmtypes.Block) {
 	if !w.Enabled() {
 		return
 	}
+	// update block hash
+	block.Hash = w.blockHash
 	if w.InfuraKeeper != nil {
 		w.InfuraKeeper.OnSaveBlock(block)
 	}
-	wMsg := NewMsgBlock(block, ethBlockHash)
+	wMsg := NewMsgBlock(block, w.blockHash)
 	if wMsg != nil {
 		w.batch = append(w.batch, wMsg)
 	}
 
-	wInfo := NewMsgBlockInfo(w.height, ethBlockHash)
+	wInfo := NewMsgBlockInfo(w.height, w.blockHash)
 	if wInfo != nil {
 		w.batch = append(w.batch, wInfo)
 	}
 	w.SaveLatestHeight(w.height)
 }
 
-func (w *Watcher) SaveBlockStdTxHash(blockHash common.Hash) {
+func (w *Watcher) SaveBlockStdTxHash() {
 	if !w.Enabled() || (len(w.blockStdTxs) == 0) {
 		return
 	}
-	wMsg := NewMsgBlockStdTxHash(w.blockStdTxs, blockHash)
+	wMsg := NewMsgBlockStdTxHash(w.blockStdTxs, w.blockHash)
 	if wMsg != nil {
 		w.batch = append(w.batch, wMsg)
 	}
@@ -317,6 +319,16 @@ func (w *Watcher) CommitAccountToRpcDb(account auth.Account) {
 	if wMsg != nil {
 		key := append(prefixRpcDb, wMsg.GetKey()...)
 		w.store.Set(key, []byte(wMsg.GetValue()))
+	}
+}
+
+func (w *Watcher) CommitReceiptToDb(txHash common.Hash, receipt *TransactionReceipt) {
+	if !w.Enabled() {
+		return
+	}
+	wMsg := NewMsgTransactionReceipt(receipt, txHash)
+	if wMsg != nil {
+		w.store.Set(wMsg.GetKey(), []byte(wMsg.GetValue()))
 	}
 }
 

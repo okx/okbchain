@@ -62,6 +62,7 @@ const (
 	FlagMaxOpenConnections = "max-open"
 	FlagRPCReadTimeout     = "read-timeout"
 	FlagRPCWriteTimeout    = "write-timeout"
+	FlagMaxBodyBytes       = "max-body-bytes"
 	FlagOutputDocument     = "output-document" // inspired by wget -O
 	FlagSkipConfirmation   = "yes"
 	FlagProve              = "prove"
@@ -70,7 +71,6 @@ const (
 	FlagLimit              = "limit"
 	FlagUnsafeCORS         = "unsafe-cors"
 	FlagNodeIndex          = "node-index"
-
 
 	TrustNodeUsage = `Using true doesn't verify results, quickly(300~400ms). True is recommended to connect familiar or self-built nodes. 
 Using false verifies the proof of results, safely but slowly(2~3s). False is recommended to connect to unfamiliar nodes.`
@@ -81,6 +81,8 @@ const (
 	FlagOffset        = "offset"
 	FlagTimeoutHeight = "timeout-height"
 	FlagCountTotal    = "count-total"
+
+	DefaultMaxBodyBytes = 1000 * 1000
 )
 
 // LineBreak can be included in a command list to provide a blank line
@@ -118,8 +120,8 @@ func PostCommands(cmds ...*cobra.Command) []*cobra.Command {
 		c.Flags().Uint64P(FlagAccountNumber, "a", 0, "The account number of the signing account (offline mode only)")
 		c.Flags().Uint64(FlagSequence, 0, "The sequence number of the signing account (offline mode only)")
 		c.Flags().String(FlagMemo, "", "Memo to send along with transaction")
-		c.Flags().String(FlagFees, "", "Fees to pay along with transaction; eg: 10uatom")
-		c.Flags().String(FlagGasPrices, "", "Gas prices to determine the transaction fee (e.g. 10uatom)")
+		c.Flags().String(FlagFees, "", "Fees to pay along with transaction; eg: 0.1okb")
+		c.Flags().String(FlagGasPrices, "", "Gas prices to determine the transaction fee (e.g. 0.1okb)")
 		c.Flags().String(FlagNode, "tcp://localhost:26657", "<host>:<port> to tendermint rpc interface for this chain")
 		c.Flags().Bool(FlagUseLedger, false, "Use a connected Ledger device")
 		c.Flags().Float64(FlagGasAdjustment, DefaultGasAdjustment, "adjustment factor to be multiplied against the estimate returned by the tx simulation; if the gas limit is set manually this flag is ignored ")
@@ -152,6 +154,7 @@ func RegisterRestServerFlags(cmd *cobra.Command) *cobra.Command {
 	cmd = GetCommands(cmd)[0]
 	cmd.Flags().String(FlagListenAddr, "tcp://localhost:1317", "The address for the server to listen on")
 	cmd.Flags().Uint(FlagMaxOpenConnections, 1000, "The number of maximum open connections")
+	cmd.Flags().Int64(FlagMaxBodyBytes, DefaultMaxBodyBytes, "The RPC maximum size of request body, in bytes")
 	cmd.Flags().Uint(FlagRPCReadTimeout, 10, "The RPC read timeout (in seconds)")
 	cmd.Flags().Uint(FlagRPCWriteTimeout, 10, "The RPC write timeout (in seconds)")
 	cmd.Flags().Bool(FlagUnsafeCORS, false, "Allows CORS requests from all domains. For development purposes only, use it at your own risk.")
@@ -250,8 +253,8 @@ func AddTxFlagsToCmd(cmd *cobra.Command) {
 	cmd.Flags().Uint64P(FlagAccountNumber, "a", 0, "The account number of the signing account (offline mode only)")
 	cmd.Flags().Uint64P(FlagSequence, "s", 0, "The sequence number of the signing account (offline mode only)")
 	cmd.Flags().String(FlagMemo, "", "Memo to send along with transaction")
-	cmd.Flags().String(FlagFees, "", "Fees to pay along with transaction; eg: 10uatom")
-	cmd.Flags().String(FlagGasPrices, "", "Gas prices in decimal format to determine the transaction fee (e.g. 0.1uatom)")
+	cmd.Flags().String(FlagFees, "", "Fees to pay along with transaction; eg: 0.1okb")
+	cmd.Flags().String(FlagGasPrices, "", "Gas prices in decimal format to determine the transaction fee (e.g. 0.1okb)")
 	cmd.Flags().String(FlagNode, "tcp://localhost:26657", "<host>:<port> to tendermint rpc interface for this chain")
 	cmd.Flags().Bool(FlagUseLedger, false, "Use a connected Ledger device")
 	cmd.Flags().Float64(FlagGasAdjustment, DefaultGasAdjustment, "adjustment factor to be multiplied against the estimate returned by the tx simulation; if the gas limit is set manually this flag is ignored ")
@@ -265,7 +268,7 @@ func AddTxFlagsToCmd(cmd *cobra.Command) {
 	// --gas can accept integers and "auto"
 
 	cmd.MarkFlagRequired(FlagChainID)
-	cmd.Flags().Uint64Var(&GasFlagVar.Gas, "gas", DefaultGasLimit, fmt.Sprintf(
+	cmd.Flags().Var(&GasFlagVar, "gas", fmt.Sprintf(
 		"gas limit to set per-transaction; set to %q to calculate required gas automatically (default %d)",
 		GasFlagAuto, DefaultGasLimit,
 	))

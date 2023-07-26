@@ -2,6 +2,7 @@ package types
 
 import (
 	"github.com/ethereum/go-ethereum/common"
+	stypes "github.com/okx/okbchain/libs/cosmos-sdk/store/types"
 
 	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
 )
@@ -21,11 +22,17 @@ type AccNonceHandler func(ctx Context, address AccAddress) (nonce uint64)
 
 type EvmSysContractAddressHandler func(ctx Context, addr AccAddress) bool
 
+type UpdateCMTxNonceHandler func(tx Tx, nonce uint64)
+
 type UpdateFeeCollectorAccHandler func(ctx Context, balance Coins, txFeesplit []*FeeSplitInfo) error
+
+type GetGasConfigHandler func(ctx Context) *stypes.GasConfig
+
+type UpdateCosmosTxCount func(ctx Context, txCount int)
 
 type LogFix func(tx []Tx, logIndex []int, hasEnterEvmTx []bool, errs []error, resp []abci.ResponseDeliverTx) (logs [][]byte)
 type UpdateFeeSplitHandler func(txHash common.Hash, addr AccAddress, fee Coins, isDelete bool)
-type GetTxFeeAndFromHandler func(ctx Context, tx Tx) (Coins, bool, string, string, error)
+type GetTxFeeAndFromHandler func(ctx Context, tx Tx) (Coins, bool, bool, string, string, error, bool)
 type GetTxFeeHandler func(tx Tx) Coins
 
 type CustomizeOnStop func(ctx Context) error
@@ -72,21 +79,22 @@ func ChainAnteDecorators(chain ...AnteDecorator) AnteHandler {
 
 // Terminator AnteDecorator will get added to the chain to simplify decorator code
 // Don't need to check if next == nil further up the chain
-//                        ______
-//                     <((((((\\\
-//                     /      . }\
-//                     ;--..--._|}
-//  (\                 '--/\--'  )
-//   \\                | '-'  :'|
-//    \\               . -==- .-|
-//     \\               \.__.'   \--._
-//     [\\          __.--|       //  _/'--.
-//     \ \\       .'-._ ('-----'/ __/      \
-//      \ \\     /   __>|      | '--.       |
-//       \ \\   |   \   |     /    /       /
-//        \ '\ /     \  |     |  _/       /
-//         \  \       \ |     | /        /
-//   snd    \  \      \        /
+//
+//	                      ______
+//	                   <((((((\\\
+//	                   /      . }\
+//	                   ;--..--._|}
+//	(\                 '--/\--'  )
+//	 \\                | '-'  :'|
+//	  \\               . -==- .-|
+//	   \\               \.__.'   \--._
+//	   [\\          __.--|       //  _/'--.
+//	   \ \\       .'-._ ('-----'/ __/      \
+//	    \ \\     /   __>|      | '--.       |
+//	     \ \\   |   \   |     /    /       /
+//	      \ '\ /     \  |     |  _/       /
+//	       \  \       \ |     | /        /
+//	 snd    \  \      \        /
 type Terminator struct{}
 
 const AnteTerminatorTag = "ante-terminator"

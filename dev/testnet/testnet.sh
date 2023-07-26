@@ -15,7 +15,7 @@ set -m
 
 set -x # activate debugging
 
-source okc.profile
+source okb.profile
 WRAPPEDTX=false
 PRERUN=false
 NUM_RPC=0
@@ -95,7 +95,7 @@ killbyname() {
 init() {
   killbyname ${BIN_NAME}
 
-  (cd ${OKCHAIN_TOP} && make install VenusHeight=1)
+  (cd ${OKCHAIN_TOP} && make install EarthHeight=1)
 
   rm -rf cache
 
@@ -109,7 +109,7 @@ init() {
 }
 recover() {
   killbyname ${BIN_NAME}
-  (cd ${OKCHAIN_TOP} && make install VenusHeight=1)
+  (cd ${OKCHAIN_TOP} && make install EarthHeight=1)
   rm -rf cache
   cp -rf nodecache cache
 }

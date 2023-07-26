@@ -2,6 +2,9 @@ package watcher
 
 import (
 	"encoding/json"
+	"github.com/okx/okbchain/libs/cosmos-sdk/store/prefix"
+	cosmost "github.com/okx/okbchain/libs/cosmos-sdk/store/types"
+	"io"
 	"log"
 	"path/filepath"
 	"sync"
@@ -9,9 +12,6 @@ import (
 	"github.com/okx/okbchain/app/types"
 	"github.com/okx/okbchain/libs/cosmos-sdk/client/flags"
 	"github.com/okx/okbchain/libs/cosmos-sdk/store/dbadapter"
-	"github.com/okx/okbchain/libs/cosmos-sdk/store/gaskv"
-	"github.com/okx/okbchain/libs/cosmos-sdk/store/prefix"
-	stypes "github.com/okx/okbchain/libs/cosmos-sdk/store/types"
 	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
 	dbm "github.com/okx/okbchain/libs/tm-db"
 	"github.com/okx/okbchain/x/evm/watcher"
@@ -28,17 +28,17 @@ var (
 	enableWatcher bool
 	db            dbm.DB
 	// used for parallel deliver txs mode
-	txCacheMtx      sync.Mutex
-	txStateCache    []*WatchMessage
-	blockStateCache = make(map[string]*WatchMessage)
-
-	accountKeyPrefix = []byte("wasm-account-")
+	txCacheMtx         sync.Mutex
+	txStateCache       []*WatchMessage
+	blockStateCache    = make(map[string]*WatchMessage)
+	watchdbForSimulate = dbadapter.Store{}
+	accountKeyPrefix   = []byte("wasm-account-")
 )
 
 func Enable() bool {
 	checkOnce.Do(func() {
 		checked = true
-		if viper.GetBool(watcher.FlagFastQuery) {
+		if viper.GetBool(watcher.FlagFastQueryForWasm) {
 			enableWatcher = true
 			InitDB()
 		}
@@ -61,13 +61,14 @@ func InitDB() {
 	if err != nil {
 		panic(err)
 	}
+	watchdbForSimulate = dbadapter.Store{DB: db}
 	go taskRoutine()
 }
 
 func AccountKey(addr []byte) []byte {
 	return append(accountKeyPrefix, addr...)
 }
-func GetAccount(addr sdk.AccAddress) (*types.EthAccount, error) {
+func GetAccount(addr sdk.WasmAddress) (*types.EthAccount, error) {
 	if !Enable() {
 		return nil, nil
 	}
@@ -96,7 +97,7 @@ func SetAccount(acc *types.EthAccount) error {
 	return db.Set(AccountKey(acc.Address.Bytes()), b)
 }
 
-func DeleteAccount(addr sdk.AccAddress) {
+func DeleteAccount(addr sdk.WasmAddress) {
 	if !Enable() {
 		return
 	}
@@ -105,26 +106,76 @@ func DeleteAccount(addr sdk.AccAddress) {
 	}
 }
 
-func NewReadStore(pre []byte) sdk.KVStore {
+func NewReadStore(mp map[string][]byte, store sdk.KVStore) sdk.KVStore {
 	rs := &readStore{
-		Store: dbadapter.Store{DB: db},
-	}
-	if len(pre) != 0 {
-		return prefix.NewStore(rs, pre)
+		mp: mp,
+		kv: store,
 	}
 	return rs
 }
 
 type Adapter struct{}
 
-func (a Adapter) NewStore(gasMeter sdk.GasMeter, _ sdk.KVStore, pre []byte) sdk.KVStore {
-	store := NewReadStore(pre)
-	return gaskv.NewStore(store, gasMeter, stypes.KVGasConfig())
+func (a Adapter) NewStore(ctx sdk.Context, storeKey sdk.StoreKey, pre []byte) sdk.KVStore {
+	s := NewReadStore(ctx.GetWasmSimulateCache(), ctx.KVStore(storeKey))
+	if len(pre) != 0 {
+		s = prefix.NewStore(s, pre)
+	}
+
+	return s
 }
 
 type readStore struct {
-	dbadapter.Store
+	mp map[string][]byte
+	kv sdk.KVStore
 }
 
-func (r *readStore) Set(key, value []byte) {}
-func (r *readStore) Delete(key []byte)     {}
+func (r *readStore) GetStoreType() cosmost.StoreType {
+	return r.kv.GetStoreType()
+}
+
+func (r *readStore) CacheWrap() cosmost.CacheWrap {
+	return r.kv.CacheWrap()
+}
+
+func (r *readStore) CacheWrapWithTrace(w io.Writer, tc cosmost.TraceContext) cosmost.CacheWrap {
+	return r.kv.CacheWrapWithTrace(w, tc)
+}
+
+func (r *readStore) Get(key []byte) []byte {
+	rmStateRootKey := rmStorageRootFromWatchKey(key)
+	if value, ok := r.mp[string(rmStateRootKey)]; ok {
+		return value
+	}
+	if value := watchdbForSimulate.Get(rmStateRootKey); len(value) != 0 {
+		return value
+	}
+	return r.kv.Get(key)
+}
+
+func (r *readStore) Has(key []byte) bool {
+	if _, ok := r.mp[string(key)]; ok {
+		return ok
+	}
+	if has := watchdbForSimulate.Has(key); has {
+		return has
+	}
+	return r.kv.Has(key)
+}
+
+func (r *readStore) Set(key, value []byte) {
+	rmStateRootKey := rmStorageRootFromWatchKey(key)
+	r.mp[string(rmStateRootKey)] = value
+}
+
+func (r readStore) Delete(key []byte) {
+	delete(r.mp, string(key))
+}
+
+func (r readStore) Iterator(start, end []byte) cosmost.Iterator {
+	return r.kv.Iterator(start, end)
+}
+
+func (r readStore) ReverseIterator(start, end []byte) cosmost.Iterator {
+	return r.kv.ReverseIterator(start, end)
+}

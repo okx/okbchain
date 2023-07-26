@@ -15,5 +15,23 @@ This repository hosts `OKBChain`, the implementation of the OKBChain based on th
 **Note**: Requires [Go 1.20](https://golang.org/dl/)
 
 
+## Getting Started
 
+Refer to the [document](https://www.okx.com/cn/okbc/docs/dev/quick-start/introduction/introduction-to-okbchain)
+
+* [Install OKBC](https://www.okx.com/cn/okbc/docs/dev/quick-start/build-on-okbc/install-okbc)
+
+
+* [Deploy your own OKBC Localnet](https://www.okx.com/cn/okbc/docs/dev/quick-start/build-on-okbc/deploy-your-own-okbc-localnet)
+
+--------------------
+
+* [Join the testnet](https://www.okx.com/cn/okbc/docs/dev/quick-start/build-on-okbc/join-public-testnet)
+
+
+* [Testnet faucet](https://www.okx.com/okbc/faucet)
+
+-------------------
+
+* [Latest snapshot](https://static.okex.org/cdn/okbc/snapshot/index.html) 
 

@@ -18,7 +18,6 @@ import (
 	"github.com/okx/okbchain/libs/tendermint/global"
 	distr "github.com/okx/okbchain/x/distribution"
 	"github.com/okx/okbchain/x/gov"
-	ptypes "github.com/okx/okbchain/x/params/types"
 	"github.com/okx/okbchain/x/staking"
 	token "github.com/okx/okbchain/x/token/types"
 	"github.com/okx/okbchain/x/wasm/types"
@@ -28,8 +27,6 @@ import (
 const (
 	accountBytesLen = 80
 )
-
-var gasConfig = types2.KVGasConfig()
 
 // AccountKeeperProxy defines the expected account keeper interface
 type AccountKeeperProxy struct {
@@ -60,6 +57,7 @@ func (a AccountKeeperProxy) IterateAccounts(ctx sdk.Context, cb func(account aut
 }
 
 func (a AccountKeeperProxy) GetAccount(ctx sdk.Context, addr sdk.AccAddress) authexported.Account {
+	gasConfig := types2.KVGasConfig()
 	ctx.GasMeter().ConsumeGas(gasConfig.ReadCostFlat, types2.GasReadCostFlatDesc)
 	ctx.GasMeter().ConsumeGas(gasConfig.ReadCostPerByte*accountBytesLen, types2.GasReadPerByteDesc)
 	acc, ok := a.cachedAcc[addr.String()]
@@ -79,6 +77,7 @@ func (a AccountKeeperProxy) SetAccount(ctx sdk.Context, account authexported.Acc
 		a.cachedAcc = make(map[string]*apptypes.EthAccount)
 	}
 	a.cachedAcc[account.GetAddress().String()] = acc
+	gasConfig := types2.KVGasConfig()
 	ctx.GasMeter().ConsumeGas(gasConfig.WriteCostFlat, types2.GasWriteCostFlatDesc)
 	ctx.GasMeter().ConsumeGas(gasConfig.WriteCostPerByte*accountBytesLen, types2.GasWritePerByteDesc)
 	return
@@ -86,6 +85,7 @@ func (a AccountKeeperProxy) SetAccount(ctx sdk.Context, account authexported.Acc
 
 func (a AccountKeeperProxy) RemoveAccount(ctx sdk.Context, account authexported.Account) {
 	delete(a.cachedAcc, account.GetAddress().String())
+	gasConfig := types2.KVGasConfig()
 	ctx.GasMeter().ConsumeGas(gasConfig.DeleteCost, types2.GasDeleteDesc)
 }
 
@@ -128,7 +128,7 @@ func NewBankKeeperProxy(akp AccountKeeperProxy) BankKeeperProxy {
 }
 
 func (b BankKeeperProxy) GetAllBalances(ctx sdk.Context, addr sdk.AccAddress) sdk.Coins {
-	acc, err := watcher.GetAccount(addr)
+	acc, err := watcher.GetAccount(sdk.AccToAWasmddress(addr))
 	if err == nil {
 		return acc.GetCoins()
 	}
@@ -235,7 +235,3 @@ type PortKeeperProxy struct{}
 func (p PortKeeperProxy) BindPort(ctx sdk.Context, portID string) *capabilitytypes.Capability {
 	return nil
 }
-
-type ParamsKeeperProxy struct{}
-
-func (p ParamsKeeperProxy) ClaimReadyForUpgrade(name string, cb func(ptypes.UpgradeInfo)) {}

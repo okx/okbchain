@@ -73,6 +73,8 @@ const (
 	FlagFastSyncGap = "fastsync-gap"
 
 	FlagEventBlockTime = "event-block-time"
+
+	FlagStartFromSnapshot = "start-from-snapshot"
 )
 
 // StartCmd runs the service passed in, either stand-alone or in-process with
@@ -354,4 +356,13 @@ func SetExternalPackageValue(cmd *cobra.Command) {
 	consensus.SetActiveVC(viper.GetBool(FlagActiveViewChange))
 
 	tmtypes.EnableEventBlockTime = viper.GetBool(FlagEventBlockTime)
+
+	mptstore.TrieDirtyDisabled = viper.GetBool(mptstore.FlagTrieDirtyDisabled)
+	mptstore.TrieCacheSize = viper.GetUint(mptstore.FlagTrieCacheSize)
+	mptstore.TriesInMemory = viper.GetUint(mptstore.FlagTrieInMemory)
+	mptstore.TrieAsyncDB = viper.GetBool(mptstore.FlagTrieAsyncDB)
+	mptstore.TrieAsyncDBInitCap = viper.GetInt(mptstore.FlagTrieAsyncDBInitCap)
+	mptstore.TrieAsyncDBAutoPruningOff = viper.GetBool(mptstore.FlagTrieAsyncDBAutoPruningOff)
+	mptstore.TrieAsyncDBSyncPruning = viper.GetBool(mptstore.FlagTrieAsyncDBSyncPruning)
+	mptstore.SetSnapshotJournal(viper.GetBool(mptstore.FlagTrieEnableSnapshotJournal))
 }

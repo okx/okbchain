@@ -13,12 +13,12 @@ import (
 	"github.com/ethereum/go-ethereum/core"
 	ethtypes "github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/core/vm"
-	"github.com/okx/okbchain/libs/system/trace"
 
 	types2 "github.com/okx/okbchain/libs/cosmos-sdk/store/types"
 	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
 	sdkerrors "github.com/okx/okbchain/libs/cosmos-sdk/types/errors"
 	"github.com/okx/okbchain/libs/cosmos-sdk/types/innertx"
+	"github.com/okx/okbchain/libs/system/trace"
 )
 
 // StateTransition defines data to transitionDB in evm
@@ -38,6 +38,7 @@ type StateTransition struct {
 	Simulate   bool // i.e CheckTx execution
 	TraceTx    bool // reexcute tx or its predesessors
 	TraceTxLog bool // trace tx for its evm logs (predesessors are set to false)
+	callToCM   vm.CallToWasmByPrecompile
 }
 
 // GasInfo returns the gas limit, gas consumed and gas refunded from the EVM transition
@@ -99,10 +100,12 @@ func (st *StateTransition) newEVM(
 		Difficulty:  big.NewInt(0), // unused. Only required in PoW context
 		GasLimit:    gasLimit,
 	}
-
+	ctx.SetEVMStateDB(st.Csdb)
 	txCtx := vm.TxContext{
-		Origin:   st.Sender,
-		GasPrice: gasPrice,
+		Origin:    st.Sender,
+		GasPrice:  gasPrice,
+		OKContext: &ctx,
+		CallToCM:  st.GetCallToCM(),
 	}
 
 	return vm.NewEVM(blockCtx, txCtx, csdb, config.EthereumConfig(st.ChainID), vmConfig)
@@ -218,7 +221,7 @@ func (st StateTransition) TransitionDb(ctx sdk.Context, config ChainConfig) (exe
 	csdb.SetNonce(st.Sender, st.AccountNonce)
 
 	//add InnerTx
-	callTx := innertx.AddDefaultInnerTx(evm, innertx.CosmosDepth, senderStr, "", "", "", st.Amount, nil)
+	callTx := innertx.AddDefaultInnerTx(evm, innertx.CosmosDepth, senderStr, "", "", "", st.Amount, nil, st.Payload)
 
 	// create contract or execute call
 	switch contractCreation {
@@ -323,19 +326,20 @@ func (st StateTransition) TransitionDb(ctx sdk.Context, config ChainConfig) (exe
 	// return trace log if tracetxlog no matter err = nil  or not nil
 	defer func() {
 		var traceLogs []byte
+		var traceErr error
 		if st.TraceTxLog {
 			result := &core.ExecutionResult{
 				UsedGas:    gasConsumed,
 				Err:        err,
 				ReturnData: ret,
 			}
-			traceLogs, err = GetTracerResult(tracer, result)
-			if err != nil {
-				traceLogs = []byte(err.Error())
+			traceLogs, traceErr = GetTracerResult(tracer, result)
+			if traceErr != nil {
+				traceLogs = []byte(traceErr.Error())
 			} else {
-				traceLogs, err = integratePreimage(csdb, traceLogs)
-				if err != nil {
-					traceLogs = []byte(err.Error())
+				traceLogs, traceErr = integratePreimage(csdb, traceLogs)
+				if traceErr != nil {
+					traceLogs = []byte(traceErr.Error())
 				}
 			}
 			if exeRes == nil {
@@ -366,7 +370,7 @@ func (st StateTransition) TransitionDb(ctx sdk.Context, config ChainConfig) (exe
 		logs        []*ethtypes.Log
 	)
 
-	if st.TxHash != nil && !st.Simulate {
+	if st.TxHash != nil {
 		logs, err = csdb.GetLogs(*st.TxHash)
 		if err != nil {
 			st.Csdb.RevertToSnapshot(preSSId)
@@ -378,7 +382,7 @@ func (st StateTransition) TransitionDb(ctx sdk.Context, config ChainConfig) (exe
 	}
 
 	if !st.Simulate {
-		if ctx.IsDeliver() || ctx.ParaMsg() != nil {
+		if ctx.IsDeliverWithSerial() || ctx.ParaMsg() != nil {
 			csdb.Commit(true)
 		}
 	}
@@ -451,4 +455,12 @@ func integratePreimage(csdb *CommitStateDB, traceLogs []byte) ([]byte, error) {
 	}
 	traceLogsMap["preimage"] = preimageMap
 	return json.Marshal(traceLogsMap)
+}
+
+func (st *StateTransition) SetCallToCM(callToCM vm.CallToWasmByPrecompile) {
+	st.callToCM = callToCM
+}
+
+func (st StateTransition) GetCallToCM() vm.CallToWasmByPrecompile {
+	return st.callToCM
 }

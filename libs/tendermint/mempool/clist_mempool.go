@@ -14,7 +14,6 @@ import (
 
 	"github.com/VictoriaMetrics/fastcache"
 
-	lru "github.com/hashicorp/golang-lru"
 	"github.com/tendermint/go-amino"
 
 	"github.com/okx/okbchain/libs/system/trace"
@@ -29,7 +28,7 @@ import (
 
 type TxInfoParser interface {
 	GetRawTxInfo(tx types.Tx) ExTxInfo
-	GetTxHistoryGasUsed(tx types.Tx) int64
+	GetTxHistoryGasUsed(tx types.Tx, gasLimit int64) (int64, bool)
 	GetRealTxFromRawTx(rawTx types.Tx) abci.TxEssentials
 }
 
@@ -79,7 +78,8 @@ type CListMempool struct {
 
 	eventBus types.TxEventPublisher
 
-	logger log.Logger
+	logger    log.Logger
+	pguLogger log.Logger
 
 	metrics *Metrics
 
@@ -103,11 +103,21 @@ type CListMempool struct {
 
 	simQueue chan *mempoolTx
 
-	gasCache *lru.Cache
-
 	rmPendingTxChan chan types.EventDataRmPendingTx
 
 	gpo *Oracle
+
+	info pguInfo
+}
+
+type pguInfo struct {
+	txCount int64
+	gasUsed int64
+}
+
+func (p *pguInfo) reset() {
+	p.txCount = 0
+	p.gasUsed = 0
 }
 
 var _ Mempool = &CListMempool{}
@@ -129,10 +139,6 @@ func NewCListMempool(
 		txQueue = NewBaseTxQueue()
 	}
 
-	gasCache, err := lru.New(1000000)
-	if err != nil {
-		panic(err)
-	}
 	gpoConfig := NewGPOConfig(cfg.DynamicConfig.GetDynamicGpWeight(), cfg.DynamicConfig.GetDynamicGpCheckBlocks())
 	gpo := NewOracle(gpoConfig)
 	mempool := &CListMempool{
@@ -143,10 +149,10 @@ func NewCListMempool(
 		recheckEnd:    nil,
 		eventBus:      types.NopEventBus{},
 		logger:        log.NewNopLogger(),
+		pguLogger:     log.NewNopLogger(),
 		metrics:       NopMetrics(),
 		txs:           txQueue,
 		simQueue:      make(chan *mempoolTx, 100000),
-		gasCache:      gasCache,
 		gpo:           gpo,
 	}
 
@@ -154,7 +160,9 @@ func NewCListMempool(
 		mempool.rmPendingTxChan = make(chan types.EventDataRmPendingTx, 1000)
 		go mempool.fireRmPendingTxEvents()
 	}
-	go mempool.simulationRoutine()
+	for i := 0; i < cfg.DynamicConfig.GetPGUConcurrency(); i++ {
+		go mempool.simulationRoutine()
+	}
 
 	if cfg.DynamicConfig.GetMempoolCacheSize() > 0 {
 		mempool.cache = newMapTxCache(cfg.DynamicConfig.GetMempoolCacheSize())
@@ -194,10 +202,11 @@ func (mem *CListMempool) SetEventBus(eventBus types.TxEventPublisher) {
 // SetLogger sets the Logger.
 func (mem *CListMempool) SetLogger(l log.Logger) {
 	mem.logger = l
+	mem.pguLogger = l.With("module", "pgu")
 }
 
 // WithPreCheck sets a filter for the mempool to reject a tx if f(tx) returns
-// false. This is ran before CheckTx.
+// false. This is run before CheckTx.
 func WithPreCheck(f PreCheckFunc) CListMempoolOption {
 	return func(mem *CListMempool) { mem.preCheck = f }
 }
@@ -310,6 +319,15 @@ func (mem *CListMempool) CheckTx(tx types.Tx, cb func(*abci.Response), txInfo Tx
 		return ErrTxTooLarge{mem.config.MaxTxBytes, txSize}
 	}
 
+	var nonce uint64
+	wCMTx := mem.CheckAndGetWrapCMTx(tx, txInfo)
+	if wCMTx != nil {
+		txInfo.wrapCMTx = wCMTx
+		tx = wCMTx.GetTx()
+		nonce = wCMTx.GetNonce()
+		mem.logger.Debug("checkTx is wrapCMTx", "nonce", nonce)
+	}
+
 	txkey := txKey(tx)
 
 	// CACHE
@@ -336,17 +354,6 @@ func (mem *CListMempool) CheckTx(tx types.Tx, cb func(*abci.Response), txInfo Tx
 	defer mem.updateMtx.RUnlock()
 
 	var err error
-	var gasUsed int64
-	if cfg.DynamicConfig.GetMaxGasUsedPerBlock() > -1 {
-		gasUsed = mem.txInfoparser.GetTxHistoryGasUsed(tx)
-		if gasUsed < 0 {
-			simuRes, err := mem.simulateTx(tx)
-			if err != nil {
-				return err
-			}
-			gasUsed = int64(simuRes.GasUsed)
-		}
-	}
 
 	if mem.preCheck != nil {
 		if err = mem.preCheck(tx); err != nil {
@@ -362,15 +369,19 @@ func (mem *CListMempool) CheckTx(tx types.Tx, cb func(*abci.Response), txInfo Tx
 	if txInfo.from != "" {
 		types.SignatureCache().Add(txkey[:], txInfo.from)
 	}
-	reqRes := mem.proxyAppConn.CheckTxAsync(abci.RequestCheckTx{Tx: tx, Type: txInfo.checkType, From: txInfo.wtx.GetFrom()})
-	if cfg.DynamicConfig.GetMaxGasUsedPerBlock() > -1 {
-		if r, ok := reqRes.Response.Value.(*abci.Response_CheckTx); ok {
-			mem.logger.Info(fmt.Sprintf("mempool.SimulateTx: txhash<%s>, gasLimit<%d>, gasUsed<%d>",
-				hex.EncodeToString(tx.Hash()), r.CheckTx.GasWanted, gasUsed))
-			if gasUsed < r.CheckTx.GasWanted {
-				r.CheckTx.GasWanted = gasUsed
+	reqRes := mem.proxyAppConn.CheckTxAsync(abci.RequestCheckTx{Tx: tx, Type: txInfo.checkType, From: txInfo.wtx.GetFrom(), Nonce: nonce})
+	if r, ok := reqRes.Response.Value.(*abci.Response_CheckTx); ok {
+		gasLimit := r.CheckTx.GasWanted
+		if cfg.DynamicConfig.GetMaxGasUsedPerBlock() > -1 {
+			txInfo.gasUsed, txInfo.isGasPrecise = mem.txInfoparser.GetTxHistoryGasUsed(tx, gasLimit) // r.CheckTx.GasWanted is gasLimit
+			if txInfo.gasUsed <= 0 {
+				txInfo.gasUsed, _ = mem.simulateTx(tx, gasLimit)
 			}
-
+			mem.logger.Info(fmt.Sprintf("mempool.SimulateTx: txhash<%s>, gasLimit<%d>, gasUsed<%d>",
+				hex.EncodeToString(tx.Hash()), r.CheckTx.GasWanted, txInfo.gasUsed))
+		}
+		if txInfo.gasUsed <= 0 || txInfo.gasUsed > gasLimit {
+			txInfo.gasUsed = gasLimit
 		}
 	}
 	reqRes.SetCallback(mem.reqResCb(tx, txInfo, cb))
@@ -389,6 +400,19 @@ func (mem *CListMempool) CheckTx(tx types.Tx, cb func(*abci.Response), txInfo Tx
 	}
 
 	return nil
+}
+
+func (mem *CListMempool) CheckAndGetWrapCMTx(tx types.Tx, txInfo TxInfo) *types.WrapCMTx {
+	if txInfo.wrapCMTx != nil { // from p2p
+		return txInfo.wrapCMTx
+	}
+	// from rpc should check if the tx is WrapCMTx
+	wtx := &types.WrapCMTx{}
+	err := cdc.UnmarshalJSON(tx, &wtx)
+	if err != nil {
+		return nil
+	}
+	return wtx
 }
 
 // Global callback that will be called after every ABCI response.
@@ -453,7 +477,7 @@ func (mem *CListMempool) addTx(memTx *mempoolTx) error {
 	if err := mem.txs.Insert(memTx); err != nil {
 		return err
 	}
-	if cfg.DynamicConfig.GetMaxGasUsedPerBlock() > -1 && cfg.DynamicConfig.GetEnablePGU() {
+	if cfg.DynamicConfig.GetMaxGasUsedPerBlock() > -1 && cfg.DynamicConfig.GetEnablePGU() && atomic.LoadUint32(&memTx.isSim) == 0 {
 		select {
 		case mem.simQueue <- memTx:
 		default:
@@ -516,7 +540,6 @@ func (mem *CListMempool) addPendingTx(memTx *mempoolTx) error {
 	}
 	txNonce := memTx.realTx.GetNonce()
 	mem.logger.Debug("mempool", "addPendingTx", hex.EncodeToString(memTx.realTx.TxHash()), "nonce", memTx.realTx.GetNonce(), "gp", memTx.realTx.GetGasPrice(), "pending Nouce", pendingNonce, "excepectNouce", expectedNonce)
-	// cosmos tx does not support pending pool, so here must check whether txNonce is 0
 	if txNonce == 0 || txNonce < expectedNonce {
 		return mem.addTx(memTx)
 	}
@@ -682,13 +705,25 @@ func (mem *CListMempool) resCbFirstTime(
 
 			memTx := &mempoolTx{
 				height:      mem.Height(),
-				gasWanted:   r.CheckTx.GasWanted,
+				gasLimit:    r.CheckTx.GasWanted,
+				gasWanted:   txInfo.gasUsed,
 				tx:          tx,
 				realTx:      r.CheckTx.Tx,
 				nodeKey:     txInfo.wtx.GetNodeKey(),
 				signature:   txInfo.wtx.GetSignature(),
-				from:        r.CheckTx.Tx.GetFrom(),
+				from:        r.CheckTx.Tx.GetEthAddr(),
 				senderNonce: r.CheckTx.SenderNonce,
+			}
+
+			if txInfo.isGasPrecise {
+				// gas for hgu is precise, just mark it simulated, so it will not be simulated again
+				memTx.isSim = 1
+				memTx.hguPrecise = true
+			}
+
+			if txInfo.wrapCMTx != nil {
+				memTx.isWrapCMTx = true
+				memTx.wrapCMNonce = txInfo.wrapCMTx.GetNonce()
 			}
 
 			memTx.senders = make(map[uint16]struct{})
@@ -759,7 +794,7 @@ func (mem *CListMempool) resCbRecheck(req *abci.Request, res *abci.Response) {
 			if mem.config.PendingRemoveEvent {
 				mem.rmPendingTxChan <- types.EventDataRmPendingTx{
 					memTx.realTx.TxHash(),
-					memTx.realTx.GetFrom(),
+					memTx.realTx.GetEthAddr(),
 					memTx.realTx.GetNonce(),
 					types.Recheck,
 				}
@@ -803,12 +838,7 @@ func (mem *CListMempool) notifyTxsAvailable() {
 }
 
 func (mem *CListMempool) GetTxSimulateGas(txHash string) int64 {
-	hash := hex.EncodeToString([]byte(txHash))
-	v, ok := mem.gasCache.Get(hash)
-	if !ok {
-		return -1
-	}
-	return v.(int64)
+	return getPGUGas([]byte(txHash))
 }
 
 func (mem *CListMempool) ReapEssentialTx(tx types.Tx) abci.TxEssentials {
@@ -837,8 +867,8 @@ func (mem *CListMempool) ReapMaxBytesMaxGas(maxBytes, maxGas int64) []types.Tx {
 	defer func() {
 		mem.logger.Info("ReapMaxBytesMaxGas", "ProposingHeight", mem.Height()+1,
 			"MempoolTxs", mem.txs.Len(), "ReapTxs", len(txs))
-		trace.GetElapsedInfo().AddInfo(trace.SimTx, fmt.Sprintf("%d:%d", mem.Height()+1, simCount))
-		trace.GetElapsedInfo().AddInfo(trace.SimGasUsed, fmt.Sprintf("%d:%d", mem.Height()+1, simGas))
+		mem.info.txCount = simCount
+		mem.info.gasUsed = simGas
 	}()
 	for e := mem.txs.Front(); e != nil; e = e.Next() {
 		memTx := e.Value.(*mempoolTx)
@@ -859,6 +889,7 @@ func (mem *CListMempool) ReapMaxBytesMaxGas(maxBytes, maxGas int64) []types.Tx {
 		// If maxGas is negative, skip this check.
 		// Since newTotalGas < masGas, which
 		// must be non-negative, it follows that this won't overflow.
+		atomic.AddUint32(&memTx.outdated, 1)
 		gasWanted := atomic.LoadInt64(&memTx.gasWanted)
 		newTotalGas := totalGas + gasWanted
 		if maxGas > -1 && gasWanted >= maxGas {
@@ -916,6 +947,7 @@ func (mem *CListMempool) ReapUserTxsCnt(address string) int {
 
 func (mem *CListMempool) ReapUserTxs(address string, max int) types.Txs {
 	max = tmmath.MinInt(mem.txs.Len(), max)
+
 	return mem.txs.GetAddressTxs(address, max)
 }
 
@@ -968,6 +1000,9 @@ func (mem *CListMempool) Update(
 	if mem.config.Sealed {
 		return mem.updateSealed(height, txs, deliverTxResponses)
 	}
+	trace.GetElapsedInfo().AddInfo(trace.SimTx, fmt.Sprintf("%d", mem.info.txCount))
+	trace.GetElapsedInfo().AddInfo(trace.SimGasUsed, fmt.Sprintf("%d", mem.info.gasUsed))
+	mem.info.reset()
 
 	// Set height
 	atomic.StoreInt64(&mem.height, height)
@@ -995,7 +1030,7 @@ func (mem *CListMempool) Update(
 		gasUsedPerTx := deliverTxResponses[i].GasUsed
 		gasPricePerTx := big.NewInt(0)
 		if ele := mem.cleanTx(height, tx, txCode); ele != nil {
-			atomic.AddUint32(&(ele.Value.(*mempoolTx).isOutdated), 1)
+			atomic.AddUint32(&(ele.Value.(*mempoolTx).outdated), 1)
 			addr = ele.Address
 			nonce = ele.Nonce
 			gasPricePerTx = ele.GasPrice
@@ -1091,6 +1126,8 @@ func (mem *CListMempool) Update(
 	if cfg.DynamicConfig.GetEnableDeleteMinGPTx() {
 		mem.deleteMinGPTxOnlyFull()
 	}
+
+	go mem.trySimulate4NextBlock()
 	// WARNING: The txs inserted between [ReapMaxBytesMaxGas, Update) is insert-sorted in the mempool.txs,
 	// but they are not included in the latest block, after remove the latest block txs, these txs may
 	// in unsorted state. We need to resort them again for the the purpose of absolute order, or just let it go for they are
@@ -1220,8 +1257,9 @@ func MultiPriceBump(rawPrice *big.Int, priceBump int64) *big.Int {
 
 // mempoolTx is a transaction that successfully ran
 type mempoolTx struct {
-	height      int64    // height that this tx had been validated in
-	gasWanted   int64    // amount of gas this tx states it will require
+	height      int64 // height that this tx had been validated in
+	gasWanted   int64 // amount of gas this tx states it will require
+	gasLimit    int64
 	tx          types.Tx //
 	realTx      abci.TxEssentials
 	nodeKey     []byte
@@ -1229,8 +1267,14 @@ type mempoolTx struct {
 	from        string
 	senderNonce uint64
 
-	isOutdated uint32
-	isSim      uint32
+	outdated uint32
+	isSim    uint32
+
+	// `hguPrecise` is true means hgu for this tx is precise and simulation is not necessary
+	hguPrecise bool
+
+	isWrapCMTx  bool
+	wrapCMNonce uint64
 
 	// ids of peers who've sent us this tx (as a map for quick lookups).
 	// senders: PeerID -> bool
@@ -1241,6 +1285,23 @@ type mempoolTx struct {
 // Height returns the height for this transaction
 func (memTx *mempoolTx) Height() int64 {
 	return atomic.LoadInt64(&memTx.height)
+}
+
+func (memTx *mempoolTx) ToWrappedMempoolTx() types.WrappedMempoolTx {
+	return types.WrappedMempoolTx{
+		Height:      memTx.height,
+		GasWanted:   memTx.gasWanted,
+		GasLimit:    memTx.gasLimit,
+		Tx:          memTx.tx,
+		NodeKey:     memTx.nodeKey,
+		Signature:   memTx.signature,
+		From:        memTx.from,
+		SenderNonce: memTx.senderNonce,
+		Outdated:    memTx.outdated,
+		IsSim:       memTx.isSim,
+		IsWrapCMTx:  memTx.isWrapCMTx,
+		WrapCMNonce: memTx.wrapCMNonce,
+	}
 }
 
 //--------------------------------------------------------------------------------
@@ -1388,17 +1449,29 @@ func (mem *CListMempool) consumePendingTxQueueJob() {
 	}
 }
 
-func (mem *CListMempool) simulateTx(tx types.Tx) (*SimulationResponse, error) {
+func (mem *CListMempool) simulateTx(tx types.Tx, gasLimit int64) (int64, error) {
 	var simuRes SimulationResponse
 	res, err := mem.proxyAppConn.QuerySync(abci.RequestQuery{
 		Path: "app/simulate/mempool",
 		Data: tx,
 	})
 	if err != nil {
-		return nil, err
+		return 0, err
 	}
 	err = cdc.UnmarshalBinaryBare(res.Value, &simuRes)
-	return &simuRes, err
+	if err != nil {
+		return 0, err
+	}
+	gas := int64(simuRes.GasUsed) * int64(cfg.DynamicConfig.GetPGUAdjustment()*100) / 100
+	mem.pguLogger.Info("simulateTx", "txHash", hex.EncodeToString(tx.Hash()), "gas", gas, "gasLimit", gasLimit)
+	if gas > gasLimit {
+		gas = gasLimit
+	}
+	txHash := tx.Hash()
+	if err = updatePGU(txHash, gas); err != nil {
+		mem.logger.Error("updatePGU", "txHash", hex.EncodeToString(txHash), "simGas", gas, "error", err)
+	}
+	return gas, err
 }
 
 func (mem *CListMempool) simulationRoutine() {
@@ -1409,22 +1482,61 @@ func (mem *CListMempool) simulationRoutine() {
 
 func (mem *CListMempool) simulationJob(memTx *mempoolTx) {
 	defer types.SignatureCache().Remove(memTx.realTx.TxHash())
-	if atomic.LoadUint32(&memTx.isOutdated) != 0 {
+	if atomic.LoadUint32(&memTx.outdated) != 0 {
 		// memTx is outdated
 		return
 	}
-	simuRes, err := mem.simulateTx(memTx.tx)
+	gas, err := mem.simulateTx(memTx.tx, memTx.gasLimit)
 	if err != nil {
 		mem.logger.Error("simulateTx", "error", err, "txHash", memTx.tx.Hash())
 		return
 	}
-	gas := int64(simuRes.GasUsed) * int64(cfg.DynamicConfig.GetPGUAdjustment()*100) / 100
 	atomic.StoreInt64(&memTx.gasWanted, gas)
-	atomic.StoreUint32(&memTx.isSim, 1)
-	if gas < atomic.LoadInt64(&memTx.gasWanted) {
-		atomic.StoreInt64(&memTx.gasWanted, gas)
+	atomic.AddUint32(&memTx.isSim, 1)
+}
+
+// trySimulate4BlockAfterNext will be called during Update()
+// assume that next step is to proposal a block of height `n` through ReapMaxBytesMaxGas
+// trySimulate4NextBlock will skip those txs which would be packed into that block,
+// and simulate txs to be packed into block of height `n+1`
+func (mem *CListMempool) trySimulate4NextBlock() {
+	maxGu := cfg.DynamicConfig.GetMaxGasUsedPerBlock()
+	if maxGu < 0 || !cfg.DynamicConfig.GetEnablePGU() {
+		return
 	}
-	mem.gasCache.Add(hex.EncodeToString(memTx.realTx.TxHash()), gas)
+
+	var gu int64
+	var ele *clist.CElement
+	// skip the txs that will be packed into next block
+	for ele = mem.txs.Front(); ele != nil; ele = ele.Next() {
+		gu += ele.Value.(*mempoolTx).gasWanted
+		if gu > maxGu {
+			break
+		}
+	}
+
+	// reset gu for next cycle
+	gu = 0
+
+	for ; ele != nil && gu < maxGu; ele = ele.Next() {
+		memTx := ele.Value.(*mempoolTx)
+		var gas int64
+		var err error
+		if !memTx.hguPrecise {
+			gas, err = mem.simulateTx(memTx.tx, memTx.gasLimit)
+			if err != nil {
+				mem.logger.Error("trySimulate4BlockAfterNext", "error", err, "txHash", memTx.tx.Hash())
+				return
+			}
+			atomic.StoreInt64(&memTx.gasWanted, gas)
+			atomic.AddUint32(&memTx.isSim, 1)
+		} else {
+			gas = memTx.gasWanted
+		}
+
+		gu += gas
+	}
+
 }
 
 func (mem *CListMempool) deleteMinGPTxOnlyFull() {
@@ -1442,11 +1554,15 @@ func (mem *CListMempool) deleteMinGPTxOnlyFull() {
 		mem.cache.RemoveKey(txOrTxHashToKey(removeMemTx.tx, removeMemTxHash))
 
 		if mem.config.PendingRemoveEvent {
-			mem.rmPendingTxChan <- types.EventDataRmPendingTx{removeMemTxHash, removeMemTx.realTx.GetFrom(), removeMemTx.realTx.GetNonce(), types.MinGasPrice}
+			mem.rmPendingTxChan <- types.EventDataRmPendingTx{removeMemTxHash, removeMemTx.realTx.GetEthAddr(), removeMemTx.realTx.GetNonce(), types.MinGasPrice}
 		}
 	}
 }
 
 func (mem *CListMempool) GetEnableDeleteMinGPTx() bool {
 	return cfg.DynamicConfig.GetEnableDeleteMinGPTx()
+}
+
+func (mem *CListMempool) GetPendingPoolTxsBytes() map[string]map[string]types.WrappedMempoolTx {
+	return mem.pendingPool.GetWrappedAddressTxsMap()
 }

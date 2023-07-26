@@ -5,6 +5,8 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/tendermint/go-amino"
+
 	"github.com/okx/okbchain/libs/system/trace"
 	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
 	cfg "github.com/okx/okbchain/libs/tendermint/config"
@@ -17,7 +19,6 @@ import (
 	"github.com/okx/okbchain/libs/tendermint/types"
 	tmtime "github.com/okx/okbchain/libs/tendermint/types/time"
 	dbm "github.com/okx/okbchain/libs/tm-db"
-	"github.com/tendermint/go-amino"
 )
 
 // -----------------------------------------------------------------------------
@@ -224,6 +225,7 @@ func (blockExec *BlockExecutor) ApplyBlock(
 		now := time.Now().UnixNano()
 		blockExec.metrics.IntervalTime.Set(float64(now-blockExec.metrics.lastBlockTime) / 1e6)
 		blockExec.metrics.lastBlockTime = now
+		blockExec.metrics.CommittedHeight.Set(float64(block.Height))
 	}()
 
 	if err := blockExec.ValidateBlock(state, block); err != nil {

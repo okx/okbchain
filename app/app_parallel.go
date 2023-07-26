@@ -1,19 +1,22 @@
 package app
 
 import (
-	"encoding/hex"
 	"sort"
 	"strings"
 
+	appante "github.com/okx/okbchain/app/ante"
 	ethermint "github.com/okx/okbchain/app/types"
+	"github.com/okx/okbchain/libs/cosmos-sdk/baseapp"
 	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
 	"github.com/okx/okbchain/libs/cosmos-sdk/x/auth"
 	authante "github.com/okx/okbchain/libs/cosmos-sdk/x/auth/ante"
 	"github.com/okx/okbchain/libs/cosmos-sdk/x/bank"
 	"github.com/okx/okbchain/libs/cosmos-sdk/x/supply"
 	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
+	"github.com/okx/okbchain/libs/tendermint/types"
 	"github.com/okx/okbchain/x/evm"
 	evmtypes "github.com/okx/okbchain/x/evm/types"
+	wasmkeeper "github.com/okx/okbchain/x/wasm/keeper"
 )
 
 // feeCollectorHandler set or get the value of feeCollectorAcc
@@ -44,6 +47,12 @@ func updateFeeCollectorHandler(bk bank.Keeper, sk supply.Keeper) sdk.UpdateFeeCo
 func fixLogForParallelTxHandler(ek *evm.Keeper) sdk.LogFix {
 	return func(tx []sdk.Tx, logIndex []int, hasEnterEvmTx []bool, anteErrs []error, resp []abci.ResponseDeliverTx) (logs [][]byte) {
 		return ek.FixLog(tx, logIndex, hasEnterEvmTx, anteErrs, resp)
+	}
+}
+
+func fixCosmosTxCountInWasmForParallelTx(storeKey sdk.StoreKey) sdk.UpdateCosmosTxCount {
+	return func(ctx sdk.Context, txCount int) {
+		wasmkeeper.UpdateTxCount(ctx, storeKey, txCount)
 	}
 }
 
@@ -80,10 +89,19 @@ func getTxFeeHandler() sdk.GetTxFeeHandler {
 }
 
 // getTxFeeAndFromHandler get tx fee and from
-func getTxFeeAndFromHandler(ak auth.AccountKeeper) sdk.GetTxFeeAndFromHandler {
-	return func(ctx sdk.Context, tx sdk.Tx) (fee sdk.Coins, isEvm bool, from string, to string, err error) {
+func getTxFeeAndFromHandler(ek appante.EVMKeeper) sdk.GetTxFeeAndFromHandler {
+	return func(ctx sdk.Context, tx sdk.Tx) (fee sdk.Coins, isEvm bool, needUpdateTXCounter bool, from string, to string, err error, supportPara bool) {
 		if evmTx, ok := tx.(*evmtypes.MsgEthereumTx); ok {
 			isEvm = true
+			supportPara = true
+			if appante.IsE2CTx(ek, &ctx, evmTx) {
+				needUpdateTXCounter = true
+				// E2C will include cosmos Msg in the Payload.
+				// Sometimes, this Msg do not support parallel execution.
+				if !types.HigherThanMercury(ctx.BlockHeight()) || !isParaSupportedE2CMsg(evmTx.Data.Payload) {
+					supportPara = false
+				}
+			}
 			err = evmTxVerifySigHandler(ctx.ChainID(), ctx.BlockHeight(), evmTx)
 			if err != nil {
 				return
@@ -98,9 +116,21 @@ func getTxFeeAndFromHandler(ak auth.AccountKeeper) sdk.GetTxFeeAndFromHandler {
 			}
 		} else if feeTx, ok := tx.(authante.FeeTx); ok {
 			fee = feeTx.GetFee()
-			feePayer := feeTx.FeePayer(ctx)
-			feePayerAcc := ak.GetAccount(ctx, feePayer)
-			from = hex.EncodeToString(feePayerAcc.GetAddress())
+			if tx.GetType() == sdk.StdTxType {
+				if types.HigherThanEarth(ctx.BlockHeight()) {
+					needUpdateTXCounter = true
+				}
+				txMsgs := tx.GetMsgs()
+				// only support one message
+				if len(txMsgs) == 1 {
+					if msg, ok := txMsgs[0].(interface{ CalFromAndToForPara() (string, string) }); ok {
+						from, to = msg.CalFromAndToForPara()
+						if types.HigherThanMercury(ctx.BlockHeight()) {
+							supportPara = true
+						}
+					}
+				}
+			}
 		}
 
 		return
@@ -128,4 +158,24 @@ func groupByAddrAndSortFeeSplits(txFeesplit []*sdk.FeeSplitInfo) (feesplits map[
 	sort.Strings(sortAddrs)
 
 	return
+}
+
+func isParaSupportedE2CMsg(payload []byte) bool {
+	// Here, payload must be E2C's Data.Payload
+	p, err := evm.ParseContractParam(payload)
+	if err != nil {
+		return false
+	}
+	mw, err := baseapp.ParseMsgWrapper(p)
+	if err != nil {
+		return false
+	}
+	switch mw.Name {
+	case "wasm/MsgExecuteContract":
+		return true
+	case "wasm/MsgStoreCode":
+		return true
+	default:
+		return false
+	}
 }

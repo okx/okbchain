@@ -17,6 +17,7 @@ import (
 	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
 	"github.com/okx/okbchain/libs/iavl"
 	"github.com/okx/okbchain/libs/system"
+	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
 	cfg "github.com/okx/okbchain/libs/tendermint/config"
 	"github.com/okx/okbchain/libs/tendermint/global"
 	tmlog "github.com/okx/okbchain/libs/tendermint/libs/log"
@@ -88,6 +89,8 @@ func repairStateOnStart(ctx *server.Context) {
 func RepairState(ctx *server.Context, onStart bool) {
 	sm.SetIgnoreSmbCheck(true)
 	iavl.SetIgnoreVersionCheck(true)
+	global.SetRepairState(true)
+	defer global.SetRepairState(false)
 
 	// load latest block height
 	dataDir := filepath.Join(ctx.Config.RootDir, "data")
@@ -146,6 +149,8 @@ func RepairState(ctx *server.Context, onStart bool) {
 
 	err = repairApp.LoadStartVersion(startVersion)
 	panicError(err)
+
+	repairApp.InitUpgrade(repairApp.BaseApp.NewContext(true, abci.Header{}))
 
 	rawTrieDirtyDisabledFlag := viper.GetBool(mpttypes.FlagTrieDirtyDisabled)
 	mpttypes.TrieDirtyDisabled = true

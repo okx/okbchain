@@ -17,6 +17,7 @@ import (
 	"github.com/okx/okbchain/libs/tendermint/abci/example/kvstore"
 	cfg "github.com/okx/okbchain/libs/tendermint/config"
 	"github.com/okx/okbchain/libs/tendermint/libs/log"
+	rrand "github.com/okx/okbchain/libs/tendermint/libs/rand"
 	"github.com/okx/okbchain/libs/tendermint/p2p"
 	"github.com/okx/okbchain/libs/tendermint/p2p/mock"
 	"github.com/okx/okbchain/libs/tendermint/proxy"
@@ -529,4 +530,21 @@ func BenchmarkReactorLogCheckTxError(b *testing.B) {
 			memR.Logger.Info("Could not check tx", "tx", txIDStringer{tx, memR.mempool.height}, "err", err)
 		}
 	})
+}
+
+func BenchmarkGetRealTxFromWrapCMTx(b *testing.B) {
+	N := b.N
+	var data = make([][]byte, N)
+	for i := 0; i < N; i++ {
+		wtx := &types.WrapCMTx{Tx: rrand.Bytes(256), Nonce: uint64(i)}
+		d, err := cdc.MarshalJSON(wtx)
+		assert.NoError(b, err)
+		data[i] = d
+	}
+	b.ResetTimer()
+	var re = make([]int, N)
+	for i := 0; i < N; i++ {
+		res := GetRealTxFromWrapCMTx(data[i])
+		re[i] = len(res)
+	}
 }

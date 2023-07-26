@@ -1,9 +1,9 @@
 package keeper
 
 import (
+	"encoding/hex"
+	"encoding/json"
 	"fmt"
-	"math/big"
-
 	"github.com/ethereum/go-ethereum/common"
 	ethermint "github.com/okx/okbchain/app/types"
 	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
@@ -13,6 +13,7 @@ import (
 	evmtypes "github.com/okx/okbchain/x/evm/types"
 	"github.com/okx/okbchain/x/evm/watcher"
 	"github.com/okx/okbchain/x/vmbridge/types"
+	"math/big"
 )
 
 // event __SendToWasmEventName(string wasmAddr,string recipient, string amount)
@@ -57,6 +58,53 @@ func (h SendToWasmEventHandler) Handle(ctx sdk.Context, contract common.Address,
 	return h.Keeper.SendToWasm(ctx, caller, wasmAddr, recipient, amount)
 }
 
+// event __OKBCCallToWasm(string wasmAddr,uint256 value, string calldata)
+type CallToWasmEventHandler struct {
+	Keeper
+}
+
+func NewCallToWasmEventHandler(k Keeper) *CallToWasmEventHandler {
+	return &CallToWasmEventHandler{k}
+}
+
+// EventID Return the id of the log signature it handles
+func (h CallToWasmEventHandler) EventID() common.Hash {
+	return types.CallToWasmEvent.ID
+}
+
+// Handle Process the log
+func (h CallToWasmEventHandler) Handle(ctx sdk.Context, contract common.Address, data []byte) error {
+	if !tmtypes.HigherThanEarth(ctx.BlockHeight()) {
+		errMsg := fmt.Sprintf("vmbridge not supprt at height %d", ctx.BlockHeight())
+		return sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, errMsg)
+	}
+
+	params := h.wasmKeeper.GetParams(ctx)
+	if !params.VmbridgeEnable {
+		return types.ErrVMBridgeEnable
+	}
+
+	logger := h.Keeper.Logger()
+	unpacked, err := types.CallToWasmEvent.Inputs.Unpack(data)
+	if err != nil {
+		// log and ignore
+		logger.Error("log signature matches but failed to decode", "error", err)
+		return nil
+	}
+
+	caller := sdk.AccAddress(contract.Bytes())
+	wasmAddr := unpacked[0].(string)
+	value := sdk.NewIntFromBigInt(unpacked[1].(*big.Int))
+	calldata := unpacked[2].(string)
+
+	buff, err := hex.DecodeString(calldata)
+	if err != nil {
+		return err
+	}
+	_, err = h.Keeper.CallToWasm(ctx, caller, wasmAddr, value, string(buff))
+	return err
+}
+
 // wasm call evm for erc20 exchange cw20,
 func (k Keeper) SendToEvm(ctx sdk.Context, caller, contract string, recipient string, amount sdk.Int) (success bool, err error) {
 	if !sdk.IsETHAddress(recipient) {
@@ -86,7 +134,7 @@ func (k Keeper) SendToEvm(ctx sdk.Context, caller, contract string, recipient st
 	if watcher.IsWatcherEnabled() {
 		ctx.SetWatcher(watcher.NewTxWatcher())
 	}
-	_, result, err := k.CallEvm(ctx, &conrtractAddr, big.NewInt(0), input)
+	_, result, err := k.CallEvm(ctx, erc20types.IbcEvmModuleETHAddr, &conrtractAddr, big.NewInt(0), input)
 	if err != nil {
 		return false, err
 	}
@@ -97,9 +145,43 @@ func (k Keeper) SendToEvm(ctx sdk.Context, caller, contract string, recipient st
 	return success, err
 }
 
+// wasm call evm
+func (k Keeper) CallToEvm(ctx sdk.Context, caller, contract string, calldata string, value sdk.Int) (response string, err error) {
+
+	if !sdk.IsETHAddress(contract) {
+		return types.ErrIsNotETHAddr.Error(), types.ErrIsNotETHAddr
+	}
+
+	contractAccAddr, err := sdk.AccAddressFromBech32(contract)
+	if err != nil {
+		return err.Error(), err
+	}
+	conrtractAddr := common.BytesToAddress(contractAccAddr.Bytes())
+	callerAddr, err := sdk.WasmAddressFromBech32(caller)
+	if err != nil {
+		return err.Error(), err
+	}
+	// k.CallEvm will call evm, so we must enable evm watch db with follow code
+	if watcher.IsWatcherEnabled() {
+		ctx.SetWatcher(watcher.NewTxWatcher())
+	}
+
+	realCall, err := hex.DecodeString(calldata)
+	if err != nil {
+		return err.Error(), err
+	}
+	_, result, err := k.CallEvm(ctx, common.BytesToAddress(callerAddr.Bytes()), &conrtractAddr, value.BigInt(), realCall)
+	if err != nil {
+		return err.Error(), err
+	}
+	if watcher.IsWatcherEnabled() && err == nil {
+		ctx.GetWatcher().Finalize()
+	}
+	return string(result.Ret), nil
+}
+
 // callEvm execute an evm message from native module
-func (k Keeper) CallEvm(ctx sdk.Context, to *common.Address, value *big.Int, data []byte) (*evmtypes.ExecutionResult, *evmtypes.ResultData, error) {
-	callerAddr := erc20types.IbcEvmModuleETHAddr
+func (k Keeper) CallEvm(ctx sdk.Context, callerAddr common.Address, to *common.Address, value *big.Int, data []byte) (*evmtypes.ExecutionResult, *evmtypes.ResultData, error) {
 
 	config, found := k.evmKeeper.GetChainConfig(ctx)
 	if !found {
@@ -139,19 +221,59 @@ func (k Keeper) CallEvm(ctx sdk.Context, to *common.Address, value *big.Int, dat
 		TraceTx:      false,
 		TraceTxLog:   false,
 	}
+	st.Csdb.Prepare(ethTxHash, k.evmKeeper.GetBlockHash(), 0)
 
-	executionResult, resultData, err, _, _ := st.TransitionDb(ctx, config)
+	st.SetCallToCM(k.evmKeeper.GetCallToCM())
+	addVMBridgeInnertx(ctx, k.evmKeeper, callerAddr.String(), to, VMBRIDGE_START_INNERTX, value)
+	executionResult, resultData, err, innertxs, contracts := st.TransitionDb(ctx, config)
+	addVMBridgeInnertx(ctx, k.evmKeeper, callerAddr.String(), to, VMBRIDGE_END_INNERTX, value)
 	if !ctx.IsCheckTx() && !ctx.IsTraceTx() {
-		//TODO maybe add innertx
-		//k.addEVMInnerTx(ethTxHash.Hex(), innertxs, contracts)
+		if innertxs != nil {
+			k.evmKeeper.AddInnerTx(ethTxHash.Hex(), innertxs)
+		}
+		if contracts != nil {
+			k.evmKeeper.AddContract(contracts)
+		}
 	}
+	attributes := make([]sdk.Attribute, 0)
+	if err != nil {
+		attribute := sdk.NewAttribute(types.AttributeResult, err.Error())
+		attributes = append(attributes, attribute)
+	} else {
+		buff, err := json.Marshal(resultData)
+		if err != nil {
+			attribute := sdk.NewAttribute(types.AttributeResult, err.Error())
+			attributes = append(attributes, attribute)
+		} else {
+			attribute := sdk.NewAttribute(types.AttributeResult, string(buff))
+			attributes = append(attributes, attribute)
+		}
+
+	}
+
+	ctx.EventManager().EmitEvent(
+		sdk.NewEvent(
+			types.EventTypeWasmCallEvm,
+			attributes...,
+		),
+	)
 	if err != nil {
 		return nil, nil, err
 	}
 
 	st.Csdb.Commit(false) // write code to db
-	acc.SetSequence(nonce + 1)
-	k.accountKeeper.SetAccount(ctx, acc)
+
+	temp := k.accountKeeper.GetAccount(ctx, callerAddr.Bytes())
+	if temp == nil {
+		if err := acc.SetCoins(sdk.Coins{}); err != nil {
+			return nil, nil, err
+		}
+		temp = acc
+	}
+	if err := temp.SetSequence(nonce + 1); err != nil {
+		return nil, nil, err
+	}
+	k.accountKeeper.SetAccount(ctx, temp)
 
 	return executionResult, resultData, err
 }

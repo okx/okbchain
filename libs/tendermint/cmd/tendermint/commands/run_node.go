@@ -121,6 +121,11 @@ func AddNodeFlags(cmd *cobra.Command) {
 		config.Mempool.EnableDeleteMinGPTx,
 		"Enable delete the minimum gas price tx from mempool when mempool is full",
 	)
+	cmd.Flags().String(
+		"mempool.pending-pool-blacklist",
+		"",
+		"Set the address blacklist of the pending pool, separated by commas",
+	)
 	cmd.Flags().Int64(
 		"mempool.max_gas_used_per_block",
 		config.Mempool.MaxGasUsedPerBlock,
@@ -131,11 +136,25 @@ func AddNodeFlags(cmd *cobra.Command) {
 		false,
 		"enable precise gas used",
 	)
+	cmd.Flags().Int64(
+		"mempool.pgu-percentage-threshold",
+		10,
+		"use pgu when hgu has a margin of at least threshold percent",
+	)
+	cmd.Flags().Int(
+		"mempool.pgu-concurrency",
+		1,
+		"pgu concurrency",
+	)
 	cmd.Flags().Float64(
 		"mempool.pgu-adjustment",
 		1,
 		"adjustment for pgu, such as 0.9 or 1.1",
 	)
+	cmd.Flags().Bool(
+		"mempool.pgu-persist",
+		false,
+		"persist the gas estimated by pgu")
 	cmd.Flags().Bool(
 		"mempool.sort_tx_by_gp",
 		config.Mempool.SortTxByGp,

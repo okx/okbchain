@@ -51,9 +51,11 @@ import (
 	"github.com/okx/okbchain/libs/tendermint/global"
 	"github.com/okx/okbchain/libs/tendermint/libs/log"
 	tmtypes "github.com/okx/okbchain/libs/tendermint/types"
+	"github.com/okx/okbchain/x/erc20"
 	"github.com/okx/okbchain/x/evm"
 	evmtypes "github.com/okx/okbchain/x/evm/types"
 	"github.com/okx/okbchain/x/evm/watcher"
+	"github.com/okx/okbchain/x/vmbridge"
 )
 
 const (
@@ -71,23 +73,26 @@ const (
 
 // PublicEthereumAPI is the eth_ prefixed set of APIs in the Web3 JSON-RPC spec.
 type PublicEthereumAPI struct {
-	ctx                context.Context
-	clientCtx          clientcontext.CLIContext
-	chainIDEpoch       *big.Int
-	logger             log.Logger
-	backend            backend.Backend
-	keys               []ethsecp256k1.PrivKey // unlocked keys
-	nonceLock          *rpctypes.AddrLocker
-	keyringLock        sync.Mutex
-	gasPrice           *hexutil.Big
-	wrappedBackend     *watcher.Querier
-	watcherBackend     *watcher.Watcher
-	evmFactory         simulation.EvmFactory
-	txPool             *TxPool
-	Metrics            *monitor.RpcMetrics
-	callCache          *lru.Cache
-	cdc                *codec.Codec
-	fastQueryThreshold uint64
+	ctx                  context.Context
+	clientCtx            clientcontext.CLIContext
+	chainIDEpoch         *big.Int
+	logger               log.Logger
+	backend              backend.Backend
+	keys                 []ethsecp256k1.PrivKey // unlocked keys
+	nonceLock            *rpctypes.AddrLocker
+	keyringLock          sync.Mutex
+	gasPrice             *hexutil.Big
+	wrappedBackend       *watcher.Querier
+	watcherBackend       *watcher.Watcher
+	evmFactory           simulation.EvmFactory
+	txPool               *TxPool
+	Metrics              *monitor.RpcMetrics
+	callCache            *lru.Cache
+	cdc                  *codec.Codec
+	fastQueryThreshold   uint64
+	systemContract       []byte
+	e2cWasmCodeLimit     uint64
+	e2cWasmMsgHelperAddr string
 }
 
 // NewAPI creates an instance of the public ETH Web3 API.
@@ -102,29 +107,29 @@ func NewAPI(
 	}
 
 	api := &PublicEthereumAPI{
-		ctx:                context.Background(),
-		clientCtx:          clientCtx,
-		chainIDEpoch:       epoch,
-		logger:             log.With("module", "json-rpc", "namespace", NameSpace),
-		backend:            backend,
-		keys:               keys,
-		nonceLock:          nonceLock,
-		gasPrice:           ParseGasPrice(),
-		wrappedBackend:     watcher.NewQuerier(),
-		watcherBackend:     watcher.NewWatcher(log),
-		fastQueryThreshold: viper.GetUint64(FlagFastQueryThreshold),
+		ctx:                  context.Background(),
+		clientCtx:            clientCtx,
+		chainIDEpoch:         epoch,
+		logger:               log.With("module", "json-rpc", "namespace", NameSpace),
+		backend:              backend,
+		keys:                 keys,
+		nonceLock:            nonceLock,
+		gasPrice:             ParseGasPrice(),
+		wrappedBackend:       watcher.NewQuerier(),
+		watcherBackend:       watcher.NewWatcher(log),
+		fastQueryThreshold:   viper.GetUint64(FlagFastQueryThreshold),
+		systemContract:       getSystemContractAddr(clientCtx),
+		e2cWasmMsgHelperAddr: viper.GetString(FlagE2cWasmMsgHelperAddr),
 	}
 	api.evmFactory = simulation.NewEvmFactory(clientCtx.ChainID, api.wrappedBackend)
 	module := evm.AppModuleBasic{}
 	api.cdc = codec.New()
 	module.RegisterCodec(api.cdc)
-	if watcher.IsWatcherEnabled() {
-		callCache, err := lru.New(CacheOfEthCallLru)
-		if err != nil {
-			panic(err)
-		}
-		api.callCache = callCache
+	callCache, err := lru.New(CacheOfEthCallLru)
+	if err != nil {
+		panic(err)
 	}
+	api.callCache = callCache
 
 	if err := api.GetKeyringInfo(); err != nil {
 		api.logger.Error("failed to get keybase info", "error", err)
@@ -857,6 +862,20 @@ func (api *PublicEthereumAPI) Call(args rpctypes.CallArgs, blockNrOrHash rpctype
 	if err != nil {
 		return nil, err
 	}
+
+	wasmCode, newParam, isWasmMsgStoreCode := api.isLargeWasmMsgStoreCode(args)
+	if isWasmMsgStoreCode {
+		*args.Data = newParam
+		wasmCode, err = judgeWasmCode(wasmCode)
+		if err != nil {
+			return []byte{}, TransformDataError(err, "eth_call judgeWasmCode")
+		}
+	}
+
+	// eth_call for wasm
+	if api.isWasmCall(args) {
+		return api.wasmCall(args, blockNr)
+	}
 	simRes, err := api.doCall(args, blockNr, big.NewInt(ethermint.DefaultRPCGasLimit), false, overrides)
 	if err != nil {
 		return []byte{}, TransformDataError(err, "eth_call")
@@ -866,6 +885,15 @@ func (api *PublicEthereumAPI) Call(args rpctypes.CallArgs, blockNrOrHash rpctype
 	if err != nil {
 		return []byte{}, TransformDataError(err, "eth_call")
 	}
+
+	if isWasmMsgStoreCode {
+		ret, err := replaceToRealWasmCode(data.Ret, wasmCode)
+		if err != nil {
+			return []byte{}, TransformDataError(err, "eth_call replaceToRealWasmCode")
+		}
+		data.Ret = ret
+	}
+
 	if overrides == nil {
 		api.addCallCache(key, data.Ret)
 	}
@@ -948,7 +976,23 @@ func (api *PublicEthereumAPI) doCall(
 
 	//only worked when fast-query has been enabled
 	if sim != nil && useWatch {
-		return sim.DoCall(msg, addr.String(), overridesBytes, api.evmFactory.PutBackStorePool)
+		simRes, err := sim.DoCall(msg, addr.String(), overridesBytes, api.evmFactory.PutBackStorePool)
+		if err != nil {
+			return simRes, err
+		}
+		data, err := evmtypes.DecodeResultData(simRes.Result.Data)
+		if err != nil {
+			return simRes, err
+		}
+		tempHooks := evm.NewLogProcessEvmHook(
+			erc20.NewSendToIbcEventHandler(erc20.Keeper{}),
+			erc20.NewSendNative20ToIbcEventHandler(erc20.Keeper{}),
+			vmbridge.NewSendToWasmEventHandler(vmbridge.Keeper{}),
+			vmbridge.NewCallToWasmEventHandler(vmbridge.Keeper{}),
+		)
+		if ok := tempHooks.IsCanHooked(data.Logs); !ok {
+			return simRes, nil
+		}
 	}
 
 	//Generate tx to be used to simulate (signature isn't needed)
@@ -1258,7 +1302,8 @@ func (api *PublicEthereumAPI) GetTransactionReceipt(hash common.Hash) (*watcher.
 	monitor := monitor.GetMonitor("eth_getTransactionReceipt", api.logger, api.Metrics).OnBegin()
 	defer monitor.OnEnd("hash", hash)
 	res, e := api.wrappedBackend.GetTransactionReceipt(hash)
-	if e == nil {
+	// do not use watchdb when it`s a evm2cm tx
+	if e == nil && !api.isEvm2CmTx(res.To) {
 		return res, nil
 	}
 
@@ -1273,7 +1318,6 @@ func (api *PublicEthereumAPI) GetTransactionReceipt(hash common.Hash) (*watcher.
 	if err != nil {
 		return nil, err
 	}
-
 	blockHash := common.BytesToHash(block.Block.Hash())
 
 	// Convert tx bytes to eth transaction
@@ -1293,11 +1337,11 @@ func (api *PublicEthereumAPI) GetTransactionReceipt(hash common.Hash) (*watcher.
 	}
 
 	// Set status codes based on tx result
-	var status hexutil.Uint64
+	var status uint32
 	if tx.TxResult.IsOK() {
-		status = hexutil.Uint64(1)
+		status = 1
 	} else {
-		status = hexutil.Uint64(0)
+		status = 0
 	}
 
 	txData := tx.TxResult.GetData()
@@ -1311,10 +1355,22 @@ func (api *PublicEthereumAPI) GetTransactionReceipt(hash common.Hash) (*watcher.
 		data.Logs = []*ethtypes.Log{}
 		data.Bloom = ethtypes.BytesToBloom(make([]byte, 256))
 	}
+	for k, log := range data.Logs {
+		if len(log.Topics) == 0 {
+			data.Logs[k].Topics = make([]common.Hash, 0)
+		}
+	}
 
-	contractAddr := &data.ContractAddress
-	if data.ContractAddress == common.HexToAddress("0x00000000000000000000") {
-		contractAddr = nil
+	// evm2cm tx logs
+	if api.isEvm2CmTx(ethTx.To()) {
+		data.Logs = append(data.Logs, &ethtypes.Log{
+			Address:     *ethTx.To(),
+			Topics:      []common.Hash{hash},
+			Data:        []byte(tx.TxResult.Log),
+			BlockNumber: uint64(tx.Height),
+			TxHash:      hash,
+			BlockHash:   blockHash,
+		})
 	}
 
 	// fix gasUsed when deliverTx ante handler check sequence invalid
@@ -1323,19 +1379,11 @@ func (api *PublicEthereumAPI) GetTransactionReceipt(hash common.Hash) (*watcher.
 		gasUsed = 0
 	}
 
-	receipt := &watcher.TransactionReceipt{
-		Status:            status,
-		CumulativeGasUsed: hexutil.Uint64(cumulativeGasUsed),
-		LogsBloom:         data.Bloom,
-		Logs:              data.Logs,
-		TransactionHash:   hash.String(),
-		ContractAddress:   contractAddr,
-		GasUsed:           hexutil.Uint64(gasUsed),
-		BlockHash:         blockHash.String(),
-		BlockNumber:       hexutil.Uint64(tx.Height),
-		TransactionIndex:  hexutil.Uint64(tx.Index),
-		From:              ethTx.GetFrom(),
-		To:                ethTx.To(),
+	// write transaction receipt to watchdb
+	receipt := watcher.NewTransactionReceiptResponse(status, ethTx, hash, blockHash, uint64(tx.Index),
+		uint64(tx.Height), &data, cumulativeGasUsed, uint64(gasUsed))
+	if api.watcherBackend.Enabled() {
+		api.watcherBackend.CommitReceiptToDb(hash, receipt)
 	}
 
 	return receipt, nil

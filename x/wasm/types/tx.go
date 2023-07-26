@@ -3,7 +3,10 @@ package types
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"strings"
+
+	ethcmm "github.com/ethereum/go-ethereum/common"
 
 	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
 	sdkerrors "github.com/okx/okbchain/libs/cosmos-sdk/types/errors"
@@ -50,7 +53,7 @@ func (msg MsgStoreCode) Type() string {
 }
 
 func (msg MsgStoreCode) ValidateBasic() error {
-	if _, err := sdk.AccAddressFromBech32(msg.Sender); err != nil {
+	if _, err := sdk.WasmAddressFromBech32(msg.Sender); err != nil {
 		return err
 	}
 
@@ -71,11 +74,21 @@ func (msg MsgStoreCode) GetSignBytes() []byte {
 }
 
 func (msg MsgStoreCode) GetSigners() []sdk.AccAddress {
-	senderAddr, err := sdk.AccAddressFromBech32(msg.Sender)
+	senderAddr, err := sdk.WasmAddressFromBech32(msg.Sender)
 	if err != nil { // should never happen as valid basic rejects invalid addresses
 		panic(err.Error())
 	}
-	return []sdk.AccAddress{senderAddr}
+	return []sdk.AccAddress{sdk.WasmToAccAddress(senderAddr)}
+}
+
+func (msg MsgStoreCode) FnSignatureInfo() (string, int, error) {
+	codeLen := len(msg.WASMByteCode)
+	var err error
+	if codeLen <= 0 {
+		err = fmt.Errorf("wasm byte code length is 0")
+	}
+
+	return msg.Type(), codeLen, err
 }
 
 func (msg MsgInstantiateContract) Route() string {
@@ -87,7 +100,7 @@ func (msg MsgInstantiateContract) Type() string {
 }
 
 func (msg MsgInstantiateContract) ValidateBasic() error {
-	if _, err := sdk.AccAddressFromBech32(msg.Sender); err != nil {
+	if _, err := sdk.WasmAddressFromBech32(msg.Sender); err != nil {
 		return sdkerrors.Wrap(err, "sender")
 	}
 
@@ -104,7 +117,7 @@ func (msg MsgInstantiateContract) ValidateBasic() error {
 	}
 
 	if len(msg.Admin) != 0 {
-		if _, err := sdk.AccAddressFromBech32(msg.Admin); err != nil {
+		if _, err := sdk.WasmAddressFromBech32(msg.Admin); err != nil {
 			return sdkerrors.Wrap(err, "admin")
 		}
 	}
@@ -119,11 +132,11 @@ func (msg MsgInstantiateContract) GetSignBytes() []byte {
 }
 
 func (msg MsgInstantiateContract) GetSigners() []sdk.AccAddress {
-	senderAddr, err := sdk.AccAddressFromBech32(msg.Sender)
+	senderAddr, err := sdk.WasmAddressFromBech32(msg.Sender)
 	if err != nil { // should never happen as valid basic rejects invalid addresses
 		panic(err.Error())
 	}
-	return []sdk.AccAddress{senderAddr}
+	return []sdk.AccAddress{sdk.WasmToAccAddress(senderAddr)}
 }
 
 func (msg MsgExecuteContract) Route() string {
@@ -135,10 +148,10 @@ func (msg MsgExecuteContract) Type() string {
 }
 
 func (msg MsgExecuteContract) ValidateBasic() error {
-	if _, err := sdk.AccAddressFromBech32(msg.Sender); err != nil {
+	if _, err := sdk.WasmAddressFromBech32(msg.Sender); err != nil {
 		return sdkerrors.Wrap(err, "sender")
 	}
-	if _, err := sdk.AccAddressFromBech32(msg.Contract); err != nil {
+	if _, err := sdk.WasmAddressFromBech32(msg.Contract); err != nil {
 		return sdkerrors.Wrap(err, "contract")
 	}
 
@@ -156,11 +169,40 @@ func (msg MsgExecuteContract) GetSignBytes() []byte {
 }
 
 func (msg MsgExecuteContract) GetSigners() []sdk.AccAddress {
-	senderAddr, err := sdk.AccAddressFromBech32(msg.Sender)
+	senderAddr, err := sdk.WasmAddressFromBech32(msg.Sender)
 	if err != nil { // should never happen as valid basic rejects invalid addresses
 		panic(err.Error())
 	}
-	return []sdk.AccAddress{senderAddr}
+	return []sdk.AccAddress{sdk.WasmToAccAddress(senderAddr)}
+}
+
+func (msg MsgExecuteContract) FnSignatureInfo() (string, int, error) {
+	if err := msg.Msg.ValidateBasic(); err != nil {
+		return "", 0, fmt.Errorf("failed to validate msg:%v", err)
+	}
+
+	var v interface{}
+	json.Unmarshal(msg.Msg, &v)
+	data := v.(map[string]interface{})
+	if len(data) != 1 {
+		return "", 0, fmt.Errorf("failed to check msg method:%s", string(msg.Msg.Bytes()))
+	}
+
+	method := ""
+	for k, _ := range data {
+		method = k
+		break
+	}
+
+	if len(method) <= 0 {
+		return "", 0, fmt.Errorf("msg has not method:%s", string(msg.Msg.Bytes()))
+	}
+
+	var builder strings.Builder
+	builder.WriteString(msg.Contract)
+	builder.WriteString(method)
+
+	return builder.String(), 0, nil
 }
 
 func (msg MsgMigrateContract) Route() string {
@@ -175,10 +217,10 @@ func (msg MsgMigrateContract) ValidateBasic() error {
 	if msg.CodeID == 0 {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "code id is required")
 	}
-	if _, err := sdk.AccAddressFromBech32(msg.Sender); err != nil {
+	if _, err := sdk.WasmAddressFromBech32(msg.Sender); err != nil {
 		return sdkerrors.Wrap(err, "sender")
 	}
-	if _, err := sdk.AccAddressFromBech32(msg.Contract); err != nil {
+	if _, err := sdk.WasmAddressFromBech32(msg.Contract); err != nil {
 		return sdkerrors.Wrap(err, "contract")
 	}
 
@@ -194,11 +236,11 @@ func (msg MsgMigrateContract) GetSignBytes() []byte {
 }
 
 func (msg MsgMigrateContract) GetSigners() []sdk.AccAddress {
-	senderAddr, err := sdk.AccAddressFromBech32(msg.Sender)
+	senderAddr, err := sdk.WasmAddressFromBech32(msg.Sender)
 	if err != nil { // should never happen as valid basic rejects invalid addresses
 		panic(err.Error())
 	}
-	return []sdk.AccAddress{senderAddr}
+	return []sdk.AccAddress{sdk.WasmToAccAddress(senderAddr)}
 }
 
 func (msg MsgUpdateAdmin) Route() string {
@@ -210,13 +252,13 @@ func (msg MsgUpdateAdmin) Type() string {
 }
 
 func (msg MsgUpdateAdmin) ValidateBasic() error {
-	if _, err := sdk.AccAddressFromBech32(msg.Sender); err != nil {
+	if _, err := sdk.WasmAddressFromBech32(msg.Sender); err != nil {
 		return sdkerrors.Wrap(err, "sender")
 	}
-	if _, err := sdk.AccAddressFromBech32(msg.Contract); err != nil {
+	if _, err := sdk.WasmAddressFromBech32(msg.Contract); err != nil {
 		return sdkerrors.Wrap(err, "contract")
 	}
-	if _, err := sdk.AccAddressFromBech32(msg.NewAdmin); err != nil {
+	if _, err := sdk.WasmAddressFromBech32(msg.NewAdmin); err != nil {
 		return sdkerrors.Wrap(err, "new admin")
 	}
 	if strings.EqualFold(msg.Sender, msg.NewAdmin) {
@@ -230,11 +272,12 @@ func (msg MsgUpdateAdmin) GetSignBytes() []byte {
 }
 
 func (msg MsgUpdateAdmin) GetSigners() []sdk.AccAddress {
-	senderAddr, err := sdk.AccAddressFromBech32(msg.Sender)
+	senderAddr, err := sdk.WasmAddressFromBech32(msg.Sender)
 	if err != nil { // should never happen as valid basic rejects invalid addresses
 		panic(err.Error())
 	}
-	return []sdk.AccAddress{senderAddr}
+
+	return []sdk.AccAddress{sdk.WasmToAccAddress(senderAddr)}
 }
 
 func (msg MsgClearAdmin) Route() string {
@@ -246,10 +289,10 @@ func (msg MsgClearAdmin) Type() string {
 }
 
 func (msg MsgClearAdmin) ValidateBasic() error {
-	if _, err := sdk.AccAddressFromBech32(msg.Sender); err != nil {
+	if _, err := sdk.WasmAddressFromBech32(msg.Sender); err != nil {
 		return sdkerrors.Wrap(err, "sender")
 	}
-	if _, err := sdk.AccAddressFromBech32(msg.Contract); err != nil {
+	if _, err := sdk.WasmAddressFromBech32(msg.Contract); err != nil {
 		return sdkerrors.Wrap(err, "contract")
 	}
 	return nil
@@ -260,11 +303,11 @@ func (msg MsgClearAdmin) GetSignBytes() []byte {
 }
 
 func (msg MsgClearAdmin) GetSigners() []sdk.AccAddress {
-	senderAddr, err := sdk.AccAddressFromBech32(msg.Sender)
+	senderAddr, err := sdk.WasmAddressFromBech32(msg.Sender)
 	if err != nil { // should never happen as valid basic rejects invalid addresses
 		panic(err.Error())
 	}
-	return []sdk.AccAddress{senderAddr}
+	return []sdk.AccAddress{sdk.WasmToAccAddress(senderAddr)}
 }
 
 func (msg MsgIBCSend) Route() string {
@@ -305,4 +348,12 @@ func (msg MsgIBCCloseChannel) GetSignBytes() []byte {
 
 func (msg MsgIBCCloseChannel) GetSigners() []sdk.AccAddress {
 	return nil
+}
+
+func (m *MsgStoreCode) CalFromAndToForPara() (string, string) {
+	return strings.ToLower(ethcmm.BytesToAddress(m.GetSigners()[0]).String()[2:]), ""
+}
+
+func (m *MsgExecuteContract) CalFromAndToForPara() (string, string) {
+	return strings.ToLower(ethcmm.BytesToAddress(m.GetSigners()[0]).String()[2:]), m.Contract
 }

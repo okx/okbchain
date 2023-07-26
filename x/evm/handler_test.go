@@ -51,7 +51,7 @@ func (suite *EvmTestSuite) SetupTest() {
 
 	suite.app = app.Setup(checkTx)
 	suite.ctx = suite.app.BaseApp.NewContext(checkTx, abci.Header{Height: 1, ChainID: chain_id, Time: time.Now().UTC()})
-	suite.ctx.SetDeliver()
+	suite.ctx.SetDeliverSerial()
 	suite.stateDB = types.CreateEmptyCommitStateDB(suite.app.EvmKeeper.GenerateCSDBParams(), suite.ctx)
 	suite.handler = evm.NewHandler(suite.app.EvmKeeper)
 	suite.querier = keeper.NewQuerier(*suite.app.EvmKeeper)
@@ -614,12 +614,14 @@ func (suite *EvmTestSuite) TestSimulateConflict() {
 	suite.Require().NoError(err)
 
 	suite.ctx.SetGasMeter(sdk.NewInfiniteGasMeter())
-	suite.ctx.SetIsCheckTx(true).SetIsDeliverTx(false)
-	result, err := suite.handler(suite.ctx, tx)
+	suite.ctx.SetIsCheckTx(true).SetIsDeliverTxSerial(false)
+
+	cacheCtx, _ := suite.ctx.CacheContext()
+	result, err := suite.handler(cacheCtx, tx)
 	suite.Require().NotNil(result)
 	suite.Require().Nil(err)
 
-	suite.ctx.SetIsCheckTx(false).SetIsDeliverTx(true)
+	suite.ctx.SetIsCheckTx(false).SetIsDeliverTxSerial(true)
 	result, err = suite.handler(suite.ctx, tx)
 	suite.Require().NotNil(result)
 	suite.Require().Nil(err)
@@ -799,7 +801,7 @@ func (suite *EvmContractBlockedListTestSuite) SetupTest() {
 
 	suite.app = app.Setup(checkTx)
 	suite.ctx = suite.app.BaseApp.NewContext(checkTx, abci.Header{Height: 1, ChainID: "ethermint-3", Time: time.Now().UTC()})
-	suite.ctx.SetDeliver()
+	suite.ctx.SetDeliverSerial()
 	suite.stateDB = types.CreateEmptyCommitStateDB(suite.app.EvmKeeper.GenerateCSDBParams(), suite.ctx)
 	suite.handler = evm.NewHandler(suite.app.EvmKeeper)
 
@@ -1041,7 +1043,7 @@ func (suite *EvmContractBlockedListTestSuite) TestEvmParamsAndContractMethodBloc
 	for _, tc := range testCases {
 		suite.Run(tc.msg, func() {
 			suite.SetupTest()
-			suite.ctx.SetIsDeliverTx(true).SetIsCheckTx(false)
+			suite.ctx.SetIsDeliverTxSerial(true).SetIsCheckTx(false)
 
 			// set contract code
 			suite.stateDB.CreateAccount(callEthAcc)

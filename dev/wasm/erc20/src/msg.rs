@@ -47,7 +47,7 @@ pub enum ExecuteMsg {
         evmContract: String,
         recipient: String,
         amount: Uint128,
-    }
+    },
 }
 
 #[derive(Serialize, Deserialize, Clone, PartialEq, JsonSchema, Debug)]
@@ -65,6 +65,7 @@ impl Into<CosmosMsg<SendToEvmMsg>> for SendToEvmMsg {
     }
 }
 impl CustomMsg for SendToEvmMsg {}
+
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
 #[serde(rename_all = "snake_case")]

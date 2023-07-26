@@ -5,13 +5,14 @@ import (
 	"sync"
 	"time"
 
+	"github.com/ethereum/go-ethereum/core/vm"
 	"github.com/gogo/protobuf/proto"
-	"github.com/okx/okbchain/libs/system/trace"
-	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
-	"github.com/okx/okbchain/libs/tendermint/libs/log"
 
 	"github.com/okx/okbchain/libs/cosmos-sdk/store/gaskv"
 	stypes "github.com/okx/okbchain/libs/cosmos-sdk/store/types"
+	"github.com/okx/okbchain/libs/system/trace"
+	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
+	"github.com/okx/okbchain/libs/tendermint/libs/log"
 )
 
 /*
@@ -23,34 +24,37 @@ but please do not over-use it. We try to keep all data structured
 and standard additions here would be better just to add to the Context struct
 */
 type Context struct {
-	ctx                context.Context
-	ms                 MultiStore
-	header             *abci.Header
-	chainID            string
-	from               string
-	txBytes            []byte
-	logger             log.Logger
-	voteInfo           []abci.VoteInfo
-	gasMeter           GasMeter
-	blockGasMeter      GasMeter
-	isDeliver          bool
-	checkTx            bool
-	recheckTx          bool   // if recheckTx == true, then checkTx must also be true
-	wrappedCheckTx     bool   // if wrappedCheckTx == true, then checkTx must also be true
-	traceTx            bool   // traceTx is set true for trace tx and its predesessors , traceTx was set in app.beginBlockForTrace()
-	traceTxLog         bool   // traceTxLog is used to create trace logger for evm , traceTxLog is set to true when only tracing target tx (its predesessors will set false), traceTxLog is set before runtx
-	traceTxConfigBytes []byte // traceTxConfigBytes is used to save traceTxConfig, passed from api to x/evm
-	minGasPrice        DecCoins
-	consParams         *abci.ConsensusParams
-	eventManager       *EventManager
-	accountNonce       uint64
-	trc                *trace.Tracer
-	accountCache       *AccountCache
-	paraMsg            *ParaMsg
+	ctx                 context.Context
+	ms                  MultiStore
+	header              *abci.Header
+	chainID             string
+	from                string
+	txBytes             []byte
+	logger              log.Logger
+	voteInfo            []abci.VoteInfo
+	gasMeter            GasMeter
+	blockGasMeter       GasMeter
+	isDeliverWithSerial bool
+	checkTx             bool
+	recheckTx           bool   // if recheckTx == true, then checkTx must also be true
+	wrappedCheckTx      bool   // if wrappedCheckTx == true, then checkTx must also be true
+	traceTx             bool   // traceTx is set true for trace tx and its predesessors , traceTx was set in app.beginBlockForTrace()
+	traceTxLog          bool   // traceTxLog is used to create trace logger for evm , traceTxLog is set to true when only tracing target tx (its predesessors will set false), traceTxLog is set before runtx
+	traceTxConfigBytes  []byte // traceTxConfigBytes is used to save traceTxConfig, passed from api to x/evm
+	minGasPrice         DecCoins
+	consParams          *abci.ConsensusParams
+	eventManager        *EventManager
+	accountNonce        uint64
+	trc                 *trace.Tracer
+	accountCache        *AccountCache
+	paraMsg             *ParaMsg
 	//	txCount            uint32
-	overridesBytes []byte // overridesBytes is used to save overrides info, passed from ethCall to x/evm
-	watcher        *TxWatcher
-	feesplitInfo   *FeeSplitInfo
+	overridesBytes    []byte // overridesBytes is used to save overrides info, passed from ethCall to x/evm
+	watcher           *TxWatcher
+	feesplitInfo      *FeeSplitInfo
+	statedb           vm.StateDB
+	outOfGas          bool
+	wasmSimulateCache map[string][]byte
 }
 
 // Proposed rename, not done to avoid API breakage
@@ -79,12 +83,13 @@ func (c *Context) VoteInfos() []abci.VoteInfo { return c.voteInfo }
 func (c *Context) GasMeter() GasMeter         { return c.gasMeter }
 func (c *Context) BlockGasMeter() GasMeter    { return c.blockGasMeter }
 
-func (c *Context) IsDeliver() bool {
-	return c.isDeliver
+func (c *Context) IsDeliverWithSerial() bool {
+	return c.isDeliverWithSerial
 }
 
 func (c *Context) UseParamCache() bool {
-	return c.isDeliver || (c.paraMsg != nil && !c.paraMsg.HaveCosmosTxInBlock) || c.checkTx
+	// c.paraMsg.HaveCosmosTxInBlock is also true when there are only E2C txs in a block
+	return c.isDeliverWithSerial || (c.paraMsg != nil && !c.paraMsg.HaveCosmosTxInBlock) || c.checkTx
 }
 
 func (c *Context) IsCheckTx() bool             { return c.checkTx }
@@ -182,6 +187,10 @@ func (c *Context) ConsensusParams() *abci.ConsensusParams {
 //	return c.txCount
 //}
 
+var (
+	nilKvStore = KVStore(nil)
+)
+
 // NewContext create a new context
 func NewContext(ms MultiStore, header abci.Header, isCheckTx bool, logger log.Logger) Context {
 	// https://github.com/gogo/protobuf/issues/519
@@ -200,9 +209,27 @@ func NewContext(ms MultiStore, header abci.Header, isCheckTx bool, logger log.Lo
 	}
 }
 
-func (c *Context) SetDeliver() *Context {
-	c.isDeliver = true
+func (c *Context) SetDeliverSerial() *Context {
+	c.isDeliverWithSerial = true
 	return c
+}
+
+func (c *Context) SetWasmSimulateCache() {
+	c.wasmSimulateCache = getWasmCacheMap()
+}
+func (c *Context) GetWasmSimulateCache() map[string][]byte {
+	if c.wasmSimulateCache == nil {
+		c.wasmSimulateCache = getWasmCacheMap()
+		return c.wasmSimulateCache
+	}
+	return c.wasmSimulateCache
+}
+
+func (c *Context) MoveWasmSimulateCacheToPool() {
+	for k, _ := range c.wasmSimulateCache {
+		delete(c.wasmSimulateCache, k)
+	}
+	putBackWasmCacheMap(c.wasmSimulateCache)
 }
 
 // TODO: remove???
@@ -292,8 +319,8 @@ func (c *Context) SetIsCheckTx(isCheckTx bool) *Context {
 	return c
 }
 
-func (c *Context) SetIsDeliverTx(isDeliverTx bool) *Context {
-	c.isDeliver = isDeliverTx
+func (c *Context) SetIsDeliverTxSerial(isDeliverWithSerial bool) *Context {
+	c.isDeliverWithSerial = isDeliverWithSerial
 	return c
 }
 
@@ -396,6 +423,14 @@ func (c *Context) GetWatcher() IWatcher {
 	return c.watcher.IWatcher
 }
 
+func (c *Context) GetEVMStateDB() vm.StateDB {
+	return c.statedb
+}
+
+func (c *Context) SetEVMStateDB(db vm.StateDB) {
+	c.statedb = db
+}
+
 //func (c *Context) SetTxCount(count uint32) *Context {
 //	c.txCount = count
 //	return c
@@ -443,6 +478,21 @@ func (c *Context) CacheContext() (cc Context, writeCache func()) {
 	cc.SetEventManager(NewEventManager())
 	writeCache = cms.Write
 	return
+}
+
+func (c *Context) CacheContextWithMultiSnapshotRWSet() (cc Context, writeCacheWithRWSet func() stypes.MultiSnapshotWSet) {
+	cms := c.MultiStore().CacheMultiStore()
+	cc = *c
+	cc.SetMultiStore(cms)
+	cc.SetEventManager(NewEventManager())
+	writeCacheWithRWSet = cms.WriteGetMultiSnapshotWSet
+	return
+}
+
+func (c *Context) RevertDBWithMultiSnapshotRWSet(set stypes.MultiSnapshotWSet) {
+	cms := c.MultiStore().CacheMultiStore()
+	cms.RevertDBWithMultiSnapshotRWSet(set)
+	cms.Write()
 }
 
 func (c Context) WithBlockTime(newTime time.Time) Context {
@@ -506,6 +556,14 @@ func (c Context) WithValue(key, value interface{}) Context {
 //	ctx.Value(key)
 func (c Context) Value(key interface{}) interface{} {
 	return c.ctx.Value(key)
+}
+
+func (c *Context) SetOutOfGas(v bool) {
+	c.outOfGas = v
+}
+
+func (c *Context) GetOutOfGas() bool {
+	return c.outOfGas
 }
 
 type AccountCache struct {

@@ -5,10 +5,8 @@ import (
 	"fmt"
 	"math/big"
 
+	ethcmn "github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/rlp"
-	"github.com/tendermint/go-amino"
-	yaml "gopkg.in/yaml.v2"
-
 	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
 	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
 	sdkerrors "github.com/okx/okbchain/libs/cosmos-sdk/types/errors"
@@ -16,6 +14,8 @@ import (
 	"github.com/okx/okbchain/libs/tendermint/crypto"
 	cryptoamino "github.com/okx/okbchain/libs/tendermint/crypto/encoding/amino"
 	"github.com/okx/okbchain/libs/tendermint/crypto/multisig"
+	"github.com/tendermint/go-amino"
+	yaml "gopkg.in/yaml.v2"
 )
 
 var (
@@ -268,8 +268,33 @@ func (tx *StdTx) GetGasPrice() *big.Int {
 	return tx.Fee.GasPrices()[0].Amount.BigInt()
 }
 
+type WasmMsgChecker interface {
+	FnSignatureInfo() (string, int, error)
+}
+
 func (tx *StdTx) GetTxFnSignatureInfo() ([]byte, int) {
-	return nil, 0
+	// hgu can't be right simulated with many Msgs.
+	if len(tx.Msgs) != 1 {
+		return nil, 0
+	}
+
+	fnSign := ""
+	deploySize := 0
+	for _, msg := range tx.Msgs {
+		v, ok := msg.(WasmMsgChecker)
+		if !ok {
+			break
+		}
+		fn, size, err := v.FnSignatureInfo()
+		if err != nil || len(fn) <= 0 {
+			break
+		}
+
+		deploySize = size
+		fnSign = fn
+		break
+	}
+	return []byte(fnSign), deploySize
 }
 
 func (tx *StdTx) GetFrom() string {
@@ -280,12 +305,20 @@ func (tx *StdTx) GetFrom() string {
 	return signers[0].String()
 }
 
+func (tx *StdTx) GetEthAddr() string {
+	signers := tx.GetSigners()
+	if len(signers) == 0 {
+		return ""
+	}
+	return ethcmn.BytesToAddress(signers[0]).String()
+}
+
 func (tx *StdTx) GetSender(_ sdk.Context) string {
 	return tx.GetFrom()
 }
 
 func (tx *StdTx) GetNonce() uint64 {
-	return 0
+	return tx.Nonce
 }
 
 //__________________________________________________________

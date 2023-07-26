@@ -20,7 +20,7 @@ func (m *modeHandlerDeliverInAsync) handleDeferRefund(info *runTxInfo) {
 		gasRefundCtx = info.ctx
 		gasRefundCtx.SetMultiStore(info.msCache)
 	}
-
+	gasRefundCtx.SetOutOfGas(info.outOfGas)
 	refundGas, err := app.GasRefundHandler(gasRefundCtx, info.tx)
 	if err != nil {
 		panic(err)

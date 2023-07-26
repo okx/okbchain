@@ -2,9 +2,13 @@ package app
 
 import (
 	"fmt"
+	"github.com/okx/okbchain/libs/cosmos-sdk/client/flags"
 	"io"
 	"os"
+	"runtime/debug"
 	"sync"
+
+	paramstypes "github.com/okx/okbchain/x/params/types"
 
 	"github.com/okx/okbchain/x/vmbridge"
 
@@ -48,6 +52,7 @@ import (
 	"github.com/okx/okbchain/libs/cosmos-sdk/server"
 	"github.com/okx/okbchain/libs/cosmos-sdk/simapp"
 	"github.com/okx/okbchain/libs/cosmos-sdk/store/mpt"
+	stypes "github.com/okx/okbchain/libs/cosmos-sdk/store/types"
 	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
 	"github.com/okx/okbchain/libs/cosmos-sdk/types/module"
 	upgradetypes "github.com/okx/okbchain/libs/cosmos-sdk/types/upgrade"
@@ -157,11 +162,11 @@ var (
 			fsclient.FeeSplitSharesProposalHandler,
 			wasmclient.MigrateContractProposalHandler,
 			wasmclient.UpdateContractAdminProposalHandler,
-			wasmclient.ClearContractAdminProposalHandler,
 			wasmclient.PinCodesProposalHandler,
 			wasmclient.UnpinCodesProposalHandler,
 			wasmclient.UpdateDeploymentWhitelistProposalHandler,
 			wasmclient.UpdateWASMContractMethodBlockedListProposalHandler,
+			wasmclient.GetCmdExtraProposal,
 			stakingclient.ProposeValidatorProposalHandler,
 		),
 		params.AppModuleBasic{},
@@ -200,7 +205,8 @@ var (
 		icatypes.ModuleName:         nil,
 	}
 
-	onceLog sync.Once
+	onceLog              sync.Once
+	FlagGolangMaxThreads string = "golang-max-threads"
 )
 
 var _ simapp.App = (*OKBChainApp)(nil)
@@ -467,10 +473,10 @@ func NewOKBChainApp(
 	app.WasmKeeper = wasm.NewKeeper(
 		app.marshal,
 		keys[wasm.StoreKey],
+		keys[mpt.StoreKey],
 		app.subspaces[wasm.ModuleName],
 		&app.AccountKeeper,
 		bank.NewBankKeeperAdapter(app.BankKeeper),
-		&app.ParamsKeeper,
 		v2keeper.ChannelKeeper,
 		&v2keeper.PortKeeper,
 		nil,
@@ -559,8 +565,8 @@ func NewOKBChainApp(
 
 	wasmModule := wasm.NewAppModule(*app.marshal, &app.WasmKeeper)
 	app.WasmPermissionKeeper = wasmModule.GetPermissionKeeper()
-	app.VMBridgeKeeper = vmbridge.NewKeeper(app.marshal, app.Logger(), app.EvmKeeper, app.WasmPermissionKeeper, app.AccountKeeper)
-
+	app.VMBridgeKeeper = vmbridge.NewKeeper(app.marshal, app.Logger(), app.EvmKeeper, app.WasmPermissionKeeper, app.AccountKeeper, app.BankKeeper)
+	app.EvmKeeper.SetCallToCM(vmbridge.PrecompileHooks(app.VMBridgeKeeper))
 	// Set EVM hooks
 	app.EvmKeeper.SetHooks(
 		evm.NewMultiEvmHooks(
@@ -568,6 +574,7 @@ func NewOKBChainApp(
 				erc20.NewSendToIbcEventHandler(app.Erc20Keeper),
 				erc20.NewSendNative20ToIbcEventHandler(app.Erc20Keeper),
 				vmbridge.NewSendToWasmEventHandler(*app.VMBridgeKeeper),
+				vmbridge.NewCallToWasmEventHandler(*app.VMBridgeKeeper),
 			),
 			app.FeeSplitKeeper.Hooks(),
 		),
@@ -691,13 +698,16 @@ func NewOKBChainApp(
 	app.SetGasRefundHandler(refund.NewGasRefundHandler(app.AccountKeeper, app.SupplyKeeper, app.EvmKeeper))
 	app.SetAccNonceHandler(NewAccNonceHandler(app.AccountKeeper))
 
+	app.SetUpdateWasmTxCount(fixCosmosTxCountInWasmForParallelTx(app.WasmHandler.TXCounterStoreKey))
 	app.SetUpdateFeeCollectorAccHandler(updateFeeCollectorHandler(app.BankKeeper, app.SupplyKeeper))
 	app.SetParallelTxLogHandlers(fixLogForParallelTxHandler(app.EvmKeeper))
 	app.SetPreDeliverTxHandler(preDeliverTxHandler(app.AccountKeeper))
-	app.SetPartialConcurrentHandlers(getTxFeeAndFromHandler(app.AccountKeeper))
+	app.SetPartialConcurrentHandlers(getTxFeeAndFromHandler(app.EvmKeeper))
 	app.SetGetTxFeeHandler(getTxFeeHandler())
 	app.SetEvmSysContractAddressHandler(NewEvmSysContractAddressHandler(app.EvmKeeper))
 	app.SetEvmWatcherCollector(app.EvmKeeper.Watcher.Collect)
+	app.SetUpdateCMTxNonceHandler(NewUpdateCMTxNonceHandler())
+	app.SetGetGasConfigHandler(NewGetGasConfigHandler(app.ParamsKeeper))
 	mpt.AccountStateRootRetriever = app.AccountKeeper
 	if loadLatest {
 		err := app.LoadLatestVersion(app.keys[bam.MainStoreKey])
@@ -709,10 +719,8 @@ func NewOKBChainApp(
 		if err := app.WasmKeeper.InitializePinnedCodes(ctx); err != nil {
 			tmos.Exit(fmt.Sprintf("failed initialize pinned codes %s", err))
 		}
-
-		if err := app.ParamsKeeper.ApplyEffectiveUpgrade(ctx); err != nil {
-			tmos.Exit(fmt.Sprintf("failed apply effective upgrade height info: %s", err))
-		}
+		app.InitUpgrade(ctx)
+		app.WasmKeeper.UpdateGasRegister(ctx)
 	}
 
 	app.ScopedIBCKeeper = scopedIBCKeeper
@@ -726,6 +734,19 @@ func NewOKBChainApp(
 	trace.EnableAnalyzer(enableAnalyzer)
 
 	return app
+}
+
+func (app *OKBChainApp) InitUpgrade(ctx sdk.Context) {
+	// Claim before ApplyEffectiveUpgrade
+	app.ParamsKeeper.ClaimReadyForUpgrade(tmtypes.MILESTONE_EARTH, func(info paramstypes.UpgradeInfo) {
+		tmtypes.InitMilestoneEarthHeight(int64(info.EffectiveHeight))
+	})
+	app.ParamsKeeper.ClaimReadyForUpgrade(tmtypes.MILESTONE_MERCURY, func(info paramstypes.UpgradeInfo) {
+		tmtypes.InitMilestoneMercuryHeight(int64(info.EffectiveHeight))
+	})
+	if err := app.ParamsKeeper.ApplyEffectiveUpgrade(ctx); err != nil {
+		tmos.Exit(fmt.Sprintf("failed apply effective upgrade height info: %s", err))
+	}
 }
 
 func (app *OKBChainApp) SetOption(req abci.RequestSetOption) (res abci.ResponseSetOption) {
@@ -869,12 +890,18 @@ func NewAccNonceHandler(ak auth.AccountKeeper) sdk.AccNonceHandler {
 }
 
 func PreRun(ctx *server.Context, cmd *cobra.Command) error {
+
+	prepareSnapshotDataIfNeed(viper.GetString(server.FlagStartFromSnapshot), viper.GetString(flags.FlagHome), ctx.Logger)
+
 	// check start flag conflicts
 	err := sanity.CheckStart()
 	if err != nil {
 		return err
 	}
 
+	if maxThreads := viper.GetInt(FlagGolangMaxThreads); maxThreads != 0 {
+		debug.SetMaxThreads(maxThreads)
+	}
 	// set config by node mode
 	err = setNodeConfig(ctx)
 	if err != nil {
@@ -920,5 +947,24 @@ func NewEvmSysContractAddressHandler(ak *evm.Keeper) sdk.EvmSysContractAddressHa
 			return false
 		}
 		return ak.IsMatchSysContractAddress(ctx, addr)
+	}
+}
+
+func NewUpdateCMTxNonceHandler() sdk.UpdateCMTxNonceHandler {
+	return func(tx sdk.Tx, nonce uint64) {
+		if nonce != 0 {
+			switch v := tx.(type) {
+			case *authtypes.StdTx:
+				v.Nonce = nonce
+			case *authtypes.IbcTx:
+				v.Nonce = nonce
+			}
+		}
+	}
+}
+
+func NewGetGasConfigHandler(pk params.Keeper) sdk.GetGasConfigHandler {
+	return func(ctx sdk.Context) *stypes.GasConfig {
+		return pk.GetGasConfig(ctx)
 	}
 }

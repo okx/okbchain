@@ -4,13 +4,12 @@ import (
 	"fmt"
 	"runtime/debug"
 
-	"github.com/pkg/errors"
-
-	"github.com/okx/okbchain/libs/system/trace"
-
 	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
 	sdkerrors "github.com/okx/okbchain/libs/cosmos-sdk/types/errors"
+	"github.com/okx/okbchain/libs/system/trace"
 	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
+	tmtypes "github.com/okx/okbchain/libs/tendermint/types"
+	"github.com/pkg/errors"
 )
 
 type runTxInfo struct {
@@ -32,6 +31,7 @@ type runTxInfo struct {
 
 	reusableCacheMultiStore sdk.CacheMultiStore
 	overridesBytes          []byte
+	outOfGas                bool
 }
 
 func (info *runTxInfo) GetCacheMultiStore() (sdk.CacheMultiStore, bool) {
@@ -113,9 +113,13 @@ func (app *BaseApp) runtxWithInfo(info *runTxInfo, mode runTxMode, txBytes []byt
 	// There is no need to update BlockGasMeter.GasConsumed and info.gInfo using ctx.GasMeter
 	// as gas is not consumed actually when ante failed.
 	isAnteSucceed := false
+	recoverd := false
 	defer func() {
 		if r := recover(); r != nil {
 			err = app.runTx_defer_recover(r, info)
+			recoverd = true
+		}
+		if recoverd {
 			info.msCache = nil //TODO msCache not write
 			info.result = nil
 		}
@@ -138,9 +142,20 @@ func (app *BaseApp) runtxWithInfo(info *runTxInfo, mode runTxMode, txBytes []byt
 	}()
 
 	defer func() {
+		if r := recover(); r != nil {
+			err = app.runTx_defer_recover(r, info)
+			recoverd = true
+		}
 		app.pin(trace.Refund, true, mode)
 		defer app.pin(trace.Refund, false, mode)
-		handler.handleDeferRefund(info)
+		if (tx.GetType() == sdk.StdTxType && isAnteSucceed && err == nil) ||
+			tx.GetType() == sdk.EvmTxType {
+			handler.handleDeferRefund(info)
+		} else {
+			if tmtypes.HigherThanMercury(info.ctx.BlockHeight()) {
+				info.ctx.GasMeter().SetGas(info.ctx.GasMeter().Limit())
+			}
+		}
 	}()
 
 	if err := validateBasicTxMsgs(info.tx.GetMsgs()); err != nil {
@@ -290,20 +305,22 @@ func (app *BaseApp) DeliverTx(req abci.RequestDeliverTx) abci.ResponseDeliverTx 
 		}
 	}
 
+	var deliverTx abci.ResponseDeliverTx
 	info, err := app.runTx(runTxModeDeliver, req.Tx, realTx, LatestSimulateTxHeight)
 	if err != nil {
-		return sdkerrors.ResponseDeliverTx(err, info.gInfo.GasWanted, info.gInfo.GasUsed, app.trace)
-	}
-
-	deliverTx := abci.ResponseDeliverTx{
-		GasWanted: int64(info.gInfo.GasWanted), // TODO: Should type accept unsigned ints?
-		GasUsed:   int64(info.gInfo.GasUsed),   // TODO: Should type accept unsigned ints?
-		Log:       info.result.Log,
-		Data:      info.result.Data,
-		Events:    info.result.Events.ToABCIEvents(),
+		deliverTx = sdkerrors.ResponseDeliverTx(err, info.gInfo.GasWanted, info.gInfo.GasUsed, app.trace)
+	} else {
+		deliverTx = abci.ResponseDeliverTx{
+			GasWanted: int64(info.gInfo.GasWanted), // TODO: Should type accept unsigned ints?
+			GasUsed:   int64(info.gInfo.GasUsed),   // TODO: Should type accept unsigned ints?
+			Log:       info.result.Log,
+			Data:      info.result.Data,
+			Events:    info.result.Events.ToABCIEvents(),
+		}
 	}
 	deliverTx.SetHash(realTx.TxHash())
 	deliverTx.SetType(int(realTx.GetType()))
+
 	return deliverTx
 }
 
@@ -341,19 +358,22 @@ func (app *BaseApp) DeliverRealTx(txes abci.TxEssentials) abci.ResponseDeliverTx
 			return sdkerrors.ResponseDeliverTx(err, 0, 0, app.trace)
 		}
 	}
+	var deliverTx abci.ResponseDeliverTx
 	info, err := app.runTx(runTxModeDeliver, realTx.GetRaw(), realTx, LatestSimulateTxHeight)
 	if err != nil {
-		return sdkerrors.ResponseDeliverTx(err, info.gInfo.GasWanted, info.gInfo.GasUsed, app.trace)
-	}
-	deliverTx := abci.ResponseDeliverTx{
-		GasWanted: int64(info.gInfo.GasWanted), // TODO: Should type accept unsigned ints?
-		GasUsed:   int64(info.gInfo.GasUsed),   // TODO: Should type accept unsigned ints?
-		Log:       info.result.Log,
-		Data:      info.result.Data,
-		Events:    info.result.Events.ToABCIEvents(),
+		deliverTx = sdkerrors.ResponseDeliverTx(err, info.gInfo.GasWanted, info.gInfo.GasUsed, app.trace)
+	} else {
+		deliverTx = abci.ResponseDeliverTx{
+			GasWanted: int64(info.gInfo.GasWanted), // TODO: Should type accept unsigned ints?
+			GasUsed:   int64(info.gInfo.GasUsed),   // TODO: Should type accept unsigned ints?
+			Log:       info.result.Log,
+			Data:      info.result.Data,
+			Events:    info.result.Events.ToABCIEvents(),
+		}
 	}
 	deliverTx.SetHash(realTx.TxHash())
 	deliverTx.SetType(int(realTx.GetType()))
+
 	return deliverTx
 }
 
@@ -370,10 +390,11 @@ func (app *BaseApp) runTx_defer_recover(r interface{}, info *runTxInfo) error {
 	// TODO: Use ErrOutOfGas instead of ErrorOutOfGas which would allow us
 	// to keep the stracktrace.
 	case sdk.ErrorOutOfGas:
+		info.outOfGas = true
 		err = sdkerrors.Wrap(
 			sdkerrors.ErrOutOfGas, fmt.Sprintf(
 				"out of gas in location: %v; gasWanted: %d, gasUsed: %d",
-				rType.Descriptor, info.gasWanted, info.ctx.GasMeter().GasConsumed(),
+				rType.Descriptor, info.gasWanted, info.gasWanted,
 			),
 		)
 
@@ -404,7 +425,7 @@ func (app *BaseApp) asyncDeliverTx(txIndex int) *executeResult {
 		return asyncExe
 	}
 
-	if !txStatus.isEvm {
+	if !txStatus.supportPara {
 		asyncExe := newExecuteResult(abci.ResponseDeliverTx{}, nil, uint32(txIndex), nil,
 			blockHeight, sdk.EmptyWatcher{}, nil, app.parallelTxManage, nil)
 		return asyncExe
@@ -423,6 +444,8 @@ func (app *BaseApp) asyncDeliverTx(txIndex int) *executeResult {
 			Events:    info.result.Events.ToABCIEvents(),
 		}
 	}
+	resp.SetHash(txStatus.stdTx.TxHash())
+	resp.SetType(int(txStatus.stdTx.GetType()))
 
 	asyncExe := newExecuteResult(resp, info.msCacheAnte, uint32(txIndex), info.ctx.ParaMsg(),
 		blockHeight, info.runMsgCtx.GetWatcher(), info.tx.GetMsgs(), app.parallelTxManage, info.ctx.GetFeeSplitInfo())

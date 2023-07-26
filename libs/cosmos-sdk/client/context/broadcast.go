@@ -46,6 +46,7 @@ func (ctx CLIContext) CheckTendermintError(err error, txBytes []byte) *sdk.TxRes
 		return nil
 	}
 
+	txBytes = mempool.GetRealTxFromWrapCMTx(txBytes)
 	errStr := strings.ToLower(err.Error())
 	txHash := fmt.Sprintf("%X", types.Tx(txBytes).Hash())
 

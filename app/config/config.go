@@ -49,12 +49,20 @@ type OkbcConfig struct {
 	maxGasUsedPerBlock int64
 	// mempool.enable-pgu
 	enablePGU bool
+	// mempool.pgu-percentage-threshold
+	pguPercentageThreshold int64
+	// mempool.pgu-concurrency
+	pguConcurrency int
 	// mempool.pgu-adjustment
 	pguAdjustment float64
+	// mempool.pgu-persist
+	pguPersist bool
 	// mempool.node_key_whitelist
 	nodeKeyWhitelist []string
 	//mempool.check_tx_cost
 	mempoolCheckTxCost bool
+	//mempool.pending-pool-blacklist
+	pendingPoolBlacklist string
 	// p2p.sentry_addrs
 	sentryAddrs []string
 
@@ -122,6 +130,8 @@ type OkbcConfig struct {
 
 	//
 	commitGapOffset int64
+
+	maxSubscriptionClients int
 }
 
 const (
@@ -135,10 +145,14 @@ const (
 	FlagMaxTxNumPerBlock           = "mempool.max_tx_num_per_block"
 	FlagMaxGasUsedPerBlock         = "mempool.max_gas_used_per_block"
 	FlagEnablePGU                  = "mempool.enable-pgu"
+	FlagPGUPercentageThreshold     = "mempool.pgu-percentage-threshold"
+	FlagPGUConcurrency             = "mempool.pgu-concurrency"
 	FlagPGUAdjustment              = "mempool.pgu-adjustment"
+	FlagPGUPersist                 = "mempool.pgu-persist"
 	FlagNodeKeyWhitelist           = "mempool.node_key_whitelist"
 	FlagMempoolCheckTxCost         = "mempool.check_tx_cost"
 	FlagMempoolEnableDeleteMinGPTx = "mempool.enable_delete_min_gp_tx"
+	FlagPendingPoolBlacklist       = "mempool.pending-pool-blacklist"
 	FlagGasLimitBuffer             = "gas-limit-buffer"
 	FlagEnableDynamicGp            = "enable-dynamic-gp"
 	FlagDynamicGpMode              = "dynamic-gp-mode"
@@ -159,6 +173,7 @@ const (
 	FlagEnableHasBlockPartMsg      = "enable-blockpart-ack"
 	FlagDebugGcInterval            = "debug.gc-interval"
 	FlagCommitGapOffset            = "commit-gap-offset"
+	FlagMaxSubscriptionClients     = "max-subscription-clients"
 )
 
 var (
@@ -275,9 +290,13 @@ func (c *OkbcConfig) loadFromConfig() {
 	c.SetMempoolCheckTxCost(viper.GetBool(FlagMempoolCheckTxCost))
 	c.SetMaxTxNumPerBlock(viper.GetInt64(FlagMaxTxNumPerBlock))
 	c.SetEnableDeleteMinGPTx(viper.GetBool(FlagMempoolEnableDeleteMinGPTx))
+	c.SetPendingPoolBlacklist(viper.GetString(FlagPendingPoolBlacklist))
 	c.SetMaxGasUsedPerBlock(viper.GetInt64(FlagMaxGasUsedPerBlock))
 	c.SetEnablePGU(viper.GetBool(FlagEnablePGU))
+	c.SetPGUPercentageThreshold(viper.GetInt64(FlagPGUPercentageThreshold))
+	c.SetPGUConcurrency(viper.GetInt(FlagPGUConcurrency))
 	c.SetPGUAdjustment(viper.GetFloat64(FlagPGUAdjustment))
+	c.SetPGUPersist(viper.GetBool(FlagPGUPersist))
 	c.SetGasLimitBuffer(viper.GetUint64(FlagGasLimitBuffer))
 
 	c.SetEnableDynamicGp(viper.GetBool(FlagEnableDynamicGp))
@@ -308,6 +327,7 @@ func (c *OkbcConfig) loadFromConfig() {
 	c.SetEnableHasBlockPartMsg(viper.GetBool(FlagEnableHasBlockPartMsg))
 	c.SetGcInterval(viper.GetInt(FlagDebugGcInterval))
 	c.SetIavlAcNoBatch(viper.GetBool(tmiavl.FlagIavlCommitAsyncNoBatch))
+	c.SetMaxSubscriptionClients(viper.GetInt(FlagMaxSubscriptionClients))
 }
 
 func resolveNodeKeyWhitelist(plain string) []string {
@@ -356,6 +376,7 @@ func (c *OkbcConfig) format() string {
 	mempool.flush: %v
 	mempool.max_tx_num_per_block: %d
 	mempool.enable_delete_min_gp_tx: %v
+	mempool.pending-pool-blacklist: %v
 	mempool.max_gas_used_per_block: %d
 	mempool.check_tx_cost: %v
 
@@ -380,7 +401,8 @@ func (c *OkbcConfig) format() string {
     commit-gap-height: %d
 	enable-analyzer: %v
     iavl-commit-async-no-batch: %v
-	active-view-change: %v`, system.ChainName,
+	active-view-change: %v
+	max_subscription_clients: %v`, system.ChainName,
 		c.GetMempoolRecheck(),
 		c.GetMempoolForceRecheckGap(),
 		c.GetMempoolSize(),
@@ -388,6 +410,7 @@ func (c *OkbcConfig) format() string {
 		c.GetMempoolFlush(),
 		c.GetMaxTxNumPerBlock(),
 		c.GetEnableDeleteMinGPTx(),
+		c.GetPendingPoolBlacklist(),
 		c.GetMaxGasUsedPerBlock(),
 		c.GetMempoolCheckTxCost(),
 		c.GetGasLimitBuffer(),
@@ -410,6 +433,7 @@ func (c *OkbcConfig) format() string {
 		c.GetEnableAnalyzer(),
 		c.GetIavlAcNoBatch(),
 		c.GetActiveVC(),
+		c.GetMaxSubscriptionClients(),
 	)
 }
 
@@ -462,6 +486,8 @@ func (c *OkbcConfig) updateFromKVStr(k, v string) {
 			return
 		}
 		c.SetEnableDeleteMinGPTx(r)
+	case FlagPendingPoolBlacklist:
+		c.SetPendingPoolBlacklist(v)
 	case FlagNodeKeyWhitelist:
 		c.SetNodeKeyWhitelist(v)
 	case FlagMempoolCheckTxCost:
@@ -484,12 +510,30 @@ func (c *OkbcConfig) updateFromKVStr(k, v string) {
 			return
 		}
 		c.SetEnablePGU(r)
+	case FlagPGUPercentageThreshold:
+		r, err := strconv.ParseInt(v, 10, 64)
+		if err != nil {
+			return
+		}
+		c.SetPGUPercentageThreshold(r)
+	case FlagPGUConcurrency:
+		r, err := strconv.Atoi(v)
+		if err != nil {
+			return
+		}
+		c.SetPGUConcurrency(r)
 	case FlagPGUAdjustment:
 		r, err := strconv.ParseFloat(v, 64)
 		if err != nil {
 			return
 		}
 		c.SetPGUAdjustment(r)
+	case FlagPGUPersist:
+		r, err := strconv.ParseBool(v)
+		if err != nil {
+			return
+		}
+		c.SetPGUPersist(r)
 	case FlagGasLimitBuffer:
 		r, err := strconv.ParseUint(v, 10, 64)
 		if err != nil {
@@ -658,6 +702,12 @@ func (c *OkbcConfig) updateFromKVStr(k, v string) {
 			return
 		}
 		c.SetCommitGapOffset(r)
+	case FlagMaxSubscriptionClients:
+		r, err := strconv.Atoi(v)
+		if err != nil {
+			return
+		}
+		c.SetMaxSubscriptionClients(r)
 	}
 
 }
@@ -802,12 +852,36 @@ func (c *OkbcConfig) SetEnablePGU(value bool) {
 	c.enablePGU = value
 }
 
+func (c *OkbcConfig) GetPGUPercentageThreshold() int64 {
+	return c.pguPercentageThreshold
+}
+
+func (c *OkbcConfig) SetPGUPercentageThreshold(value int64) {
+	c.pguPercentageThreshold = value
+}
+
+func (c *OkbcConfig) GetPGUConcurrency() int {
+	return c.pguConcurrency
+}
+
+func (c *OkbcConfig) SetPGUConcurrency(value int) {
+	c.pguConcurrency = value
+}
+
 func (c *OkbcConfig) GetPGUAdjustment() float64 {
 	return c.pguAdjustment
 }
 
 func (c *OkbcConfig) SetPGUAdjustment(value float64) {
 	c.pguAdjustment = value
+}
+
+func (c *OkbcConfig) GetPGUPersist() bool {
+	return c.pguPersist
+}
+
+func (c *OkbcConfig) SetPGUPersist(value bool) {
+	c.pguPersist = value
 }
 
 func (c *OkbcConfig) GetGasLimitBuffer() uint64 {
@@ -1074,4 +1148,23 @@ func (c *OkbcConfig) GetIavlAcNoBatch() bool {
 
 func (c *OkbcConfig) SetIavlAcNoBatch(value bool) {
 	c.iavlAcNoBatch = value
+}
+
+func (c *OkbcConfig) SetMaxSubscriptionClients(v int) {
+	if v < 0 {
+		v = 0
+	}
+	c.maxSubscriptionClients = v
+}
+
+func (c *OkbcConfig) GetMaxSubscriptionClients() int {
+	return c.maxSubscriptionClients
+}
+
+func (c *OkbcConfig) SetPendingPoolBlacklist(v string) {
+	c.pendingPoolBlacklist = v
+}
+
+func (c *OkbcConfig) GetPendingPoolBlacklist() string {
+	return c.pendingPoolBlacklist
 }

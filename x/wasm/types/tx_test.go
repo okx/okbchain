@@ -14,11 +14,9 @@ import (
 const firstCodeID = 1
 
 func TestStoreCodeValidation(t *testing.T) {
-	bad, err := sdk.AccAddressFromHex("012345")
-	require.NoError(t, err)
-	badAddress := bad.String()
+	badAddress := "0x12345"
 	// proper address size
-	goodAddress := sdk.AccAddress(make([]byte, ContractAddrLen)).String()
+	goodAddress := sdk.WasmAddress(make([]byte, SDKAddrLen)).String()
 	sdk.GetConfig().SetAddressVerifier(VerifyAddressLen())
 	cases := map[string]struct {
 		msg   MsgStoreCode
@@ -78,11 +76,9 @@ func TestStoreCodeValidation(t *testing.T) {
 }
 
 func TestInstantiateContractValidation(t *testing.T) {
-	bad, err := sdk.AccAddressFromHex("012345")
-	require.NoError(t, err)
-	badAddress := bad.String()
+	badAddress := "0x12345"
 	// proper address size
-	goodAddress := sdk.AccAddress(make([]byte, 20)).String()
+	goodAddress := sdk.WasmAddress(make([]byte, 20)).String()
 
 	cases := map[string]struct {
 		msg   MsgInstantiateContract
@@ -185,11 +181,9 @@ func TestInstantiateContractValidation(t *testing.T) {
 }
 
 func TestExecuteContractValidation(t *testing.T) {
-	bad, err := sdk.AccAddressFromHex("012345")
-	require.NoError(t, err)
-	badAddress := bad.String()
+	badAddress := "0x12345"
 	// proper address size
-	goodAddress := sdk.AccAddress(make([]byte, 20)).String()
+	goodAddress := sdk.WasmAddress(make([]byte, 20)).String()
 	fmt.Println(badAddress, goodAddress)
 
 	cases := map[string]struct {
@@ -295,13 +289,11 @@ func TestExecuteContractValidation(t *testing.T) {
 }
 
 func TestMsgUpdateAdministrator(t *testing.T) {
-	bad, err := sdk.AccAddressFromHex("012345")
-	require.NoError(t, err)
-	badAddress := bad.String()
+	badAddress := "0x12345"
 	// proper address size
-	goodAddress := sdk.AccAddress(make([]byte, 20)).String()
-	otherGoodAddress := sdk.AccAddress(bytes.Repeat([]byte{0x1}, 20)).String()
-	anotherGoodAddress := sdk.AccAddress(bytes.Repeat([]byte{0x2}, 20)).String()
+	goodAddress := sdk.WasmAddress(make([]byte, 20)).String()
+	otherGoodAddress := sdk.WasmAddress(bytes.Repeat([]byte{0x1}, 20)).String()
+	anotherGoodAddress := sdk.WasmAddress(bytes.Repeat([]byte{0x2}, 20)).String()
 
 	specs := map[string]struct {
 		src    MsgUpdateAdmin
@@ -367,12 +359,10 @@ func TestMsgUpdateAdministrator(t *testing.T) {
 }
 
 func TestMsgClearAdministrator(t *testing.T) {
-	bad, err := sdk.AccAddressFromHex("012345")
-	require.NoError(t, err)
-	badAddress := bad.String()
+	badAddress := "0x12345"
 	// proper address size
-	goodAddress := sdk.AccAddress(make([]byte, 20)).String()
-	anotherGoodAddress := sdk.AccAddress(bytes.Repeat([]byte{0x2}, 20)).String()
+	goodAddress := sdk.WasmAddress(make([]byte, 20)).String()
+	anotherGoodAddress := sdk.WasmAddress(bytes.Repeat([]byte{0x2}, 20)).String()
 
 	specs := map[string]struct {
 		src    MsgClearAdmin
@@ -418,12 +408,10 @@ func TestMsgClearAdministrator(t *testing.T) {
 }
 
 func TestMsgMigrateContract(t *testing.T) {
-	bad, err := sdk.AccAddressFromHex("012345")
-	require.NoError(t, err)
-	badAddress := bad.String()
+	badAddress := "0x12345"
 	// proper address size
-	goodAddress := sdk.AccAddress(make([]byte, 20)).String()
-	anotherGoodAddress := sdk.AccAddress(bytes.Repeat([]byte{0x2}, 20)).String()
+	goodAddress := sdk.WasmAddress(make([]byte, 20)).String()
+	anotherGoodAddress := sdk.WasmAddress(bytes.Repeat([]byte{0x2}, 20)).String()
 
 	specs := map[string]struct {
 		src    MsgMigrateContract
@@ -554,6 +542,103 @@ func TestMsgJsonSignBytes(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			bz := spec.src.GetSignBytes()
 			assert.JSONEq(t, spec.exp, string(bz), "raw: %s", string(bz))
+		})
+	}
+}
+
+func TestMsgStoreCodeFnSignatureInfo(t *testing.T) {
+	cases := map[string]struct {
+		msg MsgStoreCode
+		len int
+		err error
+	}{
+		"normal": {
+			msg: MsgStoreCode{
+				Sender:       sdk.WasmAddress(make([]byte, 20)).String(),
+				WASMByteCode: []byte("foo"),
+			},
+			len: 3,
+			err: nil,
+		},
+		"empty": {
+			msg: MsgStoreCode{
+				Sender:       sdk.WasmAddress(make([]byte, 20)).String(),
+				WASMByteCode: []byte(""),
+			},
+			len: 0,
+			err: fmt.Errorf("wasm byte code length is 0"),
+		},
+	}
+
+	for name, tc := range cases {
+		t.Run(name, func(t *testing.T) {
+			name, lenFn, err := tc.msg.FnSignatureInfo()
+			require.Equal(t, name, "store-code")
+			require.Equal(t, lenFn, tc.len)
+			require.Equal(t, err, tc.err)
+		})
+	}
+}
+
+func TestMsgExecuteContractFnSignatureInfo(t *testing.T) {
+	cases := map[string]struct {
+		msg  MsgExecuteContract
+		name string
+		err  error
+	}{
+		"normal": {
+			msg: MsgExecuteContract{
+				Sender:   sdk.WasmAddress(make([]byte, 20)).String(),
+				Contract: sdk.WasmAddress(make([]byte, 20)).String(),
+				Msg:      []byte("{\"press\":{\"ascending\":true}}"),
+			},
+			name: "0x0000000000000000000000000000000000000000press",
+			err:  nil,
+		},
+		"empty msg name": {
+			msg: MsgExecuteContract{
+				Sender:   sdk.WasmAddress(make([]byte, 20)).String(),
+				Contract: sdk.WasmAddress(make([]byte, 20)).String(),
+				Msg:      []byte("{\"\":{\"ascending\":true}}"),
+			},
+			name: "",
+			err:  fmt.Errorf("msg has not method:{\"\":{\"ascending\":true}}"),
+		},
+		"validate msg": {
+			msg: MsgExecuteContract{
+				Sender:   sdk.WasmAddress(make([]byte, 20)).String(),
+				Contract: sdk.WasmAddress(make([]byte, 20)).String(),
+				Msg:      []byte("sdfasdf"),
+			},
+			name: "",
+			err:  fmt.Errorf("failed to validate msg:invalid"),
+		},
+		"check msg method, 0": {
+			msg: MsgExecuteContract{
+				Sender:   sdk.WasmAddress(make([]byte, 20)).String(),
+				Contract: sdk.WasmAddress(make([]byte, 20)).String(),
+				Msg:      []byte("{}"),
+			},
+			name: "",
+			err:  fmt.Errorf("failed to check msg method:{}"),
+		},
+		"check msg method, 1": {
+			msg: MsgExecuteContract{
+				Sender:   sdk.WasmAddress(make([]byte, 20)).String(),
+				Contract: sdk.WasmAddress(make([]byte, 20)).String(),
+				Msg:      []byte("{\"press\":{\"ascending\":true},\"hello\":{\"ascending\":true}}"),
+			},
+			name: "",
+			err:  fmt.Errorf("failed to check msg method:{\"press\":{\"ascending\":true},\"hello\":{\"ascending\":true}}"),
+		},
+	}
+
+	for name, tc := range cases {
+		t.Run(name, func(t *testing.T) {
+			name, lenFn, err := tc.msg.FnSignatureInfo()
+			require.Equal(t, tc.name, name)
+			require.Equal(t, lenFn, 0)
+			require.Equal(t, tc.err, err)
 		})
 	}
 }

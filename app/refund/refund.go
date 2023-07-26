@@ -13,6 +13,7 @@ import (
 	"github.com/okx/okbchain/libs/cosmos-sdk/x/auth"
 	"github.com/okx/okbchain/libs/cosmos-sdk/x/auth/exported"
 	"github.com/okx/okbchain/libs/cosmos-sdk/x/auth/types"
+	tmtypes "github.com/okx/okbchain/libs/tendermint/types"
 )
 
 func NewGasRefundHandler(ak auth.AccountKeeper, sk types.SupplyKeeper, ik innertx.InnerTxKeeper) sdk.GasRefundHandler {
@@ -23,10 +24,14 @@ func NewGasRefundHandler(ak auth.AccountKeeper, sk types.SupplyKeeper, ik innert
 	) (refundFee sdk.Coins, err error) {
 		var gasRefundHandler sdk.GasRefundHandler
 
-		if tx.GetType() == sdk.EvmTxType {
+		if tmtypes.HigherThanEarth(ctx.BlockHeight()) {
 			gasRefundHandler = evmGasRefundHandler
 		} else {
-			return nil, nil
+			if tx.GetType() == sdk.EvmTxType {
+				gasRefundHandler = evmGasRefundHandler
+			} else {
+				return nil, nil
+			}
 		}
 		return gasRefundHandler(ctx, tx)
 	}
@@ -56,6 +61,18 @@ func gasRefund(ik innertx.InnerTxKeeper, ak accountKeeperInterface, sk types.Sup
 
 	if gasUsed >= gasLimit {
 		return nil, nil
+	}
+
+	if tmtypes.HigherThanMercury(ctx.BlockHeight()) {
+		if ctx.GetOutOfGas() {
+			ctx.GasMeter().SetGas(ctx.GasMeter().Limit())
+			currentGasMeter.SetGas(gasLimit)
+			return nil, nil
+		}
+	} else {
+		if tx.GetType() == sdk.StdTxType && ctx.GetOutOfGas() {
+			return nil, nil
+		}
 	}
 
 	feeTx, ok := tx.(ante.FeeTx)
