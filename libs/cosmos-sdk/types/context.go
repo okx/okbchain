@@ -49,6 +49,7 @@ type Context struct {
 	accountCache        *AccountCache
 	paraMsg             *ParaMsg
 	//	txCount            uint32
+	wasmCallDepth     uint32
 	overridesBytes    []byte // overridesBytes is used to save overrides info, passed from ethCall to x/evm
 	watcher           *TxWatcher
 	feesplitInfo      *FeeSplitInfo
@@ -414,6 +415,18 @@ func (c *Context) SetWatcher(w IWatcher) {
 		return
 	}
 	c.watcher.IWatcher = w
+}
+
+func (c *Context) IncrementCallDepth() {
+	c.wasmCallDepth++
+}
+
+func (c *Context) DecrementCallDepth() {
+	c.wasmCallDepth--
+}
+
+func (c *Context) CallDepth() uint32 {
+	return c.wasmCallDepth
 }
 
 func (c *Context) GetWatcher() IWatcher {
