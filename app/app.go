@@ -721,6 +721,7 @@ func NewOKBChainApp(
 		}
 		app.InitUpgrade(ctx)
 		app.WasmKeeper.UpdateGasRegister(ctx)
+		app.WasmKeeper.UpdateCurBlockNum(ctx)
 	}
 
 	app.ScopedIBCKeeper = scopedIBCKeeper
