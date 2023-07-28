@@ -532,6 +532,7 @@ func (k Keeper) instantiate(ctx sdk.Context, codeID uint64, creator, admin, cont
 		CanonicalAddress: canonicalAddress,
 		Contract:         contractExternal(ctx, k),
 	}
+	gasInfo := types.GetGasInfo(k.gasRegister.GetGasMultiplier())
 
 	// create prefixed data store
 	// 0x00 | BuildContractAddress (sdk.WasmAddress) | stateRoot
@@ -543,7 +544,7 @@ func (k Keeper) instantiate(ctx sdk.Context, codeID uint64, creator, admin, cont
 
 	// instantiate wasm contract
 	gas := k.runtimeGasForContract(ctx)
-	res, gasUsed, err := k.wasmVM.Instantiate(codeInfo.CodeHash, env, info, initMsg, prefixStoreAdapter, cosmwasmAPI, querier, k.gasMeter(ctx), gas, costJSONDeserialization)
+	res, gasUsed, err := k.wasmVM.Instantiate(codeInfo.CodeHash, env, info, initMsg, prefixStoreAdapter, cosmwasmAPI, querier, k.gasMeter(ctx), gas, costJSONDeserialization, gasInfo)
 	k.consumeRuntimeGas(ctx, gasUsed)
 	if !ctx.IsCheckTx() && k.innertxKeeper != nil {
 		k.innertxKeeper.UpdateWasmInnerTx(ctx.TxBytes(), ctx.BlockHeight(), innertx.CosmosDepth, creator, contractAddress, innertx.CosmosCallType, types.InstantiateInnertxName, sdk.Coins{}, err, k.gasRegister.FromWasmVMGas(gasUsed), string(initMsg))
@@ -616,6 +617,7 @@ func (k Keeper) execute(ctx sdk.Context, contractAddress sdk.WasmAddress, caller
 		CanonicalAddress: canonicalAddress,
 		Contract:         contractExternal(ctx, k),
 	}
+	gasInfo := types.GetGasInfo(k.gasRegister.GetGasMultiplier())
 
 	// prepare querier
 	querier := k.newQueryHandler(ctx, contractAddress)
@@ -633,7 +635,7 @@ func (k Keeper) execute(ctx sdk.Context, contractAddress sdk.WasmAddress, caller
 		}
 	}
 
-	res, gasUsed, execErr := k.wasmVM.Execute(codeInfo.CodeHash, env, info, msg, prefixStore, cosmwasmAPI, querier, k.gasMeter(ctx), gas, costJSONDeserialization)
+	res, gasUsed, execErr := k.wasmVM.Execute(codeInfo.CodeHash, env, info, msg, prefixStore, cosmwasmAPI, querier, k.gasMeter(ctx), gas, costJSONDeserialization, gasInfo)
 	k.consumeRuntimeGas(ctx, gasUsed)
 	if !ctx.IsCheckTx() && k.innertxKeeper != nil {
 		k.innertxKeeper.UpdateWasmInnerTx(ctx.TxBytes(), ctx.BlockHeight(), innertx.CosmosDepth, caller, contractAddress, innertx.CosmosCallType, types.ExecuteInnertxName, coins, err, k.gasRegister.FromWasmVMGas(gasUsed), string(msg))
