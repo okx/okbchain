@@ -2,8 +2,8 @@ package types
 
 import (
 	"fmt"
-	wasmvmtypes "github.com/CosmWasm/wasmvm/types"
 
+	wasmvmtypes "github.com/CosmWasm/wasmvm/types"
 	"github.com/okx/okbchain/libs/cosmos-sdk/types"
 )
 
