@@ -2,6 +2,7 @@ package types
 
 import (
 	"fmt"
+	stypes "github.com/okx/okbchain/libs/cosmos-sdk/store/types"
 	"reflect"
 	"strings"
 
@@ -254,6 +255,16 @@ func (a *AbsoluteTxPosition) Bytes() []byte {
 	copy(r[0:], sdk.Uint64ToBigEndian(a.BlockHeight))
 	copy(r[8:], sdk.Uint64ToBigEndian(a.TxIndex))
 	return r
+}
+
+func GetGasInfo(gasMultiplier uint64) wasmvmtypes.GasInfo {
+	gc := stypes.KVGasConfig()
+	return wasmvmtypes.GasInfo{
+		WriteCostFlat:    gc.WriteCostFlat,
+		WriteCostPerByte: gc.ReadCostPerByte,
+		DeleteCost:       gc.DeleteCost,
+		GasMultiplier:    gasMultiplier,
+	}
 }
 
 // NewEnv initializes the environment for a contract instance
