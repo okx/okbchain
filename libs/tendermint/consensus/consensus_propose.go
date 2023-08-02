@@ -75,9 +75,41 @@ func (cs *State) isBlockProducer() (string, string) {
 	return isBlockProducer, strings.ToLower(bpStr)
 }
 
+// Used to determine if a node is still a block producer
+// when an active view change event is triggered.
+func (cs *State) isBlockProducerAVC(height int64) bool {
+	isStr, _ := cs.isBlockProducer()
+	if !GetActiveVC() {
+		if isStr == "y" {
+			return true
+		} else {
+			return false
+		}
+	}
+
+	isBlockProducer := false
+	if cs.vcHeight[height] != "" && cs.Round == 0 {
+		avcStr := cs.vcHeight[height]
+		if cs.privValidator != nil && cs.privValidatorPubKey != nil {
+			address := cs.privValidatorPubKey.Address()
+			addrStr := address.String()
+
+			if bytes.Equal([]byte(avcStr), []byte(addrStr)) {
+				isBlockProducer = true
+			}
+		}
+	} else if isStr == "y" {
+		isBlockProducer = true
+	}
+
+	return isBlockProducer
+}
+
 // Enter (CreateEmptyBlocks): from enterNewRound(height,round)
 // Enter (CreateEmptyBlocks, CreateEmptyBlocksInterval > 0 ):
-// 		after enterNewRound(height,round), after timeout of CreateEmptyBlocksInterval
+//
+//	after enterNewRound(height,round), after timeout of CreateEmptyBlocksInterval
+//
 // Enter (!CreateEmptyBlocks) : after enterNewRound(height,round), once txs are in the mempool
 func (cs *State) enterPropose(height int64, round int) {
 	logger := cs.Logger.With("height", height, "round", round)
@@ -102,6 +134,7 @@ func (cs *State) enterPropose(height int64, round int) {
 		newProposer = "-avc-" + cs.vcHeight[height][:6]
 	}
 	cs.stateMtx.RUnlock()
+
 	cs.trc.Pin("enterPropose-%d-%s-%s%s", round, isBlockProducer, bpAddr, newProposer)
 
 	logger.Info(fmt.Sprintf("enterPropose(%v/%v). Current: %v/%v/%v", height, round, cs.Height, cs.Round, cs.Step))

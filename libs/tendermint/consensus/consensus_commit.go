@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"encoding/hex"
 	"fmt"
+	"time"
+
 	"github.com/okx/okbchain/libs/iavl"
 	iavlcfg "github.com/okx/okbchain/libs/iavl/config"
 	"github.com/okx/okbchain/libs/system/trace"
@@ -14,7 +16,6 @@ import (
 	sm "github.com/okx/okbchain/libs/tendermint/state"
 	"github.com/okx/okbchain/libs/tendermint/types"
 	tmtime "github.com/okx/okbchain/libs/tendermint/types/time"
-	"time"
 )
 
 func (cs *State) dumpElapsed(trc *trace.Tracer, schema string) {
@@ -254,6 +255,13 @@ func (cs *State) finalizeCommit(height int64) {
 			cs.Logger.Error("Failed to kill this process - please do so manually", "err", err)
 		}
 		return
+	}
+
+	//Add trace.SimTx After ApplyBlock using isBLockProducer
+	isBlockProducer := cs.isBlockProducerAVC(height)
+	err = cs.blockExec.MempoolLogPgu(isBlockProducer)
+	if err != nil {
+		cs.Logger.Error("Failed to print PGU log from mempool", "Height", height, "err", err)
 	}
 
 	//reset offset after commitGap

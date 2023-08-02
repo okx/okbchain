@@ -457,6 +457,15 @@ func (blockExec *BlockExecutor) commit(
 	return res, res.RetainHeight, err
 }
 
+func (blockExec *BlockExecutor) MempoolLogPgu(isBlockProducer bool) error {
+	clistmempool, ok := blockExec.mempool.(*mempl.CListMempool)
+	if !ok {
+		return fmt.Errorf("error on Printing PGU Log SimTx and SimGasUsed in mempool")
+	}
+	clistmempool.LogPgu(isBlockProducer)
+	return nil
+}
+
 func transTxsToBytes(txs types.Txs) [][]byte {
 	ret := make([][]byte, 0)
 	for _, v := range txs {
