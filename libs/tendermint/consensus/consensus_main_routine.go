@@ -118,7 +118,7 @@ func (cs *State) handleAVCProposal(proposal *types.Proposal) {
 		part := res.blockParts.GetPart(i)
 		cs.sendInternalMessage(msgInfo{&BlockPartMessage{cs.Height, cs.Round, part}, ""})
 	}
-	cs.avcp = true
+	cs.needLogPgu = true
 	cs.trc.Pin("isAVCProposer")
 }
 

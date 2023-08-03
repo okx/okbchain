@@ -163,8 +163,8 @@ type State struct {
 
 	vcMsg    *ViewChangeMessage
 	vcHeight map[int64]string
-	//AVC proposer
-	avcp bool
+	//actual proposer when avc
+	needLogPgu bool
 
 	preBlockTaskChan chan *preBlockTask
 	taskResultChan   chan *preBlockTaskRes
@@ -209,7 +209,7 @@ func NewState(
 		bt:               &BlockTransport{},
 		blockTimeTrc:     trace.NewTracer(trace.LastBlockTime),
 		vcHeight:         make(map[int64]string),
-		avcp:             false,
+		needLogPgu:       false,
 		taskResultChan:   make(chan *preBlockTaskRes, 1),
 		preBlockTaskChan: make(chan *preBlockTask, 1),
 	}

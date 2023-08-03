@@ -257,9 +257,8 @@ func (cs *State) finalizeCommit(height int64) {
 		return
 	}
 
-	//Add trace.SimTx After ApplyBlock using isBLockProducer
-	isBlockProducer := cs.isBlockProducerAVC(height)
-	err = cs.blockExec.MempoolLogPgu(isBlockProducer)
+	//Add trace.SimTx After ApplyBlock using needLogPgu
+	err = cs.blockExec.MempoolLogPgu(cs.needLogPgu)
 	if err != nil {
 		cs.Logger.Error("Failed to print PGU log from mempool", "Height", height, "err", err)
 	}
@@ -409,7 +408,7 @@ func (cs *State) updateToState(state sm.State) {
 	cs.LastValidators = state.LastValidators
 	cs.TriggeredTimeoutPrecommit = false
 	cs.state = state
-	cs.avcp = false
+	cs.needLogPgu = false
 
 	// Finally, broadcast RoundState
 	cs.newStep()
