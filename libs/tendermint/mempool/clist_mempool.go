@@ -1000,9 +1000,6 @@ func (mem *CListMempool) Update(
 	if mem.config.Sealed {
 		return mem.updateSealed(height, txs, deliverTxResponses)
 	}
-	//trace.GetElapsedInfo().AddInfo(trace.SimTx, fmt.Sprintf("%d", mem.info.txCount))
-	//trace.GetElapsedInfo().AddInfo(trace.SimGasUsed, fmt.Sprintf("%d", mem.info.gasUsed))
-	//mem.info.reset()
 
 	// Set height
 	atomic.StoreInt64(&mem.height, height)

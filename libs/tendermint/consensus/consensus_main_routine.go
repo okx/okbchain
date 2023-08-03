@@ -3,14 +3,15 @@ package consensus
 import (
 	"bytes"
 	"fmt"
+	"reflect"
+	"runtime/debug"
+	"time"
+
 	cfg "github.com/okx/okbchain/libs/tendermint/config"
 	cstypes "github.com/okx/okbchain/libs/tendermint/consensus/types"
 	"github.com/okx/okbchain/libs/tendermint/libs/fail"
 	"github.com/okx/okbchain/libs/tendermint/types"
 	tmtime "github.com/okx/okbchain/libs/tendermint/types/time"
-	"reflect"
-	"runtime/debug"
-	"time"
 )
 
 //-----------------------------------------
@@ -117,6 +118,8 @@ func (cs *State) handleAVCProposal(proposal *types.Proposal) {
 		part := res.blockParts.GetPart(i)
 		cs.sendInternalMessage(msgInfo{&BlockPartMessage{cs.Height, cs.Round, part}, ""})
 	}
+	cs.avcp = true
+	cs.trc.Pin("isAVCProposer")
 }
 
 // state transitions on complete-proposal, 2/3-any, 2/3-one

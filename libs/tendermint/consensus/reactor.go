@@ -381,10 +381,6 @@ func (conR *Reactor) Receive(chID byte, src p2p.Peer, msgBytes []byte) {
 			conR.conS.peerMsgQueue <- msgInfo{msg, ""}
 		case *ProposeResponseMessage:
 			conR.conS.peerMsgQueue <- msgInfo{msg, ""}
-			conR.conS.stateMtx.Lock()
-			defer conR.conS.stateMtx.Unlock()
-			conR.conS.vcHeight[msg.Height] = conR.conS.privValidatorPubKey.Address().String()
-			conR.conS.trc.Pin("AVC-PResMsg-%s", conR.conS.privValidatorPubKey.Address().String()[:6])
 		case *ProposeRequestMessage:
 			conR.conS.stateMtx.Lock()
 			defer conR.conS.stateMtx.Unlock()
