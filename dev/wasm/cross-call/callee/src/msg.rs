@@ -18,7 +18,7 @@ pub enum ExecuteMsg {
 #[cw_serde]
 #[derive(QueryResponses)]
 pub enum QueryMsg {
-    #[returns(u256)]
+    #[returns(Uint256)]
     GetCounter {},
 }
 

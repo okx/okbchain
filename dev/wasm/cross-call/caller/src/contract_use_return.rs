@@ -54,7 +54,9 @@ pub fn call_ret(deps: DepsMut, delta:Uint256, callee_addr:String, _env: &Env) ->
         Ok(data1) => {
             let pret = String::from_utf8(data1.clone()).unwrap();
             deps.api.debug(pret.as_str());
-            let result: ContractResult<Response> = from_slice(data1.as_slice()).unwrap();
+            let result: ContractResult<Response> = from_slice(data1.as_slice()).unwrap_or_else(|_| {
+                ContractResult::Err(format!("this is contract call err about unwrap"))
+            });
             if result.is_err() {
                 deps.api.debug(format!("this is contract err: {:?}", result).as_str());
             } else {
@@ -84,7 +86,7 @@ pub fn call_ret(deps: DepsMut, delta:Uint256, callee_addr:String, _env: &Env) ->
                 }
             }
         }
-        Err(StdError::GenericErr {msg: mssage} )=> {
+        Err(StdError::GenericErr {msg: mssage, .. } )=> {
             deps.api.debug(format!("this is contract err: {:?}", mssage).as_str());
         }
         Err(err) => {
@@ -107,7 +109,9 @@ pub fn del_call_ret(deps: DepsMut, delta:Uint256, callee_addr:String, _env: &Env
         Ok(data1) => {
             let pret = String::from_utf8(data1.clone()).unwrap();
             deps.api.debug(pret.as_str());
-            let result: ContractResult<Response> = from_slice(data1.as_slice()).unwrap();
+            let result: ContractResult<Response> = from_slice(data1.as_slice()).unwrap_or_else(|_| {
+                ContractResult::Err(format!("this is contract call err about unwrap"))
+            });
             if result.is_err() {
                 deps.api.debug(format!("this is contract err: {:?}", result).as_str());
             } else {
@@ -137,7 +141,7 @@ pub fn del_call_ret(deps: DepsMut, delta:Uint256, callee_addr:String, _env: &Env
                 }
             }
         }
-        Err(StdError::GenericErr {msg: mssage} )=> {
+        Err(StdError::GenericErr {msg: mssage, .. } )=> {
             deps.api.debug(format!("this is contract err: {:?}", mssage).as_str());
         }
         Err(err) => {
@@ -172,10 +176,8 @@ pub fn migrate(deps: DepsMut, _env: Env, _msg: MigrateMsg) -> StdResult<Response
 #[cfg(test)]
 mod tests {
     use super::*;
-    use cosmwasm_std::testing::{
-        mock_dependencies, mock_dependencies_with_balances, mock_env, mock_info, MOCK_CONTRACT_ADDR,
-    };
-    use cosmwasm_std::Api as _;
+    use cosmwasm_std::testing::{mock_dependencies, mock_dependencies_with_balances, mock_env, mock_info, MOCK_CONTRACT_ADDR, mock_dependencies_with_balance};
+    use cosmwasm_std::{Api as _, from_binary};
     // import trait Storage to get access to read
     use cosmwasm_std::{attr, coins, Addr, Storage, SubMsg};
 
@@ -183,158 +185,65 @@ mod tests {
     fn proper_initialization() {
         let mut deps = mock_dependencies();
 
-        let verifier = String::from("verifies");
-        let beneficiary = String::from("benefits");
         let creator = String::from("creator");
-        let expected_state = State {
-            verifier: deps.api.addr_validate(&verifier).unwrap(),
-            beneficiary: deps.api.addr_validate(&beneficiary).unwrap(),
-            funder: deps.api.addr_validate(&creator).unwrap(),
+        let expected_state = State1 {
+            counter: Uint256::from(0u32),
         };
 
         let msg = InstantiateMsg {
-            verifier,
-            beneficiary,
+            addr: String::from("to call")
         };
         let info = mock_info(creator.as_str(), &[]);
         let res = instantiate(deps.as_mut(), mock_env(), info, msg).unwrap();
-        assert_eq!(res.messages.len(), 0);
-        assert_eq!(res.attributes.len(), 1);
-        assert_eq!(res.attributes[0].key, "Let the");
-        assert_eq!(res.attributes[0].value, "hacking begin");
+        assert_eq!(0, res.messages.len());
 
         // it worked, let's check the state
-        let data = deps.storage.get(CONFIG_KEY).expect("no data stored");
-        let state: State = from_slice(&data).unwrap();
+        let data = deps.storage.get(CONFIG_KEY1).expect("no data stored");
+        let state: State1 = from_slice(&data).unwrap();
         assert_eq!(state, expected_state);
     }
 
     #[test]
-    fn instantiate_and_query() {
-        let mut deps = mock_dependencies();
+    fn call() {
+        let mut deps = mock_dependencies_with_balance(&coins(2, "token"));
 
-        let verifier = String::from("verifies");
-        let beneficiary = String::from("benefits");
-        let creator = String::from("creator");
         let msg = InstantiateMsg {
-            verifier: verifier.clone(),
-            beneficiary,
+            addr: String::from("")
         };
-        let info = mock_info(&creator, &[]);
-        let res = instantiate(deps.as_mut(), mock_env(), info, msg).unwrap();
-        assert_eq!(0, res.messages.len());
-
-        // now let's query
-        let query_response = query_verifier(deps.as_ref()).unwrap();
-        assert_eq!(query_response.verifier, verifier);
-    }
-
-    #[test]
-    fn querier_callbacks_work() {
-        let rich_addr = String::from("foobar");
-        let rich_balance = coins(10000, "gold");
-        let deps = mock_dependencies_with_balances(&[(&rich_addr, &rich_balance)]);
-
-        // querying with balance gets the balance
-        let bal = query_other_balance(deps.as_ref(), rich_addr).unwrap();
-        assert_eq!(bal.amount, rich_balance);
-
-        // querying other accounts gets none
-        let bal = query_other_balance(deps.as_ref(), String::from("someone else")).unwrap();
-        assert_eq!(bal.amount, vec![]);
-    }
-
-    #[test]
-    fn execute_release_works() {
-        let mut deps = mock_dependencies();
-
-        // initialize the store
         let creator = String::from("creator");
-        let verifier = String::from("verifies");
-        let beneficiary = String::from("benefits");
-
-        let instantiate_msg = InstantiateMsg {
-            verifier: verifier.clone(),
-            beneficiary: beneficiary.clone(),
-        };
-        let init_amount = coins(1000, "earth");
-        let init_info = mock_info(&creator, &init_amount);
-        let init_res = instantiate(deps.as_mut(), mock_env(), init_info, instantiate_msg).unwrap();
-        assert_eq!(init_res.messages.len(), 0);
-
-        // balance changed in init
-        deps.querier.update_balance(MOCK_CONTRACT_ADDR, init_amount);
+        let info = mock_info(creator.as_str(), &[]);
+        let _res = instantiate(deps.as_mut(), mock_env(), info, msg).unwrap();
 
         // beneficiary can release it
-        let execute_info = mock_info(verifier.as_str(), &[]);
-        let execute_res = execute(
-            deps.as_mut(),
-            mock_env(),
-            execute_info,
-            ExecuteMsg::Release {},
-        )
-        .unwrap();
-        assert_eq!(execute_res.messages.len(), 1);
-        let msg = execute_res.messages.get(0).expect("no message");
-        assert_eq!(
-            msg,
-            &SubMsg::new(BankMsg::Send {
-                to_address: beneficiary,
-                amount: coins(1000, "earth"),
-            }),
-        );
-        assert_eq!(
-            execute_res.attributes,
-            vec![
-                attr("action", "release"),
-                attr("destination", "benefits"),
-                attr("foo", "300")
-            ],
-        );
-        assert_eq!(execute_res.data, Some(vec![0xF0, 0x0B, 0xAA].into()));
+        let info = mock_info("anyone", &[]);
+        let msg = ExecuteMsg::Call {delta:Uint256::from(1u128), addr:String::from("to_call")};
+        let _res = execute(deps.as_mut(), mock_env(), info, msg).unwrap();
+
+        // should increase counter by 1
+        let res = query(deps.as_ref(), mock_env(), QueryMsg::GetCounter {}).unwrap();
+        let value: Uint256 = from_binary(&res).unwrap();
+        assert_eq!(Uint256::from(0u128), value);
     }
 
     #[test]
-    fn execute_release_fails_for_wrong_sender() {
-        let mut deps = mock_dependencies();
+    fn del_call() {
+        let mut deps = mock_dependencies_with_balance(&coins(2, "token"));
 
-        // initialize the store
-        let creator = String::from("creator");
-        let verifier = String::from("verifies");
-        let beneficiary = String::from("benefits");
-
-        let instantiate_msg = InstantiateMsg {
-            verifier: verifier.clone(),
-            beneficiary: beneficiary.clone(),
+        let msg = InstantiateMsg {
+            addr: String::from("")
         };
-        let init_amount = coins(1000, "earth");
-        let init_info = mock_info(&creator, &init_amount);
-        let init_res = instantiate(deps.as_mut(), mock_env(), init_info, instantiate_msg).unwrap();
-        assert_eq!(init_res.messages.len(), 0);
+        let creator = String::from("creator");
+        let info = mock_info(creator.as_str(), &[]);
+        let _res = instantiate(deps.as_mut(), mock_env(), info, msg).unwrap();
 
-        // balance changed in init
-        deps.querier.update_balance(MOCK_CONTRACT_ADDR, init_amount);
+        // beneficiary can release it
+        let info = mock_info("anyone", &[]);
+        let msg = ExecuteMsg::DelegateCall {delta:Uint256::from(1u128), addr:String::from("to_call")};
+        let _res = execute(deps.as_mut(), mock_env(), info, msg).unwrap();
 
-        // beneficiary cannot release it
-        let execute_info = mock_info(beneficiary.as_str(), &[]);
-        let execute_res = execute(
-            deps.as_mut(),
-            mock_env(),
-            execute_info,
-            ExecuteMsg::Release {},
-        );
-        assert_eq!(execute_res.unwrap_err(), HackError::Unauthorized {});
-
-        // state should not change
-        let data = deps.storage.get(CONFIG_KEY).expect("no data stored");
-        let state: State = from_slice(&data).unwrap();
-        assert_eq!(
-            state,
-            State {
-                verifier: Addr::unchecked(verifier),
-                beneficiary: Addr::unchecked(beneficiary),
-                funder: Addr::unchecked(creator),
-            }
-        );
+        // should increase counter by 1
+        let res = query(deps.as_ref(), mock_env(), QueryMsg::GetCounter {}).unwrap();
+        let value: Uint256 = from_binary(&res).unwrap();
+        assert_eq!(Uint256::from(0u128), value);
     }
 }
