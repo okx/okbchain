@@ -708,6 +708,7 @@ func NewOKBChainApp(
 	app.SetEvmWatcherCollector(app.EvmKeeper.Watcher.Collect)
 	app.SetUpdateCMTxNonceHandler(NewUpdateCMTxNonceHandler())
 	app.SetGetGasConfigHandler(NewGetGasConfigHandler(app.ParamsKeeper))
+	app.SetGetBlockConfigHandler(NewGetBlockConfigHandler(app.ParamsKeeper))
 	mpt.AccountStateRootRetriever = app.AccountKeeper
 	if loadLatest {
 		err := app.LoadLatestVersion(app.keys[bam.MainStoreKey])
@@ -970,5 +971,11 @@ func NewUpdateCMTxNonceHandler() sdk.UpdateCMTxNonceHandler {
 func NewGetGasConfigHandler(pk params.Keeper) sdk.GetGasConfigHandler {
 	return func(ctx sdk.Context) *stypes.GasConfig {
 		return pk.GetGasConfig(ctx)
+	}
+}
+
+func NewGetBlockConfigHandler(pk params.Keeper) sdk.GetBlockConfigHandler {
+	return func(ctx sdk.Context) *sdk.BlockConfig {
+		return pk.GetBlockConfig(ctx)
 	}
 }
