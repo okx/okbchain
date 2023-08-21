@@ -16,6 +16,7 @@ import (
 
 	ethcommon "github.com/ethereum/go-ethereum/common"
 	"github.com/gorilla/mux"
+
 	"github.com/okx/okbchain/libs/cosmos-sdk/client/context"
 	"github.com/okx/okbchain/libs/cosmos-sdk/client/rpc"
 	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
@@ -215,6 +216,10 @@ func ManageContractMethodBlockedListProposalRESTHandler(context.CLIContext) govR
 
 // ManageContractBytecodeProposalRESTHandler defines evm proposal handler
 func ManageContractBytecodeProposalRESTHandler(context.CLIContext) govRest.ProposalRESTHandler {
+	return govRest.ProposalRESTHandler{}
+}
+
+func ManageBrczeroEVMDataProposalRESTHandler(context.CLIContext) govRest.ProposalRESTHandler {
 	return govRest.ProposalRESTHandler{}
 }
 

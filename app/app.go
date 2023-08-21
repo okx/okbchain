@@ -2,52 +2,25 @@ package app
 
 import (
 	"fmt"
-	"github.com/okx/okbchain/libs/cosmos-sdk/client/flags"
 	"io"
 	"os"
 	"runtime/debug"
 	"sync"
-
-	paramstypes "github.com/okx/okbchain/x/params/types"
-
-	"github.com/okx/okbchain/x/vmbridge"
-
-	ica "github.com/okx/okbchain/libs/ibc-go/modules/apps/27-interchain-accounts"
-	icacontroller "github.com/okx/okbchain/libs/ibc-go/modules/apps/27-interchain-accounts/controller"
-	icahost "github.com/okx/okbchain/libs/ibc-go/modules/apps/27-interchain-accounts/host"
-	"github.com/okx/okbchain/x/icamauth"
-
-	ibccommon "github.com/okx/okbchain/libs/ibc-go/modules/core/common"
-
-	icacontrollertypes "github.com/okx/okbchain/libs/ibc-go/modules/apps/27-interchain-accounts/controller/types"
-	icahosttypes "github.com/okx/okbchain/libs/ibc-go/modules/apps/27-interchain-accounts/host/types"
-	icamauthtypes "github.com/okx/okbchain/x/icamauth/types"
-
-	icacontrollerkeeper "github.com/okx/okbchain/libs/ibc-go/modules/apps/27-interchain-accounts/controller/keeper"
-	icahostkeeper "github.com/okx/okbchain/libs/ibc-go/modules/apps/27-interchain-accounts/host/keeper"
-	icamauthkeeper "github.com/okx/okbchain/x/icamauth/keeper"
-
-	ibcfeekeeper "github.com/okx/okbchain/libs/ibc-go/modules/apps/29-fee/keeper"
-
-	icatypes "github.com/okx/okbchain/libs/ibc-go/modules/apps/27-interchain-accounts/types"
-	ibcfeetypes "github.com/okx/okbchain/libs/ibc-go/modules/apps/29-fee/types"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"google.golang.org/grpc/encoding"
 	"google.golang.org/grpc/encoding/proto"
 
-	ibcfee "github.com/okx/okbchain/libs/ibc-go/modules/apps/29-fee"
-
-	"github.com/okx/okbchain/app/utils/appstatus"
-
 	"github.com/okx/okbchain/app/ante"
 	chaincodec "github.com/okx/okbchain/app/codec"
 	appconfig "github.com/okx/okbchain/app/config"
 	"github.com/okx/okbchain/app/refund"
 	chain "github.com/okx/okbchain/app/types"
+	"github.com/okx/okbchain/app/utils/appstatus"
 	"github.com/okx/okbchain/app/utils/sanity"
 	bam "github.com/okx/okbchain/libs/cosmos-sdk/baseapp"
+	"github.com/okx/okbchain/libs/cosmos-sdk/client/flags"
 	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
 	"github.com/okx/okbchain/libs/cosmos-sdk/server"
 	"github.com/okx/okbchain/libs/cosmos-sdk/simapp"
@@ -69,6 +42,17 @@ import (
 	"github.com/okx/okbchain/libs/cosmos-sdk/x/supply"
 	"github.com/okx/okbchain/libs/cosmos-sdk/x/upgrade"
 	"github.com/okx/okbchain/libs/iavl"
+	ica "github.com/okx/okbchain/libs/ibc-go/modules/apps/27-interchain-accounts"
+	icacontroller "github.com/okx/okbchain/libs/ibc-go/modules/apps/27-interchain-accounts/controller"
+	icacontrollerkeeper "github.com/okx/okbchain/libs/ibc-go/modules/apps/27-interchain-accounts/controller/keeper"
+	icacontrollertypes "github.com/okx/okbchain/libs/ibc-go/modules/apps/27-interchain-accounts/controller/types"
+	icahost "github.com/okx/okbchain/libs/ibc-go/modules/apps/27-interchain-accounts/host"
+	icahostkeeper "github.com/okx/okbchain/libs/ibc-go/modules/apps/27-interchain-accounts/host/keeper"
+	icahosttypes "github.com/okx/okbchain/libs/ibc-go/modules/apps/27-interchain-accounts/host/types"
+	icatypes "github.com/okx/okbchain/libs/ibc-go/modules/apps/27-interchain-accounts/types"
+	ibcfee "github.com/okx/okbchain/libs/ibc-go/modules/apps/29-fee"
+	ibcfeekeeper "github.com/okx/okbchain/libs/ibc-go/modules/apps/29-fee/keeper"
+	ibcfeetypes "github.com/okx/okbchain/libs/ibc-go/modules/apps/29-fee/types"
 	ibctransfer "github.com/okx/okbchain/libs/ibc-go/modules/apps/transfer"
 	ibctransferkeeper "github.com/okx/okbchain/libs/ibc-go/modules/apps/transfer/keeper"
 	ibctransfertypes "github.com/okx/okbchain/libs/ibc-go/modules/apps/transfer/types"
@@ -78,6 +62,7 @@ import (
 	ibcclienttypes "github.com/okx/okbchain/libs/ibc-go/modules/core/02-client/types"
 	ibcporttypes "github.com/okx/okbchain/libs/ibc-go/modules/core/05-port/types"
 	ibchost "github.com/okx/okbchain/libs/ibc-go/modules/core/24-host"
+	ibccommon "github.com/okx/okbchain/libs/ibc-go/modules/core/common"
 	"github.com/okx/okbchain/libs/system"
 	"github.com/okx/okbchain/libs/system/trace"
 	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
@@ -99,13 +84,18 @@ import (
 	"github.com/okx/okbchain/x/genutil"
 	"github.com/okx/okbchain/x/gov"
 	"github.com/okx/okbchain/x/gov/keeper"
+	"github.com/okx/okbchain/x/icamauth"
+	icamauthkeeper "github.com/okx/okbchain/x/icamauth/keeper"
+	icamauthtypes "github.com/okx/okbchain/x/icamauth/types"
 	"github.com/okx/okbchain/x/infura"
 	"github.com/okx/okbchain/x/params"
 	paramsclient "github.com/okx/okbchain/x/params/client"
+	paramstypes "github.com/okx/okbchain/x/params/types"
 	"github.com/okx/okbchain/x/slashing"
 	"github.com/okx/okbchain/x/staking"
 	stakingclient "github.com/okx/okbchain/x/staking/client"
 	"github.com/okx/okbchain/x/token"
+	"github.com/okx/okbchain/x/vmbridge"
 	"github.com/okx/okbchain/x/wasm"
 	wasmclient "github.com/okx/okbchain/x/wasm/client"
 	wasmkeeper "github.com/okx/okbchain/x/wasm/keeper"
@@ -148,6 +138,7 @@ var (
 			distr.WithdrawRewardEnabledProposalHandler,
 			distr.RewardTruncatePrecisionProposalHandler,
 			evmclient.ManageContractDeploymentWhitelistProposalHandler,
+			evmclient.ManageBrczeroEVMDataProposalHandler,
 			evmclient.ManageContractBlockedListProposalHandler,
 			evmclient.ManageContractMethodGuFactorProposalHandler,
 			evmclient.ManageContractMethodBlockedListProposalHandler,

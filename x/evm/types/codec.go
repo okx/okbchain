@@ -1,9 +1,10 @@
 package types
 
 import (
+	"github.com/tendermint/go-amino"
+
 	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
 	"github.com/okx/okbchain/libs/system"
-	"github.com/tendermint/go-amino"
 )
 
 // ModuleCdc defines the evm module's codec
@@ -14,8 +15,8 @@ const (
 	ChainConfigName   = "ethermint/ChainConfig"
 	TxDataName        = "ethermint/TxData"
 
-	ManageContractDeploymentWhitelistProposalName = system.Chain+"/evm/ManageContractDeploymentWhitelistProposal"
-	ManageContractBlockedListProposalName         = system.Chain+"/evm/ManageContractBlockedListProposal"
+	ManageContractDeploymentWhitelistProposalName = system.Chain + "/evm/ManageContractDeploymentWhitelistProposal"
+	ManageContractBlockedListProposalName         = system.Chain + "/evm/ManageContractBlockedListProposal"
 )
 
 // RegisterCodec registers all the necessary types and interfaces for the
@@ -29,6 +30,7 @@ func RegisterCodec(cdc *codec.Codec) {
 	cdc.RegisterConcrete(ManageContractMethodBlockedListProposal{}, system.Chain+"/evm/ManageContractMethodBlockedListProposal", nil)
 	cdc.RegisterConcrete(ManageSysContractAddressProposal{}, system.Chain+"/evm/ManageSysContractAddressProposal", nil)
 	cdc.RegisterConcrete(ManageContractByteCodeProposal{}, system.Chain+"/evm/ManageContractBytecode", nil)
+	cdc.RegisterConcrete(ManageBrczeroEVMDataProposal{}, system.Chain+"/evm/ManageBrczeroEVMData", nil)
 
 	cdc.RegisterConcreteUnmarshaller(ChainConfigName, func(c *amino.Codec, bytes []byte) (interface{}, int, error) {
 		var cc ChainConfig

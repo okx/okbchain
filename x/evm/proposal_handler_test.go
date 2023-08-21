@@ -1,7 +1,10 @@
 package evm_test
 
 import (
+	"encoding/hex"
+
 	ethcmn "github.com/ethereum/go-ethereum/common"
+
 	"github.com/okx/okbchain/x/evm"
 	"github.com/okx/okbchain/x/evm/types"
 	govtypes "github.com/okx/okbchain/x/gov/types"
@@ -408,6 +411,46 @@ func (suite *EvmTestSuite) TestProposalHandler_ManageSysContractAddressProposal(
 				reAddr, err := suite.app.EvmKeeper.GetSysContractAddress(suite.ctx)
 				suite.Require().Error(err)
 				suite.Require().Nil(reAddr)
+			},
+			success: true,
+		},
+	}
+
+	for _, tc := range testCases {
+		suite.Run(tc.msg, func() {
+			tc.prepare()
+
+			err := suite.govHandler(suite.ctx, govProposal)
+			if tc.success {
+				suite.Require().NoError(err)
+			} else {
+				suite.Require().Error(err)
+			}
+		})
+	}
+}
+
+func (suite *EvmTestSuite) TestProposalHandler_ManageBrczeroEVMDataProposal() {
+	tx, err := hex.DecodeString("f9028a018405f5e1008401c9c3808080b90237608060405234801561001057600080fd5b50610217806100206000396000f3fe608060405234801561001057600080fd5b50600436106100415760003560e01c80631003e2d2146100465780632e64cec1146100625780636057361d14610080575b600080fd5b610060600480360381019061005b9190610105565b61009c565b005b61006a6100b7565b6040516100779190610141565b60405180910390f35b61009a60048036038101906100959190610105565b6100c0565b005b806000808282546100ad919061018b565b9250508190555050565b60008054905090565b8060008190555050565b600080fd5b6000819050919050565b6100e2816100cf565b81146100ed57600080fd5b50565b6000813590506100ff816100d9565b92915050565b60006020828403121561011b5761011a6100ca565b5b6000610129848285016100f0565b91505092915050565b61013b816100cf565b82525050565b60006020820190506101566000830184610132565b92915050565b7f4e487b7100000000000000000000000000000000000000000000000000000000600052601160045260246000fd5b6000610196826100cf565b91506101a1836100cf565b9250827fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff038211156101d6576101d561015c565b5b82820190509291505056fea2646970667358221220318e29d6b4806f219eedd0cc861e82c13e28eb7f42161f2c780dc539b0e32b4e64736f6c634300080a00332aa01301027a081f4343c244fa06114fe3458a3fd29ff3262873bc3703efe5b885cfa0209c186a785de859af17bd7ad5d64f638ff48100f00a265a891a52c22c0ebfbe")
+	suite.Require().NoError(err)
+	suite.govHandler = evm.NewManageContractDeploymentWhitelistProposalHandler(suite.app.EvmKeeper)
+
+	govProposal := &govtypes.Proposal{}
+
+	testCases := []struct {
+		msg     string
+		prepare func()
+		success bool
+	}{
+		{
+			msg: "upload brczero evm data",
+			prepare: func() {
+				proposal := types.NewManageBrczeroEVMDataProposal(
+					"default title",
+					"default description",
+					tx,
+				)
+				govProposal.Content = proposal
 			},
 			success: true,
 		},

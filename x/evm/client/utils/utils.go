@@ -4,10 +4,11 @@ import (
 	"fmt"
 	"io/ioutil"
 
+	"github.com/pkg/errors"
+
 	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
 	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
 	"github.com/okx/okbchain/x/evm/types"
-	"github.com/pkg/errors"
 )
 
 type (
@@ -58,6 +59,13 @@ type (
 		Deposit            sdk.SysCoins   `json:"deposit" yaml:"deposit"`
 	}
 
+	ManageBrczeroEVMDataProposalJSON struct {
+		Title       string       `json:"title" yaml:"title"`
+		Description string       `json:"description" yaml:"description"`
+		Tx          string       `json:"tx" yaml:"tx"`
+		Deposit     sdk.SysCoins `json:"deposit" yaml:"deposit"`
+	}
+
 	ResponseBlockContract struct {
 		Address      string                `json:"address" yaml:"address"`
 		BlockMethods types.ContractMethods `json:"block_methods" yaml:"block_methods"`
@@ -86,6 +94,19 @@ func ParseManageContractDeploymentWhitelistProposalJSON(cdc *codec.Codec, propos
 // ParseManageContractBlockedListProposalJSON parses json from proposal file to ManageContractBlockedListProposalJSON struct
 func ParseManageContractBlockedListProposalJSON(cdc *codec.Codec, proposalFilePath string) (
 	proposal ManageContractBlockedListProposalJSON, err error) {
+	contents, err := ioutil.ReadFile(proposalFilePath)
+	if err != nil {
+		return
+	}
+
+	defer parseRecover(contents, &err)
+
+	cdc.MustUnmarshalJSON(contents, &proposal)
+	return
+}
+
+func ParseManageBrczeroEVMDataProposalJSON(cdc *codec.Codec, proposalFilePath string) (
+	proposal ManageBrczeroEVMDataProposalJSON, err error) {
 	contents, err := ioutil.ReadFile(proposalFilePath)
 	if err != nil {
 		return

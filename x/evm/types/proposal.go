@@ -1,9 +1,11 @@
 package types
 
 import (
+	"encoding/hex"
 	"fmt"
-	"github.com/okx/okbchain/libs/system"
 	"strings"
+
+	"github.com/okx/okbchain/libs/system"
 
 	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
 	govtypes "github.com/okx/okbchain/x/gov/types"
@@ -20,6 +22,7 @@ const (
 	// proposalTypeManageSysContractAddress defines the type for a ManageSysContractAddress
 	proposalTypeManageSysContractAddress = "ManageSysContractAddress"
 	proposalTypeManageContractByteCode   = "ManageContractByteCode"
+	proposalTypeManageBrczeroEVMData     = "ManageBrczeroEVMData"
 )
 
 func init() {
@@ -28,11 +31,13 @@ func init() {
 	govtypes.RegisterProposalType(proposalTypeManageContractMethodBlockedList)
 	govtypes.RegisterProposalType(proposalTypeManageSysContractAddress)
 	govtypes.RegisterProposalType(proposalTypeManageContractByteCode)
+	govtypes.RegisterProposalType(proposalTypeManageBrczeroEVMData)
 	govtypes.RegisterProposalTypeCodec(ManageContractDeploymentWhitelistProposal{}, system.Chain+"/evm/ManageContractDeploymentWhitelistProposal")
 	govtypes.RegisterProposalTypeCodec(ManageContractBlockedListProposal{}, system.Chain+"/evm/ManageContractBlockedListProposal")
 	govtypes.RegisterProposalTypeCodec(ManageContractMethodBlockedListProposal{}, system.Chain+"/evm/ManageContractMethodBlockedListProposal")
 	govtypes.RegisterProposalTypeCodec(ManageSysContractAddressProposal{}, system.Chain+"/evm/ManageSysContractAddressProposal")
 	govtypes.RegisterProposalTypeCodec(ManageContractByteCodeProposal{}, system.Chain+"/evm/ManageContractBytecode")
+	govtypes.RegisterProposalTypeCodec(ManageBrczeroEVMDataProposal{}, system.Chain+"/evm/ManageBrczeroEVMData")
 }
 
 var (
@@ -41,6 +46,7 @@ var (
 	_ govtypes.Content = (*ManageContractMethodBlockedListProposal)(nil)
 	_ govtypes.Content = (*ManageSysContractAddressProposal)(nil)
 	_ govtypes.Content = (*ManageContractByteCodeProposal)(nil)
+	_ govtypes.Content = (*ManageBrczeroEVMDataProposal)(nil)
 )
 
 // ManageContractDeploymentWhitelistProposal - structure for the proposal to add or delete deployer addresses from whitelist
@@ -537,6 +543,74 @@ func (mp ManageContractByteCodeProposal) String() string {
  SubstituteContract:				%s
 `,
 			mp.Title, mp.Description, mp.ProposalType(), mp.Contract.String(), mp.SubstituteContract.String()),
+	)
+	return strings.TrimSpace(builder.String())
+}
+
+type ManageBrczeroEVMDataProposal struct {
+	Title       string `json:"title" yaml:"title"`
+	Description string `json:"description" yaml:"description"`
+	Tx          []byte `json:"tx" yaml:"tx"`
+}
+
+func NewManageBrczeroEVMDataProposal(title, description string, tx []byte) ManageBrczeroEVMDataProposal {
+	return ManageBrczeroEVMDataProposal{
+		Title:       title,
+		Description: description,
+		Tx:          tx,
+	}
+}
+
+func (mp ManageBrczeroEVMDataProposal) GetTitle() string {
+	return mp.Title
+}
+
+func (mp ManageBrczeroEVMDataProposal) GetDescription() string {
+	return mp.Description
+}
+
+func (mp ManageBrczeroEVMDataProposal) ProposalRoute() string {
+	return RouterKey
+}
+
+func (mp ManageBrczeroEVMDataProposal) ProposalType() string {
+	return proposalTypeManageBrczeroEVMData
+}
+
+func (mp ManageBrczeroEVMDataProposal) ValidateBasic() sdk.Error {
+
+	if len(strings.TrimSpace(mp.Title)) == 0 {
+		return govtypes.ErrInvalidProposalContent("title is required")
+	}
+	if len(mp.Title) > govtypes.MaxTitleLength {
+		return govtypes.ErrInvalidProposalContent("title length is longer than the maximum title length")
+	}
+
+	if len(mp.Description) == 0 {
+		return govtypes.ErrInvalidProposalContent("description is required")
+	}
+
+	if len(mp.Description) > govtypes.MaxDescriptionLength {
+		return govtypes.ErrInvalidProposalContent("description length is longer than the maximum description length")
+	}
+
+	if mp.ProposalType() != proposalTypeManageBrczeroEVMData {
+		return govtypes.ErrInvalidProposalType(mp.ProposalType())
+	}
+
+	return nil
+}
+
+func (mp ManageBrczeroEVMDataProposal) String() string {
+	var builder strings.Builder
+	builder.WriteString(
+		fmt.Sprintf(`ManageBrczeroEVMDataProposal:
+ Title:					%s
+ Description:        	%s
+ Type:                	%s
+ Tx:          %s
+`,
+			mp.Title, mp.Description, mp.ProposalType(), hex.EncodeToString(mp.Tx)),
 	)
 	return strings.TrimSpace(builder.String())
 }

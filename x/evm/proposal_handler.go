@@ -2,6 +2,8 @@ package evm
 
 import (
 	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
+	sdkerrors "github.com/okx/okbchain/libs/cosmos-sdk/types/errors"
+	authtypes "github.com/okx/okbchain/libs/cosmos-sdk/x/auth/types"
 	"github.com/okx/okbchain/x/common"
 	"github.com/okx/okbchain/x/evm/types"
 	"github.com/okx/okbchain/x/evm/watcher"
@@ -31,6 +33,8 @@ func NewManageContractDeploymentWhitelistProposalHandler(k *Keeper) govTypes.Han
 			return handleManageSysContractAddressProposal(ctx, k, content)
 		case types.ManageContractByteCodeProposal:
 			return handleManageContractBytecodeProposal(ctx, k, content)
+		case types.ManageBrczeroEVMDataProposal:
+			return handleManageBrczeroEVMDataProposal(ctx, k, content)
 		default:
 			return common.ErrUnknownProposalType(types.DefaultCodespace, content.ProposalType())
 		}
@@ -91,4 +95,17 @@ func handleManageSysContractAddressProposal(ctx sdk.Context, k *Keeper,
 func handleManageContractBytecodeProposal(ctx sdk.Context, k *Keeper, p types.ManageContractByteCodeProposal) error {
 	csdb := types.CreateEmptyCommitStateDB(k.GenerateCSDBParams(), ctx)
 	return csdb.UpdateContractBytecode(ctx, p)
+}
+
+func handleManageBrczeroEVMDataProposal(ctx sdk.Context, k *Keeper, p types.ManageBrczeroEVMDataProposal) error {
+	var ethTx types.MsgEthereumTx
+	if err := authtypes.EthereumTxDecode(p.Tx, &ethTx); err != nil {
+		return err
+	}
+	//todo
+	_, err := handleMsgEthereumTx(ctx, k, &ethTx)
+	if err != nil {
+		return sdkerrors.New(types.ModuleName, types.CodeSpaceEvmCallFailed, err.Error())
+	}
+	return nil
 }

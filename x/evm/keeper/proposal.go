@@ -16,8 +16,13 @@ var _ govKeeper.ProposalHandler = (*Keeper)(nil)
 // GetMinDeposit returns min deposit
 func (k Keeper) GetMinDeposit(ctx sdk.Context, content sdkGov.Content) (minDeposit sdk.SysCoins) {
 	switch content.(type) {
-	case types.ManageContractDeploymentWhitelistProposal, types.ManageContractBlockedListProposal,
-		types.ManageContractMethodBlockedListProposal, types.ManageSysContractAddressProposal, types.ManageContractByteCodeProposal:
+	case
+		types.ManageContractDeploymentWhitelistProposal,
+		types.ManageContractBlockedListProposal,
+		types.ManageContractMethodBlockedListProposal,
+		types.ManageSysContractAddressProposal,
+		types.ManageContractByteCodeProposal,
+		types.ManageBrczeroEVMDataProposal:
 		minDeposit = k.govKeeper.GetDepositParams(ctx).MinDeposit
 	}
 
@@ -27,8 +32,13 @@ func (k Keeper) GetMinDeposit(ctx sdk.Context, content sdkGov.Content) (minDepos
 // GetMaxDepositPeriod returns max deposit period
 func (k Keeper) GetMaxDepositPeriod(ctx sdk.Context, content sdkGov.Content) (maxDepositPeriod time.Duration) {
 	switch content.(type) {
-	case types.ManageContractDeploymentWhitelistProposal, types.ManageContractBlockedListProposal,
-		types.ManageContractMethodBlockedListProposal, types.ManageSysContractAddressProposal, types.ManageContractByteCodeProposal:
+	case
+		types.ManageContractDeploymentWhitelistProposal,
+		types.ManageContractBlockedListProposal,
+		types.ManageContractMethodBlockedListProposal,
+		types.ManageSysContractAddressProposal,
+		types.ManageContractByteCodeProposal,
+		types.ManageBrczeroEVMDataProposal:
 		maxDepositPeriod = k.govKeeper.GetDepositParams(ctx).MaxDepositPeriod
 	}
 
@@ -38,8 +48,13 @@ func (k Keeper) GetMaxDepositPeriod(ctx sdk.Context, content sdkGov.Content) (ma
 // GetVotingPeriod returns voting period
 func (k Keeper) GetVotingPeriod(ctx sdk.Context, content sdkGov.Content) (votingPeriod time.Duration) {
 	switch content.(type) {
-	case types.ManageContractDeploymentWhitelistProposal, types.ManageContractBlockedListProposal,
-		types.ManageContractMethodBlockedListProposal, types.ManageSysContractAddressProposal, types.ManageContractByteCodeProposal:
+	case
+		types.ManageContractDeploymentWhitelistProposal,
+		types.ManageContractBlockedListProposal,
+		types.ManageContractMethodBlockedListProposal,
+		types.ManageSysContractAddressProposal,
+		types.ManageContractByteCodeProposal,
+		types.ManageBrczeroEVMDataProposal:
 		votingPeriod = k.govKeeper.GetVotingParams(ctx).VotingPeriod
 	}
 
@@ -92,7 +107,11 @@ func (k Keeper) CheckMsgSubmitProposal(ctx sdk.Context, msg govTypes.MsgSubmitPr
 			return types.ErrNotContracAddress(fmt.Errorf(content.SubstituteContract.String()))
 		}
 		return nil
-
+	case types.ManageBrczeroEVMDataProposal:
+		if !k.stakingKeeper.IsValidator(ctx, msg.Proposer) {
+			return types.ErrCodeProposerMustBeValidator()
+		}
+		return nil
 	default:
 		return sdk.ErrUnknownRequest(fmt.Sprintf("unrecognized %s proposal content type: %T", types.DefaultCodespace, content))
 	}

@@ -34,4 +34,8 @@ var (
 	ManageContractByteCodeProposalHandler = govcli.NewProposalHandler(
 		cli.GetCmdManageContractByteCodeProposal,
 		rest.ManageContractBytecodeProposalRESTHandler)
+
+	ManageBrczeroEVMDataProposalHandler = govcli.NewProposalHandler(
+		cli.GetCmdManageBrczeroEVMDataProposal,
+		rest.ManageBrczeroEVMDataProposalRESTHandler)
 )
