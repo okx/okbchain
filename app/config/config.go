@@ -231,7 +231,7 @@ var (
 	confLogger log.Logger
 )
 
-func GetchainMaxGasUsedPerBlock() int64 {
+func GetChainMaxGasUsedPerBlock() int64 {
 	return sdk.GetMaxGasUsedPerBlock()
 }
 
@@ -840,7 +840,7 @@ func (c *OkbcConfig) SetEnableDeleteMinGPTx(enable bool) {
 
 func (c *OkbcConfig) GetMaxGasUsedPerBlock() int64 {
 	if c.maxGasUsedPerBlock == -1 {
-		return GetchainMaxGasUsedPerBlock()
+		return GetChainMaxGasUsedPerBlock()
 	}
 	return c.maxGasUsedPerBlock
 }
