@@ -21,6 +21,7 @@ func ParamKeyTable() sdkparams.KeyTable {
 	kt := sdkparams.NewKeyTable()
 	kt.RegisterParamSet(&Params{})
 	kt.RegisterParamSet(&GasConfig{})
+	kt.RegisterParamSet(&BlockConfig{})
 	return kt
 }
 

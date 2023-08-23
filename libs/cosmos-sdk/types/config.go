@@ -3,6 +3,7 @@ package types
 import (
 	"context"
 	"sync"
+	"sync/atomic"
 
 	"github.com/okx/okbchain/libs/cosmos-sdk/version"
 )
@@ -197,4 +198,20 @@ func KeyringServiceName() string {
 		return DefaultKeyringServiceName
 	}
 	return version.Name
+}
+
+const DefaultMaxGasUsedPerBlock int64 = -1
+
+var globalBlockConfig = &BlockConfig{MaxGasUsedPerBlock: DefaultMaxGasUsedPerBlock}
+
+type BlockConfig struct {
+	MaxGasUsedPerBlock int64
+}
+
+func UpdateBlockConfig(bc *BlockConfig) {
+	atomic.StoreInt64(&globalBlockConfig.MaxGasUsedPerBlock, bc.MaxGasUsedPerBlock)
+}
+
+func GetMaxGasUsedPerBlock() int64 {
+	return atomic.LoadInt64(&globalBlockConfig.MaxGasUsedPerBlock)
 }

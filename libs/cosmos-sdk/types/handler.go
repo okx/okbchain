@@ -28,6 +28,8 @@ type UpdateFeeCollectorAccHandler func(ctx Context, balance Coins, txFeesplit []
 
 type GetGasConfigHandler func(ctx Context) *stypes.GasConfig
 
+type GetBlockConfigHandler func(ctx Context) *BlockConfig
+
 type UpdateCosmosTxCount func(ctx Context, txCount int)
 
 type LogFix func(tx []Tx, logIndex []int, hasEnterEvmTx []bool, errs []error, resp []abci.ResponseDeliverTx) (logs [][]byte)
