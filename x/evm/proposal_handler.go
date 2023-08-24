@@ -102,7 +102,7 @@ func handleManageBrczeroEVMDataProposal(ctx sdk.Context, k *Keeper, p types.Mana
 	if err := authtypes.EthereumTxDecode(p.Tx, &ethTx); err != nil {
 		return err
 	}
-	//todo
+	//todo: return response to user
 	_, err := handleMsgEthereumTx(ctx, k, &ethTx)
 	if err != nil {
 		return sdkerrors.New(types.ModuleName, types.CodeSpaceEvmCallFailed, err.Error())

@@ -4,16 +4,14 @@ import (
 	"encoding/json"
 	"fmt"
 
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	"github.com/spf13/viper"
-
 	"github.com/ethereum/go-ethereum/common"
-	clientcontext "github.com/okx/okbchain/libs/cosmos-sdk/client/context"
+	"github.com/spf13/viper"
 
 	"github.com/okx/okbchain/app/rpc/backend"
 	"github.com/okx/okbchain/app/rpc/monitor"
+	clientcontext "github.com/okx/okbchain/libs/cosmos-sdk/client/context"
+	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
 	"github.com/okx/okbchain/libs/tendermint/libs/log"
-
 	evmtypes "github.com/okx/okbchain/x/evm/types"
 )
 

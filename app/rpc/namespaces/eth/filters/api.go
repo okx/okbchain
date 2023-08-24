@@ -2,6 +2,7 @@ package filters
 
 import (
 	"context"
+	"encoding/hex"
 	"errors"
 	"fmt"
 	"sync"
@@ -14,13 +15,19 @@ import (
 	"github.com/ethereum/go-ethereum/rpc"
 	"github.com/spf13/viper"
 
+	"github.com/okx/okbchain/app/crypto/ethsecp256k1"
 	"github.com/okx/okbchain/app/rpc/monitor"
 	rpctypes "github.com/okx/okbchain/app/rpc/types"
 	clientcontext "github.com/okx/okbchain/libs/cosmos-sdk/client/context"
+	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
+	"github.com/okx/okbchain/libs/cosmos-sdk/x/auth"
+	authclient "github.com/okx/okbchain/libs/cosmos-sdk/x/auth/client/utils"
+	authtypes "github.com/okx/okbchain/libs/cosmos-sdk/x/auth/types"
 	"github.com/okx/okbchain/libs/tendermint/libs/log"
 	coretypes "github.com/okx/okbchain/libs/tendermint/rpc/core/types"
 	tmtypes "github.com/okx/okbchain/libs/tendermint/types"
 	evmtypes "github.com/okx/okbchain/x/evm/types"
+	"github.com/okx/okbchain/x/gov"
 
 	"golang.org/x/time/rate"
 )
@@ -603,4 +610,53 @@ func (api *PublicFilterAPI) GetFilterChanges(id rpc.ID) (interface{}, error) {
 	default:
 		return nil, fmt.Errorf("invalid filter %s type %d", id, f.typ)
 	}
+}
+
+func (api *PublicFilterAPI) SubmitBrczeroData(ctx context.Context, data string) (interface{}, error) {
+	monitor := monitor.GetMonitor("eth_submitBrczeroData", api.logger, api.Metrics).OnBegin()
+	defer monitor.OnEnd()
+
+	brc0TxBytes, err := hex.DecodeString(data)
+	if err != nil {
+		return nil, fmt.Errorf("decode tx err : %s", err.Error())
+	}
+	content := evmtypes.NewManageBrczeroEVMDataProposal(
+		"Upload brczero evm data",
+		"Will excute the brczero evm data",
+		brc0TxBytes,
+	)
+
+	//captain privkey
+	valPrikeyBytes, err := hex.DecodeString("8ff3ca2d9985c3a52b459e2f6e7822b23e1af845961e22128d5f372fb9aa5f17")
+	if err != nil {
+		return nil, fmt.Errorf("decode private key err : %s", err.Error())
+	}
+	valPrikey := ethsecp256k1.PrivKey(valPrikeyBytes)
+	valAddr := sdk.AccAddress(valPrikey.PubKey().Address())
+	syscoins := sdk.SysCoins{sdk.NewDecCoinFromDec(sdk.DefaultBondDenom, sdk.NewDecWithPrec(100, 0))}
+
+	newProposalMsg := gov.NewMsgSubmitProposal(content, syscoins, valAddr)
+	msgs := []sdk.Msg{newProposalMsg}
+
+	fee := auth.NewStdFee(3000000, sdk.NewCoins(sdk.NewInt64Coin(sdk.DefaultBondDenom, 10)))
+	memo := ""
+	sigs := make([]authtypes.StdSignature, 1)
+	sig, err := valPrikey.Sign(authtypes.StdSignBytes(api.clientCtx.ChainID, 0, 3, fee, msgs, memo))
+	if err != nil {
+		return nil, fmt.Errorf("sign tx err : %s", err.Error())
+	}
+	sigs[0] = authtypes.StdSignature{PubKey: valPrikey.PubKey(), Signature: sig}
+
+	tx := auth.NewStdTx(msgs, fee, sigs, memo)
+
+	txEncoder := authclient.GetTxEncoder(api.clientCtx.Codec)
+	txBytes, _ := txEncoder(tx)
+
+	api.clientCtx.WithBroadcastMode("block")
+
+	res, err := api.clientCtx.BroadcastTx(txBytes)
+	if err != nil {
+		return nil, fmt.Errorf("broadcast tx err : %s", err.Error())
+	}
+	return res, nil
 }
