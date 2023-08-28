@@ -14,6 +14,7 @@ var (
 	milestoneEarthHeight   int64
 	milestoneVenus4Height  int64
 	milestoneMercuryHeight int64
+	milestoneVenus7Height  int64
 
 	// note: it stores the earlies height of the node,and it is used by cli
 	nodePruneHeight int64
@@ -26,6 +27,8 @@ const (
 	MILESTONE_EARTH   = "earth"
 	MILESTONE_Venus4  = "venus4"
 	MILESTONE_MERCURY = "mercury"
+
+	MILESTONE_VENUS7_NAME = "venus7"
 )
 
 func SetupMainNetEnvironment(pruneH int64) {
@@ -138,4 +141,24 @@ func InitMilestoneMercuryHeight(h int64) {
 }
 
 // =========== Mercury ===============
+// ==================================
+
+// ==================================
+// =========== Venus7 ===============
+func HigherThanVenus7(h int64) bool {
+	if milestoneVenus7Height == 0 {
+		return false
+	}
+	return h > milestoneVenus7Height
+}
+
+func InitMilestoneVenus7Height(h int64) {
+	milestoneVenus7Height = h
+}
+
+func GetVenus7Height() int64 {
+	return milestoneVenus7Height
+}
+
+// =========== Venus7 ===============
 // ==================================
