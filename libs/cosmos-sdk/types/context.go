@@ -55,6 +55,7 @@ type Context struct {
 	statedb           vm.StateDB
 	outOfGas          bool
 	wasmSimulateCache map[string][]byte
+	wasmCallDepth     uint32
 }
 
 // Proposed rename, not done to avoid API breakage
@@ -230,6 +231,18 @@ func (c *Context) MoveWasmSimulateCacheToPool() {
 		delete(c.wasmSimulateCache, k)
 	}
 	putBackWasmCacheMap(c.wasmSimulateCache)
+}
+
+func (c *Context) IncrementCallDepth() {
+	c.wasmCallDepth++
+}
+
+func (c *Context) DecrementCallDepth() {
+	c.wasmCallDepth--
+}
+
+func (c *Context) CallDepth() uint32 {
+	return c.wasmCallDepth
 }
 
 // TODO: remove???
