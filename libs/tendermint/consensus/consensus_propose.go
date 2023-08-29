@@ -77,7 +77,9 @@ func (cs *State) isBlockProducer() (string, string) {
 
 // Enter (CreateEmptyBlocks): from enterNewRound(height,round)
 // Enter (CreateEmptyBlocks, CreateEmptyBlocksInterval > 0 ):
-// 		after enterNewRound(height,round), after timeout of CreateEmptyBlocksInterval
+//
+//	after enterNewRound(height,round), after timeout of CreateEmptyBlocksInterval
+//
 // Enter (!CreateEmptyBlocks) : after enterNewRound(height,round), once txs are in the mempool
 func (cs *State) enterPropose(height int64, round int) {
 	logger := cs.Logger.With("height", height, "round", round)
@@ -102,6 +104,7 @@ func (cs *State) enterPropose(height int64, round int) {
 		newProposer = "-avc-" + cs.vcHeight[height][:6]
 	}
 	cs.stateMtx.RUnlock()
+
 	cs.trc.Pin("enterPropose-%d-%s-%s%s", round, isBlockProducer, bpAddr, newProposer)
 
 	logger.Info(fmt.Sprintf("enterPropose(%v/%v). Current: %v/%v/%v", height, round, cs.Height, cs.Round, cs.Step))
@@ -179,6 +182,7 @@ func (cs *State) defaultDecideProposal(height int64, round int) {
 			part := blockParts.GetPart(i)
 			cs.sendInternalMessage(msgInfo{&BlockPartMessage{cs.Height, cs.Round, part}, ""})
 		}
+		cs.needLogPgu = true
 		cs.Logger.Info("Signed proposal", "height", height, "round", round, "proposal", proposal)
 		cs.Logger.Debug(fmt.Sprintf("Signed proposal block: %v", block))
 	} else if !cs.replayMode {
