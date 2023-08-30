@@ -118,7 +118,7 @@ func GetVenus4Height() int64 {
 // ==================================
 // =========== Mercury ===============
 func UnittestOnlySetMilestoneMercuryHeight(h int64) {
-	milestoneEarthHeight = h
+	milestoneMercuryHeight = h
 }
 
 func SetMilestoneMercuryHeight(h int64) {
