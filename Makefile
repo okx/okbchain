@@ -17,9 +17,9 @@ Version=v0.1.7
 CosmosSDK=v0.39.2
 Tendermint=v0.33.9
 Iavl=v0.14.3
-Name=okbchain
-ServerName=okbchaind
-ClientName=okbchaincli
+Name=brczero
+ServerName=brczerod
+ClientName=brczerocli
 
 LINK_STATICALLY = false
 cgo_flags=
@@ -72,32 +72,32 @@ endif
 build_tags += $(BUILD_TAGS)
 build_tags := $(strip $(build_tags))
 
-ldflags = -X $(GithubTop)/okx/okbchain/libs/cosmos-sdk/version.Version=$(Version) \
-	-X $(GithubTop)/okx/okbchain/libs/cosmos-sdk/version.Name=$(Name) \
-  -X $(GithubTop)/okx/okbchain/libs/cosmos-sdk/version.ServerName=$(ServerName) \
-  -X $(GithubTop)/okx/okbchain/libs/cosmos-sdk/version.ClientName=$(ClientName) \
-  -X $(GithubTop)/okx/okbchain/libs/cosmos-sdk/version.Commit=$(COMMIT) \
-  -X $(GithubTop)/okx/okbchain/libs/cosmos-sdk/version.CosmosSDK=$(CosmosSDK) \
-  -X $(GithubTop)/okx/okbchain/libs/cosmos-sdk/version.Tendermint=$(Tendermint) \
-  -X "$(GithubTop)/okx/okbchain/libs/cosmos-sdk/version.BuildTags=$(build_tags)" \
+ldflags = -X $(GithubTop)/okx/brczero/libs/cosmos-sdk/version.Version=$(Version) \
+	-X $(GithubTop)/okx/brczero/libs/cosmos-sdk/version.Name=$(Name) \
+  -X $(GithubTop)/okx/brczero/libs/cosmos-sdk/version.ServerName=$(ServerName) \
+  -X $(GithubTop)/okx/brczero/libs/cosmos-sdk/version.ClientName=$(ClientName) \
+  -X $(GithubTop)/okx/brczero/libs/cosmos-sdk/version.Commit=$(COMMIT) \
+  -X $(GithubTop)/okx/brczero/libs/cosmos-sdk/version.CosmosSDK=$(CosmosSDK) \
+  -X $(GithubTop)/okx/brczero/libs/cosmos-sdk/version.Tendermint=$(Tendermint) \
+  -X "$(GithubTop)/okx/brczero/libs/cosmos-sdk/version.BuildTags=$(build_tags)" \
 
 ifeq ($(WITH_ROCKSDB),true)
-  ldflags += -X github.com/okx/okbchain/libs/tendermint/types.DBBackend=rocksdb
+  ldflags += -X github.com/okx/brczero/libs/tendermint/types.DBBackend=rocksdb
 endif
 
 ifeq ($(MAKECMDGOALS),testnet)
-  ldflags += -X github.com/okx/okbchain/libs/cosmos-sdk/server.ChainID=okbchaintest-195
+  ldflags += -X github.com/okx/brczero/libs/cosmos-sdk/server.ChainID=brczerotest-195
 endif
 
 ifeq ($(LINK_STATICALLY),true)
 	ldflags += -linkmode=external -extldflags "-Wl,-z,muldefs -static"
 endif
 
-ifeq ($(OKBCMALLOC),tcmalloc)
+ifeq ($(BRCZEROMALLOC),tcmalloc)
   ldflags += -extldflags "-ltcmalloc_minimal"
 endif
 
-ifeq ($(OKBCMALLOC),jemalloc)
+ifeq ($(BRCZEROMALLOC),jemalloc)
   ldflags += -extldflags "-ljemalloc"
 endif
 
@@ -113,19 +113,19 @@ endif
 
 all: install
 
-install: okbchain
+install: brczero
 
 
-okbchain: check_version
-	$(cgo_flags) go install $(PGO_AUTO) -v $(BUILD_FLAGS) -tags "$(build_tags)" ./cmd/okbchaind
-	$(cgo_flags) go install $(PGO_AUTO) -v $(BUILD_FLAGS) -tags "$(build_tags)" ./cmd/okbchaincli
+brczero: check_version
+	$(cgo_flags) go install $(PGO_AUTO) -v $(BUILD_FLAGS) -tags "$(build_tags)" ./cmd/brczerod
+	$(cgo_flags) go install $(PGO_AUTO) -v $(BUILD_FLAGS) -tags "$(build_tags)" ./cmd/brczerocli
 
 check_version:
 	@sh $(shell pwd)/libs/check/check-version.sh $(GO_VERSION) $(ROCKSDB_VERSION)
 
-mainnet: okbchain
+mainnet: brczero
 
-testnet: okbchain
+testnet: brczero
 
 test-unit:
 	@VERSION=$(VERSION) go test -mod=readonly -tags='ledger test_ledger_mock' ./app/...
@@ -159,21 +159,21 @@ go.sum: go.mod
 	@go mod tidy
 
 cli:
-	go install -v $(BUILD_FLAGS) -tags "$(build_tags)" ./cmd/okbchaincli
+	go install -v $(BUILD_FLAGS) -tags "$(build_tags)" ./cmd/brczerocli
 
 server:
-	go install -v $(BUILD_FLAGS) -tags "$(build_tags)" ./cmd/okbchaind
+	go install -v $(BUILD_FLAGS) -tags "$(build_tags)" ./cmd/brczerod
 
 format:
 	find . -name '*.go' -type f -not -path "./vendor*" -not -path "*.git*" -not -path "./client/lcd/statik/statik.go" | xargs gofmt -w -s
 
 build:
 ifeq ($(OS),Windows_NT)
-	go build $(PGO_AUTO) $(BUILD_FLAGS) -tags "$(build_tags)" -o build/okbchaind.exe ./cmd/okbchaind
-	go build $(PGO_AUTO) $(BUILD_FLAGS) -tags "$(build_tags)" -o build/okbchaincli.exe ./cmd/okbchaincli
+	go build $(PGO_AUTO) $(BUILD_FLAGS) -tags "$(build_tags)" -o build/brczerod.exe ./cmd/brczerod
+	go build $(PGO_AUTO) $(BUILD_FLAGS) -tags "$(build_tags)" -o build/brczerocli.exe ./cmd/brczerocli
 else
-	go build $(PGO_AUTO) $(BUILD_FLAGS) -tags "$(build_tags)" -o build/okbchaind ./cmd/okbchaind
-	go build $(PGO_AUTO) $(BUILD_FLAGS) -tags "$(build_tags)" -o build/okbchaincli ./cmd/okbchaincli
+	go build $(PGO_AUTO) $(BUILD_FLAGS) -tags "$(build_tags)" -o build/brczerod ./cmd/brczerod
+	go build $(PGO_AUTO) $(BUILD_FLAGS) -tags "$(build_tags)" -o build/brczerocli ./cmd/brczerocli
 endif
 
 
@@ -205,12 +205,12 @@ testibc:
 build-linux:
 	LEDGER_ENABLED=false GOOS=linux GOARCH=amd64 $(MAKE) build
 
-build-docker-okbchainnode:
+build-docker-brczeronode:
 	$(MAKE) -C networks/local
 
 # Run a 4-node testnet locally
 localnet-start: localnet-stop
-	@if ! [ -f build/node0/okbchaind/config/genesis.json ]; then docker run --rm -v $(CURDIR)/build:/okbchaind:Z okbchain/node testnet --v 4 -o . --starting-ip-address 192.168.10.2 --keyring-backend=test ; fi
+	@if ! [ -f build/node0/brczerod/config/genesis.json ]; then docker run --rm -v $(CURDIR)/build:/brczerod:Z brczero/node testnet --v 4 -o . --starting-ip-address 192.168.10.2 --keyring-backend=test ; fi
 	docker-compose up -d
 
 # Stop testnet

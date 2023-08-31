@@ -16,8 +16,8 @@ mpt.db
 /rocksdb/
 dump.rdb
 # Build
-.okbchaind
-.okbchaincli
+.brczerod
+.brczerocli
 vendor*
 build
 tools/

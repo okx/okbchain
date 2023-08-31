@@ -823,7 +823,7 @@ func (app *BRCZeroApp) GetKey(storeKey string) *sdk.KVStoreKey {
 	return app.keys[storeKey]
 }
 
-// Codec returns OKBChain's codec.
+// Codec returns BRCZero's codec.
 //
 // NOTE: This is solely to be used for testing purposes as it may be desirable
 // for modules to register their own custom testing types.
