@@ -8,11 +8,11 @@ import (
 	"sync/atomic"
 	"time"
 
-	flow "github.com/okx/okbchain/libs/tendermint/libs/flowrate"
-	"github.com/okx/okbchain/libs/tendermint/libs/log"
-	"github.com/okx/okbchain/libs/tendermint/libs/service"
-	"github.com/okx/okbchain/libs/tendermint/p2p"
-	"github.com/okx/okbchain/libs/tendermint/types"
+	flow "github.com/okx/brczero/libs/tendermint/libs/flowrate"
+	"github.com/okx/brczero/libs/tendermint/libs/log"
+	"github.com/okx/brczero/libs/tendermint/libs/service"
+	"github.com/okx/brczero/libs/tendermint/p2p"
+	"github.com/okx/brczero/libs/tendermint/types"
 )
 
 /*

@@ -5,14 +5,14 @@ import (
 	"math/rand"
 	"testing"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
+	"github.com/okx/brczero/libs/cosmos-sdk/codec"
 
-	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
-	"github.com/okx/okbchain/libs/tendermint/crypto"
+	abci "github.com/okx/brczero/libs/tendermint/abci/types"
+	"github.com/okx/brczero/libs/tendermint/crypto"
 	"github.com/stretchr/testify/require"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/baseapp"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/baseapp"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
 )
 
 // BigInterval is a representation of the interval [lo, hi), where

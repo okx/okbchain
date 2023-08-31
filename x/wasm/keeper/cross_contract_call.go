@@ -3,8 +3,8 @@ package keeper
 import (
 	"encoding/json"
 	wasmvm "github.com/CosmWasm/wasmvm"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	"github.com/okx/okbchain/x/wasm/types"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	"github.com/okx/brczero/x/wasm/types"
 )
 
 var (

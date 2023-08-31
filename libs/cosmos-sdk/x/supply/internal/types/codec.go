@@ -3,8 +3,8 @@ package types
 import (
 	"fmt"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/supply/exported"
+	"github.com/okx/brczero/libs/cosmos-sdk/codec"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/supply/exported"
 	"github.com/tendermint/go-amino"
 )
 

@@ -1,10 +1,10 @@
 package mock
 
 import (
-	"github.com/okx/okbchain/libs/tendermint/crypto"
-	tmtypes "github.com/okx/okbchain/libs/tendermint/types"
+	"github.com/okx/brczero/libs/tendermint/crypto"
+	tmtypes "github.com/okx/brczero/libs/tendermint/types"
 
-	"github.com/okx/okbchain/libs/tendermint/crypto/ed25519"
+	"github.com/okx/brczero/libs/tendermint/crypto/ed25519"
 )
 
 var _ tmtypes.PrivValidator = PV{}

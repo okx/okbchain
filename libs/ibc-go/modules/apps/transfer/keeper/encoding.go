@@ -1,7 +1,7 @@
 package keeper
 
 import (
-	"github.com/okx/okbchain/libs/ibc-go/modules/apps/transfer/types"
+	"github.com/okx/brczero/libs/ibc-go/modules/apps/transfer/types"
 )
 
 // UnmarshalDenomTrace attempts to decode and return an DenomTrace object from

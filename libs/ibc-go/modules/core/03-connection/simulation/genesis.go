@@ -3,8 +3,8 @@ package simulation
 import (
 	"math/rand"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/simulation"
-	"github.com/okx/okbchain/libs/ibc-go/modules/core/03-connection/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/simulation"
+	"github.com/okx/brczero/libs/ibc-go/modules/core/03-connection/types"
 )
 
 // GenConnectionGenesis returns the default connection genesis state.

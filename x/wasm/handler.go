@@ -4,16 +4,16 @@ import (
 	"fmt"
 
 	"github.com/gogo/protobuf/proto"
-	bam "github.com/okx/okbchain/libs/cosmos-sdk/baseapp"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	sdkerrors "github.com/okx/okbchain/libs/cosmos-sdk/types/errors"
-	sdktypes "github.com/okx/okbchain/libs/cosmos-sdk/x/auth/types"
-	cfg "github.com/okx/okbchain/libs/tendermint/config"
-	"github.com/okx/okbchain/libs/tendermint/libs/kv"
-	types2 "github.com/okx/okbchain/libs/tendermint/types"
-	"github.com/okx/okbchain/x/wasm/keeper"
-	"github.com/okx/okbchain/x/wasm/types"
-	"github.com/okx/okbchain/x/wasm/watcher"
+	bam "github.com/okx/brczero/libs/cosmos-sdk/baseapp"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	sdkerrors "github.com/okx/brczero/libs/cosmos-sdk/types/errors"
+	sdktypes "github.com/okx/brczero/libs/cosmos-sdk/x/auth/types"
+	cfg "github.com/okx/brczero/libs/tendermint/config"
+	"github.com/okx/brczero/libs/tendermint/libs/kv"
+	types2 "github.com/okx/brczero/libs/tendermint/types"
+	"github.com/okx/brczero/x/wasm/keeper"
+	"github.com/okx/brczero/x/wasm/types"
+	"github.com/okx/brczero/x/wasm/watcher"
 )
 
 // NewHandler returns a handler for "wasm" type messages.

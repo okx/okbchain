@@ -7,15 +7,15 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/spf13/cobra"
 
-	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
+	abci "github.com/okx/brczero/libs/tendermint/abci/types"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/client/context"
-	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	"github.com/okx/okbchain/libs/cosmos-sdk/types/module"
-	//"github.com/okx/okbchain/libs/cosmos-sdk/x/crisis/client/cli"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/crisis/internal/keeper"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/crisis/internal/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/client/context"
+	"github.com/okx/brczero/libs/cosmos-sdk/codec"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/types/module"
+	//"github.com/okx/brczero/libs/cosmos-sdk/x/crisis/client/cli"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/crisis/internal/keeper"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/crisis/internal/types"
 )
 
 var (

@@ -7,12 +7,12 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 
-	rpcfilters "github.com/okx/okbchain/app/rpc/namespaces/eth/filters"
-	"github.com/okx/okbchain/libs/cosmos-sdk/client/context"
-	"github.com/okx/okbchain/libs/tendermint/libs/log"
-	coretypes "github.com/okx/okbchain/libs/tendermint/rpc/core/types"
-	tmtypes "github.com/okx/okbchain/libs/tendermint/types"
-	evmtypes "github.com/okx/okbchain/x/evm/types"
+	rpcfilters "github.com/okx/brczero/app/rpc/namespaces/eth/filters"
+	"github.com/okx/brczero/libs/cosmos-sdk/client/context"
+	"github.com/okx/brczero/libs/tendermint/libs/log"
+	coretypes "github.com/okx/brczero/libs/tendermint/rpc/core/types"
+	tmtypes "github.com/okx/brczero/libs/tendermint/types"
+	evmtypes "github.com/okx/brczero/x/evm/types"
 )
 
 type Watcher struct {

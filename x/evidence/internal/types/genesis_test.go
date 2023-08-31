@@ -3,11 +3,11 @@ package types_test
 import (
 	"testing"
 
-	"github.com/okx/okbchain/libs/tendermint/crypto/ed25519"
+	"github.com/okx/brczero/libs/tendermint/crypto/ed25519"
 	"github.com/stretchr/testify/require"
 
-	"github.com/okx/okbchain/x/evidence/exported"
-	"github.com/okx/okbchain/x/evidence/internal/types"
+	"github.com/okx/brczero/x/evidence/exported"
+	"github.com/okx/brczero/x/evidence/internal/types"
 )
 
 func TestDefaultGenesisState(t *testing.T) {

@@ -1,12 +1,12 @@
 package proxy
 
 import (
-	"github.com/okx/okbchain/libs/tendermint/libs/bytes"
-	lrpc "github.com/okx/okbchain/libs/tendermint/lite2/rpc"
-	ctypes "github.com/okx/okbchain/libs/tendermint/rpc/core/types"
-	rpcserver "github.com/okx/okbchain/libs/tendermint/rpc/jsonrpc/server"
-	rpctypes "github.com/okx/okbchain/libs/tendermint/rpc/jsonrpc/types"
-	"github.com/okx/okbchain/libs/tendermint/types"
+	"github.com/okx/brczero/libs/tendermint/libs/bytes"
+	lrpc "github.com/okx/brczero/libs/tendermint/lite2/rpc"
+	ctypes "github.com/okx/brczero/libs/tendermint/rpc/core/types"
+	rpcserver "github.com/okx/brczero/libs/tendermint/rpc/jsonrpc/server"
+	rpctypes "github.com/okx/brczero/libs/tendermint/rpc/jsonrpc/types"
+	"github.com/okx/brczero/libs/tendermint/types"
 )
 
 func RPCRoutes(c *lrpc.Client) map[string]*rpcserver.RPCFunc {

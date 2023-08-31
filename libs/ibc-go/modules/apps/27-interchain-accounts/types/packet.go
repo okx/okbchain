@@ -1,9 +1,9 @@
 package types
 
 import (
-	codectypes "github.com/okx/okbchain/libs/cosmos-sdk/codec/types"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	sdkerrors "github.com/okx/okbchain/libs/cosmos-sdk/types/errors"
+	codectypes "github.com/okx/brczero/libs/cosmos-sdk/codec/types"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	sdkerrors "github.com/okx/brczero/libs/cosmos-sdk/types/errors"
 )
 
 // MaxMemoCharLength defines the maximum length for the InterchainAccountPacketData memo field

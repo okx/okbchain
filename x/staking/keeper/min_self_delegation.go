@@ -3,8 +3,8 @@ package keeper
 import (
 	"time"
 
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	"github.com/okx/okbchain/x/staking/types"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	"github.com/okx/brczero/x/staking/types"
 )
 
 // WithdrawMinSelfDelegation withdraws the msd from validator

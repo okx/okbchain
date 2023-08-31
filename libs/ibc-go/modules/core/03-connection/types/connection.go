@@ -1,10 +1,10 @@
 package types
 
 import (
-	sdkerrors "github.com/okx/okbchain/libs/cosmos-sdk/types/errors"
-	commitmenttypes "github.com/okx/okbchain/libs/ibc-go/modules/core/23-commitment/types"
-	host "github.com/okx/okbchain/libs/ibc-go/modules/core/24-host"
-	"github.com/okx/okbchain/libs/ibc-go/modules/core/exported"
+	sdkerrors "github.com/okx/brczero/libs/cosmos-sdk/types/errors"
+	commitmenttypes "github.com/okx/brczero/libs/ibc-go/modules/core/23-commitment/types"
+	host "github.com/okx/brczero/libs/ibc-go/modules/core/24-host"
+	"github.com/okx/brczero/libs/ibc-go/modules/core/exported"
 )
 
 var _ exported.ConnectionI = (*ConnectionEnd)(nil)

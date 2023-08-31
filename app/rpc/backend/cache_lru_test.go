@@ -3,11 +3,11 @@ package backend
 import (
 	"testing"
 
-	evmtypes "github.com/okx/okbchain/x/evm/types"
+	evmtypes "github.com/okx/brczero/x/evm/types"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
-	"github.com/okx/okbchain/x/evm/watcher"
+	"github.com/okx/brczero/x/evm/watcher"
 	"github.com/spf13/viper"
 	"github.com/stretchr/testify/require"
 )

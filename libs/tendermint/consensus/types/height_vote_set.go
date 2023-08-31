@@ -6,8 +6,8 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/okx/okbchain/libs/tendermint/p2p"
-	"github.com/okx/okbchain/libs/tendermint/types"
+	"github.com/okx/brczero/libs/tendermint/p2p"
+	"github.com/okx/brczero/libs/tendermint/types"
 )
 
 type RoundVoteSet struct {

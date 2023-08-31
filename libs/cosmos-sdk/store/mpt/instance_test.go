@@ -8,10 +8,11 @@ import (
 
 	ethcmn "github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
-	"github.com/okx/okbchain/libs/cosmos-sdk/client/flags"
-	"github.com/okx/okbchain/libs/cosmos-sdk/types"
 	"github.com/spf13/viper"
 	"github.com/stretchr/testify/suite"
+
+	"github.com/okx/brczero/libs/cosmos-sdk/client/flags"
+	"github.com/okx/brczero/libs/cosmos-sdk/types"
 )
 
 type InstanceTestSuite struct {
@@ -25,8 +26,8 @@ func TestInstanceTestSuite(t *testing.T) {
 }
 
 func (suite *InstanceTestSuite) SetupTest() {
-	// set okbchaind path
-	serverDir, err := ioutil.TempDir("", ".okbchaind")
+	// set brczerod path
+	serverDir, err := ioutil.TempDir("", ".brczerod")
 	if err != nil {
 		panic(err)
 	}

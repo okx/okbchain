@@ -1,8 +1,8 @@
 package cli
 
 import (
-	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
-	interfacetypes "github.com/okx/okbchain/libs/cosmos-sdk/codec/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/codec"
+	interfacetypes "github.com/okx/brczero/libs/cosmos-sdk/codec/types"
 	"github.com/spf13/cobra"
 )
 

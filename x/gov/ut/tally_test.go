@@ -4,12 +4,12 @@ import (
 	"testing"
 	"time"
 
-	"github.com/okx/okbchain/x/gov/keeper"
+	"github.com/okx/brczero/x/gov/keeper"
 
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	"github.com/okx/okbchain/x/common"
-	"github.com/okx/okbchain/x/gov/types"
-	"github.com/okx/okbchain/x/staking"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	"github.com/okx/brczero/x/common"
+	"github.com/okx/brczero/x/gov/types"
+	"github.com/okx/brczero/x/staking"
 	"github.com/stretchr/testify/require"
 )
 

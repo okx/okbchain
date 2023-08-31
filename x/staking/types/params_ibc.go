@@ -1,6 +1,6 @@
 package types
 
-import "github.com/okx/okbchain/x/params"
+import "github.com/okx/brczero/x/params"
 
 var (
 	_ params.ParamSet = KeyHistoricalEntriesParamsSet{}

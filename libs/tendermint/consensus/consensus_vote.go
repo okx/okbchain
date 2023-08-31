@@ -4,10 +4,10 @@ import (
 	"bytes"
 	"encoding/hex"
 	"fmt"
-	cstypes "github.com/okx/okbchain/libs/tendermint/consensus/types"
-	"github.com/okx/okbchain/libs/tendermint/p2p"
-	"github.com/okx/okbchain/libs/tendermint/types"
-	tmtime "github.com/okx/okbchain/libs/tendermint/types/time"
+	cstypes "github.com/okx/brczero/libs/tendermint/consensus/types"
+	"github.com/okx/brczero/libs/tendermint/p2p"
+	"github.com/okx/brczero/libs/tendermint/types"
+	tmtime "github.com/okx/brczero/libs/tendermint/types/time"
 	"time"
 )
 

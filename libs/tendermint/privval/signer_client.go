@@ -5,8 +5,8 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/okx/okbchain/libs/tendermint/crypto"
-	"github.com/okx/okbchain/libs/tendermint/types"
+	"github.com/okx/brczero/libs/tendermint/crypto"
+	"github.com/okx/brczero/libs/tendermint/types"
 )
 
 // SignerClient implements PrivValidator.

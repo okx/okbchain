@@ -6,7 +6,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	db "github.com/okx/okbchain/libs/tm-db"
+	db "github.com/okx/brczero/libs/tm-db"
 )
 
 func ExampleImporter() {

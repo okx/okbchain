@@ -1,10 +1,10 @@
 package ante
 
 import (
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	sdkerrors "github.com/okx/okbchain/libs/cosmos-sdk/types/errors"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/auth"
-	evmtypes "github.com/okx/okbchain/x/evm/types"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	sdkerrors "github.com/okx/brczero/libs/cosmos-sdk/types/errors"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/auth"
+	evmtypes "github.com/okx/brczero/x/evm/types"
 )
 
 // AccountVerificationDecorator validates an account balance checks

@@ -1,10 +1,10 @@
 package types
 
 import (
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	authexported "github.com/okx/okbchain/libs/cosmos-sdk/x/auth/exported"
-	supplyexported "github.com/okx/okbchain/libs/cosmos-sdk/x/supply/exported"
-	stakingexported "github.com/okx/okbchain/x/staking/exported"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	authexported "github.com/okx/brczero/libs/cosmos-sdk/x/auth/exported"
+	supplyexported "github.com/okx/brczero/libs/cosmos-sdk/x/supply/exported"
+	stakingexported "github.com/okx/brczero/x/staking/exported"
 )
 
 // AccountKeeper defines the expected account keeper (noalias)

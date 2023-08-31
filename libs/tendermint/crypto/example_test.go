@@ -17,7 +17,7 @@ package crypto_test
 import (
 	"fmt"
 
-	"github.com/okx/okbchain/libs/tendermint/crypto"
+	"github.com/okx/brczero/libs/tendermint/crypto"
 )
 
 func ExampleSha256() {

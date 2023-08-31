@@ -6,15 +6,15 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/client"
-	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	sdkerrors "github.com/okx/okbchain/libs/cosmos-sdk/types/errors"
-	stakingtypes "github.com/okx/okbchain/libs/cosmos-sdk/x/staking/types"
-	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
-	"github.com/okx/okbchain/libs/tendermint/crypto"
-	"github.com/okx/okbchain/x/common"
-	"github.com/okx/okbchain/x/staking/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/client"
+	"github.com/okx/brczero/libs/cosmos-sdk/codec"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	sdkerrors "github.com/okx/brczero/libs/cosmos-sdk/types/errors"
+	stakingtypes "github.com/okx/brczero/libs/cosmos-sdk/x/staking/types"
+	abci "github.com/okx/brczero/libs/tendermint/abci/types"
+	"github.com/okx/brczero/libs/tendermint/crypto"
+	"github.com/okx/brczero/x/common"
+	"github.com/okx/brczero/x/staking/types"
 )
 
 // NewQuerier creates a querier for staking REST endpoints

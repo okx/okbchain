@@ -14,12 +14,13 @@ import (
 	"github.com/ethereum/go-ethereum/core/state"
 	"github.com/ethereum/go-ethereum/ethdb/memorydb"
 	trie2 "github.com/ethereum/go-ethereum/trie"
-	"github.com/okx/okbchain/libs/cosmos-sdk/client/flags"
-	"github.com/okx/okbchain/libs/cosmos-sdk/store/types"
-	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
 	"github.com/spf13/viper"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
+
+	"github.com/okx/brczero/libs/cosmos-sdk/client/flags"
+	"github.com/okx/brczero/libs/cosmos-sdk/store/types"
+	abci "github.com/okx/brczero/libs/tendermint/abci/types"
 )
 
 var (
@@ -50,8 +51,8 @@ func TestStoreTestSuite(t *testing.T) {
 }
 
 func (suite *StoreTestSuite) SetupTest() {
-	// set okbchaind path
-	serverDir, err := ioutil.TempDir("", ".okbchaind")
+	// set brczerod path
+	serverDir, err := ioutil.TempDir("", ".brczerod")
 	if err != nil {
 		panic(err)
 	}

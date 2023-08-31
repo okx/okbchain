@@ -1,11 +1,11 @@
 package transfer
 
 import (
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	sdkerrors "github.com/okx/okbchain/libs/cosmos-sdk/types/errors"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	sdkerrors "github.com/okx/brczero/libs/cosmos-sdk/types/errors"
 
-	"github.com/okx/okbchain/libs/ibc-go/modules/apps/transfer/keeper"
-	"github.com/okx/okbchain/libs/ibc-go/modules/apps/transfer/types"
+	"github.com/okx/brczero/libs/ibc-go/modules/apps/transfer/keeper"
+	"github.com/okx/brczero/libs/ibc-go/modules/apps/transfer/types"
 )
 
 // NewHandler returns sdk.Handler for IBC token transfer module messages

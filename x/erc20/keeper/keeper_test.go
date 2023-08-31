@@ -11,16 +11,16 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/stretchr/testify/suite"
 
-	"github.com/okx/okbchain/app"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	minttypes "github.com/okx/okbchain/libs/cosmos-sdk/x/mint"
-	transfertypes "github.com/okx/okbchain/libs/ibc-go/modules/apps/transfer/types"
-	clienttypes "github.com/okx/okbchain/libs/ibc-go/modules/core/02-client/types"
-	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
-	tmbytes "github.com/okx/okbchain/libs/tendermint/libs/bytes"
-	"github.com/okx/okbchain/x/erc20/keeper"
-	"github.com/okx/okbchain/x/erc20/types"
-	evmtypes "github.com/okx/okbchain/x/evm/types"
+	"github.com/okx/brczero/app"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	minttypes "github.com/okx/brczero/libs/cosmos-sdk/x/mint"
+	transfertypes "github.com/okx/brczero/libs/ibc-go/modules/apps/transfer/types"
+	clienttypes "github.com/okx/brczero/libs/ibc-go/modules/core/02-client/types"
+	abci "github.com/okx/brczero/libs/tendermint/abci/types"
+	tmbytes "github.com/okx/brczero/libs/tendermint/libs/bytes"
+	"github.com/okx/brczero/x/erc20/keeper"
+	"github.com/okx/brczero/x/erc20/types"
+	evmtypes "github.com/okx/brczero/x/evm/types"
 )
 
 var (
@@ -35,7 +35,7 @@ type KeeperTestSuite struct {
 	suite.Suite
 
 	ctx sdk.Context
-	app *app.OKBChainApp
+	app *app.BRCZeroApp
 
 	querier sdk.Querier
 }

@@ -2,13 +2,13 @@ package types_test
 
 import (
 	"fmt"
-	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
+	abci "github.com/okx/brczero/libs/tendermint/abci/types"
 	"github.com/stretchr/testify/require"
 	// abci "github.com/tendermint/tendermint/abci/types"
 	// crypto "github.com/tendermint/tendermint/proto/tendermint/crypto"
-	"github.com/okx/okbchain/libs/tendermint/crypto/merkle"
+	"github.com/okx/brczero/libs/tendermint/crypto/merkle"
 
-	"github.com/okx/okbchain/libs/ibc-go/modules/core/23-commitment/types"
+	"github.com/okx/brczero/libs/ibc-go/modules/core/23-commitment/types"
 )
 
 func (suite *MerkleTestSuite) TestConvertProofs() {

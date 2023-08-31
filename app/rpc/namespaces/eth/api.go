@@ -12,7 +12,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/store/mpt"
+	"github.com/okx/brczero/libs/cosmos-sdk/store/mpt"
 
 	"github.com/ethereum/go-ethereum/accounts"
 	"github.com/ethereum/go-ethereum/accounts/keystore"
@@ -24,38 +24,38 @@ import (
 	lru "github.com/hashicorp/golang-lru"
 	"github.com/spf13/viper"
 
-	appconfig "github.com/okx/okbchain/app/config"
-	"github.com/okx/okbchain/libs/tendermint/mempool"
+	appconfig "github.com/okx/brczero/app/config"
+	"github.com/okx/brczero/libs/tendermint/mempool"
 
-	"github.com/okx/okbchain/app/config"
-	"github.com/okx/okbchain/app/crypto/ethsecp256k1"
-	"github.com/okx/okbchain/app/crypto/hd"
-	"github.com/okx/okbchain/app/rpc/backend"
-	"github.com/okx/okbchain/app/rpc/monitor"
-	"github.com/okx/okbchain/app/rpc/namespaces/eth/simulation"
-	rpctypes "github.com/okx/okbchain/app/rpc/types"
-	ethermint "github.com/okx/okbchain/app/types"
-	"github.com/okx/okbchain/app/utils"
-	clientcontext "github.com/okx/okbchain/libs/cosmos-sdk/client/context"
-	"github.com/okx/okbchain/libs/cosmos-sdk/client/flags"
-	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
-	"github.com/okx/okbchain/libs/cosmos-sdk/crypto/keys"
-	cmserver "github.com/okx/okbchain/libs/cosmos-sdk/server"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	sdkerrors "github.com/okx/okbchain/libs/cosmos-sdk/types/errors"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/auth"
-	authclient "github.com/okx/okbchain/libs/cosmos-sdk/x/auth/client/utils"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/auth/exported"
-	authtypes "github.com/okx/okbchain/libs/cosmos-sdk/x/auth/types"
-	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
-	"github.com/okx/okbchain/libs/tendermint/global"
-	"github.com/okx/okbchain/libs/tendermint/libs/log"
-	tmtypes "github.com/okx/okbchain/libs/tendermint/types"
-	"github.com/okx/okbchain/x/erc20"
-	"github.com/okx/okbchain/x/evm"
-	evmtypes "github.com/okx/okbchain/x/evm/types"
-	"github.com/okx/okbchain/x/evm/watcher"
-	"github.com/okx/okbchain/x/vmbridge"
+	"github.com/okx/brczero/app/config"
+	"github.com/okx/brczero/app/crypto/ethsecp256k1"
+	"github.com/okx/brczero/app/crypto/hd"
+	"github.com/okx/brczero/app/rpc/backend"
+	"github.com/okx/brczero/app/rpc/monitor"
+	"github.com/okx/brczero/app/rpc/namespaces/eth/simulation"
+	rpctypes "github.com/okx/brczero/app/rpc/types"
+	ethermint "github.com/okx/brczero/app/types"
+	"github.com/okx/brczero/app/utils"
+	clientcontext "github.com/okx/brczero/libs/cosmos-sdk/client/context"
+	"github.com/okx/brczero/libs/cosmos-sdk/client/flags"
+	"github.com/okx/brczero/libs/cosmos-sdk/codec"
+	"github.com/okx/brczero/libs/cosmos-sdk/crypto/keys"
+	cmserver "github.com/okx/brczero/libs/cosmos-sdk/server"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	sdkerrors "github.com/okx/brczero/libs/cosmos-sdk/types/errors"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/auth"
+	authclient "github.com/okx/brczero/libs/cosmos-sdk/x/auth/client/utils"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/auth/exported"
+	authtypes "github.com/okx/brczero/libs/cosmos-sdk/x/auth/types"
+	abci "github.com/okx/brczero/libs/tendermint/abci/types"
+	"github.com/okx/brczero/libs/tendermint/global"
+	"github.com/okx/brczero/libs/tendermint/libs/log"
+	tmtypes "github.com/okx/brczero/libs/tendermint/types"
+	"github.com/okx/brczero/x/erc20"
+	"github.com/okx/brczero/x/evm"
+	evmtypes "github.com/okx/brczero/x/evm/types"
+	"github.com/okx/brczero/x/evm/watcher"
+	"github.com/okx/brczero/x/vmbridge"
 )
 
 const (
@@ -267,7 +267,7 @@ func (api *PublicEthereumAPI) GasPrice() *hexutil.Big {
 	maxGP := new(big.Int).Mul(minGP, big.NewInt(5000))
 
 	rgp := new(big.Int).Set(minGP)
-	if appconfig.GetOkbcConfig().GetDynamicGpMode() != tmtypes.MinimalGpMode {
+	if appconfig.GetBRCZeroConfig().GetDynamicGpMode() != tmtypes.MinimalGpMode {
 		// If current block is not congested, rgp == minimal gas price.
 		if mempool.IsCongested {
 			rgp.Set(mempool.GlobalRecommendedGP)
@@ -277,8 +277,8 @@ func (api *PublicEthereumAPI) GasPrice() *hexutil.Big {
 			rgp.Set(minGP)
 		}
 
-		if appconfig.GetOkbcConfig().GetDynamicGpCoefficient() > 1 {
-			coefficient := big.NewInt(int64(appconfig.GetOkbcConfig().GetDynamicGpCoefficient()))
+		if appconfig.GetBRCZeroConfig().GetDynamicGpCoefficient() > 1 {
+			coefficient := big.NewInt(int64(appconfig.GetBRCZeroConfig().GetDynamicGpCoefficient()))
 			rgp = new(big.Int).Mul(rgp, coefficient)
 		}
 
@@ -298,7 +298,7 @@ func (api *PublicEthereumAPI) GasPriceIn3Gears() *rpctypes.GPIn3Gears {
 	maxGP := new(big.Int).Mul(minGP, big.NewInt(5000))
 
 	avgGP := new(big.Int).Set(minGP)
-	if appconfig.GetOkbcConfig().GetDynamicGpMode() != tmtypes.MinimalGpMode {
+	if appconfig.GetBRCZeroConfig().GetDynamicGpMode() != tmtypes.MinimalGpMode {
 		if mempool.IsCongested {
 			avgGP.Set(mempool.GlobalRecommendedGP)
 		}
@@ -307,8 +307,8 @@ func (api *PublicEthereumAPI) GasPriceIn3Gears() *rpctypes.GPIn3Gears {
 			avgGP.Set(minGP)
 		}
 
-		if appconfig.GetOkbcConfig().GetDynamicGpCoefficient() > 1 {
-			coefficient := big.NewInt(int64(appconfig.GetOkbcConfig().GetDynamicGpCoefficient()))
+		if appconfig.GetBRCZeroConfig().GetDynamicGpCoefficient() > 1 {
+			coefficient := big.NewInt(int64(appconfig.GetBRCZeroConfig().GetDynamicGpCoefficient()))
 			avgGP = new(big.Int).Mul(avgGP, coefficient)
 		}
 
@@ -1116,7 +1116,7 @@ func (api *PublicEthereumAPI) EstimateGas(args rpctypes.CallArgs) (hexutil.Uint6
 		return hexutil.Uint64(estimatedGas), nil
 	}
 
-	gasBuffer := estimatedGas / 100 * config.GetOkbcConfig().GetGasLimitBuffer()
+	gasBuffer := estimatedGas / 100 * config.GetBRCZeroConfig().GetGasLimitBuffer()
 	//EvmHookGasEstimate: evm tx with cosmos hook,we cannot estimate hook gas
 	//simple add EvmHookGasEstimate,run tx will refund the extra gas
 	gas := estimatedGas + gasBuffer + EvmHookGasEstimate

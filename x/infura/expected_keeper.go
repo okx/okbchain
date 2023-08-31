@@ -1,6 +1,6 @@
 package infura
 
-import evm "github.com/okx/okbchain/x/evm/watcher"
+import evm "github.com/okx/brczero/x/evm/watcher"
 
 type EvmKeeper interface {
 	SetObserverKeeper(keeper evm.InfuraKeeper)

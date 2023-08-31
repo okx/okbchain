@@ -3,45 +3,47 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/okx/okbchain/libs/system"
 	"io"
 	"os"
 	"strings"
 
-	"github.com/okx/okbchain/app/logevents"
-	"github.com/okx/okbchain/cmd/okbchaind/fss"
-	"github.com/okx/okbchain/cmd/okbchaind/mpt"
+	"github.com/okx/brczero/libs/system"
 
-	"github.com/okx/okbchain/app/rpc"
-	evmtypes "github.com/okx/okbchain/x/evm/types"
+	"github.com/okx/brczero/app/logevents"
+	"github.com/okx/brczero/cmd/brczerod/fss"
+	"github.com/okx/brczero/cmd/brczerod/mpt"
+
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
-	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
-	tmamino "github.com/okx/okbchain/libs/tendermint/crypto/encoding/amino"
-	"github.com/okx/okbchain/libs/tendermint/crypto/multisig"
-	"github.com/okx/okbchain/libs/tendermint/libs/cli"
-	"github.com/okx/okbchain/libs/tendermint/libs/log"
-	tmtypes "github.com/okx/okbchain/libs/tendermint/types"
-	dbm "github.com/okx/okbchain/libs/tm-db"
+	"github.com/okx/brczero/app/rpc"
+	evmtypes "github.com/okx/brczero/x/evm/types"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/baseapp"
-	"github.com/okx/okbchain/libs/cosmos-sdk/client/flags"
-	clientkeys "github.com/okx/okbchain/libs/cosmos-sdk/client/keys"
-	"github.com/okx/okbchain/libs/cosmos-sdk/crypto/keys"
-	"github.com/okx/okbchain/libs/cosmos-sdk/server"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/auth"
+	abci "github.com/okx/brczero/libs/tendermint/abci/types"
+	tmamino "github.com/okx/brczero/libs/tendermint/crypto/encoding/amino"
+	"github.com/okx/brczero/libs/tendermint/crypto/multisig"
+	"github.com/okx/brczero/libs/tendermint/libs/cli"
+	"github.com/okx/brczero/libs/tendermint/libs/log"
+	tmtypes "github.com/okx/brczero/libs/tendermint/types"
+	dbm "github.com/okx/brczero/libs/tm-db"
 
-	"github.com/okx/okbchain/app"
-	"github.com/okx/okbchain/app/codec"
-	"github.com/okx/okbchain/app/crypto/ethsecp256k1"
-	chain "github.com/okx/okbchain/app/types"
-	"github.com/okx/okbchain/cmd/client"
-	"github.com/okx/okbchain/x/genutil"
-	genutilcli "github.com/okx/okbchain/x/genutil/client/cli"
-	genutiltypes "github.com/okx/okbchain/x/genutil/types"
-	"github.com/okx/okbchain/x/staking"
+	"github.com/okx/brczero/libs/cosmos-sdk/baseapp"
+	"github.com/okx/brczero/libs/cosmos-sdk/client/flags"
+	clientkeys "github.com/okx/brczero/libs/cosmos-sdk/client/keys"
+	"github.com/okx/brczero/libs/cosmos-sdk/crypto/keys"
+	"github.com/okx/brczero/libs/cosmos-sdk/server"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/auth"
+
+	"github.com/okx/brczero/app"
+	"github.com/okx/brczero/app/codec"
+	"github.com/okx/brczero/app/crypto/ethsecp256k1"
+	chain "github.com/okx/brczero/app/types"
+	"github.com/okx/brczero/cmd/client"
+	"github.com/okx/brczero/x/genutil"
+	genutilcli "github.com/okx/brczero/x/genutil/client/cli"
+	genutiltypes "github.com/okx/brczero/x/genutil/types"
+	"github.com/okx/brczero/x/staking"
 )
 
 const flagInvCheckPeriod = "inv-check-period"
@@ -144,7 +146,7 @@ func checkSetEnv(envName string, value string) {
 
 func closeApp(iApp abci.Application) {
 	fmt.Println("Close App")
-	app := iApp.(*app.OKBChainApp)
+	app := iApp.(*app.BRCZeroApp)
 	app.StopBaseApp()
 	evmtypes.CloseIndexer()
 	rpc.CloseEthBackend()
@@ -157,7 +159,7 @@ func newApp(logger log.Logger, db dbm.DB, traceStore io.Writer) abci.Application
 		panic(err)
 	}
 
-	return app.NewOKBChainApp(
+	return app.NewBRCZeroApp(
 		logger,
 		db,
 		traceStore,
@@ -173,15 +175,15 @@ func newApp(logger log.Logger, db dbm.DB, traceStore io.Writer) abci.Application
 func exportAppStateAndTMValidators(
 	logger log.Logger, db dbm.DB, traceStore io.Writer, height int64, forZeroHeight bool, jailWhiteList []string,
 ) (json.RawMessage, []tmtypes.GenesisValidator, error) {
-	var ethermintApp *app.OKBChainApp
+	var ethermintApp *app.BRCZeroApp
 	if height != -1 {
-		ethermintApp = app.NewOKBChainApp(logger, db, traceStore, false, map[int64]bool{}, 0)
+		ethermintApp = app.NewBRCZeroApp(logger, db, traceStore, false, map[int64]bool{}, 0)
 
 		if err := ethermintApp.LoadHeight(height); err != nil {
 			return nil, nil, err
 		}
 	} else {
-		ethermintApp = app.NewOKBChainApp(logger, db, traceStore, true, map[int64]bool{}, 0)
+		ethermintApp = app.NewBRCZeroApp(logger, db, traceStore, true, map[int64]bool{}, 0)
 	}
 
 	return ethermintApp.ExportAppStateAndValidators(forZeroHeight, jailWhiteList)

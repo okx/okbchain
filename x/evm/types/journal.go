@@ -2,8 +2,8 @@ package types
 
 import (
 	ethcmn "github.com/ethereum/go-ethereum/common"
-	"github.com/okx/okbchain/libs/cosmos-sdk/store/types"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/store/types"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
 )
 
 var ripemd = ethcmn.HexToAddress("0000000000000000000000000000000000000003")

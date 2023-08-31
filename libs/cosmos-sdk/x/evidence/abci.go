@@ -3,10 +3,10 @@ package evidence
 import (
 	"fmt"
 
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
 
-	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
-	tmtypes "github.com/okx/okbchain/libs/tendermint/types"
+	abci "github.com/okx/brczero/libs/tendermint/abci/types"
+	tmtypes "github.com/okx/brczero/libs/tendermint/types"
 )
 
 // BeginBlocker iterates through and handles any newly discovered evidence of

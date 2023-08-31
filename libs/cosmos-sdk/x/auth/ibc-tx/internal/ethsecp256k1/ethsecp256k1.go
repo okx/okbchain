@@ -7,11 +7,11 @@ import (
 	"fmt"
 
 	"github.com/ethereum/go-ethereum/crypto"
-	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
-	cryptotypes "github.com/okx/okbchain/libs/cosmos-sdk/crypto/types"
-	sdkerrors "github.com/okx/okbchain/libs/cosmos-sdk/types/errors"
+	"github.com/okx/brczero/libs/cosmos-sdk/codec"
+	cryptotypes "github.com/okx/brczero/libs/cosmos-sdk/crypto/types"
+	sdkerrors "github.com/okx/brczero/libs/cosmos-sdk/types/errors"
 
-	tmcrypto "github.com/okx/okbchain/libs/tendermint/crypto"
+	tmcrypto "github.com/okx/brczero/libs/tendermint/crypto"
 )
 
 const (

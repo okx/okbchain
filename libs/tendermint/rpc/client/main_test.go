@@ -5,9 +5,9 @@ import (
 	"os"
 	"testing"
 
-	"github.com/okx/okbchain/libs/tendermint/abci/example/kvstore"
-	nm "github.com/okx/okbchain/libs/tendermint/node"
-	rpctest "github.com/okx/okbchain/libs/tendermint/rpc/test"
+	"github.com/okx/brczero/libs/tendermint/abci/example/kvstore"
+	nm "github.com/okx/brczero/libs/tendermint/node"
+	rpctest "github.com/okx/brczero/libs/tendermint/rpc/test"
 )
 
 var node *nm.Node

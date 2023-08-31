@@ -4,11 +4,11 @@ import (
 	"errors"
 
 	"github.com/golang/protobuf/ptypes/wrappers"
-	"github.com/okx/okbchain/libs/cosmos-sdk/client/context"
-	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
-	anytypes "github.com/okx/okbchain/libs/cosmos-sdk/codec/types"
-	sdktypes "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	types "github.com/okx/okbchain/libs/cosmos-sdk/types/ibc-adapter"
+	"github.com/okx/brczero/libs/cosmos-sdk/client/context"
+	"github.com/okx/brczero/libs/cosmos-sdk/codec"
+	anytypes "github.com/okx/brczero/libs/cosmos-sdk/codec/types"
+	sdktypes "github.com/okx/brczero/libs/cosmos-sdk/types"
+	types "github.com/okx/brczero/libs/cosmos-sdk/types/ibc-adapter"
 )
 
 var (

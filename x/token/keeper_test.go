@@ -4,14 +4,14 @@ import (
 	"fmt"
 	"testing"
 
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/mock"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/supply"
-	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/mock"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/supply"
+	abci "github.com/okx/brczero/libs/tendermint/abci/types"
 	"github.com/stretchr/testify/require"
 
-	"github.com/okx/okbchain/x/common"
-	"github.com/okx/okbchain/x/token/types"
+	"github.com/okx/brczero/x/common"
+	"github.com/okx/brczero/x/token/types"
 )
 
 func TestKeeper_GetFeeDetailList(t *testing.T) {

@@ -2,9 +2,9 @@ package evm_test
 
 import (
 	ethcmn "github.com/ethereum/go-ethereum/common"
-	"github.com/okx/okbchain/x/evm"
-	"github.com/okx/okbchain/x/evm/types"
-	govtypes "github.com/okx/okbchain/x/gov/types"
+	"github.com/okx/brczero/x/evm"
+	"github.com/okx/brczero/x/evm/types"
+	govtypes "github.com/okx/brczero/x/gov/types"
 )
 
 func (suite *EvmTestSuite) TestProposalHandler_ManageContractDeploymentWhitelistProposal() {

@@ -3,7 +3,7 @@ package types
 import (
 	"bytes"
 	"fmt"
-	"github.com/okx/okbchain/libs/system"
+	"github.com/okx/brczero/libs/system"
 	"math/big"
 	"math/rand"
 	"strings"
@@ -11,30 +11,30 @@ import (
 
 	"encoding/hex"
 
-	ibcfee "github.com/okx/okbchain/libs/ibc-go/modules/apps/29-fee"
+	ibcfee "github.com/okx/brczero/libs/ibc-go/modules/apps/29-fee"
 
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/common/math"
-	chaincodec "github.com/okx/okbchain/app/codec"
+	chaincodec "github.com/okx/brczero/app/codec"
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/okx/okbchain/app/crypto/ethsecp256k1"
-	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
+	"github.com/okx/brczero/app/crypto/ethsecp256k1"
+	"github.com/okx/brczero/libs/cosmos-sdk/codec"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
 
 	ethcmn "github.com/ethereum/go-ethereum/common"
 	ethtypes "github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/rlp"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/types/module"
-	ibctxdecode "github.com/okx/okbchain/libs/cosmos-sdk/x/auth/ibc-tx"
-	authtypes "github.com/okx/okbchain/libs/cosmos-sdk/x/auth/types"
-	ibctransfer "github.com/okx/okbchain/libs/ibc-go/modules/apps/transfer"
-	ibc "github.com/okx/okbchain/libs/ibc-go/modules/core"
-	"github.com/okx/okbchain/libs/tendermint/crypto/secp256k1"
-	"github.com/okx/okbchain/libs/tendermint/crypto/tmhash"
-	tmtypes "github.com/okx/okbchain/libs/tendermint/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/types/module"
+	ibctxdecode "github.com/okx/brczero/libs/cosmos-sdk/x/auth/ibc-tx"
+	authtypes "github.com/okx/brczero/libs/cosmos-sdk/x/auth/types"
+	ibctransfer "github.com/okx/brczero/libs/ibc-go/modules/apps/transfer"
+	ibc "github.com/okx/brczero/libs/ibc-go/modules/core"
+	"github.com/okx/brczero/libs/tendermint/crypto/secp256k1"
+	"github.com/okx/brczero/libs/tendermint/crypto/tmhash"
+	tmtypes "github.com/okx/brczero/libs/tendermint/types"
 )
 
 func newSdkAddress() sdk.AccAddress {

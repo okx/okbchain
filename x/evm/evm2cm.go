@@ -6,9 +6,9 @@ import (
 	"fmt"
 
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/okx/okbchain/libs/cosmos-sdk/baseapp"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	"github.com/okx/okbchain/x/evm/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/baseapp"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	"github.com/okx/brczero/x/evm/types"
 )
 
 var (

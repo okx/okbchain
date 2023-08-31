@@ -3,9 +3,9 @@ package keeper
 import (
 	"encoding/binary"
 
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	tmtypes "github.com/okx/okbchain/libs/tendermint/types"
-	"github.com/okx/okbchain/x/wasm/types"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	tmtypes "github.com/okx/brczero/libs/tendermint/types"
+	"github.com/okx/brczero/x/wasm/types"
 )
 
 type HandlerOption struct {

@@ -4,12 +4,13 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/client"
-	"github.com/okx/okbchain/libs/cosmos-sdk/client/context"
-	"github.com/okx/okbchain/libs/cosmos-sdk/client/flags"
-	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
-	"github.com/okx/okbchain/x/erc20/types"
 	"github.com/spf13/cobra"
+
+	"github.com/okx/brczero/libs/cosmos-sdk/client"
+	"github.com/okx/brczero/libs/cosmos-sdk/client/context"
+	"github.com/okx/brczero/libs/cosmos-sdk/client/flags"
+	"github.com/okx/brczero/libs/cosmos-sdk/codec"
+	"github.com/okx/brczero/x/erc20/types"
 )
 
 // GetQueryCmd defines erc20 module queries through the cli
@@ -36,7 +37,7 @@ func GetCmdQueryParams(queryRoute string, cdc *codec.Codec) *cobra.Command {
 		Short: "Query all the modifiable parameters of gov proposal",
 		Long: strings.TrimSpace(`Query the all the parameters for the governance process:
 
-$ okbchaincli query erc20 params
+$ brczerocli query erc20 params
 `),
 		Args: cobra.NoArgs,
 		RunE: func(_ *cobra.Command, _ []string) error {
@@ -61,7 +62,7 @@ func GetCmdQueryTokenMapping(queryRoute string, cdc *codec.Codec) *cobra.Command
 		Short: "Query all token mapping of denom and contract",
 		Long: strings.TrimSpace(`Query all mapping of denom and contract:
 
-$ okbchaincli query erc20 token-mapping
+$ brczerocli query erc20 token-mapping
 `),
 		Args: cobra.NoArgs,
 		RunE: func(_ *cobra.Command, _ []string) error {
@@ -85,7 +86,7 @@ func GetCmdTemplateContract(queryRoute string, cdc *codec.Codec) *cobra.Command 
 		Use:   "contract-template",
 		Short: "Query contract-template and note the return value is not available to post as proposal",
 		Long: strings.TrimSpace(`Query all mapping of denom and contract:
-$ okbchaincli query erc20 contract-template
+$ brczerocli query erc20 contract-template
 `),
 		Args: cobra.NoArgs,
 		RunE: func(_ *cobra.Command, _ []string) error {

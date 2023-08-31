@@ -3,14 +3,14 @@ package distribution
 import (
 	"testing"
 
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/auth"
-	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
-	"github.com/okx/okbchain/libs/tendermint/crypto"
-	"github.com/okx/okbchain/x/distribution/keeper"
-	"github.com/okx/okbchain/x/distribution/types"
-	"github.com/okx/okbchain/x/staking"
-	stakingtypes "github.com/okx/okbchain/x/staking/types"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/auth"
+	abci "github.com/okx/brczero/libs/tendermint/abci/types"
+	"github.com/okx/brczero/libs/tendermint/crypto"
+	"github.com/okx/brczero/x/distribution/keeper"
+	"github.com/okx/brczero/x/distribution/types"
+	"github.com/okx/brczero/x/staking"
+	stakingtypes "github.com/okx/brczero/x/staking/types"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
 )

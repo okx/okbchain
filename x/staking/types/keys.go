@@ -5,12 +5,12 @@ import (
 	"fmt"
 	"time"
 
-	cryptoAmino "github.com/okx/okbchain/libs/tendermint/crypto/encoding/amino"
+	cryptoAmino "github.com/okx/brczero/libs/tendermint/crypto/encoding/amino"
 
-	"github.com/okx/okbchain/libs/tendermint/crypto"
-	"github.com/okx/okbchain/libs/tendermint/libs/bech32"
+	"github.com/okx/brczero/libs/tendermint/crypto"
+	"github.com/okx/brczero/libs/tendermint/libs/bech32"
 
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
 )
 
 const (

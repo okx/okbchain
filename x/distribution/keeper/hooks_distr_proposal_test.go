@@ -4,10 +4,10 @@ import (
 	"testing"
 	"time"
 
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	"github.com/okx/okbchain/x/staking"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	"github.com/okx/brczero/x/staking"
 
-	"github.com/okx/okbchain/x/distribution/types"
+	"github.com/okx/brczero/x/distribution/types"
 	"github.com/stretchr/testify/require"
 )
 

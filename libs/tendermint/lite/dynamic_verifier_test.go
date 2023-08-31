@@ -8,11 +8,11 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	dbm "github.com/okx/okbchain/libs/tm-db"
+	dbm "github.com/okx/brczero/libs/tm-db"
 
-	"github.com/okx/okbchain/libs/tendermint/crypto/tmhash"
-	log "github.com/okx/okbchain/libs/tendermint/libs/log"
-	"github.com/okx/okbchain/libs/tendermint/types"
+	"github.com/okx/brczero/libs/tendermint/crypto/tmhash"
+	log "github.com/okx/brczero/libs/tendermint/libs/log"
+	"github.com/okx/brczero/libs/tendermint/types"
 )
 
 const testChainID = "inquiry-test"

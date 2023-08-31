@@ -2,12 +2,12 @@ package types
 
 import (
 	"fmt"
-	"github.com/okx/okbchain/libs/system"
+	"github.com/okx/brczero/libs/system"
 	"strings"
 
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	sdkgovtypes "github.com/okx/okbchain/libs/cosmos-sdk/x/gov/types"
-	govtypes "github.com/okx/okbchain/x/gov/types"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	sdkgovtypes "github.com/okx/brczero/libs/cosmos-sdk/x/gov/types"
+	govtypes "github.com/okx/brczero/x/gov/types"
 )
 
 type UpgradeStatus uint32

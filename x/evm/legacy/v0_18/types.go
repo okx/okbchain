@@ -1,8 +1,8 @@
 package v018
 
 import (
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	"github.com/okx/okbchain/x/evm/legacy/v0_16"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	"github.com/okx/brczero/x/evm/legacy/v0_16"
 )
 
 type (

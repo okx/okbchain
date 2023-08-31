@@ -4,10 +4,10 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
 
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	sdkerrors "github.com/okx/okbchain/libs/cosmos-sdk/types/errors"
-	"github.com/okx/okbchain/x/feesplit/keeper"
-	"github.com/okx/okbchain/x/feesplit/types"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	sdkerrors "github.com/okx/brczero/libs/cosmos-sdk/types/errors"
+	"github.com/okx/brczero/x/feesplit/keeper"
+	"github.com/okx/brczero/x/feesplit/types"
 )
 
 // NewHandler defines the fees module handler instance

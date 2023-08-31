@@ -1,14 +1,14 @@
 package config
 
 import (
-	"github.com/okx/okbchain/libs/system/trace"
+	"github.com/okx/brczero/libs/system/trace"
 	"path"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/server"
+	"github.com/okx/brczero/libs/cosmos-sdk/server"
 
 	"github.com/mosn/holmes"
-	"github.com/okx/okbchain/libs/tendermint/libs/cli"
-	tmos "github.com/okx/okbchain/libs/tendermint/libs/os"
+	"github.com/okx/brczero/libs/tendermint/libs/cli"
+	tmos "github.com/okx/brczero/libs/tendermint/libs/os"
 	"github.com/spf13/viper"
 )
 

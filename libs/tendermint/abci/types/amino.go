@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/okx/okbchain/libs/tendermint/libs/kv"
+	"github.com/okx/brczero/libs/tendermint/libs/kv"
 
 	"github.com/tendermint/go-amino"
 )

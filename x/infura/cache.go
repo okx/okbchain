@@ -1,8 +1,8 @@
 package infura
 
 import (
-	evmtypes "github.com/okx/okbchain/x/evm/types"
-	evm "github.com/okx/okbchain/x/evm/watcher"
+	evmtypes "github.com/okx/brczero/x/evm/types"
+	evm "github.com/okx/brczero/x/evm/watcher"
 )
 
 const defaultCacheCap = 2000

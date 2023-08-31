@@ -9,16 +9,16 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
-	"github.com/okx/okbchain/app"
-	"github.com/okx/okbchain/app/utils/appstatus"
-	"github.com/okx/okbchain/libs/cosmos-sdk/server"
-	"github.com/okx/okbchain/libs/cosmos-sdk/store/flatkv"
-	"github.com/okx/okbchain/libs/cosmos-sdk/store/mpt"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	tmiavl "github.com/okx/okbchain/libs/iavl"
-	"github.com/okx/okbchain/libs/system/trace"
-	sm "github.com/okx/okbchain/libs/tendermint/state"
-	tmtypes "github.com/okx/okbchain/libs/tendermint/types"
+	"github.com/okx/brczero/app"
+	"github.com/okx/brczero/app/utils/appstatus"
+	"github.com/okx/brczero/libs/cosmos-sdk/server"
+	"github.com/okx/brczero/libs/cosmos-sdk/store/flatkv"
+	"github.com/okx/brczero/libs/cosmos-sdk/store/mpt"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	tmiavl "github.com/okx/brczero/libs/iavl"
+	"github.com/okx/brczero/libs/system/trace"
+	sm "github.com/okx/brczero/libs/tendermint/state"
+	tmtypes "github.com/okx/brczero/libs/tendermint/types"
 )
 
 func repairStateCmd(ctx *server.Context) *cobra.Command {

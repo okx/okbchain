@@ -6,10 +6,10 @@ import (
 	"sort"
 	"sync"
 
-	"github.com/okx/okbchain/libs/iavl/config"
+	"github.com/okx/brczero/libs/iavl/config"
 
-	"github.com/okx/okbchain/libs/system/trace"
-	dbm "github.com/okx/okbchain/libs/tm-db"
+	"github.com/okx/brczero/libs/system/trace"
+	dbm "github.com/okx/brczero/libs/tm-db"
 )
 
 const (

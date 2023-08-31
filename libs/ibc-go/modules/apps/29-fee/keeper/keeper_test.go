@@ -4,16 +4,16 @@ import (
 	"fmt"
 	"testing"
 
-	types2 "github.com/okx/okbchain/libs/tendermint/types"
+	types2 "github.com/okx/brczero/libs/tendermint/types"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/baseapp"
+	"github.com/okx/brczero/libs/cosmos-sdk/baseapp"
 
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	ibctesting "github.com/okx/okbchain/libs/ibc-go/testing"
-	ibcmock "github.com/okx/okbchain/libs/ibc-go/testing/mock"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	ibctesting "github.com/okx/brczero/libs/ibc-go/testing"
+	ibcmock "github.com/okx/brczero/libs/ibc-go/testing/mock"
 
-	"github.com/okx/okbchain/libs/ibc-go/modules/apps/29-fee/types"
-	channeltypes "github.com/okx/okbchain/libs/ibc-go/modules/core/04-channel/types"
+	"github.com/okx/brczero/libs/ibc-go/modules/apps/29-fee/types"
+	channeltypes "github.com/okx/brczero/libs/ibc-go/modules/core/04-channel/types"
 	"github.com/stretchr/testify/suite"
 )
 

@@ -3,14 +3,14 @@ package v0_36
 import (
 	"testing"
 
-	"github.com/okx/okbchain/libs/tendermint/crypto"
-	"github.com/okx/okbchain/libs/tendermint/crypto/secp256k1"
+	"github.com/okx/brczero/libs/tendermint/crypto"
+	"github.com/okx/brczero/libs/tendermint/crypto/secp256k1"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/types"
-	v034distr "github.com/okx/okbchain/libs/cosmos-sdk/x/distribution/legacy/v0_34"
-	v034accounts "github.com/okx/okbchain/libs/cosmos-sdk/x/genaccounts/legacy/v0_34"
-	v034gov "github.com/okx/okbchain/libs/cosmos-sdk/x/gov/legacy/v0_34"
-	v034staking "github.com/okx/okbchain/libs/cosmos-sdk/x/staking/legacy/v0_34"
+	"github.com/okx/brczero/libs/cosmos-sdk/types"
+	v034distr "github.com/okx/brczero/libs/cosmos-sdk/x/distribution/legacy/v0_34"
+	v034accounts "github.com/okx/brczero/libs/cosmos-sdk/x/genaccounts/legacy/v0_34"
+	v034gov "github.com/okx/brczero/libs/cosmos-sdk/x/gov/legacy/v0_34"
+	v034staking "github.com/okx/brczero/libs/cosmos-sdk/x/staking/legacy/v0_34"
 
 	"github.com/stretchr/testify/require"
 )

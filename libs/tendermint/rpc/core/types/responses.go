@@ -4,11 +4,11 @@ import (
 	"encoding/json"
 	"time"
 
-	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
-	"github.com/okx/okbchain/libs/tendermint/crypto"
-	"github.com/okx/okbchain/libs/tendermint/libs/bytes"
-	"github.com/okx/okbchain/libs/tendermint/p2p"
-	"github.com/okx/okbchain/libs/tendermint/types"
+	abci "github.com/okx/brczero/libs/tendermint/abci/types"
+	"github.com/okx/brczero/libs/tendermint/crypto"
+	"github.com/okx/brczero/libs/tendermint/libs/bytes"
+	"github.com/okx/brczero/libs/tendermint/p2p"
+	"github.com/okx/brczero/libs/tendermint/types"
 )
 
 // List of blocks

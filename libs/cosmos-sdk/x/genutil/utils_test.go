@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/tests"
+	"github.com/okx/brczero/libs/cosmos-sdk/tests"
 
 	"github.com/stretchr/testify/require"
 )

@@ -9,17 +9,17 @@ import (
 	"strconv"
 	"strings"
 
-	dbm "github.com/okx/okbchain/libs/tm-db"
+	dbm "github.com/okx/brczero/libs/tm-db"
 	"github.com/pkg/errors"
 
-	cfg "github.com/okx/okbchain/libs/tendermint/config"
-	"github.com/okx/okbchain/libs/tendermint/libs/log"
-	tmos "github.com/okx/okbchain/libs/tendermint/libs/os"
-	"github.com/okx/okbchain/libs/tendermint/mock"
-	"github.com/okx/okbchain/libs/tendermint/proxy"
-	sm "github.com/okx/okbchain/libs/tendermint/state"
-	"github.com/okx/okbchain/libs/tendermint/store"
-	"github.com/okx/okbchain/libs/tendermint/types"
+	cfg "github.com/okx/brczero/libs/tendermint/config"
+	"github.com/okx/brczero/libs/tendermint/libs/log"
+	tmos "github.com/okx/brczero/libs/tendermint/libs/os"
+	"github.com/okx/brczero/libs/tendermint/mock"
+	"github.com/okx/brczero/libs/tendermint/proxy"
+	sm "github.com/okx/brczero/libs/tendermint/state"
+	"github.com/okx/brczero/libs/tendermint/store"
+	"github.com/okx/brczero/libs/tendermint/types"
 )
 
 const (

@@ -13,12 +13,12 @@ import (
 	"github.com/gogo/protobuf/proto"
 	lru "github.com/hashicorp/golang-lru"
 
-	"github.com/okx/okbchain/app/rpc/namespaces/eth/state"
-	"github.com/okx/okbchain/app/types"
-	clientcontext "github.com/okx/okbchain/libs/cosmos-sdk/client/context"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	evmtypes "github.com/okx/okbchain/x/evm/types"
-	prototypes "github.com/okx/okbchain/x/evm/watcher/proto"
+	"github.com/okx/brczero/app/rpc/namespaces/eth/state"
+	"github.com/okx/brczero/app/types"
+	clientcontext "github.com/okx/brczero/libs/cosmos-sdk/client/context"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	evmtypes "github.com/okx/brczero/x/evm/types"
+	prototypes "github.com/okx/brczero/x/evm/watcher/proto"
 )
 
 const MsgFunctionDisable = "fast query function has been disabled"

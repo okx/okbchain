@@ -1,6 +1,6 @@
 package utils
 
-import "github.com/okx/okbchain/libs/cosmos-sdk/x/gov/types"
+import "github.com/okx/brczero/libs/cosmos-sdk/x/gov/types"
 
 // NormalizeVoteOption - normalize user specified vote option
 func NormalizeVoteOption(option string) string {

@@ -3,10 +3,10 @@ package bank
 // nolint
 
 import (
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/bank/internal/keeper"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/bank/internal/keeperadapter"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/bank/internal/types"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/bank/internal/typesadapter"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/bank/internal/keeper"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/bank/internal/keeperadapter"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/bank/internal/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/bank/internal/typesadapter"
 )
 
 const (

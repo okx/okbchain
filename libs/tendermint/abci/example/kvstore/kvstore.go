@@ -7,14 +7,14 @@ import (
 	"fmt"
 	"math/big"
 
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
 
-	dbm "github.com/okx/okbchain/libs/tm-db"
+	dbm "github.com/okx/brczero/libs/tm-db"
 
-	"github.com/okx/okbchain/libs/tendermint/abci/example/code"
-	"github.com/okx/okbchain/libs/tendermint/abci/types"
-	"github.com/okx/okbchain/libs/tendermint/libs/kv"
-	"github.com/okx/okbchain/libs/tendermint/version"
+	"github.com/okx/brczero/libs/tendermint/abci/example/code"
+	"github.com/okx/brczero/libs/tendermint/abci/types"
+	"github.com/okx/brczero/libs/tendermint/libs/kv"
+	"github.com/okx/brczero/libs/tendermint/version"
 )
 
 var (

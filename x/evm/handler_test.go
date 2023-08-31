@@ -12,20 +12,21 @@ import (
 	ethcmn "github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	ethcrypto "github.com/ethereum/go-ethereum/crypto"
-	"github.com/okx/okbchain/app"
-	"github.com/okx/okbchain/app/crypto/ethsecp256k1"
-	ethermint "github.com/okx/okbchain/app/types"
-	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	auth "github.com/okx/okbchain/libs/cosmos-sdk/x/auth/types"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/supply"
-	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
-	"github.com/okx/okbchain/x/evm"
-	"github.com/okx/okbchain/x/evm/keeper"
-	"github.com/okx/okbchain/x/evm/types"
-	govtypes "github.com/okx/okbchain/x/gov/types"
 	"github.com/status-im/keycard-go/hexutils"
 	"github.com/stretchr/testify/suite"
+
+	"github.com/okx/brczero/app"
+	"github.com/okx/brczero/app/crypto/ethsecp256k1"
+	ethermint "github.com/okx/brczero/app/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/codec"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	auth "github.com/okx/brczero/libs/cosmos-sdk/x/auth/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/supply"
+	abci "github.com/okx/brczero/libs/tendermint/abci/types"
+	"github.com/okx/brczero/x/evm"
+	"github.com/okx/brczero/x/evm/keeper"
+	"github.com/okx/brczero/x/evm/types"
+	govtypes "github.com/okx/brczero/x/gov/types"
 )
 
 // erc20 contract with params:
@@ -40,7 +41,7 @@ type EvmTestSuite struct {
 	handler    sdk.Handler
 	govHandler govtypes.Handler
 	querier    sdk.Querier
-	app        *app.OKBChainApp
+	app        *app.BRCZeroApp
 	stateDB    *types.CommitStateDB
 	codec      *codec.Codec
 }
@@ -781,7 +782,7 @@ type EvmContractBlockedListTestSuite struct {
 
 	ctx     sdk.Context
 	handler sdk.Handler
-	app     *app.OKBChainApp
+	app     *app.BRCZeroApp
 	stateDB *types.CommitStateDB
 
 	// global data for test

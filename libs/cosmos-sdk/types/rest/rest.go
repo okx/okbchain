@@ -13,13 +13,13 @@ import (
 	"strconv"
 	"strings"
 
-	sdkerrors "github.com/okx/okbchain/libs/cosmos-sdk/types/errors"
-	"github.com/okx/okbchain/libs/cosmos-sdk/types/query"
-	"github.com/okx/okbchain/libs/tendermint/types"
+	sdkerrors "github.com/okx/brczero/libs/cosmos-sdk/types/errors"
+	"github.com/okx/brczero/libs/cosmos-sdk/types/query"
+	"github.com/okx/brczero/libs/tendermint/types"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/client/context"
-	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/client/context"
+	"github.com/okx/brczero/libs/cosmos-sdk/codec"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
 )
 
 const (

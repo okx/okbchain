@@ -13,12 +13,12 @@ import (
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	ethtypes "github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/crypto"
-	"github.com/okx/okbchain/app/crypto/ethsecp256k1"
-	"github.com/okx/okbchain/app/crypto/hd"
-	"github.com/okx/okbchain/libs/cosmos-sdk/crypto/keys"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	tmamino "github.com/okx/okbchain/libs/tendermint/crypto/encoding/amino"
-	"github.com/okx/okbchain/x/evm/watcher"
+	"github.com/okx/brczero/app/crypto/ethsecp256k1"
+	"github.com/okx/brczero/app/crypto/hd"
+	"github.com/okx/brczero/libs/cosmos-sdk/crypto/keys"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	tmamino "github.com/okx/brczero/libs/tendermint/crypto/encoding/amino"
+	"github.com/okx/brczero/x/evm/watcher"
 	"github.com/stretchr/testify/require"
 )
 

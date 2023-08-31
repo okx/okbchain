@@ -1,9 +1,9 @@
 package keeper
 
 import (
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
 
-	stakingtypes "github.com/okx/okbchain/x/staking/types"
+	stakingtypes "github.com/okx/brczero/x/staking/types"
 )
 
 // Hooks is struct of keepers from other module

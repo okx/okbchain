@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/okx/okbchain/libs/tendermint/abci/example/kvstore"
-	rpchttp "github.com/okx/okbchain/libs/tendermint/rpc/client/http"
-	ctypes "github.com/okx/okbchain/libs/tendermint/rpc/core/types"
-	rpctest "github.com/okx/okbchain/libs/tendermint/rpc/test"
+	"github.com/okx/brczero/libs/tendermint/abci/example/kvstore"
+	rpchttp "github.com/okx/brczero/libs/tendermint/rpc/client/http"
+	ctypes "github.com/okx/brczero/libs/tendermint/rpc/core/types"
+	rpctest "github.com/okx/brczero/libs/tendermint/rpc/test"
 )
 
 func ExampleHTTP_simple() {

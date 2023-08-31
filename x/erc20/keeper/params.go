@@ -3,9 +3,9 @@ package keeper
 import (
 	"strings"
 
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	sdkerrors "github.com/okx/okbchain/libs/cosmos-sdk/types/errors"
-	"github.com/okx/okbchain/x/erc20/types"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	sdkerrors "github.com/okx/brczero/libs/cosmos-sdk/types/errors"
+	"github.com/okx/brczero/x/erc20/types"
 )
 
 // GetParams returns the total set of erc20 parameters.

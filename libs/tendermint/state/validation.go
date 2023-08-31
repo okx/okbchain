@@ -5,10 +5,10 @@ import (
 	"errors"
 	"fmt"
 
-	dbm "github.com/okx/okbchain/libs/tm-db"
+	dbm "github.com/okx/brczero/libs/tm-db"
 
-	"github.com/okx/okbchain/libs/tendermint/crypto"
-	"github.com/okx/okbchain/libs/tendermint/types"
+	"github.com/okx/brczero/libs/tendermint/crypto"
+	"github.com/okx/brczero/libs/tendermint/types"
 )
 
 //-----------------------------------------------------

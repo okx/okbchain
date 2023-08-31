@@ -3,7 +3,7 @@ package common
 import (
 	"fmt"
 
-	"github.com/okx/okbchain/x/params/subspace"
+	"github.com/okx/brczero/x/params/subspace"
 )
 
 type ConsensusType string

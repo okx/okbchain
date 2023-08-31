@@ -6,9 +6,9 @@ import (
 	"fmt"
 	"math/rand"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
-	"github.com/okx/okbchain/libs/cosmos-sdk/types/module"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/bank/internal/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/codec"
+	"github.com/okx/brczero/libs/cosmos-sdk/types/module"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/bank/internal/types"
 )
 
 // Simulation parameter constants

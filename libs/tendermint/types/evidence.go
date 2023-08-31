@@ -9,12 +9,12 @@ import (
 	"github.com/pkg/errors"
 	amino "github.com/tendermint/go-amino"
 
-	"github.com/okx/okbchain/libs/tendermint/crypto"
-	cryptoenc "github.com/okx/okbchain/libs/tendermint/crypto/encoding"
-	cryptoamino "github.com/okx/okbchain/libs/tendermint/crypto/encoding/amino"
-	"github.com/okx/okbchain/libs/tendermint/crypto/merkle"
-	"github.com/okx/okbchain/libs/tendermint/crypto/tmhash"
-	tmproto "github.com/okx/okbchain/libs/tendermint/proto/types"
+	"github.com/okx/brczero/libs/tendermint/crypto"
+	cryptoenc "github.com/okx/brczero/libs/tendermint/crypto/encoding"
+	cryptoamino "github.com/okx/brczero/libs/tendermint/crypto/encoding/amino"
+	"github.com/okx/brczero/libs/tendermint/crypto/merkle"
+	"github.com/okx/brczero/libs/tendermint/crypto/tmhash"
+	tmproto "github.com/okx/brczero/libs/tendermint/proto/types"
 )
 
 const (

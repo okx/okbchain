@@ -7,15 +7,15 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/okx/okbchain/libs/tendermint/libs/log"
-	dbm "github.com/okx/okbchain/libs/tm-db"
+	"github.com/okx/brczero/libs/tendermint/libs/log"
+	dbm "github.com/okx/brczero/libs/tm-db"
 
-	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
+	abci "github.com/okx/brczero/libs/tendermint/abci/types"
 
-	"github.com/okx/okbchain/libs/tendermint/crypto/secp256k1"
+	"github.com/okx/brczero/libs/tendermint/crypto/secp256k1"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/store"
-	"github.com/okx/okbchain/libs/cosmos-sdk/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/store"
+	"github.com/okx/brczero/libs/cosmos-sdk/types"
 )
 
 type MockLogger struct {

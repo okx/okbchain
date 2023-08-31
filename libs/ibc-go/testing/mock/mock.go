@@ -8,19 +8,19 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
-	"github.com/okx/okbchain/libs/cosmos-sdk/client/context"
-	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
-	codectypes "github.com/okx/okbchain/libs/cosmos-sdk/codec/types"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	"github.com/okx/okbchain/libs/cosmos-sdk/types/module"
-	capabilitykeeper "github.com/okx/okbchain/libs/cosmos-sdk/x/capability/keeper"
-	capabilitytypes "github.com/okx/okbchain/libs/cosmos-sdk/x/capability/types"
-	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/client/context"
+	"github.com/okx/brczero/libs/cosmos-sdk/codec"
+	codectypes "github.com/okx/brczero/libs/cosmos-sdk/codec/types"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/types/module"
+	capabilitykeeper "github.com/okx/brczero/libs/cosmos-sdk/x/capability/keeper"
+	capabilitytypes "github.com/okx/brczero/libs/cosmos-sdk/x/capability/types"
+	abci "github.com/okx/brczero/libs/tendermint/abci/types"
 	"github.com/spf13/cobra"
 
-	channeltypes "github.com/okx/okbchain/libs/ibc-go/modules/core/04-channel/types"
-	host "github.com/okx/okbchain/libs/ibc-go/modules/core/24-host"
-	"github.com/okx/okbchain/libs/ibc-go/modules/core/exported"
+	channeltypes "github.com/okx/brczero/libs/ibc-go/modules/core/04-channel/types"
+	host "github.com/okx/brczero/libs/ibc-go/modules/core/24-host"
+	"github.com/okx/brczero/libs/ibc-go/modules/core/exported"
 )
 
 const (

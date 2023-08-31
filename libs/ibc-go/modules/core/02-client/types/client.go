@@ -7,10 +7,10 @@ import (
 	"strings"
 
 	"github.com/gogo/protobuf/proto"
-	"github.com/okx/okbchain/libs/cosmos-sdk/codec/types"
-	sdkerrors "github.com/okx/okbchain/libs/cosmos-sdk/types/errors"
-	host "github.com/okx/okbchain/libs/ibc-go/modules/core/24-host"
-	"github.com/okx/okbchain/libs/ibc-go/modules/core/exported"
+	"github.com/okx/brczero/libs/cosmos-sdk/codec/types"
+	sdkerrors "github.com/okx/brczero/libs/cosmos-sdk/types/errors"
+	host "github.com/okx/brczero/libs/ibc-go/modules/core/24-host"
+	"github.com/okx/brczero/libs/ibc-go/modules/core/exported"
 )
 
 // UnpackInterfaces implements UnpackInterfacesMesssage.UnpackInterfaces

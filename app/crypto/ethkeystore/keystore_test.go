@@ -3,12 +3,12 @@ package ethkeystore
 import (
 	"testing"
 
-	"github.com/okx/okbchain/app/crypto/ethsecp256k1"
-	"github.com/okx/okbchain/app/crypto/hd"
-	"github.com/okx/okbchain/libs/cosmos-sdk/crypto/keys"
-	"github.com/okx/okbchain/libs/cosmos-sdk/tests"
-	tmamino "github.com/okx/okbchain/libs/tendermint/crypto/encoding/amino"
-	"github.com/okx/okbchain/libs/tendermint/crypto/multisig"
+	"github.com/okx/brczero/app/crypto/ethsecp256k1"
+	"github.com/okx/brczero/app/crypto/hd"
+	"github.com/okx/brczero/libs/cosmos-sdk/crypto/keys"
+	"github.com/okx/brczero/libs/cosmos-sdk/tests"
+	tmamino "github.com/okx/brczero/libs/tendermint/crypto/encoding/amino"
+	"github.com/okx/brczero/libs/tendermint/crypto/multisig"
 	"github.com/stretchr/testify/require"
 )
 

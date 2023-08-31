@@ -4,15 +4,15 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/okx/okbchain/x/token/types"
+	"github.com/okx/brczero/x/token/types"
 
 	"encoding/json"
 	"strings"
 
 	"github.com/gorilla/mux"
-	"github.com/okx/okbchain/libs/cosmos-sdk/client/context"
-	"github.com/okx/okbchain/libs/cosmos-sdk/types/rest"
-	"github.com/okx/okbchain/x/common"
+	"github.com/okx/brczero/libs/cosmos-sdk/client/context"
+	"github.com/okx/brczero/libs/cosmos-sdk/types/rest"
+	"github.com/okx/brczero/x/common"
 )
 
 // RegisterRoutes, a central function to define routes

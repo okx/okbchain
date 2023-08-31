@@ -6,13 +6,14 @@ import (
 	"path/filepath"
 
 	ethcmn "github.com/ethereum/go-ethereum/common"
-	"github.com/okx/okbchain/app"
-	"github.com/okx/okbchain/libs/cosmos-sdk/server"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
-	tmtypes "github.com/okx/okbchain/libs/tendermint/types"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+
+	"github.com/okx/brczero/app"
+	"github.com/okx/brczero/libs/cosmos-sdk/server"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	abci "github.com/okx/brczero/libs/tendermint/abci/types"
+	tmtypes "github.com/okx/brczero/libs/tendermint/types"
 )
 
 const (
@@ -111,7 +112,7 @@ func displayContractState(ctx *server.Context) {
 	})
 }
 
-func newDisplayApp(ctx *server.Context) *app.OKBChainApp {
+func newDisplayApp(ctx *server.Context) *app.BRCZeroApp {
 	rootDir := ctx.Config.RootDir
 	dataDir := filepath.Join(rootDir, "data")
 	db, err := sdk.NewDB(applicationDB, dataDir)
@@ -119,7 +120,7 @@ func newDisplayApp(ctx *server.Context) *app.OKBChainApp {
 		panic("fail to open application db: " + err.Error())
 	}
 
-	return app.NewOKBChainApp(
+	return app.NewBRCZeroApp(
 		ctx.Logger,
 		db,
 		nil,

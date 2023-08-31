@@ -2,38 +2,38 @@ package ibctesting
 
 import (
 	"encoding/json"
-	staking "github.com/okx/okbchain/x/staking/types"
+	staking "github.com/okx/brczero/x/staking/types"
 	"testing"
 	"time"
 
-	ibc "github.com/okx/okbchain/libs/ibc-go/modules/core"
+	ibc "github.com/okx/brczero/libs/ibc-go/modules/core"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/client"
-	authtypes "github.com/okx/okbchain/libs/cosmos-sdk/x/auth/types"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/bank"
+	"github.com/okx/brczero/libs/cosmos-sdk/client"
+	authtypes "github.com/okx/brczero/libs/cosmos-sdk/x/auth/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/bank"
 
-	//cryptocodec "github.com/okx/okbchain/app/crypto/ethsecp256k1"
+	//cryptocodec "github.com/okx/brczero/app/crypto/ethsecp256k1"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	authexported "github.com/okx/okbchain/libs/cosmos-sdk/x/auth/exported"
+	"github.com/okx/brczero/libs/cosmos-sdk/codec"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	authexported "github.com/okx/brczero/libs/cosmos-sdk/x/auth/exported"
 
-	//authtypes "github.com/okx/okbchain/libs/cosmos-sdk/x/auth/types"
+	//authtypes "github.com/okx/brczero/libs/cosmos-sdk/x/auth/types"
 
-	capabilitykeeper "github.com/okx/okbchain/libs/cosmos-sdk/x/capability/keeper"
-	stakingtypes "github.com/okx/okbchain/libs/cosmos-sdk/x/staking/types"
-	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
-	"github.com/okx/okbchain/libs/tendermint/libs/log"
-	tmtypes "github.com/okx/okbchain/libs/tendermint/types"
-	dbm "github.com/okx/okbchain/libs/tm-db"
-	"github.com/okx/okbchain/x/evm"
-	evmtypes "github.com/okx/okbchain/x/evm/types"
-	stakingkeeper "github.com/okx/okbchain/x/staking"
+	capabilitykeeper "github.com/okx/brczero/libs/cosmos-sdk/x/capability/keeper"
+	stakingtypes "github.com/okx/brczero/libs/cosmos-sdk/x/staking/types"
+	abci "github.com/okx/brczero/libs/tendermint/abci/types"
+	"github.com/okx/brczero/libs/tendermint/libs/log"
+	tmtypes "github.com/okx/brczero/libs/tendermint/types"
+	dbm "github.com/okx/brczero/libs/tm-db"
+	"github.com/okx/brczero/x/evm"
+	evmtypes "github.com/okx/brczero/x/evm/types"
+	stakingkeeper "github.com/okx/brczero/x/staking"
 	"github.com/stretchr/testify/require"
 
-	bam "github.com/okx/okbchain/libs/cosmos-sdk/baseapp"
-	"github.com/okx/okbchain/libs/ibc-go/modules/core/keeper"
-	"github.com/okx/okbchain/libs/ibc-go/testing/simapp"
+	bam "github.com/okx/brczero/libs/cosmos-sdk/baseapp"
+	"github.com/okx/brczero/libs/ibc-go/modules/core/keeper"
+	"github.com/okx/brczero/libs/ibc-go/testing/simapp"
 )
 
 var DefaultTestingAppInit func() (TestingApp, map[string]json.RawMessage) = SetupTestingApp

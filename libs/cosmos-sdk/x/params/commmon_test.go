@@ -2,13 +2,13 @@
 package params
 
 import (
-	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
-	"github.com/okx/okbchain/libs/tendermint/libs/log"
-	dbm "github.com/okx/okbchain/libs/tm-db"
+	abci "github.com/okx/brczero/libs/tendermint/abci/types"
+	"github.com/okx/brczero/libs/tendermint/libs/log"
+	dbm "github.com/okx/brczero/libs/tm-db"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
-	"github.com/okx/okbchain/libs/cosmos-sdk/store"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/codec"
+	"github.com/okx/brczero/libs/cosmos-sdk/store"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
 )
 
 type invalid struct{}

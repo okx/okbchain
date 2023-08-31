@@ -3,11 +3,11 @@ package types
 import (
 	"encoding/json"
 
-	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
+	abci "github.com/okx/brczero/libs/tendermint/abci/types"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	authexported "github.com/okx/okbchain/libs/cosmos-sdk/x/auth/exported"
+	"github.com/okx/brczero/libs/cosmos-sdk/codec"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	authexported "github.com/okx/brczero/libs/cosmos-sdk/x/auth/exported"
 )
 
 // StakingKeeper defines the expected staking keeper (noalias)

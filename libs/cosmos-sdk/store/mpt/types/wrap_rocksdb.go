@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"github.com/cosmos/gorocksdb"
 	"github.com/ethereum/go-ethereum/ethdb"
-	tmdb "github.com/okx/okbchain/libs/tm-db"
+	tmdb "github.com/okx/brczero/libs/tm-db"
 	"github.com/pkg/errors"
 )
 

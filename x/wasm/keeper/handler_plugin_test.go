@@ -2,22 +2,22 @@ package keeper
 
 import (
 	"encoding/json"
-	ibcadapter "github.com/okx/okbchain/libs/cosmos-sdk/types/ibc-adapter"
+	ibcadapter "github.com/okx/brczero/libs/cosmos-sdk/types/ibc-adapter"
 	"testing"
 
 	wasmvmtypes "github.com/CosmWasm/wasmvm/types"
-	"github.com/okx/okbchain/libs/cosmos-sdk/baseapp"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	sdkerrors "github.com/okx/okbchain/libs/cosmos-sdk/types/errors"
-	capabilitytypes "github.com/okx/okbchain/libs/cosmos-sdk/x/capability/types"
-	clienttypes "github.com/okx/okbchain/libs/ibc-go/modules/core/02-client/types"
-	channeltypes "github.com/okx/okbchain/libs/ibc-go/modules/core/04-channel/types"
-	ibcexported "github.com/okx/okbchain/libs/ibc-go/modules/core/exported"
+	"github.com/okx/brczero/libs/cosmos-sdk/baseapp"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	sdkerrors "github.com/okx/brczero/libs/cosmos-sdk/types/errors"
+	capabilitytypes "github.com/okx/brczero/libs/cosmos-sdk/x/capability/types"
+	clienttypes "github.com/okx/brczero/libs/ibc-go/modules/core/02-client/types"
+	channeltypes "github.com/okx/brczero/libs/ibc-go/modules/core/04-channel/types"
+	ibcexported "github.com/okx/brczero/libs/ibc-go/modules/core/exported"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/okx/okbchain/x/wasm/keeper/wasmtesting"
-	"github.com/okx/okbchain/x/wasm/types"
+	"github.com/okx/brczero/x/wasm/keeper/wasmtesting"
+	"github.com/okx/brczero/x/wasm/types"
 )
 
 func TestMessageHandlerChainDispatch(t *testing.T) {

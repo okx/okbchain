@@ -12,21 +12,21 @@ import (
 	"testing"
 	"time"
 
-	"github.com/okx/okbchain/libs/tendermint/libs/clist"
+	"github.com/okx/brczero/libs/tendermint/libs/clist"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	amino "github.com/tendermint/go-amino"
 
-	"github.com/okx/okbchain/libs/tendermint/abci/example/counter"
-	"github.com/okx/okbchain/libs/tendermint/abci/example/kvstore"
-	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
-	cfg "github.com/okx/okbchain/libs/tendermint/config"
-	"github.com/okx/okbchain/libs/tendermint/libs/log"
-	tmrand "github.com/okx/okbchain/libs/tendermint/libs/rand"
-	"github.com/okx/okbchain/libs/tendermint/proxy"
-	"github.com/okx/okbchain/libs/tendermint/types"
+	"github.com/okx/brczero/libs/tendermint/abci/example/counter"
+	"github.com/okx/brczero/libs/tendermint/abci/example/kvstore"
+	abci "github.com/okx/brczero/libs/tendermint/abci/types"
+	cfg "github.com/okx/brczero/libs/tendermint/config"
+	"github.com/okx/brczero/libs/tendermint/libs/log"
+	tmrand "github.com/okx/brczero/libs/tendermint/libs/rand"
+	"github.com/okx/brczero/libs/tendermint/proxy"
+	"github.com/okx/brczero/libs/tendermint/types"
 )
 
 const (

@@ -1,9 +1,9 @@
 package lite
 
 import (
-	log "github.com/okx/okbchain/libs/tendermint/libs/log"
-	lerr "github.com/okx/okbchain/libs/tendermint/lite/errors"
-	"github.com/okx/okbchain/libs/tendermint/types"
+	log "github.com/okx/brczero/libs/tendermint/libs/log"
+	lerr "github.com/okx/brczero/libs/tendermint/lite/errors"
+	"github.com/okx/brczero/libs/tendermint/types"
 )
 
 var _ PersistentProvider = (*multiProvider)(nil)

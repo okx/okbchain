@@ -2,13 +2,13 @@ package capability
 
 import (
 	"encoding/json"
-	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	capabilityModule "github.com/okx/okbchain/libs/cosmos-sdk/x/capability"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/capability/keeper"
-	types2 "github.com/okx/okbchain/libs/cosmos-sdk/x/capability/types"
-	"github.com/okx/okbchain/libs/ibc-go/testing/simapp/adapter"
-	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/codec"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	capabilityModule "github.com/okx/brczero/libs/cosmos-sdk/x/capability"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/capability/keeper"
+	types2 "github.com/okx/brczero/libs/cosmos-sdk/x/capability/types"
+	"github.com/okx/brczero/libs/ibc-go/testing/simapp/adapter"
+	abci "github.com/okx/brczero/libs/tendermint/abci/types"
 )
 
 type CapabilityModuleAdapter struct {

@@ -3,8 +3,8 @@ package client
 import (
 	"github.com/gorilla/mux"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/client/context"
-	"github.com/okx/okbchain/libs/cosmos-sdk/client/rpc"
+	"github.com/okx/brczero/libs/cosmos-sdk/client/context"
+	"github.com/okx/brczero/libs/cosmos-sdk/client/rpc"
 )
 
 // Register routes

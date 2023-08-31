@@ -4,12 +4,12 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/okx/okbchain/x/common"
+	"github.com/okx/brczero/x/common"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/params/subspace"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/params/subspace"
 
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	sdkparams "github.com/okx/okbchain/libs/cosmos-sdk/x/params"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	sdkparams "github.com/okx/brczero/libs/cosmos-sdk/x/params"
 )
 
 const (

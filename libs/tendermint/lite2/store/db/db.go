@@ -7,13 +7,13 @@ import (
 	"strconv"
 	"sync"
 
-	dbm "github.com/okx/okbchain/libs/tm-db"
+	dbm "github.com/okx/brczero/libs/tm-db"
 	"github.com/pkg/errors"
 	"github.com/tendermint/go-amino"
 
-	cryptoAmino "github.com/okx/okbchain/libs/tendermint/crypto/encoding/amino"
-	"github.com/okx/okbchain/libs/tendermint/lite2/store"
-	"github.com/okx/okbchain/libs/tendermint/types"
+	cryptoAmino "github.com/okx/brczero/libs/tendermint/crypto/encoding/amino"
+	"github.com/okx/brczero/libs/tendermint/lite2/store"
+	"github.com/okx/brczero/libs/tendermint/types"
 )
 
 var (

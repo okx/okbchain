@@ -12,33 +12,34 @@ import (
 
 	ethtypes "github.com/ethereum/go-ethereum/core/types"
 	ethcrypto "github.com/ethereum/go-ethereum/crypto"
-	"github.com/okx/okbchain/app/crypto/hd"
-	ethermint "github.com/okx/okbchain/app/types"
-	"github.com/okx/okbchain/libs/cosmos-sdk/client/flags"
-	clientkeys "github.com/okx/okbchain/libs/cosmos-sdk/client/keys"
-	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
-	"github.com/okx/okbchain/libs/cosmos-sdk/crypto/keys"
-	"github.com/okx/okbchain/libs/cosmos-sdk/server"
-	srvconfig "github.com/okx/okbchain/libs/cosmos-sdk/server/config"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	"github.com/okx/okbchain/libs/cosmos-sdk/types/module"
-	authexported "github.com/okx/okbchain/libs/cosmos-sdk/x/auth/exported"
-	authtypes "github.com/okx/okbchain/libs/cosmos-sdk/x/auth/types"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/crisis"
-	genutiltypes "github.com/okx/okbchain/libs/cosmos-sdk/x/genutil/types"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/mint"
-	tmconfig "github.com/okx/okbchain/libs/tendermint/config"
-	tmcrypto "github.com/okx/okbchain/libs/tendermint/crypto"
-	tmos "github.com/okx/okbchain/libs/tendermint/libs/os"
-	tmrand "github.com/okx/okbchain/libs/tendermint/libs/rand"
-	tmtypes "github.com/okx/okbchain/libs/tendermint/types"
-	tmtime "github.com/okx/okbchain/libs/tendermint/types/time"
-	"github.com/okx/okbchain/x/common"
-	"github.com/okx/okbchain/x/genutil"
-	"github.com/okx/okbchain/x/gov"
-	stakingtypes "github.com/okx/okbchain/x/staking/types"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+
+	"github.com/okx/brczero/app/crypto/hd"
+	ethermint "github.com/okx/brczero/app/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/client/flags"
+	clientkeys "github.com/okx/brczero/libs/cosmos-sdk/client/keys"
+	"github.com/okx/brczero/libs/cosmos-sdk/codec"
+	"github.com/okx/brczero/libs/cosmos-sdk/crypto/keys"
+	"github.com/okx/brczero/libs/cosmos-sdk/server"
+	srvconfig "github.com/okx/brczero/libs/cosmos-sdk/server/config"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/types/module"
+	authexported "github.com/okx/brczero/libs/cosmos-sdk/x/auth/exported"
+	authtypes "github.com/okx/brczero/libs/cosmos-sdk/x/auth/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/crisis"
+	genutiltypes "github.com/okx/brczero/libs/cosmos-sdk/x/genutil/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/mint"
+	tmconfig "github.com/okx/brczero/libs/tendermint/config"
+	tmcrypto "github.com/okx/brczero/libs/tendermint/crypto"
+	tmos "github.com/okx/brczero/libs/tendermint/libs/os"
+	tmrand "github.com/okx/brczero/libs/tendermint/libs/rand"
+	tmtypes "github.com/okx/brczero/libs/tendermint/types"
+	tmtime "github.com/okx/brczero/libs/tendermint/types/time"
+	"github.com/okx/brczero/x/common"
+	"github.com/okx/brczero/x/genutil"
+	"github.com/okx/brczero/x/gov"
+	stakingtypes "github.com/okx/brczero/x/staking/types"
 )
 
 var (
@@ -79,7 +80,7 @@ necessary files (private validator, genesis, config, etc.).
 
 Note, strict routability for addresses is turned off in the config file.`,
 
-		Example: "okbchaind testnet --v 4 --keyring-backend test --output-dir ./output --starting-ip-address 192.168.10.2",
+		Example: "brczerod testnet --v 4 --keyring-backend test --output-dir ./output --starting-ip-address 192.168.10.2",
 		RunE: func(cmd *cobra.Command, _ []string) error {
 			config := ctx.Config
 
@@ -108,8 +109,8 @@ Note, strict routability for addresses is turned off in the config file.`,
 	cmd.Flags().Int(flagNumValidators, 4, "Number of validators to initialize the testnet with")
 	cmd.Flags().StringP(flagOutputDir, "o", "./build", "Directory to store initialization data for the testnet")
 	cmd.Flags().String(flagNodeDirPrefix, "node", "Prefix the directory name for each node with (node results in node0, node1, ...)")
-	cmd.Flags().String(flagNodeDaemonHome, "okbchaind", "Home directory of the node's daemon configuration")
-	cmd.Flags().String(flagNodeCLIHome, "okbchaincli", "Home directory of the node's cli configuration")
+	cmd.Flags().String(flagNodeDaemonHome, "brczerod", "Home directory of the node's daemon configuration")
+	cmd.Flags().String(flagNodeCLIHome, "brczerocli", "Home directory of the node's cli configuration")
 	cmd.Flags().String(flagStartingIPAddress, "192.168.0.1", "Starting IP address (192.168.0.1 results in persistent peers list ID0@192.168.0.1:46656, ID1@192.168.0.2:46656, ...)")
 	cmd.Flags().StringSlice(flagIPAddrs, []string{}, "List of IP addresses to use (i.e. `192.168.0.1,172.168.0.1` results in persistent peers list ID0@192.168.0.1:46656, ID1@172.168.0.1)")
 	cmd.Flags().String(flags.FlagChainID, "", "genesis file chain-id, if left blank will be randomly created")

@@ -7,9 +7,9 @@ import (
 
 	"github.com/gogo/protobuf/proto"
 	lru "github.com/hashicorp/golang-lru"
-	"github.com/okx/okbchain/libs/cosmos-sdk/client/flags"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	db "github.com/okx/okbchain/libs/tm-db"
+	"github.com/okx/brczero/libs/cosmos-sdk/client/flags"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	db "github.com/okx/brczero/libs/tm-db"
 	"github.com/spf13/viper"
 )
 

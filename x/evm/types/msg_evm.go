@@ -11,12 +11,12 @@ import (
 	ethcmn "github.com/ethereum/go-ethereum/common"
 	ethcrypto "github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/rlp"
-	"github.com/okx/okbchain/app/types"
-	ethermint "github.com/okx/okbchain/app/types"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	sdkerrors "github.com/okx/okbchain/libs/cosmos-sdk/types/errors"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/auth/ante"
-	tmtypes "github.com/okx/okbchain/libs/tendermint/types"
+	"github.com/okx/brczero/app/types"
+	ethermint "github.com/okx/brczero/app/types"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	sdkerrors "github.com/okx/brczero/libs/cosmos-sdk/types/errors"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/auth/ante"
+	tmtypes "github.com/okx/brczero/libs/tendermint/types"
 	"github.com/tendermint/go-amino"
 )
 

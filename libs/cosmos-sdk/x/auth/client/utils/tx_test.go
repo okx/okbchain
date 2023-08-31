@@ -7,10 +7,10 @@ import (
 	"os"
 	"testing"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	authtypes "github.com/okx/okbchain/libs/cosmos-sdk/x/auth/types"
-	"github.com/okx/okbchain/libs/tendermint/crypto/ed25519"
+	"github.com/okx/brczero/libs/cosmos-sdk/codec"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	authtypes "github.com/okx/brczero/libs/cosmos-sdk/x/auth/types"
+	"github.com/okx/brczero/libs/tendermint/crypto/ed25519"
 	"github.com/stretchr/testify/require"
 )
 

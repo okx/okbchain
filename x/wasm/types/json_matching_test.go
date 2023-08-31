@@ -3,7 +3,7 @@ package types
 import (
 	"testing"
 
-	// sdkerrors "github.com/okx/okbchain/libs/cosmos-sdk/types/errors"
+	// sdkerrors "github.com/okx/brczero/libs/cosmos-sdk/types/errors"
 	"github.com/stretchr/testify/require"
 )
 

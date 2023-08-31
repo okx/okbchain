@@ -3,11 +3,11 @@ package keeper
 import (
 	"fmt"
 
-	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
+	abci "github.com/okx/brczero/libs/tendermint/abci/types"
 
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/distribution/types"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/staking/exported"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/distribution/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/staking/exported"
 )
 
 // AllocateTokens handles distribution of the collected fees

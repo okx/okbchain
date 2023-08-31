@@ -1,9 +1,9 @@
 package upgrade
 
 import (
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	sdkerrors "github.com/okx/okbchain/libs/cosmos-sdk/types/errors"
-	govtypes "github.com/okx/okbchain/libs/cosmos-sdk/x/gov/types"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	sdkerrors "github.com/okx/brczero/libs/cosmos-sdk/types/errors"
+	govtypes "github.com/okx/brczero/libs/cosmos-sdk/x/gov/types"
 )
 
 // NewSoftwareUpgradeProposalHandler creates a governance handler to manage new proposal types.

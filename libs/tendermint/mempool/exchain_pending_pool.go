@@ -5,8 +5,8 @@ import (
 	"strings"
 	"sync"
 
-	cfg "github.com/okx/okbchain/libs/tendermint/config"
-	"github.com/okx/okbchain/libs/tendermint/types"
+	cfg "github.com/okx/brczero/libs/tendermint/config"
+	"github.com/okx/brczero/libs/tendermint/types"
 )
 
 const (

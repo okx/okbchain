@@ -1,15 +1,15 @@
 package token
 
 import (
-	"github.com/okx/okbchain/x/common"
+	"github.com/okx/brczero/x/common"
 	"testing"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
+	"github.com/okx/brczero/libs/cosmos-sdk/codec"
 
-	cliLcd "github.com/okx/okbchain/libs/cosmos-sdk/client/lcd"
-	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
-	"github.com/okx/okbchain/x/common/version"
-	"github.com/okx/okbchain/x/token/types"
+	cliLcd "github.com/okx/brczero/libs/cosmos-sdk/client/lcd"
+	abci "github.com/okx/brczero/libs/tendermint/abci/types"
+	"github.com/okx/brczero/x/common/version"
+	"github.com/okx/brczero/x/token/types"
 	"github.com/stretchr/testify/require"
 )
 

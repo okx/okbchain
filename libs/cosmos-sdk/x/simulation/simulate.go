@@ -11,10 +11,10 @@ import (
 	"testing"
 	"time"
 
-	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
+	abci "github.com/okx/brczero/libs/tendermint/abci/types"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/baseapp"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/baseapp"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
 )
 
 // AppStateFn returns the app state json bytes and the genesis accounts

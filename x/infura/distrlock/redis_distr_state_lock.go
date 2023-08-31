@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/go-redis/redis/v8"
-	"github.com/okx/okbchain/libs/tendermint/libs/log"
+	"github.com/okx/brczero/libs/tendermint/libs/log"
 )
 
 var unlockScript = redis.NewScript(`

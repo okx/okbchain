@@ -13,12 +13,12 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	ethcrypto "github.com/ethereum/go-ethereum/crypto"
 	"github.com/google/uuid"
-	"github.com/okx/okbchain/app/crypto/ethsecp256k1"
-	"github.com/okx/okbchain/app/crypto/hd"
-	"github.com/okx/okbchain/libs/cosmos-sdk/crypto/keys"
-	"github.com/okx/okbchain/libs/cosmos-sdk/crypto/keys/mintkey"
-	tmcrypto "github.com/okx/okbchain/libs/tendermint/crypto"
-	"github.com/okx/okbchain/libs/tendermint/crypto/secp256k1"
+	"github.com/okx/brczero/app/crypto/ethsecp256k1"
+	"github.com/okx/brczero/app/crypto/hd"
+	"github.com/okx/brczero/libs/cosmos-sdk/crypto/keys"
+	"github.com/okx/brczero/libs/cosmos-sdk/crypto/keys/mintkey"
+	tmcrypto "github.com/okx/brczero/libs/tendermint/crypto"
+	"github.com/okx/brczero/libs/tendermint/crypto/secp256k1"
 )
 
 // CreateKeystoreByTmKey  create a eth keystore by accountname from keybase

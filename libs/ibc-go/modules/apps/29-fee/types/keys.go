@@ -5,8 +5,8 @@ import (
 	"strconv"
 	"strings"
 
-	sdkerrors "github.com/okx/okbchain/libs/cosmos-sdk/types/errors"
-	channeltypes "github.com/okx/okbchain/libs/ibc-go/modules/core/04-channel/types"
+	sdkerrors "github.com/okx/brczero/libs/cosmos-sdk/types/errors"
+	channeltypes "github.com/okx/brczero/libs/ibc-go/modules/core/04-channel/types"
 )
 
 const (

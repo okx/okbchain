@@ -1,13 +1,13 @@
 package types
 
 import (
-	"github.com/okx/okbchain/libs/tendermint/global"
+	"github.com/okx/brczero/libs/tendermint/global"
 	"math/rand"
 	"testing"
 	"time"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/gov/types"
-	govtypes "github.com/okx/okbchain/x/gov/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/gov/types"
+	govtypes "github.com/okx/brczero/x/gov/types"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
 )

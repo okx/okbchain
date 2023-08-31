@@ -2,13 +2,14 @@ package types
 
 import (
 	"fmt"
-	"github.com/okx/okbchain/libs/system"
 	"math/big"
 	"regexp"
 	"strings"
 	"sync"
 
-	sdkerrors "github.com/okx/okbchain/libs/cosmos-sdk/types/errors"
+	"github.com/okx/brczero/libs/system"
+
+	sdkerrors "github.com/okx/brczero/libs/cosmos-sdk/types/errors"
 )
 
 var (

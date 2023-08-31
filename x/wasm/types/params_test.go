@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"testing"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
-	codectypes "github.com/okx/okbchain/libs/cosmos-sdk/codec/types"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/codec"
+	codectypes "github.com/okx/brczero/libs/cosmos-sdk/codec/types"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

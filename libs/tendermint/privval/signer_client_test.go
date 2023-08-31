@@ -8,8 +8,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	tmrand "github.com/okx/okbchain/libs/tendermint/libs/rand"
-	"github.com/okx/okbchain/libs/tendermint/types"
+	tmrand "github.com/okx/brczero/libs/tendermint/libs/rand"
+	"github.com/okx/brczero/libs/tendermint/types"
 )
 
 type signerTestCase struct {

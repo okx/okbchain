@@ -1,9 +1,9 @@
 package v0_38
 
 import (
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	v034distr "github.com/okx/okbchain/libs/cosmos-sdk/x/distribution/legacy/v0_34"
-	v036distr "github.com/okx/okbchain/libs/cosmos-sdk/x/distribution/legacy/v0_36"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	v034distr "github.com/okx/brczero/libs/cosmos-sdk/x/distribution/legacy/v0_34"
+	v036distr "github.com/okx/brczero/libs/cosmos-sdk/x/distribution/legacy/v0_36"
 )
 
 // DONTCOVER

@@ -10,11 +10,11 @@ import (
 	"github.com/ethereum/go-ethereum/rlp"
 	"github.com/tendermint/go-amino"
 
-	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
-	"github.com/okx/okbchain/libs/tendermint/crypto/etherhash"
-	"github.com/okx/okbchain/libs/tendermint/crypto/merkle"
-	"github.com/okx/okbchain/libs/tendermint/crypto/tmhash"
-	tmbytes "github.com/okx/okbchain/libs/tendermint/libs/bytes"
+	abci "github.com/okx/brczero/libs/tendermint/abci/types"
+	"github.com/okx/brczero/libs/tendermint/crypto/etherhash"
+	"github.com/okx/brczero/libs/tendermint/crypto/merkle"
+	"github.com/okx/brczero/libs/tendermint/crypto/tmhash"
+	tmbytes "github.com/okx/brczero/libs/tendermint/libs/bytes"
 )
 
 // Tx is an arbitrary byte array.

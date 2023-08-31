@@ -4,11 +4,12 @@ import (
 	"log"
 	"path/filepath"
 
-	"github.com/okx/okbchain/app"
-	"github.com/okx/okbchain/libs/cosmos-sdk/server"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	tmtypes "github.com/okx/okbchain/libs/tendermint/types"
 	"github.com/spf13/cobra"
+
+	"github.com/okx/brczero/app"
+	"github.com/okx/brczero/libs/cosmos-sdk/server"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	tmtypes "github.com/okx/brczero/libs/tendermint/types"
 )
 
 func exportAppCmd(ctx *server.Context) *cobra.Command {
@@ -39,11 +40,11 @@ func export(ctx *server.Context) {
 	}
 }
 
-func createApp(ctx *server.Context, dataPath string) *app.OKBChainApp {
+func createApp(ctx *server.Context, dataPath string) *app.BRCZeroApp {
 	rootDir := ctx.Config.RootDir
 	dataDir := filepath.Join(rootDir, dataPath)
 	db, err := sdk.NewDB(applicationDB, dataDir)
 	panicError(err)
 	exapp := newApp(ctx.Logger, db, nil)
-	return exapp.(*app.OKBChainApp)
+	return exapp.(*app.BRCZeroApp)
 }

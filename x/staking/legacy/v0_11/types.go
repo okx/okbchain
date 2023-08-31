@@ -3,9 +3,9 @@ package v0_11
 import (
 	"time"
 
-	"github.com/okx/okbchain/x/staking/legacy/v0_10"
+	"github.com/okx/brczero/x/staking/legacy/v0_10"
 
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
 )
 
 const ModuleName = "staking"

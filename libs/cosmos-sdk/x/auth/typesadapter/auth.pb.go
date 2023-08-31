@@ -7,7 +7,7 @@ import (
 	fmt "fmt"
 	_ "github.com/gogo/protobuf/gogoproto"
 	proto "github.com/gogo/protobuf/proto"
-	"github.com/okx/okbchain/libs/cosmos-sdk/codec/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/codec/types"
 	_ "github.com/regen-network/cosmos-proto"
 	io "io"
 	math "math"

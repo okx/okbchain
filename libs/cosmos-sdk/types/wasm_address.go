@@ -9,7 +9,7 @@ import (
 	"strings"
 
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/okx/okbchain/libs/tendermint/libs/bech32"
+	"github.com/okx/brczero/libs/tendermint/libs/bech32"
 	"gopkg.in/yaml.v2"
 )
 

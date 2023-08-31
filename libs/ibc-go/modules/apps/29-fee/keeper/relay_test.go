@@ -1,11 +1,11 @@
 package keeper_test
 
 import (
-	"github.com/okx/okbchain/libs/ibc-go/modules/apps/29-fee/types"
-	clienttypes "github.com/okx/okbchain/libs/ibc-go/modules/core/02-client/types"
-	channeltypes "github.com/okx/okbchain/libs/ibc-go/modules/core/04-channel/types"
-	ibctesting "github.com/okx/okbchain/libs/ibc-go/testing"
-	ibcmock "github.com/okx/okbchain/libs/ibc-go/testing/mock"
+	"github.com/okx/brczero/libs/ibc-go/modules/apps/29-fee/types"
+	clienttypes "github.com/okx/brczero/libs/ibc-go/modules/core/02-client/types"
+	channeltypes "github.com/okx/brczero/libs/ibc-go/modules/core/04-channel/types"
+	ibctesting "github.com/okx/brczero/libs/ibc-go/testing"
+	ibcmock "github.com/okx/brczero/libs/ibc-go/testing/mock"
 )
 
 func (suite *KeeperTestSuite) TestWriteAcknowledgementAsync() {

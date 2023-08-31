@@ -2,7 +2,7 @@ package logevents
 
 import (
 	"fmt"
-	"github.com/okx/okbchain/libs/system"
+	"github.com/okx/brczero/libs/system"
 	"os"
 	"time"
 )

@@ -5,13 +5,13 @@ import (
 	"fmt"
 
 	ethcmm "github.com/ethereum/go-ethereum/common"
-	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	sdkerrors "github.com/okx/okbchain/libs/cosmos-sdk/types/errors"
-	transfertypes "github.com/okx/okbchain/libs/ibc-go/modules/apps/transfer/types"
-	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
-	"github.com/okx/okbchain/x/common"
-	"github.com/okx/okbchain/x/erc20/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/codec"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	sdkerrors "github.com/okx/brczero/libs/cosmos-sdk/types/errors"
+	transfertypes "github.com/okx/brczero/libs/ibc-go/modules/apps/transfer/types"
+	abci "github.com/okx/brczero/libs/tendermint/abci/types"
+	"github.com/okx/brczero/x/common"
+	"github.com/okx/brczero/x/erc20/types"
 )
 
 // NewQuerier is the module level router for state queries

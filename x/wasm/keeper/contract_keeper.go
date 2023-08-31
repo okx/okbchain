@@ -2,8 +2,8 @@ package keeper
 
 import (
 	wasmvmtypes "github.com/CosmWasm/wasmvm/types"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	"github.com/okx/okbchain/x/wasm/types"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	"github.com/okx/brczero/x/wasm/types"
 )
 
 var _ types.ContractOpsKeeper = PermissionedKeeper{}

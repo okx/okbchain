@@ -2,9 +2,9 @@ package tracetxlog
 
 import (
 	"fmt"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	"github.com/okx/okbchain/x/evm/txs/base"
-	"github.com/okx/okbchain/x/evm/txs/check"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	"github.com/okx/brczero/x/evm/txs/base"
+	"github.com/okx/brczero/x/evm/txs/check"
 )
 
 // tx trace tx log depends on check tx

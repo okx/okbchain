@@ -1,11 +1,11 @@
 package client
 
 import (
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	sdkerrors "github.com/okx/okbchain/libs/cosmos-sdk/types/errors"
-	"github.com/okx/okbchain/libs/ibc-go/modules/core/02-client/keeper"
-	"github.com/okx/okbchain/libs/ibc-go/modules/core/02-client/types"
-	govtypes "github.com/okx/okbchain/x/gov/types"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	sdkerrors "github.com/okx/brczero/libs/cosmos-sdk/types/errors"
+	"github.com/okx/brczero/libs/ibc-go/modules/core/02-client/keeper"
+	"github.com/okx/brczero/libs/ibc-go/modules/core/02-client/types"
+	govtypes "github.com/okx/brczero/x/gov/types"
 )
 
 // NewClientUpdateProposalHandler defines the client update proposal handler

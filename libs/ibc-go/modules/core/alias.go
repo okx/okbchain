@@ -1,9 +1,9 @@
 package ibc
 
 import (
-	"github.com/okx/okbchain/libs/ibc-go/modules/core/common"
-	"github.com/okx/okbchain/libs/ibc-go/modules/core/keeper"
-	"github.com/okx/okbchain/libs/ibc-go/modules/core/types"
+	"github.com/okx/brczero/libs/ibc-go/modules/core/common"
+	"github.com/okx/brczero/libs/ibc-go/modules/core/keeper"
+	"github.com/okx/brczero/libs/ibc-go/modules/core/types"
 )
 
 type (

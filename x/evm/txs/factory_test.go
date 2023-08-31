@@ -1,11 +1,11 @@
 package txs
 
 import (
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	"github.com/okx/okbchain/x/evm/txs/base"
-	"github.com/okx/okbchain/x/evm/txs/check"
-	"github.com/okx/okbchain/x/evm/txs/deliver"
-	"github.com/okx/okbchain/x/evm/txs/tracetxlog"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	"github.com/okx/brczero/x/evm/txs/base"
+	"github.com/okx/brczero/x/evm/txs/check"
+	"github.com/okx/brczero/x/evm/txs/deliver"
+	"github.com/okx/brczero/x/evm/txs/tracetxlog"
 	"reflect"
 	"testing"
 )

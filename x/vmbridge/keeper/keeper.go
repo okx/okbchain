@@ -1,10 +1,10 @@
 package keeper
 
 import (
-	"github.com/okx/okbchain/x/vmbridge/types"
+	"github.com/okx/brczero/x/vmbridge/types"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
-	"github.com/okx/okbchain/libs/tendermint/libs/log"
+	"github.com/okx/brczero/libs/cosmos-sdk/codec"
+	"github.com/okx/brczero/libs/tendermint/libs/log"
 )
 
 type Keeper struct {

@@ -4,7 +4,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/okx/okbchain/libs/tendermint/types"
+	"github.com/okx/brczero/libs/tendermint/types"
 )
 
 func TestMain(m *testing.M) {

@@ -6,8 +6,8 @@ import (
 
 	"github.com/pkg/errors"
 
-	cmn "github.com/okx/okbchain/libs/iavl/common"
-	"github.com/okx/okbchain/libs/tendermint/crypto/tmhash"
+	cmn "github.com/okx/brczero/libs/iavl/common"
+	"github.com/okx/brczero/libs/tendermint/crypto/tmhash"
 	amino "github.com/tendermint/go-amino"
 )
 

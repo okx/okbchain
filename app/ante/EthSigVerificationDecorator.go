@@ -1,10 +1,10 @@
 package ante
 
 import (
-	ethermint "github.com/okx/okbchain/app/types"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	sdkerrors "github.com/okx/okbchain/libs/cosmos-sdk/types/errors"
-	evmtypes "github.com/okx/okbchain/x/evm/types"
+	ethermint "github.com/okx/brczero/app/types"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	sdkerrors "github.com/okx/brczero/libs/cosmos-sdk/types/errors"
+	evmtypes "github.com/okx/brczero/x/evm/types"
 )
 
 // EthSigVerificationDecorator validates an ethereum signature

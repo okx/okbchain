@@ -4,18 +4,18 @@ import (
 	"bufio"
 	"encoding/hex"
 	"fmt"
-	"github.com/okx/okbchain/libs/tendermint/p2p"
+	"github.com/okx/brczero/libs/tendermint/p2p"
 	"io"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/client/flags"
-	clientkeys "github.com/okx/okbchain/libs/cosmos-sdk/client/keys"
-	"github.com/okx/okbchain/libs/cosmos-sdk/crypto/keys"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/client/flags"
+	clientkeys "github.com/okx/brczero/libs/cosmos-sdk/client/keys"
+	"github.com/okx/brczero/libs/cosmos-sdk/crypto/keys"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
 
-	"github.com/okx/okbchain/app/crypto/hd"
+	"github.com/okx/brczero/app/crypto/hd"
 )
 
 const (

@@ -3,11 +3,11 @@ package keeper
 import (
 	"time"
 
-	"github.com/okx/okbchain/x/common"
+	"github.com/okx/brczero/x/common"
 
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	"github.com/okx/okbchain/x/params"
-	"github.com/okx/okbchain/x/staking/types"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	"github.com/okx/brczero/x/params"
+	"github.com/okx/brczero/x/staking/types"
 )
 
 // Default parameter namespace

@@ -3,12 +3,12 @@ package proxy
 import (
 	"context"
 
-	"github.com/okx/okbchain/libs/tendermint/crypto/merkle"
-	"github.com/okx/okbchain/libs/tendermint/libs/bytes"
-	"github.com/okx/okbchain/libs/tendermint/lite"
-	rpcclient "github.com/okx/okbchain/libs/tendermint/rpc/client"
-	ctypes "github.com/okx/okbchain/libs/tendermint/rpc/core/types"
-	rpctypes "github.com/okx/okbchain/libs/tendermint/rpc/jsonrpc/types"
+	"github.com/okx/brczero/libs/tendermint/crypto/merkle"
+	"github.com/okx/brczero/libs/tendermint/libs/bytes"
+	"github.com/okx/brczero/libs/tendermint/lite"
+	rpcclient "github.com/okx/brczero/libs/tendermint/rpc/client"
+	ctypes "github.com/okx/brczero/libs/tendermint/rpc/core/types"
+	rpctypes "github.com/okx/brczero/libs/tendermint/rpc/jsonrpc/types"
 )
 
 var _ rpcclient.Client = Wrapper{}

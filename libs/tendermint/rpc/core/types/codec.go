@@ -3,7 +3,7 @@ package coretypes
 import (
 	amino "github.com/tendermint/go-amino"
 
-	"github.com/okx/okbchain/libs/tendermint/types"
+	"github.com/okx/brczero/libs/tendermint/types"
 )
 
 func RegisterAmino(cdc *amino.Codec) {

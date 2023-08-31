@@ -5,9 +5,9 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/okx/okbchain/libs/tendermint/libs/log"
-	tmos "github.com/okx/okbchain/libs/tendermint/libs/os"
-	"github.com/okx/okbchain/libs/tendermint/privval"
+	"github.com/okx/brczero/libs/tendermint/libs/log"
+	tmos "github.com/okx/brczero/libs/tendermint/libs/os"
+	"github.com/okx/brczero/libs/tendermint/privval"
 )
 
 // ResetAllCmd removes the database of this Tendermint core

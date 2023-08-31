@@ -2,10 +2,10 @@ package evidence
 
 import (
 	"fmt"
-	dbm "github.com/okx/okbchain/libs/tm-db"
+	dbm "github.com/okx/brczero/libs/tm-db"
 
-	"github.com/okx/okbchain/libs/tendermint/consensus"
-	"github.com/okx/okbchain/libs/tendermint/types"
+	"github.com/okx/brczero/libs/tendermint/consensus"
+	"github.com/okx/brczero/libs/tendermint/types"
 )
 
 /*

@@ -1,10 +1,10 @@
 package keeperadapter
 
 import (
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	sdkerrors "github.com/okx/okbchain/libs/cosmos-sdk/types/errors"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/bank/internal/keeper"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/bank/internal/types"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	sdkerrors "github.com/okx/brczero/libs/cosmos-sdk/types/errors"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/bank/internal/keeper"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/bank/internal/types"
 )
 
 var (

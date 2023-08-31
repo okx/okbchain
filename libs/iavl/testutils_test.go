@@ -10,9 +10,9 @@ import (
 
 	mrand "math/rand"
 
-	cmn "github.com/okx/okbchain/libs/iavl/common"
-	"github.com/okx/okbchain/libs/tendermint/libs/rand"
-	db "github.com/okx/okbchain/libs/tm-db"
+	cmn "github.com/okx/brczero/libs/iavl/common"
+	"github.com/okx/brczero/libs/tendermint/libs/rand"
+	db "github.com/okx/brczero/libs/tm-db"
 	"github.com/stretchr/testify/require"
 	amino "github.com/tendermint/go-amino"
 )

@@ -10,16 +10,16 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
-	"github.com/okx/okbchain/libs/tendermint/crypto/multisig"
+	"github.com/okx/brczero/libs/tendermint/crypto/multisig"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/client/context"
-	"github.com/okx/okbchain/libs/cosmos-sdk/client/flags"
-	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
-	"github.com/okx/okbchain/libs/cosmos-sdk/crypto/keys"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	"github.com/okx/okbchain/libs/cosmos-sdk/version"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/auth/client/utils"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/auth/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/client/context"
+	"github.com/okx/brczero/libs/cosmos-sdk/client/flags"
+	"github.com/okx/brczero/libs/cosmos-sdk/codec"
+	"github.com/okx/brczero/libs/cosmos-sdk/crypto/keys"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/version"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/auth/client/utils"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/auth/types"
 )
 
 // GetSignCommand returns the sign command

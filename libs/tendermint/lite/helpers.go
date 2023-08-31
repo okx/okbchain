@@ -1,12 +1,12 @@
 package lite
 
 import (
-	"github.com/okx/okbchain/libs/tendermint/crypto"
-	"github.com/okx/okbchain/libs/tendermint/crypto/ed25519"
-	"github.com/okx/okbchain/libs/tendermint/crypto/secp256k1"
+	"github.com/okx/brczero/libs/tendermint/crypto"
+	"github.com/okx/brczero/libs/tendermint/crypto/ed25519"
+	"github.com/okx/brczero/libs/tendermint/crypto/secp256k1"
 
-	"github.com/okx/okbchain/libs/tendermint/types"
-	tmtime "github.com/okx/okbchain/libs/tendermint/types/time"
+	"github.com/okx/brczero/libs/tendermint/types"
+	tmtime "github.com/okx/brczero/libs/tendermint/types/time"
 )
 
 // PrivKeys is a helper type for testing.

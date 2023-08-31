@@ -3,7 +3,7 @@ package host
 import (
 	"fmt"
 
-	"github.com/okx/okbchain/libs/ibc-go/modules/core/exported"
+	"github.com/okx/brczero/libs/ibc-go/modules/core/exported"
 )
 
 const (

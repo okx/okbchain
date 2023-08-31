@@ -3,26 +3,26 @@ package client
 import (
 	"github.com/spf13/cobra"
 
-	"github.com/okx/okbchain/app"
-	"github.com/okx/okbchain/app/config"
-	"github.com/okx/okbchain/app/rpc"
-	"github.com/okx/okbchain/app/rpc/backend"
-	"github.com/okx/okbchain/app/rpc/monitor"
-	"github.com/okx/okbchain/app/rpc/namespaces/eth"
-	"github.com/okx/okbchain/app/rpc/namespaces/eth/filters"
-	"github.com/okx/okbchain/app/rpc/websockets"
-	"github.com/okx/okbchain/app/types"
-	"github.com/okx/okbchain/app/utils/sanity"
-	"github.com/okx/okbchain/libs/system/trace"
-	"github.com/okx/okbchain/libs/tendermint/consensus"
-	"github.com/okx/okbchain/libs/tendermint/libs/automation"
-	tmtypes "github.com/okx/okbchain/libs/tendermint/types"
-	tmdb "github.com/okx/okbchain/libs/tm-db"
-	evmtypes "github.com/okx/okbchain/x/evm/types"
-	"github.com/okx/okbchain/x/evm/watcher"
-	"github.com/okx/okbchain/x/infura"
-	"github.com/okx/okbchain/x/token"
-	"github.com/okx/okbchain/x/wasm"
+	"github.com/okx/brczero/app"
+	"github.com/okx/brczero/app/config"
+	"github.com/okx/brczero/app/rpc"
+	"github.com/okx/brczero/app/rpc/backend"
+	"github.com/okx/brczero/app/rpc/monitor"
+	"github.com/okx/brczero/app/rpc/namespaces/eth"
+	"github.com/okx/brczero/app/rpc/namespaces/eth/filters"
+	"github.com/okx/brczero/app/rpc/websockets"
+	"github.com/okx/brczero/app/types"
+	"github.com/okx/brczero/app/utils/sanity"
+	"github.com/okx/brczero/libs/system/trace"
+	"github.com/okx/brczero/libs/tendermint/consensus"
+	"github.com/okx/brczero/libs/tendermint/libs/automation"
+	tmtypes "github.com/okx/brczero/libs/tendermint/types"
+	tmdb "github.com/okx/brczero/libs/tm-db"
+	evmtypes "github.com/okx/brczero/x/evm/types"
+	"github.com/okx/brczero/x/evm/watcher"
+	"github.com/okx/brczero/x/infura"
+	"github.com/okx/brczero/x/token"
+	"github.com/okx/brczero/x/wasm"
 )
 
 func RegisterAppFlag(cmd *cobra.Command) {
@@ -106,7 +106,7 @@ func RegisterAppFlag(cmd *cobra.Command) {
 
 	cmd.Flags().String(config.FlagPprofCoolDown, "3m", "The cool down time after every type of pprof dump")
 	cmd.Flags().Int64(config.FlagPprofAbciElapsed, 5000, "Elapsed time of abci in millisecond for pprof dump")
-	cmd.Flags().Bool(config.FlagPprofUseCGroup, false, "Use cgroup when okbchaind run in docker")
+	cmd.Flags().Bool(config.FlagPprofUseCGroup, false, "Use cgroup when brczerod run in docker")
 
 	cmd.Flags().String(tmdb.FlagGoLeveldbOpts, "", "Options of goleveldb. (cache_size=128MB,handlers_num=1024)")
 	cmd.Flags().String(tmdb.FlagRocksdbOpts, "", "Options of rocksdb. (block_size=4KB,block_cache=1GB,statistics=true,allow_mmap_reads=true,max_open_files=-1,unordered_write=true,pipelined_write=true)")

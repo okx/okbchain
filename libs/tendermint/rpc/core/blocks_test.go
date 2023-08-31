@@ -7,13 +7,13 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	dbm "github.com/okx/okbchain/libs/tm-db"
+	dbm "github.com/okx/brczero/libs/tm-db"
 
-	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
-	ctypes "github.com/okx/okbchain/libs/tendermint/rpc/core/types"
-	rpctypes "github.com/okx/okbchain/libs/tendermint/rpc/jsonrpc/types"
-	sm "github.com/okx/okbchain/libs/tendermint/state"
-	"github.com/okx/okbchain/libs/tendermint/types"
+	abci "github.com/okx/brczero/libs/tendermint/abci/types"
+	ctypes "github.com/okx/brczero/libs/tendermint/rpc/core/types"
+	rpctypes "github.com/okx/brczero/libs/tendermint/rpc/jsonrpc/types"
+	sm "github.com/okx/brczero/libs/tendermint/state"
+	"github.com/okx/brczero/libs/tendermint/types"
 )
 
 func TestBlockchainInfo(t *testing.T) {

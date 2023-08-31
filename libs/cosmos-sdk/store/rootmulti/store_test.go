@@ -9,19 +9,19 @@ import (
 	"strings"
 	"testing"
 
-	tmtypes "github.com/okx/okbchain/libs/tendermint/types"
+	tmtypes "github.com/okx/brczero/libs/tendermint/types"
 
-	iavltree "github.com/okx/okbchain/libs/iavl"
+	iavltree "github.com/okx/brczero/libs/iavl"
 	"github.com/stretchr/testify/assert"
 
-	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
-	"github.com/okx/okbchain/libs/tendermint/crypto/merkle"
-	dbm "github.com/okx/okbchain/libs/tm-db"
+	abci "github.com/okx/brczero/libs/tendermint/abci/types"
+	"github.com/okx/brczero/libs/tendermint/crypto/merkle"
+	dbm "github.com/okx/brczero/libs/tm-db"
 	"github.com/stretchr/testify/require"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/store/iavl"
-	"github.com/okx/okbchain/libs/cosmos-sdk/store/types"
-	sdkerrors "github.com/okx/okbchain/libs/cosmos-sdk/types/errors"
+	"github.com/okx/brczero/libs/cosmos-sdk/store/iavl"
+	"github.com/okx/brczero/libs/cosmos-sdk/store/types"
+	sdkerrors "github.com/okx/brczero/libs/cosmos-sdk/types/errors"
 )
 
 func TestStoreType(t *testing.T) {

@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"testing"
 
-	dbm "github.com/okx/okbchain/libs/tm-db"
+	dbm "github.com/okx/brczero/libs/tm-db"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/store/dbadapter"
-	"github.com/okx/okbchain/libs/cosmos-sdk/store/gaskv"
-	"github.com/okx/okbchain/libs/cosmos-sdk/store/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/store/dbadapter"
+	"github.com/okx/brczero/libs/cosmos-sdk/store/gaskv"
+	"github.com/okx/brczero/libs/cosmos-sdk/store/types"
 
 	"github.com/stretchr/testify/require"
 )

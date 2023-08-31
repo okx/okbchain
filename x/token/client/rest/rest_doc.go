@@ -27,7 +27,7 @@
 package rest
 
 import (
-	"github.com/okx/okbchain/x/token/types"
+	"github.com/okx/brczero/x/token/types"
 )
 
 // A Products is the info of the market.

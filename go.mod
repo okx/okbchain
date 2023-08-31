@@ -1,4 +1,4 @@
-module github.com/okx/okbchain
+module github.com/okx/brczero
 
 go 1.20
 

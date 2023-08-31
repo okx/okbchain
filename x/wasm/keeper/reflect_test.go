@@ -2,9 +2,9 @@ package keeper
 
 import (
 	"encoding/json"
-	ibcadapter "github.com/okx/okbchain/libs/cosmos-sdk/types/ibc-adapter"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/bank"
-	"github.com/okx/okbchain/x/wasm/keeper/testdata"
+	ibcadapter "github.com/okx/brczero/libs/cosmos-sdk/types/ibc-adapter"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/bank"
+	"github.com/okx/brczero/x/wasm/keeper/testdata"
 	"io/ioutil"
 	"strings"
 	"testing"
@@ -12,17 +12,17 @@ import (
 	"github.com/golang/protobuf/proto"
 
 	wasmvmtypes "github.com/CosmWasm/wasmvm/types"
-	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
-	codectypes "github.com/okx/okbchain/libs/cosmos-sdk/codec/types"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	sdkerrors "github.com/okx/okbchain/libs/cosmos-sdk/types/errors"
-	authkeeper "github.com/okx/okbchain/libs/cosmos-sdk/x/auth/keeper"
-	//bankkeeper "github.com/okx/okbchain/libs/cosmos-sdk/x/bank/keeper"
-	//banktypes "github.com/okx/okbchain/libs/cosmos-sdk/x/bank/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/codec"
+	codectypes "github.com/okx/brczero/libs/cosmos-sdk/codec/types"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	sdkerrors "github.com/okx/brczero/libs/cosmos-sdk/types/errors"
+	authkeeper "github.com/okx/brczero/libs/cosmos-sdk/x/auth/keeper"
+	//bankkeeper "github.com/okx/brczero/libs/cosmos-sdk/x/bank/keeper"
+	//banktypes "github.com/okx/brczero/libs/cosmos-sdk/x/bank/types"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/okx/okbchain/x/wasm/types"
+	"github.com/okx/brczero/x/wasm/types"
 )
 
 func buildReflectQuery(t *testing.T, query *testdata.ReflectQueryMsg) []byte {

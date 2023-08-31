@@ -3,12 +3,12 @@ package keeper
 import (
 	"fmt"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	"github.com/okx/okbchain/libs/tendermint/libs/log"
-	"github.com/okx/okbchain/x/params"
+	"github.com/okx/brczero/libs/cosmos-sdk/codec"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	"github.com/okx/brczero/libs/tendermint/libs/log"
+	"github.com/okx/brczero/x/params"
 
-	"github.com/okx/okbchain/x/distribution/types"
+	"github.com/okx/brczero/x/distribution/types"
 )
 
 // Keeper of the distribution store

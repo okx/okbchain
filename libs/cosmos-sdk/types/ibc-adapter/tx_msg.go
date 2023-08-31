@@ -3,9 +3,9 @@ package types
 import (
 	"github.com/gogo/protobuf/proto"
 
-	cryptotypes "github.com/okx/okbchain/libs/cosmos-sdk/crypto/types"
-	costypes "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	stdtx "github.com/okx/okbchain/libs/cosmos-sdk/x/auth/types"
+	cryptotypes "github.com/okx/brczero/libs/cosmos-sdk/crypto/types"
+	costypes "github.com/okx/brczero/libs/cosmos-sdk/types"
+	stdtx "github.com/okx/brczero/libs/cosmos-sdk/x/auth/types"
 )
 
 type (

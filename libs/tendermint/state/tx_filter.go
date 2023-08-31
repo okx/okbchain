@@ -1,8 +1,8 @@
 package state
 
 import (
-	mempl "github.com/okx/okbchain/libs/tendermint/mempool"
-	"github.com/okx/okbchain/libs/tendermint/types"
+	mempl "github.com/okx/brczero/libs/tendermint/mempool"
+	"github.com/okx/brczero/libs/tendermint/types"
 )
 
 // TxPreCheck returns a function to filter transactions before processing.

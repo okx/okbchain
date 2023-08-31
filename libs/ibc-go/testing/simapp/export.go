@@ -4,14 +4,14 @@ import (
 	"encoding/json"
 	"log"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
-	tmtypes "github.com/okx/okbchain/libs/tendermint/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/codec"
+	tmtypes "github.com/okx/brczero/libs/tendermint/types"
 
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
-	"github.com/okx/okbchain/x/slashing"
-	"github.com/okx/okbchain/x/staking"
-	"github.com/okx/okbchain/x/staking/exported"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	abci "github.com/okx/brczero/libs/tendermint/abci/types"
+	"github.com/okx/brczero/x/slashing"
+	"github.com/okx/brczero/x/staking"
+	"github.com/okx/brczero/x/staking/exported"
 	//slashingtypes "github.com/cosmos/cosmos-sdk/x/slashing/types"
 	//stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 )

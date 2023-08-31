@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/store"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	"github.com/okx/okbchain/libs/tendermint/rpc/client"
-	dbm "github.com/okx/okbchain/libs/tm-db"
+	"github.com/okx/brczero/libs/cosmos-sdk/store"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	"github.com/okx/brczero/libs/tendermint/rpc/client"
+	dbm "github.com/okx/brczero/libs/tm-db"
 )
 
 // File for storing in-package BaseApp optional functions,

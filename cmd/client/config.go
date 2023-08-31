@@ -8,11 +8,11 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
-	"github.com/okx/okbchain/libs/tendermint/libs/cli"
+	"github.com/okx/brczero/libs/tendermint/libs/cli"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/client/flags"
+	"github.com/okx/brczero/libs/cosmos-sdk/client/flags"
 
-	ethermint "github.com/okx/okbchain/app/types"
+	ethermint "github.com/okx/brczero/app/types"
 )
 
 // InitConfig adds the chain-id, encoding and output flags to the persistent flag set.

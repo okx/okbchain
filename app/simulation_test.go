@@ -3,36 +3,37 @@ package app
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
-	"github.com/okx/okbchain/libs/cosmos-sdk/store/prefix"
-	"github.com/okx/okbchain/libs/cosmos-sdk/types/module"
-	"github.com/okx/okbchain/x/wasm"
-	wasmtypes "github.com/okx/okbchain/x/wasm/types"
 	"math/rand"
 	"os"
 	"testing"
 	"time"
 
+	"github.com/okx/brczero/libs/cosmos-sdk/codec"
+	"github.com/okx/brczero/libs/cosmos-sdk/store/prefix"
+	"github.com/okx/brczero/libs/cosmos-sdk/types/module"
+	"github.com/okx/brczero/x/wasm"
+	wasmtypes "github.com/okx/brczero/x/wasm/types"
+
 	"github.com/stretchr/testify/require"
 
-	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
-	"github.com/okx/okbchain/libs/tendermint/libs/log"
-	dbm "github.com/okx/okbchain/libs/tm-db"
+	abci "github.com/okx/brczero/libs/tendermint/abci/types"
+	"github.com/okx/brczero/libs/tendermint/libs/log"
+	dbm "github.com/okx/brczero/libs/tm-db"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/baseapp"
-	"github.com/okx/okbchain/libs/cosmos-sdk/simapp"
-	"github.com/okx/okbchain/libs/cosmos-sdk/simapp/helpers"
-	"github.com/okx/okbchain/libs/cosmos-sdk/store"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/auth"
-	distr "github.com/okx/okbchain/libs/cosmos-sdk/x/distribution"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/mint"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/simulation"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/slashing"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/supply"
-	"github.com/okx/okbchain/x/gov"
-	"github.com/okx/okbchain/x/params"
-	"github.com/okx/okbchain/x/staking"
+	"github.com/okx/brczero/libs/cosmos-sdk/baseapp"
+	"github.com/okx/brczero/libs/cosmos-sdk/simapp"
+	"github.com/okx/brczero/libs/cosmos-sdk/simapp/helpers"
+	"github.com/okx/brczero/libs/cosmos-sdk/store"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/auth"
+	distr "github.com/okx/brczero/libs/cosmos-sdk/x/distribution"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/mint"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/simulation"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/slashing"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/supply"
+	"github.com/okx/brczero/x/gov"
+	"github.com/okx/brczero/x/params"
+	"github.com/okx/brczero/x/staking"
 )
 
 func init() {
@@ -69,7 +70,7 @@ func TestFullAppSimulation(t *testing.T) {
 		require.NoError(t, os.RemoveAll(dir))
 	}()
 
-	app := NewOKBChainApp(logger, db, nil, true, map[int64]bool{}, simapp.FlagPeriodValue, fauxMerkleModeOpt)
+	app := NewBRCZeroApp(logger, db, nil, true, map[int64]bool{}, simapp.FlagPeriodValue, fauxMerkleModeOpt)
 	require.Equal(t, appName, app.Name())
 
 	// run randomized simulation
@@ -101,7 +102,7 @@ func TestAppImportExport(t *testing.T) {
 		require.NoError(t, os.RemoveAll(dir))
 	}()
 
-	app := NewOKBChainApp(logger, db, nil, true, map[int64]bool{}, simapp.FlagPeriodValue, fauxMerkleModeOpt)
+	app := NewBRCZeroApp(logger, db, nil, true, map[int64]bool{}, simapp.FlagPeriodValue, fauxMerkleModeOpt)
 	require.Equal(t, appName, app.Name())
 
 	// Run randomized simulation
@@ -136,7 +137,7 @@ func TestAppImportExport(t *testing.T) {
 		require.NoError(t, os.RemoveAll(newDir))
 	}()
 
-	newApp := NewOKBChainApp(log.NewNopLogger(), newDB, nil, true, map[int64]bool{}, simapp.FlagPeriodValue, fauxMerkleModeOpt)
+	newApp := NewBRCZeroApp(log.NewNopLogger(), newDB, nil, true, map[int64]bool{}, simapp.FlagPeriodValue, fauxMerkleModeOpt)
 	require.Equal(t, appName, newApp.Name())
 
 	var genesisState map[string]json.RawMessage
@@ -177,7 +178,7 @@ func TestAppImportExport(t *testing.T) {
 	dropContractHistory(ctxA.KVStore(app.keys[wasm.StoreKey]), prefixes...)
 	dropContractHistory(ctxB.KVStore(newApp.keys[wasm.StoreKey]), prefixes...)
 
-	normalizeContractInfo := func(ctx sdk.Context, app *OKBChainApp) {
+	normalizeContractInfo := func(ctx sdk.Context, app *BRCZeroApp) {
 		var index uint64
 		app.WasmKeeper.IterateContractInfo(ctx, func(address sdk.WasmAddress, info wasmtypes.ContractInfo) bool {
 			created := &wasmtypes.AbsoluteTxPosition{
@@ -218,7 +219,7 @@ func TestAppSimulationAfterImport(t *testing.T) {
 		require.NoError(t, os.RemoveAll(dir))
 	}()
 
-	app := NewOKBChainApp(logger, db, nil, true, map[int64]bool{}, simapp.FlagPeriodValue, fauxMerkleModeOpt)
+	app := NewBRCZeroApp(logger, db, nil, true, map[int64]bool{}, simapp.FlagPeriodValue, fauxMerkleModeOpt)
 	require.Equal(t, appName, app.Name())
 
 	// Run randomized simulation
@@ -258,7 +259,7 @@ func TestAppSimulationAfterImport(t *testing.T) {
 		require.NoError(t, os.RemoveAll(newDir))
 	}()
 
-	newApp := NewOKBChainApp(log.NewNopLogger(), newDB, nil, true, map[int64]bool{}, simapp.FlagPeriodValue, fauxMerkleModeOpt)
+	newApp := NewBRCZeroApp(log.NewNopLogger(), newDB, nil, true, map[int64]bool{}, simapp.FlagPeriodValue, fauxMerkleModeOpt)
 	require.Equal(t, appName, newApp.Name())
 
 	newApp.InitChain(abci.RequestInitChain{
@@ -300,7 +301,7 @@ func TestAppStateDeterminism(t *testing.T) {
 
 		db := dbm.NewMemDB()
 
-		app := NewOKBChainApp(logger, db, nil, true, map[int64]bool{}, simapp.FlagPeriodValue, interBlockCacheOpt())
+		app := NewBRCZeroApp(logger, db, nil, true, map[int64]bool{}, simapp.FlagPeriodValue, interBlockCacheOpt())
 
 		fmt.Printf(
 			"running non-determinism simulation; seed %d: attempt: %d/%d\n",

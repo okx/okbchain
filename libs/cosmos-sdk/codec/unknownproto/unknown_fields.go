@@ -5,7 +5,7 @@ import (
 	"compress/gzip"
 	"errors"
 	"fmt"
-	"github.com/okx/okbchain/libs/cosmos-sdk/codec/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/codec/types"
 	"io/ioutil"
 	"reflect"
 	"strings"

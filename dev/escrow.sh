@@ -6,5 +6,5 @@ res=$(okbchaincli tx wasm instantiate "$code_id" '{"arbiter":"0xbbE4733d85bc2b90
 contractAddr=$(echo "$res" | jq '.logs[0].events[0].attributes[0].value' | sed 's/\"//g')
 echo "instantiate contract..."
 echo $res
-#okbchaincli tx send ex1h0j8x0v9hs4eq6ppgamemfyu4vuvp2sl0q9p3v $contractAddr 999okb --fees 0.01okb -y -b block
+#brczerocli tx send ex1h0j8x0v9hs4eq6ppgamemfyu4vuvp2sl0q9p3v $contractAddr 999okb --fees 0.01okb -y -b block
 okbchaincli tx wasm execute "$contractAddr" '{"approve":{"quantity":[{"amount":"1","denom":"okb"}]}}' --amount 888okb --fees 0.001okb --from captain -b block -y

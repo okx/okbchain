@@ -4,15 +4,15 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/okx/okbchain/libs/tendermint/types"
+	"github.com/okx/brczero/libs/tendermint/types"
 	"github.com/spf13/cobra"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
-	"github.com/okx/okbchain/libs/cosmos-sdk/server"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	"github.com/okx/okbchain/libs/cosmos-sdk/version"
-	extypes "github.com/okx/okbchain/libs/cosmos-sdk/x/genutil"
-	v018 "github.com/okx/okbchain/x/genutil/client/legacy/v0_18"
+	"github.com/okx/brczero/libs/cosmos-sdk/codec"
+	"github.com/okx/brczero/libs/cosmos-sdk/server"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/version"
+	extypes "github.com/okx/brczero/libs/cosmos-sdk/x/genutil"
+	v018 "github.com/okx/brczero/x/genutil/client/legacy/v0_18"
 )
 
 var migrationMap = extypes.MigrationMap{

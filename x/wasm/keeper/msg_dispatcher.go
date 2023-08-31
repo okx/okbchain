@@ -3,13 +3,13 @@ package keeper
 import (
 	"bytes"
 	"fmt"
-	"github.com/okx/okbchain/libs/tendermint/libs/kv"
+	"github.com/okx/brczero/libs/tendermint/libs/kv"
 	"sort"
 
 	wasmvmtypes "github.com/CosmWasm/wasmvm/types"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	sdkerrors "github.com/okx/okbchain/libs/cosmos-sdk/types/errors"
-	"github.com/okx/okbchain/x/wasm/types"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	sdkerrors "github.com/okx/brczero/libs/cosmos-sdk/types/errors"
+	"github.com/okx/brczero/x/wasm/types"
 )
 
 // Messenger is an extension point for custom wasmd message handling

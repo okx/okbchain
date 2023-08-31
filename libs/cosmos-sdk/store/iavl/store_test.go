@@ -9,15 +9,15 @@ import (
 	"strings"
 	"testing"
 
-	tmtypes "github.com/okx/okbchain/libs/tendermint/types"
+	tmtypes "github.com/okx/brczero/libs/tendermint/types"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/okx/okbchain/libs/iavl"
-	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
-	dbm "github.com/okx/okbchain/libs/tm-db"
+	"github.com/okx/brczero/libs/iavl"
+	abci "github.com/okx/brczero/libs/tendermint/abci/types"
+	dbm "github.com/okx/brczero/libs/tm-db"
 	"github.com/stretchr/testify/require"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/store/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/store/types"
 )
 
 var (

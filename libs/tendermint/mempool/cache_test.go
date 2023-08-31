@@ -4,10 +4,10 @@ import (
 	"crypto/rand"
 	"testing"
 
-	"github.com/okx/okbchain/libs/tendermint/abci/example/kvstore"
-	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
-	"github.com/okx/okbchain/libs/tendermint/proxy"
-	"github.com/okx/okbchain/libs/tendermint/types"
+	"github.com/okx/brczero/libs/tendermint/abci/example/kvstore"
+	abci "github.com/okx/brczero/libs/tendermint/abci/types"
+	"github.com/okx/brczero/libs/tendermint/proxy"
+	"github.com/okx/brczero/libs/tendermint/types"
 	"github.com/stretchr/testify/require"
 )
 

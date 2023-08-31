@@ -3,18 +3,18 @@ package keeper
 import (
 	"encoding/json"
 	"fmt"
-	ibcadapter "github.com/okx/okbchain/libs/cosmos-sdk/types/ibc-adapter"
-	bank "github.com/okx/okbchain/libs/cosmos-sdk/x/bank"
+	ibcadapter "github.com/okx/brczero/libs/cosmos-sdk/types/ibc-adapter"
+	bank "github.com/okx/brczero/libs/cosmos-sdk/x/bank"
 
 	wasmvmtypes "github.com/CosmWasm/wasmvm/types"
-	codectypes "github.com/okx/okbchain/libs/cosmos-sdk/codec/types"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	sdkerrors "github.com/okx/okbchain/libs/cosmos-sdk/types/errors"
-	ibctransfertypes "github.com/okx/okbchain/libs/ibc-go/modules/apps/transfer/types"
-	ibcclienttypes "github.com/okx/okbchain/libs/ibc-go/modules/core/02-client/types"
-	channeltypes "github.com/okx/okbchain/libs/ibc-go/modules/core/04-channel/types"
+	codectypes "github.com/okx/brczero/libs/cosmos-sdk/codec/types"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	sdkerrors "github.com/okx/brczero/libs/cosmos-sdk/types/errors"
+	ibctransfertypes "github.com/okx/brczero/libs/ibc-go/modules/apps/transfer/types"
+	ibcclienttypes "github.com/okx/brczero/libs/ibc-go/modules/core/02-client/types"
+	channeltypes "github.com/okx/brczero/libs/ibc-go/modules/core/04-channel/types"
 
-	"github.com/okx/okbchain/x/wasm/types"
+	"github.com/okx/brczero/x/wasm/types"
 )
 
 type BankEncoder func(sender sdk.WasmAddress, msg *wasmvmtypes.BankMsg) ([]ibcadapter.Msg, error)

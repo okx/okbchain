@@ -5,7 +5,7 @@ import (
 
 	"github.com/pkg/errors"
 
-	db "github.com/okx/okbchain/libs/tm-db"
+	db "github.com/okx/brczero/libs/tm-db"
 )
 
 // maxBatchSize is the maximum size of the import batch before flushing it to the database

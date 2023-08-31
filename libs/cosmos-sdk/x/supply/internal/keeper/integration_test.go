@@ -1,13 +1,13 @@
 package keeper_test
 
 import (
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/bank"
-	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/bank"
+	abci "github.com/okx/brczero/libs/tendermint/abci/types"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/simapp"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	keep "github.com/okx/okbchain/libs/cosmos-sdk/x/supply/internal/keeper"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/supply/internal/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/simapp"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	keep "github.com/okx/brczero/libs/cosmos-sdk/x/supply/internal/keeper"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/supply/internal/types"
 )
 
 var (

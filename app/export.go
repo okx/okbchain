@@ -4,17 +4,17 @@ import (
 	"encoding/json"
 	"log"
 
-	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
-	tmtypes "github.com/okx/okbchain/libs/tendermint/types"
+	abci "github.com/okx/brczero/libs/tendermint/abci/types"
+	tmtypes "github.com/okx/brczero/libs/tendermint/types"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
-	"github.com/okx/okbchain/libs/cosmos-sdk/simapp"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	"github.com/okx/okbchain/x/slashing"
-	"github.com/okx/okbchain/x/staking"
-	"github.com/okx/okbchain/x/staking/exported"
+	"github.com/okx/brczero/libs/cosmos-sdk/codec"
+	"github.com/okx/brczero/libs/cosmos-sdk/simapp"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	"github.com/okx/brczero/x/slashing"
+	"github.com/okx/brczero/x/staking"
+	"github.com/okx/brczero/x/staking/exported"
 
-	ethcdc "github.com/okx/okbchain/app/codec"
+	ethcdc "github.com/okx/brczero/app/codec"
 )
 
 // NewDefaultGenesisState generates the default state for the application.
@@ -25,7 +25,7 @@ func NewDefaultGenesisState() simapp.GenesisState {
 
 // ExportAppStateAndValidators exports the state of the application for a genesis
 // file.
-func (app *OKBChainApp) ExportAppStateAndValidators(
+func (app *BRCZeroApp) ExportAppStateAndValidators(
 	forZeroHeight bool, jailWhiteList []string,
 ) (appState json.RawMessage, validators []tmtypes.GenesisValidator, err error) {
 
@@ -53,7 +53,7 @@ func (app *OKBChainApp) ExportAppStateAndValidators(
 // NOTE zero height genesis is a temporary feature which will be deprecated
 //
 //	in favour of export at a block height
-func (app *OKBChainApp) prepForZeroHeightGenesis(ctx sdk.Context, jailWhiteList []string) {
+func (app *BRCZeroApp) prepForZeroHeightGenesis(ctx sdk.Context, jailWhiteList []string) {
 	applyWhiteList := false
 
 	//Check if there is a whitelist

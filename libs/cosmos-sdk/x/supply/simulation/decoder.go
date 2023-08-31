@@ -4,11 +4,11 @@ import (
 	"bytes"
 	"fmt"
 
-	tmkv "github.com/okx/okbchain/libs/tendermint/libs/kv"
+	tmkv "github.com/okx/brczero/libs/tendermint/libs/kv"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/supply/internal/keeper"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/supply/internal/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/codec"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/supply/internal/keeper"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/supply/internal/types"
 )
 
 // DecodeStore unmarshals the KVPair's Value to the corresponding supply type

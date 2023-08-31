@@ -5,10 +5,10 @@ import (
 	"errors"
 	"fmt"
 
-	storetypes "github.com/okx/okbchain/libs/cosmos-sdk/store/types"
+	storetypes "github.com/okx/brczero/libs/cosmos-sdk/store/types"
 
-	"github.com/okx/okbchain/libs/iavl"
-	"github.com/okx/okbchain/libs/tendermint/crypto/merkle"
+	"github.com/okx/brczero/libs/iavl"
+	"github.com/okx/brczero/libs/tendermint/crypto/merkle"
 )
 
 // MultiStoreProof defines a collection of store proofs in a multi-store

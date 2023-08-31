@@ -1,10 +1,10 @@
 package keys
 
 import (
-	cryptoAmino "github.com/okx/okbchain/libs/tendermint/crypto/encoding/amino"
+	cryptoAmino "github.com/okx/brczero/libs/tendermint/crypto/encoding/amino"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
-	"github.com/okx/okbchain/libs/cosmos-sdk/crypto/keys/hd"
+	"github.com/okx/brczero/libs/cosmos-sdk/codec"
+	"github.com/okx/brczero/libs/cosmos-sdk/crypto/keys/hd"
 )
 
 // CryptoCdc defines the codec required for keys and info

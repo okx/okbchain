@@ -3,9 +3,9 @@ package store
 import (
 	"bytes"
 
-	tmkv "github.com/okx/okbchain/libs/tendermint/libs/kv"
+	tmkv "github.com/okx/brczero/libs/tendermint/libs/kv"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/store/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/store/types"
 )
 
 // Gets the first item.

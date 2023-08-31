@@ -1,7 +1,7 @@
 package types
 
 import (
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
 )
 
 // ensure Msg interface compliance at compile time

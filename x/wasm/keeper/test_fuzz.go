@@ -4,10 +4,10 @@ import (
 	"encoding/json"
 
 	fuzz "github.com/google/gofuzz"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	tmBytes "github.com/okx/okbchain/libs/tendermint/libs/bytes"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	tmBytes "github.com/okx/brczero/libs/tendermint/libs/bytes"
 
-	"github.com/okx/okbchain/x/wasm/types"
+	"github.com/okx/brczero/x/wasm/types"
 )
 
 var ModelFuzzers = []interface{}{FuzzAddr, FuzzAddrString, FuzzAbsoluteTxPosition, FuzzContractInfo, FuzzStateModel, FuzzAccessType, FuzzAccessConfig, FuzzContractCodeHistory}

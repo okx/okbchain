@@ -1,11 +1,11 @@
 package types
 
 import (
-	stakingtypes "github.com/okx/okbchain/x/staking/types"
+	stakingtypes "github.com/okx/brczero/x/staking/types"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	authtypes "github.com/okx/okbchain/libs/cosmos-sdk/x/auth/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/codec"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	authtypes "github.com/okx/brczero/libs/cosmos-sdk/x/auth/types"
 )
 
 // ModuleCdc defines a generic sealed codec to be used throughout this module

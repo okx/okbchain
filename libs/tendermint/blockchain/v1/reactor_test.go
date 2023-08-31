@@ -12,18 +12,18 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	dbm "github.com/okx/okbchain/libs/tm-db"
+	dbm "github.com/okx/brczero/libs/tm-db"
 
-	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
-	cfg "github.com/okx/okbchain/libs/tendermint/config"
-	"github.com/okx/okbchain/libs/tendermint/libs/log"
-	"github.com/okx/okbchain/libs/tendermint/mock"
-	"github.com/okx/okbchain/libs/tendermint/p2p"
-	"github.com/okx/okbchain/libs/tendermint/proxy"
-	sm "github.com/okx/okbchain/libs/tendermint/state"
-	"github.com/okx/okbchain/libs/tendermint/store"
-	"github.com/okx/okbchain/libs/tendermint/types"
-	tmtime "github.com/okx/okbchain/libs/tendermint/types/time"
+	abci "github.com/okx/brczero/libs/tendermint/abci/types"
+	cfg "github.com/okx/brczero/libs/tendermint/config"
+	"github.com/okx/brczero/libs/tendermint/libs/log"
+	"github.com/okx/brczero/libs/tendermint/mock"
+	"github.com/okx/brczero/libs/tendermint/p2p"
+	"github.com/okx/brczero/libs/tendermint/proxy"
+	sm "github.com/okx/brczero/libs/tendermint/state"
+	"github.com/okx/brczero/libs/tendermint/store"
+	"github.com/okx/brczero/libs/tendermint/types"
+	tmtime "github.com/okx/brczero/libs/tendermint/types/time"
 )
 
 var config *cfg.Config

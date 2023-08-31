@@ -2,8 +2,8 @@ package multisig
 
 import (
 	"fmt"
-	"github.com/okx/okbchain/libs/cosmos-sdk/crypto/types"
-	"github.com/okx/okbchain/libs/cosmos-sdk/types/tx/signing"
+	"github.com/okx/brczero/libs/cosmos-sdk/crypto/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/types/tx/signing"
 	"strings"
 )
 

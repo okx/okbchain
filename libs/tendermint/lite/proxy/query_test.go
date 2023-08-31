@@ -9,16 +9,16 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/okx/okbchain/libs/tendermint/abci/example/kvstore"
-	cfg "github.com/okx/okbchain/libs/tendermint/config"
-	"github.com/okx/okbchain/libs/tendermint/crypto/merkle"
-	"github.com/okx/okbchain/libs/tendermint/lite"
-	certclient "github.com/okx/okbchain/libs/tendermint/lite/client"
-	nm "github.com/okx/okbchain/libs/tendermint/node"
-	"github.com/okx/okbchain/libs/tendermint/rpc/client"
-	rpclocal "github.com/okx/okbchain/libs/tendermint/rpc/client/local"
-	rpctest "github.com/okx/okbchain/libs/tendermint/rpc/test"
-	"github.com/okx/okbchain/libs/tendermint/types"
+	"github.com/okx/brczero/libs/tendermint/abci/example/kvstore"
+	cfg "github.com/okx/brczero/libs/tendermint/config"
+	"github.com/okx/brczero/libs/tendermint/crypto/merkle"
+	"github.com/okx/brczero/libs/tendermint/lite"
+	certclient "github.com/okx/brczero/libs/tendermint/lite/client"
+	nm "github.com/okx/brczero/libs/tendermint/node"
+	"github.com/okx/brczero/libs/tendermint/rpc/client"
+	rpclocal "github.com/okx/brczero/libs/tendermint/rpc/client/local"
+	rpctest "github.com/okx/brczero/libs/tendermint/rpc/test"
+	"github.com/okx/brczero/libs/tendermint/types"
 )
 
 var node *nm.Node

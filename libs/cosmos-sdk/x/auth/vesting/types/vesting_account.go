@@ -4,14 +4,14 @@ import (
 	"errors"
 	"time"
 
-	"github.com/okx/okbchain/libs/tendermint/crypto"
+	"github.com/okx/brczero/libs/tendermint/crypto"
 	"gopkg.in/yaml.v2"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	authexported "github.com/okx/okbchain/libs/cosmos-sdk/x/auth/exported"
-	authtypes "github.com/okx/okbchain/libs/cosmos-sdk/x/auth/types"
-	vestexported "github.com/okx/okbchain/libs/cosmos-sdk/x/auth/vesting/exported"
+	"github.com/okx/brczero/libs/cosmos-sdk/codec"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	authexported "github.com/okx/brczero/libs/cosmos-sdk/x/auth/exported"
+	authtypes "github.com/okx/brczero/libs/cosmos-sdk/x/auth/types"
+	vestexported "github.com/okx/brczero/libs/cosmos-sdk/x/auth/vesting/exported"
 )
 
 // Compile-time type assertions

@@ -1,8 +1,8 @@
 package keeper
 
 import (
-	"github.com/okx/okbchain/libs/ibc-go/modules/core/02-client/types"
-	"github.com/okx/okbchain/libs/ibc-go/modules/core/exported"
+	"github.com/okx/brczero/libs/ibc-go/modules/core/02-client/types"
+	"github.com/okx/brczero/libs/ibc-go/modules/core/exported"
 )
 
 // MustUnmarshalClientState attempts to decode and return an ClientState object from

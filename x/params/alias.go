@@ -1,8 +1,8 @@
 package params
 
 import (
-	sdkparams "github.com/okx/okbchain/libs/cosmos-sdk/x/params"
-	"github.com/okx/okbchain/x/params/types"
+	sdkparams "github.com/okx/brczero/libs/cosmos-sdk/x/params"
+	"github.com/okx/brczero/x/params/types"
 )
 
 // const

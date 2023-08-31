@@ -3,12 +3,12 @@ package rootmulti
 import (
 	"testing"
 
-	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
-	dbm "github.com/okx/okbchain/libs/tm-db"
+	abci "github.com/okx/brczero/libs/tendermint/abci/types"
+	dbm "github.com/okx/brczero/libs/tm-db"
 	"github.com/stretchr/testify/require"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/store/iavl"
-	"github.com/okx/okbchain/libs/cosmos-sdk/store/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/store/iavl"
+	"github.com/okx/brczero/libs/cosmos-sdk/store/types"
 )
 
 func TestVerifyIAVLStoreQueryProof(t *testing.T) {

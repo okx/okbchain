@@ -16,10 +16,10 @@ const FlagApollo = "config.apollo"
 type ApolloClient struct {
 	Namespace string
 	*agollo.Client
-	okbcConf *OkbcConfig
+	okbcConf *BRCZeroConfig
 }
 
-func NewApolloClient(okbcConf *OkbcConfig) *ApolloClient {
+func NewApolloClient(okbcConf *BRCZeroConfig) *ApolloClient {
 	// IP|AppID|NamespaceName
 	params := strings.Split(viper.GetString(FlagApollo), "|")
 	if len(params) != 3 {
@@ -65,7 +65,7 @@ func (a *ApolloClient) LoadConfig() (loaded bool) {
 }
 
 type CustomChangeListener struct {
-	okbcConf *OkbcConfig
+	okbcConf *BRCZeroConfig
 }
 
 func (c *CustomChangeListener) OnChange(changeEvent *storage.ChangeEvent) {

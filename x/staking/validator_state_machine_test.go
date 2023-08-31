@@ -4,9 +4,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/okx/okbchain/x/staking/types"
+	"github.com/okx/brczero/x/staking/types"
 
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
 )
 
 func TestValidatorSMCreateValidator(t *testing.T) {

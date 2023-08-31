@@ -1,7 +1,7 @@
 package subspace
 
 import (
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/params/subspace"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/params/subspace"
 )
 
 type (

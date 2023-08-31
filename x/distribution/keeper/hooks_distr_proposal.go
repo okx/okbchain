@@ -1,8 +1,8 @@
 package keeper
 
 import (
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	"github.com/okx/okbchain/x/distribution/types"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	"github.com/okx/brczero/x/distribution/types"
 )
 
 func (h Hooks) afterValidatorRemovedForDistributionProposal(ctx sdk.Context, _ sdk.ConsAddress, valAddr sdk.ValAddress) {

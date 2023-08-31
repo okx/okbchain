@@ -2,25 +2,26 @@ package keeper_test
 
 import (
 	"encoding/hex"
-	staking "github.com/okx/okbchain/x/staking/types"
 	"os"
 	"testing"
 
-	"github.com/okx/okbchain/app"
-	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
-	"github.com/okx/okbchain/libs/tendermint/libs/log"
-	dbm "github.com/okx/okbchain/libs/tm-db"
+	staking "github.com/okx/brczero/x/staking/types"
 
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/supply"
-	"github.com/okx/okbchain/x/evidence"
-	"github.com/okx/okbchain/x/evidence/exported"
-	"github.com/okx/okbchain/x/evidence/internal/keeper"
-	"github.com/okx/okbchain/x/evidence/internal/types"
+	"github.com/okx/brczero/app"
+	"github.com/okx/brczero/libs/cosmos-sdk/codec"
+	"github.com/okx/brczero/libs/tendermint/libs/log"
+	dbm "github.com/okx/brczero/libs/tm-db"
 
-	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
-	"github.com/okx/okbchain/libs/tendermint/crypto"
-	"github.com/okx/okbchain/libs/tendermint/crypto/ed25519"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/supply"
+	"github.com/okx/brczero/x/evidence"
+	"github.com/okx/brczero/x/evidence/exported"
+	"github.com/okx/brczero/x/evidence/internal/keeper"
+	"github.com/okx/brczero/x/evidence/internal/types"
+
+	abci "github.com/okx/brczero/libs/tendermint/abci/types"
+	"github.com/okx/brczero/libs/tendermint/crypto"
+	"github.com/okx/brczero/libs/tendermint/crypto/ed25519"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -59,13 +60,13 @@ type KeeperTestSuite struct {
 	ctx     sdk.Context
 	querier sdk.Querier
 	keeper  keeper.Keeper
-	app     *app.OKBChainApp
+	app     *app.BRCZeroApp
 }
 
-func MakeOKEXApp() *app.OKBChainApp {
+func MakeOKEXApp() *app.BRCZeroApp {
 	genesisState := app.NewDefaultGenesisState()
 	db := dbm.NewMemDB()
-	okexapp := app.NewOKBChainApp(log.NewTMLogger(log.NewSyncWriter(os.Stdout)), db, nil, true, map[int64]bool{}, 0)
+	okexapp := app.NewBRCZeroApp(log.NewTMLogger(log.NewSyncWriter(os.Stdout)), db, nil, true, map[int64]bool{}, 0)
 
 	stateBytes, err := codec.MarshalJSONIndent(okexapp.Codec(), genesisState)
 	if err != nil {

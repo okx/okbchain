@@ -4,7 +4,7 @@ import (
 	"bufio"
 	"bytes"
 	"fmt"
-	tmtime "github.com/okx/okbchain/libs/tendermint/types/time"
+	tmtime "github.com/okx/brczero/libs/tendermint/types/time"
 	"io"
 	"path/filepath"
 	"testing"
@@ -12,18 +12,18 @@ import (
 
 	"github.com/pkg/errors"
 
-	db "github.com/okx/okbchain/libs/tm-db"
+	db "github.com/okx/brczero/libs/tm-db"
 
-	"github.com/okx/okbchain/libs/tendermint/abci/example/kvstore"
-	cfg "github.com/okx/okbchain/libs/tendermint/config"
-	"github.com/okx/okbchain/libs/tendermint/libs/log"
-	tmrand "github.com/okx/okbchain/libs/tendermint/libs/rand"
-	"github.com/okx/okbchain/libs/tendermint/mock"
-	"github.com/okx/okbchain/libs/tendermint/privval"
-	"github.com/okx/okbchain/libs/tendermint/proxy"
-	sm "github.com/okx/okbchain/libs/tendermint/state"
-	"github.com/okx/okbchain/libs/tendermint/store"
-	"github.com/okx/okbchain/libs/tendermint/types"
+	"github.com/okx/brczero/libs/tendermint/abci/example/kvstore"
+	cfg "github.com/okx/brczero/libs/tendermint/config"
+	"github.com/okx/brczero/libs/tendermint/libs/log"
+	tmrand "github.com/okx/brczero/libs/tendermint/libs/rand"
+	"github.com/okx/brczero/libs/tendermint/mock"
+	"github.com/okx/brczero/libs/tendermint/privval"
+	"github.com/okx/brczero/libs/tendermint/proxy"
+	sm "github.com/okx/brczero/libs/tendermint/state"
+	"github.com/okx/brczero/libs/tendermint/store"
+	"github.com/okx/brczero/libs/tendermint/types"
 )
 
 // WALGenerateNBlocks generates a consensus WAL. It does this by spinning up a

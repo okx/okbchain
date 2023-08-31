@@ -8,8 +8,8 @@ import (
 	"testing"
 
 	"github.com/golang/mock/gomock"
-	"github.com/okx/okbchain/libs/iavl/mock"
-	db "github.com/okx/okbchain/libs/tm-db"
+	"github.com/okx/brczero/libs/iavl/mock"
+	db "github.com/okx/brczero/libs/tm-db"
 	"github.com/stretchr/testify/require"
 )
 

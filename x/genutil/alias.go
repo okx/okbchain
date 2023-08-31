@@ -1,10 +1,10 @@
 package genutil
 
 import (
-	"github.com/okx/okbchain/x/genutil/types"
+	"github.com/okx/brczero/x/genutil/types"
 
-	sdkgenutil "github.com/okx/okbchain/libs/cosmos-sdk/x/genutil"
-	sdkgenutiltypes "github.com/okx/okbchain/libs/cosmos-sdk/x/genutil/types"
+	sdkgenutil "github.com/okx/brczero/libs/cosmos-sdk/x/genutil"
+	sdkgenutiltypes "github.com/okx/brczero/libs/cosmos-sdk/x/genutil/types"
 )
 
 // const

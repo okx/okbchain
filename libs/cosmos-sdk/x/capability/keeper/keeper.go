@@ -4,14 +4,14 @@ import (
 	"fmt"
 	"strings"
 
-	tmtypes "github.com/okx/okbchain/libs/tendermint/types"
+	tmtypes "github.com/okx/brczero/libs/tendermint/types"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
-	"github.com/okx/okbchain/libs/cosmos-sdk/store/prefix"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	sdkerrors "github.com/okx/okbchain/libs/cosmos-sdk/types/errors"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/capability/types"
-	"github.com/okx/okbchain/libs/tendermint/libs/log"
+	"github.com/okx/brczero/libs/cosmos-sdk/codec"
+	"github.com/okx/brczero/libs/cosmos-sdk/store/prefix"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	sdkerrors "github.com/okx/brczero/libs/cosmos-sdk/types/errors"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/capability/types"
+	"github.com/okx/brczero/libs/tendermint/libs/log"
 )
 
 // initialized is a global variable used by GetCapability to ensure that the memory store

@@ -3,7 +3,7 @@ package types_test
 import (
 	"testing"
 
-	"github.com/okx/okbchain/libs/ibc-go/modules/apps/27-interchain-accounts/host/types"
+	"github.com/okx/brczero/libs/ibc-go/modules/apps/27-interchain-accounts/host/types"
 	"github.com/stretchr/testify/require"
 )
 

@@ -11,18 +11,18 @@ import (
 	"testing"
 	"time"
 
-	db "github.com/okx/okbchain/libs/tm-db"
-	dbm "github.com/okx/okbchain/libs/tm-db"
+	db "github.com/okx/brczero/libs/tm-db"
+	dbm "github.com/okx/brczero/libs/tm-db"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	cfg "github.com/okx/okbchain/libs/tendermint/config"
-	"github.com/okx/okbchain/libs/tendermint/libs/log"
-	sm "github.com/okx/okbchain/libs/tendermint/state"
+	cfg "github.com/okx/brczero/libs/tendermint/config"
+	"github.com/okx/brczero/libs/tendermint/libs/log"
+	sm "github.com/okx/brczero/libs/tendermint/state"
 
-	"github.com/okx/okbchain/libs/tendermint/types"
-	tmtime "github.com/okx/okbchain/libs/tendermint/types/time"
+	"github.com/okx/brczero/libs/tendermint/types"
+	tmtime "github.com/okx/brczero/libs/tendermint/types/time"
 )
 
 // A cleanupFunc cleans up any config / test files created for a particular

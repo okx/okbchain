@@ -8,12 +8,12 @@ import (
 	"io/ioutil"
 	"testing"
 
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	abci "github.com/okx/brczero/libs/tendermint/abci/types"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/okx/okbchain/x/wasm/types"
+	"github.com/okx/brczero/x/wasm/types"
 )
 
 func TestLegacyQueryContractState(t *testing.T) {

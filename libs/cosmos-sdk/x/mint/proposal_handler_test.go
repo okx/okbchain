@@ -1,17 +1,19 @@
 package mint_test
 
 import (
-	"github.com/okx/okbchain/app"
-	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	sdktypes "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/mint"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/mint/internal/types"
-	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
-	govtypes "github.com/okx/okbchain/x/gov/types"
-	"github.com/stretchr/testify/suite"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/suite"
+
+	"github.com/okx/brczero/app"
+	"github.com/okx/brczero/libs/cosmos-sdk/codec"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	sdktypes "github.com/okx/brczero/libs/cosmos-sdk/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/mint"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/mint/internal/types"
+	abci "github.com/okx/brczero/libs/tendermint/abci/types"
+	govtypes "github.com/okx/brczero/x/gov/types"
 )
 
 var (
@@ -29,7 +31,7 @@ type MintTestSuite struct {
 	ctx        sdk.Context
 	govHandler govtypes.Handler
 	querier    sdk.Querier
-	app        *app.OKBChainApp
+	app        *app.BRCZeroApp
 	codec      *codec.Codec
 }
 

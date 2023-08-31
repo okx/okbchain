@@ -3,13 +3,13 @@ package keeper_test
 import (
 	"testing"
 
-	tmproto "github.com/okx/okbchain/libs/tendermint/abci/types"
+	tmproto "github.com/okx/brczero/libs/tendermint/abci/types"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
 
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	"github.com/okx/okbchain/libs/ibc-go/modules/core/05-port/keeper"
-	"github.com/okx/okbchain/libs/ibc-go/testing/simapp"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	"github.com/okx/brczero/libs/ibc-go/modules/core/05-port/keeper"
+	"github.com/okx/brczero/libs/ibc-go/testing/simapp"
 )
 
 var (

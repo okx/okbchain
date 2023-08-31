@@ -5,9 +5,9 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/okx/okbchain/libs/tendermint/p2p"
-	ctypes "github.com/okx/okbchain/libs/tendermint/rpc/core/types"
-	rpctypes "github.com/okx/okbchain/libs/tendermint/rpc/jsonrpc/types"
+	"github.com/okx/brczero/libs/tendermint/p2p"
+	ctypes "github.com/okx/brczero/libs/tendermint/rpc/core/types"
+	rpctypes "github.com/okx/brczero/libs/tendermint/rpc/jsonrpc/types"
 )
 
 // NetInfo returns network info.

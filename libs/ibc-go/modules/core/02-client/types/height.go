@@ -7,9 +7,9 @@ import (
 	"strconv"
 	"strings"
 
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	sdkerrors "github.com/okx/okbchain/libs/cosmos-sdk/types/errors"
-	"github.com/okx/okbchain/libs/ibc-go/modules/core/exported"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	sdkerrors "github.com/okx/brczero/libs/cosmos-sdk/types/errors"
+	"github.com/okx/brczero/libs/ibc-go/modules/core/exported"
 )
 
 var _ exported.Height = (*Height)(nil)

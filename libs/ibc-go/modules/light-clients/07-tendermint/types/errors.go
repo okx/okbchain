@@ -1,7 +1,7 @@
 package types
 
 import (
-	sdkerrors "github.com/okx/okbchain/libs/cosmos-sdk/types/errors"
+	sdkerrors "github.com/okx/brczero/libs/cosmos-sdk/types/errors"
 )
 
 const (

@@ -4,8 +4,8 @@
 package gov
 
 import (
-	"github.com/okx/okbchain/x/gov/keeper"
-	"github.com/okx/okbchain/x/gov/types"
+	"github.com/okx/brczero/x/gov/keeper"
+	"github.com/okx/brczero/x/gov/types"
 )
 
 const (

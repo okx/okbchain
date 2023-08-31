@@ -5,10 +5,10 @@ import (
 	"path/filepath"
 	"sync"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/client/flags"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	cfg "github.com/okx/okbchain/libs/tendermint/config"
-	db "github.com/okx/okbchain/libs/tm-db"
+	"github.com/okx/brczero/libs/cosmos-sdk/client/flags"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	cfg "github.com/okx/brczero/libs/tendermint/config"
+	db "github.com/okx/brczero/libs/tm-db"
 	"github.com/spf13/viper"
 )
 

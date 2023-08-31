@@ -3,11 +3,11 @@
 package types
 
 import (
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	authexported "github.com/okx/okbchain/libs/cosmos-sdk/x/auth/exported"
-	"github.com/okx/okbchain/x/common"
-	"github.com/okx/okbchain/x/params"
-	stakingexported "github.com/okx/okbchain/x/staking/exported"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	authexported "github.com/okx/brczero/libs/cosmos-sdk/x/auth/exported"
+	"github.com/okx/brczero/x/common"
+	"github.com/okx/brczero/x/params"
+	stakingexported "github.com/okx/brczero/x/staking/exported"
 )
 
 // AccountKeeper expected account keeper

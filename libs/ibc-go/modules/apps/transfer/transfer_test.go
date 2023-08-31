@@ -5,11 +5,11 @@ import (
 
 	"github.com/stretchr/testify/suite"
 
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	"github.com/okx/okbchain/libs/ibc-go/modules/apps/transfer/types"
-	clienttypes "github.com/okx/okbchain/libs/ibc-go/modules/core/02-client/types"
-	channeltypes "github.com/okx/okbchain/libs/ibc-go/modules/core/04-channel/types"
-	ibctesting "github.com/okx/okbchain/libs/ibc-go/testing"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	"github.com/okx/brczero/libs/ibc-go/modules/apps/transfer/types"
+	clienttypes "github.com/okx/brczero/libs/ibc-go/modules/core/02-client/types"
+	channeltypes "github.com/okx/brczero/libs/ibc-go/modules/core/04-channel/types"
+	ibctesting "github.com/okx/brczero/libs/ibc-go/testing"
 )
 
 type TransferTestSuite struct {

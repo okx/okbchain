@@ -6,10 +6,10 @@ import (
 
 	yaml "gopkg.in/yaml.v2"
 
-	"github.com/okx/okbchain/libs/tendermint/crypto"
+	"github.com/okx/brczero/libs/tendermint/crypto"
 	"github.com/stretchr/testify/require"
 
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
 )
 
 var (

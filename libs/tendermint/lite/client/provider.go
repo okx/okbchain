@@ -8,13 +8,13 @@ package client
 import (
 	"fmt"
 
-	log "github.com/okx/okbchain/libs/tendermint/libs/log"
-	"github.com/okx/okbchain/libs/tendermint/lite"
-	lerr "github.com/okx/okbchain/libs/tendermint/lite/errors"
-	rpcclient "github.com/okx/okbchain/libs/tendermint/rpc/client"
-	rpchttp "github.com/okx/okbchain/libs/tendermint/rpc/client/http"
-	ctypes "github.com/okx/okbchain/libs/tendermint/rpc/core/types"
-	"github.com/okx/okbchain/libs/tendermint/types"
+	log "github.com/okx/brczero/libs/tendermint/libs/log"
+	"github.com/okx/brczero/libs/tendermint/lite"
+	lerr "github.com/okx/brczero/libs/tendermint/lite/errors"
+	rpcclient "github.com/okx/brczero/libs/tendermint/rpc/client"
+	rpchttp "github.com/okx/brczero/libs/tendermint/rpc/client/http"
+	ctypes "github.com/okx/brczero/libs/tendermint/rpc/core/types"
+	"github.com/okx/brczero/libs/tendermint/types"
 )
 
 // SignStatusClient combines a SignClient and StatusClient.

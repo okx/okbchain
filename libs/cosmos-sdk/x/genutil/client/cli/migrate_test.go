@@ -7,24 +7,24 @@ import (
 	"path/filepath"
 	"testing"
 
-	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
-	dbm "github.com/okx/okbchain/libs/tm-db"
+	abci "github.com/okx/brczero/libs/tendermint/abci/types"
+	dbm "github.com/okx/brczero/libs/tm-db"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
-	"github.com/okx/okbchain/libs/cosmos-sdk/simapp"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	genutilcli "github.com/okx/okbchain/libs/cosmos-sdk/x/genutil/client/cli"
+	"github.com/okx/brczero/libs/cosmos-sdk/codec"
+	"github.com/okx/brczero/libs/cosmos-sdk/simapp"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	genutilcli "github.com/okx/brczero/libs/cosmos-sdk/x/genutil/client/cli"
 
-	tcmd "github.com/okx/okbchain/libs/tendermint/cmd/tendermint/commands"
-	"github.com/okx/okbchain/libs/tendermint/libs/cli"
-	"github.com/okx/okbchain/libs/tendermint/libs/log"
+	tcmd "github.com/okx/brczero/libs/tendermint/cmd/tendermint/commands"
+	"github.com/okx/brczero/libs/tendermint/libs/cli"
+	"github.com/okx/brczero/libs/tendermint/libs/log"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/stretchr/testify/require"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/client/flags"
-	"github.com/okx/okbchain/libs/cosmos-sdk/server"
-	"github.com/okx/okbchain/libs/cosmos-sdk/tests"
+	"github.com/okx/brczero/libs/cosmos-sdk/client/flags"
+	"github.com/okx/brczero/libs/cosmos-sdk/server"
+	"github.com/okx/brczero/libs/cosmos-sdk/tests"
 )
 
 // custom tx codec

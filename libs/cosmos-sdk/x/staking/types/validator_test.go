@@ -7,14 +7,14 @@ import (
 	"sort"
 	"testing"
 
-	"github.com/okx/okbchain/libs/tendermint/crypto/ed25519"
-	tmtypes "github.com/okx/okbchain/libs/tendermint/types"
+	"github.com/okx/brczero/libs/tendermint/crypto/ed25519"
+	tmtypes "github.com/okx/brczero/libs/tendermint/types"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	yaml "gopkg.in/yaml.v2"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/codec"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
 )
 
 func TestValidatorTestEquivalent(t *testing.T) {

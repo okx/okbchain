@@ -2,13 +2,13 @@ package config
 
 import (
 	"fmt"
-	"github.com/okx/okbchain/libs/system"
+	"github.com/okx/brczero/libs/system"
 	"net/http"
 	"os"
 	"path/filepath"
 	"time"
 
-	"github.com/okx/okbchain/libs/tendermint/types"
+	"github.com/okx/brczero/libs/tendermint/types"
 
 	"github.com/pkg/errors"
 )

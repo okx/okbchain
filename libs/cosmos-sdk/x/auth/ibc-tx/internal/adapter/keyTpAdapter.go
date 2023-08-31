@@ -2,12 +2,12 @@ package adapter
 
 import (
 	"errors"
-	ethsecp256k12 "github.com/okx/okbchain/app/crypto/ethsecp256k1"
-	"github.com/okx/okbchain/libs/cosmos-sdk/crypto/types"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/auth/ibc-tx/internal/ethsecp256k1"
-	secp256k1 "github.com/okx/okbchain/libs/cosmos-sdk/x/auth/ibc-tx/internal/secp256k1"
-	LagacyPubKey "github.com/okx/okbchain/libs/tendermint/crypto"
-	secp256k12 "github.com/okx/okbchain/libs/tendermint/crypto/secp256k1"
+	ethsecp256k12 "github.com/okx/brczero/app/crypto/ethsecp256k1"
+	"github.com/okx/brczero/libs/cosmos-sdk/crypto/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/auth/ibc-tx/internal/ethsecp256k1"
+	secp256k1 "github.com/okx/brczero/libs/cosmos-sdk/x/auth/ibc-tx/internal/secp256k1"
+	LagacyPubKey "github.com/okx/brczero/libs/tendermint/crypto"
+	secp256k12 "github.com/okx/brczero/libs/tendermint/crypto/secp256k1"
 )
 
 func LagacyPubkey2ProtoBuffPubkey(pubKey LagacyPubKey.PubKey) types.PubKey {

@@ -1,9 +1,9 @@
 package ante
 
 import (
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	"github.com/okx/okbchain/x/evm/types"
-	wasmkeeper "github.com/okx/okbchain/x/wasm/keeper"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	"github.com/okx/brczero/x/evm/types"
+	wasmkeeper "github.com/okx/brczero/x/wasm/keeper"
 )
 
 type WrapWasmCountTXDecorator struct {

@@ -3,7 +3,6 @@ package rootmulti
 import (
 	"encoding/binary"
 	"fmt"
-	"github.com/okx/okbchain/libs/tendermint/global"
 	"io"
 	"log"
 	"path/filepath"
@@ -12,32 +11,35 @@ import (
 	"sync"
 	"time"
 
+	"github.com/okx/brczero/libs/tendermint/global"
+
 	"github.com/ethereum/go-ethereum/trie"
-	"github.com/okx/okbchain/libs/cosmos-sdk/store/cachemulti"
-	"github.com/okx/okbchain/libs/cosmos-sdk/store/dbadapter"
-	"github.com/okx/okbchain/libs/cosmos-sdk/store/flatkv"
-	"github.com/okx/okbchain/libs/cosmos-sdk/store/iavl"
-	sdkmaps "github.com/okx/okbchain/libs/cosmos-sdk/store/internal/maps"
-	"github.com/okx/okbchain/libs/cosmos-sdk/store/mem"
-	"github.com/okx/okbchain/libs/cosmos-sdk/store/mpt"
-	"github.com/okx/okbchain/libs/cosmos-sdk/store/tracekv"
-	"github.com/okx/okbchain/libs/cosmos-sdk/store/transient"
-	"github.com/okx/okbchain/libs/cosmos-sdk/store/types"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	sdkerrors "github.com/okx/okbchain/libs/cosmos-sdk/types/errors"
-	iavltree "github.com/okx/okbchain/libs/iavl"
-	"github.com/okx/okbchain/libs/iavl/config"
-	"github.com/okx/okbchain/libs/system/trace"
-	"github.com/okx/okbchain/libs/system/trace/persist"
-	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
-	cfg "github.com/okx/okbchain/libs/tendermint/config"
-	"github.com/okx/okbchain/libs/tendermint/crypto/merkle"
-	"github.com/okx/okbchain/libs/tendermint/crypto/tmhash"
-	tmlog "github.com/okx/okbchain/libs/tendermint/libs/log"
-	tmtypes "github.com/okx/okbchain/libs/tendermint/types"
-	dbm "github.com/okx/okbchain/libs/tm-db"
 	"github.com/pkg/errors"
 	"github.com/spf13/viper"
+
+	"github.com/okx/brczero/libs/cosmos-sdk/store/cachemulti"
+	"github.com/okx/brczero/libs/cosmos-sdk/store/dbadapter"
+	"github.com/okx/brczero/libs/cosmos-sdk/store/flatkv"
+	"github.com/okx/brczero/libs/cosmos-sdk/store/iavl"
+	sdkmaps "github.com/okx/brczero/libs/cosmos-sdk/store/internal/maps"
+	"github.com/okx/brczero/libs/cosmos-sdk/store/mem"
+	"github.com/okx/brczero/libs/cosmos-sdk/store/mpt"
+	"github.com/okx/brczero/libs/cosmos-sdk/store/tracekv"
+	"github.com/okx/brczero/libs/cosmos-sdk/store/transient"
+	"github.com/okx/brczero/libs/cosmos-sdk/store/types"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	sdkerrors "github.com/okx/brczero/libs/cosmos-sdk/types/errors"
+	iavltree "github.com/okx/brczero/libs/iavl"
+	"github.com/okx/brczero/libs/iavl/config"
+	"github.com/okx/brczero/libs/system/trace"
+	"github.com/okx/brczero/libs/system/trace/persist"
+	abci "github.com/okx/brczero/libs/tendermint/abci/types"
+	cfg "github.com/okx/brczero/libs/tendermint/config"
+	"github.com/okx/brczero/libs/tendermint/crypto/merkle"
+	"github.com/okx/brczero/libs/tendermint/crypto/tmhash"
+	tmlog "github.com/okx/brczero/libs/tendermint/libs/log"
+	tmtypes "github.com/okx/brczero/libs/tendermint/types"
+	dbm "github.com/okx/brczero/libs/tm-db"
 )
 
 const (
@@ -456,7 +458,7 @@ func (rs *Store) loadVersion(ver int64, upgrades *types.StoreUpgrades) error {
 	if !IgPruneHeightsLen && len(rs.pruneHeights) > maxPruneHeightsLength {
 		return fmt.Errorf("Pruned heights length <%d> exceeds <%d>, "+
 			"need to prune them with command "+
-			"<okbchaind data prune-compact state --home your_okbchaind_home_directory> before running okbchaind",
+			"<brczerod data prune-compact state --home your_okbchaind_home_directory> before running brczerod",
 			len(rs.pruneHeights), maxPruneHeightsLength)
 	}
 	return nil

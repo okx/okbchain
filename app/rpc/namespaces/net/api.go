@@ -3,11 +3,11 @@ package net
 import (
 	"fmt"
 
-	"github.com/okx/okbchain/app/rpc/monitor"
-	ethermint "github.com/okx/okbchain/app/types"
-	"github.com/okx/okbchain/libs/cosmos-sdk/client/context"
-	"github.com/okx/okbchain/libs/tendermint/libs/log"
-	rpcclient "github.com/okx/okbchain/libs/tendermint/rpc/client"
+	"github.com/okx/brczero/app/rpc/monitor"
+	ethermint "github.com/okx/brczero/app/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/client/context"
+	"github.com/okx/brczero/libs/tendermint/libs/log"
+	rpcclient "github.com/okx/brczero/libs/tendermint/rpc/client"
 	"github.com/spf13/viper"
 )
 

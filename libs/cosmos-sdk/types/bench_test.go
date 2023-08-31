@@ -3,7 +3,7 @@ package types_test
 import (
 	"testing"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/types"
 )
 
 var coinStrs = []string{

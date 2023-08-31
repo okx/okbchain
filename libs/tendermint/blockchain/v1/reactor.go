@@ -8,12 +8,12 @@ import (
 
 	amino "github.com/tendermint/go-amino"
 
-	"github.com/okx/okbchain/libs/tendermint/behaviour"
-	"github.com/okx/okbchain/libs/tendermint/libs/log"
-	"github.com/okx/okbchain/libs/tendermint/p2p"
-	sm "github.com/okx/okbchain/libs/tendermint/state"
-	"github.com/okx/okbchain/libs/tendermint/store"
-	"github.com/okx/okbchain/libs/tendermint/types"
+	"github.com/okx/brczero/libs/tendermint/behaviour"
+	"github.com/okx/brczero/libs/tendermint/libs/log"
+	"github.com/okx/brczero/libs/tendermint/p2p"
+	sm "github.com/okx/brczero/libs/tendermint/state"
+	"github.com/okx/brczero/libs/tendermint/store"
+	"github.com/okx/brczero/libs/tendermint/types"
 )
 
 const (

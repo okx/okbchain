@@ -3,10 +3,10 @@ package types
 import (
 	"time"
 
-	evmtypes "github.com/okx/okbchain/x/evm/types"
+	evmtypes "github.com/okx/brczero/x/evm/types"
 
 	"github.com/ethereum/go-ethereum/common/hexutil"
-	evm "github.com/okx/okbchain/x/evm/watcher"
+	evm "github.com/okx/brczero/x/evm/watcher"
 	"gorm.io/gorm"
 )
 

@@ -1,9 +1,9 @@
 package client
 
 import (
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/mint/client/cli"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/mint/client/rest"
-	govcli "github.com/okx/okbchain/x/gov/client"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/mint/client/cli"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/mint/client/rest"
+	govcli "github.com/okx/brczero/x/gov/client"
 )
 
 var (

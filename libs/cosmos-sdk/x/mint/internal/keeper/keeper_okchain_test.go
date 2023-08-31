@@ -1,25 +1,27 @@
 package keeper_test
 
 import (
-	ethcmm "github.com/ethereum/go-ethereum/common"
 	"math/big"
 	"testing"
 	"time"
 
-	"github.com/okx/okbchain/app"
-	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/mint/internal/types"
-	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
-	evm_types "github.com/okx/okbchain/x/evm/types"
+	ethcmm "github.com/ethereum/go-ethereum/common"
+
 	"github.com/stretchr/testify/suite"
+
+	"github.com/okx/brczero/app"
+	"github.com/okx/brczero/libs/cosmos-sdk/codec"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/mint/internal/types"
+	abci "github.com/okx/brczero/libs/tendermint/abci/types"
+	evm_types "github.com/okx/brczero/x/evm/types"
 )
 
 type TreasuresTestSuite struct {
 	suite.Suite
 
 	ctx     sdk.Context
-	app     *app.OKBChainApp
+	app     *app.BRCZeroApp
 	stateDB *evm_types.CommitStateDB
 	codec   *codec.Codec
 

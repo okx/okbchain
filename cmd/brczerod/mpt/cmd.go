@@ -1,9 +1,9 @@
 package mpt
 
 import (
-	"github.com/okx/okbchain/libs/cosmos-sdk/server"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	tmtypes "github.com/okx/okbchain/libs/tendermint/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/server"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	tmtypes "github.com/okx/brczero/libs/tendermint/types"
 	"github.com/spf13/cobra"
 )
 

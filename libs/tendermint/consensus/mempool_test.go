@@ -11,13 +11,13 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	dbm "github.com/okx/okbchain/libs/tm-db"
+	dbm "github.com/okx/brczero/libs/tm-db"
 
-	"github.com/okx/okbchain/libs/tendermint/abci/example/code"
-	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
-	mempl "github.com/okx/okbchain/libs/tendermint/mempool"
-	sm "github.com/okx/okbchain/libs/tendermint/state"
-	"github.com/okx/okbchain/libs/tendermint/types"
+	"github.com/okx/brczero/libs/tendermint/abci/example/code"
+	abci "github.com/okx/brczero/libs/tendermint/abci/types"
+	mempl "github.com/okx/brczero/libs/tendermint/mempool"
+	sm "github.com/okx/brczero/libs/tendermint/state"
+	"github.com/okx/brczero/libs/tendermint/types"
 )
 
 // for testing

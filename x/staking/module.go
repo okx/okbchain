@@ -4,27 +4,27 @@ import (
 	"encoding/json"
 	"math/rand"
 
-	sim "github.com/okx/okbchain/libs/cosmos-sdk/x/simulation"
-	"github.com/okx/okbchain/x/staking/simulation"
+	sim "github.com/okx/brczero/libs/cosmos-sdk/x/simulation"
+	"github.com/okx/brczero/x/staking/simulation"
 
-	"github.com/okx/okbchain/x/staking/keeper"
+	"github.com/okx/brczero/x/staking/keeper"
 
 	"github.com/gorilla/mux"
 	"github.com/spf13/cobra"
 	flag "github.com/spf13/pflag"
 
-	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
-	cfg "github.com/okx/okbchain/libs/tendermint/config"
-	"github.com/okx/okbchain/libs/tendermint/crypto"
+	abci "github.com/okx/brczero/libs/tendermint/abci/types"
+	cfg "github.com/okx/brczero/libs/tendermint/config"
+	"github.com/okx/brczero/libs/tendermint/crypto"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/client/context"
-	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	"github.com/okx/okbchain/libs/cosmos-sdk/types/module"
-	authtypes "github.com/okx/okbchain/libs/cosmos-sdk/x/auth/types"
-	"github.com/okx/okbchain/x/staking/client/cli"
-	"github.com/okx/okbchain/x/staking/client/rest"
-	"github.com/okx/okbchain/x/staking/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/client/context"
+	"github.com/okx/brczero/libs/cosmos-sdk/codec"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/types/module"
+	authtypes "github.com/okx/brczero/libs/cosmos-sdk/x/auth/types"
+	"github.com/okx/brczero/x/staking/client/cli"
+	"github.com/okx/brczero/x/staking/client/rest"
+	"github.com/okx/brczero/x/staking/types"
 )
 
 var (

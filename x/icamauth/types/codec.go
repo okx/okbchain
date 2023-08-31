@@ -1,10 +1,10 @@
 package types
 
 import (
-	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
-	cdctypes "github.com/okx/okbchain/libs/cosmos-sdk/codec/types"
-	txmsg "github.com/okx/okbchain/libs/cosmos-sdk/types/ibc-adapter"
-	"github.com/okx/okbchain/libs/cosmos-sdk/types/msgservice"
+	"github.com/okx/brczero/libs/cosmos-sdk/codec"
+	cdctypes "github.com/okx/brczero/libs/cosmos-sdk/codec/types"
+	txmsg "github.com/okx/brczero/libs/cosmos-sdk/types/ibc-adapter"
+	"github.com/okx/brczero/libs/cosmos-sdk/types/msgservice"
 )
 
 var (

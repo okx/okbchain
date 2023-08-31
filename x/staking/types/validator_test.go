@@ -4,16 +4,16 @@ import (
 	"math"
 	"testing"
 
-	"github.com/okx/okbchain/libs/tendermint/crypto/multisig"
+	"github.com/okx/brczero/libs/tendermint/crypto/multisig"
 
-	"github.com/okx/okbchain/libs/tendermint/types/time"
+	"github.com/okx/brczero/libs/tendermint/types/time"
 
-	"github.com/okx/okbchain/x/common"
+	"github.com/okx/brczero/x/common"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/codec"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
 
-	tmtypes "github.com/okx/okbchain/libs/tendermint/types"
+	tmtypes "github.com/okx/brczero/libs/tendermint/types"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

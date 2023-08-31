@@ -4,11 +4,11 @@ import (
 	"bytes"
 	"fmt"
 
-	tmkv "github.com/okx/okbchain/libs/tendermint/libs/kv"
+	tmkv "github.com/okx/brczero/libs/tendermint/libs/kv"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/auth/exported"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/auth/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/codec"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/auth/exported"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/auth/types"
 )
 
 // DecodeStore unmarshals the KVPair's Value to the corresponding auth type

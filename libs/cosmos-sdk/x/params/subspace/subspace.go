@@ -9,11 +9,11 @@ import (
 
 	"encoding/json"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/codec"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
 	"github.com/tendermint/go-amino"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/store/prefix"
+	"github.com/okx/brczero/libs/cosmos-sdk/store/prefix"
 )
 
 const (

@@ -5,9 +5,9 @@ import (
 	"errors"
 	"fmt"
 
-	stakingtypes "github.com/okx/okbchain/x/staking/types"
+	stakingtypes "github.com/okx/brczero/x/staking/types"
 
-	authtypes "github.com/okx/okbchain/libs/cosmos-sdk/x/auth/types"
+	authtypes "github.com/okx/brczero/libs/cosmos-sdk/x/auth/types"
 )
 
 // GenesisState defines the raw genesis transaction in JSON

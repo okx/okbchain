@@ -6,11 +6,11 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/okx/okbchain/libs/tendermint/config"
-	tmpubsub "github.com/okx/okbchain/libs/tendermint/libs/pubsub"
-	tmquery "github.com/okx/okbchain/libs/tendermint/libs/pubsub/query"
-	ctypes "github.com/okx/okbchain/libs/tendermint/rpc/core/types"
-	rpctypes "github.com/okx/okbchain/libs/tendermint/rpc/jsonrpc/types"
+	"github.com/okx/brczero/libs/tendermint/config"
+	tmpubsub "github.com/okx/brczero/libs/tendermint/libs/pubsub"
+	tmquery "github.com/okx/brczero/libs/tendermint/libs/pubsub/query"
+	ctypes "github.com/okx/brczero/libs/tendermint/rpc/core/types"
+	rpctypes "github.com/okx/brczero/libs/tendermint/rpc/jsonrpc/types"
 )
 
 const (

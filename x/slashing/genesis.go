@@ -1,9 +1,9 @@
 package slashing
 
 import (
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	"github.com/okx/okbchain/x/slashing/internal/types"
-	"github.com/okx/okbchain/x/staking/exported"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	"github.com/okx/brczero/x/slashing/internal/types"
+	"github.com/okx/brczero/x/staking/exported"
 )
 
 // InitGenesis initialize default parameters

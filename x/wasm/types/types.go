@@ -2,17 +2,17 @@ package types
 
 import (
 	"fmt"
-	stypes "github.com/okx/okbchain/libs/cosmos-sdk/store/types"
+	stypes "github.com/okx/brczero/libs/cosmos-sdk/store/types"
 	"reflect"
 	"strings"
 
 	wasmvmtypes "github.com/CosmWasm/wasmvm/types"
 	"github.com/gogo/protobuf/proto"
 
-	codectypes "github.com/okx/okbchain/libs/cosmos-sdk/codec/types"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	sdkerrors "github.com/okx/okbchain/libs/cosmos-sdk/types/errors"
-	"github.com/okx/okbchain/libs/tendermint/types"
+	codectypes "github.com/okx/brczero/libs/cosmos-sdk/codec/types"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	sdkerrors "github.com/okx/brczero/libs/cosmos-sdk/types/errors"
+	"github.com/okx/brczero/libs/tendermint/types"
 )
 
 const (

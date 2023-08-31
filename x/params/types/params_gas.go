@@ -2,10 +2,10 @@ package types
 
 import (
 	"fmt"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/params/subspace"
-	"github.com/okx/okbchain/x/common"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/params/subspace"
+	"github.com/okx/brczero/x/common"
 
-	stypes "github.com/okx/okbchain/libs/cosmos-sdk/store/types"
+	stypes "github.com/okx/brczero/libs/cosmos-sdk/store/types"
 )
 
 const (

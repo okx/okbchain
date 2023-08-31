@@ -5,8 +5,8 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/rawdb"
 	"github.com/ethereum/go-ethereum/core/state/snapshot"
-	mpttypes "github.com/okx/okbchain/libs/cosmos-sdk/store/mpt/types"
-	"github.com/okx/okbchain/libs/tendermint/global"
+	mpttypes "github.com/okx/brczero/libs/cosmos-sdk/store/mpt/types"
+	"github.com/okx/brczero/libs/tendermint/global"
 )
 
 var (

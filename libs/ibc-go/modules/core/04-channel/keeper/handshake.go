@@ -1,14 +1,14 @@
 package keeper
 
 import (
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	sdkerrors "github.com/okx/okbchain/libs/cosmos-sdk/types/errors"
-	capabilitytypes "github.com/okx/okbchain/libs/cosmos-sdk/x/capability/types"
-	connectiontypes "github.com/okx/okbchain/libs/ibc-go/modules/core/03-connection/types"
-	"github.com/okx/okbchain/libs/ibc-go/modules/core/04-channel/types"
-	porttypes "github.com/okx/okbchain/libs/ibc-go/modules/core/05-port/types"
-	host "github.com/okx/okbchain/libs/ibc-go/modules/core/24-host"
-	"github.com/okx/okbchain/libs/ibc-go/modules/core/exported"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	sdkerrors "github.com/okx/brczero/libs/cosmos-sdk/types/errors"
+	capabilitytypes "github.com/okx/brczero/libs/cosmos-sdk/x/capability/types"
+	connectiontypes "github.com/okx/brczero/libs/ibc-go/modules/core/03-connection/types"
+	"github.com/okx/brczero/libs/ibc-go/modules/core/04-channel/types"
+	porttypes "github.com/okx/brczero/libs/ibc-go/modules/core/05-port/types"
+	host "github.com/okx/brczero/libs/ibc-go/modules/core/24-host"
+	"github.com/okx/brczero/libs/ibc-go/modules/core/exported"
 )
 
 // CounterpartyHops returns the connection hops of the counterparty channel.

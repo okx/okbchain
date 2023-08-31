@@ -4,10 +4,11 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/client/context"
-	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
-	"github.com/okx/okbchain/x/params/types"
 	"github.com/spf13/cobra"
+
+	"github.com/okx/brczero/libs/cosmos-sdk/client/context"
+	"github.com/okx/brczero/libs/cosmos-sdk/codec"
+	"github.com/okx/brczero/x/params/types"
 )
 
 func GetCmdQueryUpgrade(queryRoute string, cdc *codec.Codec) *cobra.Command {
@@ -17,7 +18,7 @@ func GetCmdQueryUpgrade(queryRoute string, cdc *codec.Codec) *cobra.Command {
 		Short: "Query info of upgrade",
 		Long: strings.TrimSpace(`Query info of a upgrade, query all upgrade if 'name' is omitted:
 
-$ okbchaincli query params upgrade <name>
+$ brczerocli query params upgrade <name>
 `),
 		RunE: func(_ *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)

@@ -3,14 +3,14 @@ package types
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/okx/okbchain/libs/system"
+	"github.com/okx/brczero/libs/system"
 	"strings"
 
-	"github.com/okx/okbchain/x/common"
+	"github.com/okx/brczero/x/common"
 
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	"github.com/okx/okbchain/libs/tendermint/crypto"
-	govtypes "github.com/okx/okbchain/x/gov/types"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	"github.com/okx/brczero/libs/tendermint/crypto"
+	govtypes "github.com/okx/brczero/x/gov/types"
 )
 
 const (

@@ -3,11 +3,11 @@ package types
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/okx/okbchain/libs/system"
+	"github.com/okx/brczero/libs/system"
 	"regexp"
 	"strings"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/types/errors"
+	"github.com/okx/brczero/libs/cosmos-sdk/types/errors"
 )
 
 var (

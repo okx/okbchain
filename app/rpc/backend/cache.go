@@ -2,8 +2,8 @@ package backend
 
 import (
 	"github.com/ethereum/go-ethereum/common"
-	evmtypes "github.com/okx/okbchain/x/evm/types"
-	"github.com/okx/okbchain/x/evm/watcher"
+	evmtypes "github.com/okx/brczero/x/evm/types"
+	"github.com/okx/brczero/x/evm/watcher"
 )
 
 type Cache interface {

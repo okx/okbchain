@@ -3,10 +3,10 @@ package keeper
 import (
 	"fmt"
 
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
 
-	"github.com/okx/okbchain/x/distribution/types"
-	"github.com/okx/okbchain/x/staking/exported"
+	"github.com/okx/brczero/x/distribution/types"
+	"github.com/okx/brczero/x/staking/exported"
 )
 
 // RegisterInvariants registers all distribution invariants

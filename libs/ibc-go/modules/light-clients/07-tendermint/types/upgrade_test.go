@@ -1,12 +1,12 @@
 package types_test
 
 import (
-	clienttypes "github.com/okx/okbchain/libs/ibc-go/modules/core/02-client/types"
-	commitmenttypes "github.com/okx/okbchain/libs/ibc-go/modules/core/23-commitment/types"
-	"github.com/okx/okbchain/libs/ibc-go/modules/core/exported"
-	"github.com/okx/okbchain/libs/ibc-go/modules/light-clients/07-tendermint/types"
-	ibctesting "github.com/okx/okbchain/libs/ibc-go/testing"
-	upgradetypes "github.com/okx/okbchain/libs/ibc-go/testing/simapp/types"
+	clienttypes "github.com/okx/brczero/libs/ibc-go/modules/core/02-client/types"
+	commitmenttypes "github.com/okx/brczero/libs/ibc-go/modules/core/23-commitment/types"
+	"github.com/okx/brczero/libs/ibc-go/modules/core/exported"
+	"github.com/okx/brczero/libs/ibc-go/modules/light-clients/07-tendermint/types"
+	ibctesting "github.com/okx/brczero/libs/ibc-go/testing"
+	upgradetypes "github.com/okx/brczero/libs/ibc-go/testing/simapp/types"
 )
 
 var (

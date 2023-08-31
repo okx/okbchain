@@ -1,10 +1,10 @@
 package base
 
 import (
-	cosmost "github.com/okx/okbchain/libs/cosmos-sdk/store/types"
-	"github.com/okx/okbchain/libs/cosmos-sdk/types/module"
-	"github.com/okx/okbchain/libs/cosmos-sdk/types/upgrade"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/params"
+	cosmost "github.com/okx/brczero/libs/cosmos-sdk/store/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/types/module"
+	"github.com/okx/brczero/libs/cosmos-sdk/types/upgrade"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/params"
 )
 
 var (

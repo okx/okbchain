@@ -2,36 +2,38 @@ package main
 
 import (
 	"fmt"
-	"github.com/okx/okbchain/libs/system"
 
-	interfacetypes "github.com/okx/okbchain/libs/cosmos-sdk/codec/types"
+	"github.com/okx/brczero/libs/system"
 
-	authtypes "github.com/okx/okbchain/libs/cosmos-sdk/x/auth/types"
+	interfacetypes "github.com/okx/brczero/libs/cosmos-sdk/codec/types"
 
-	"github.com/okx/okbchain/app"
-	"github.com/okx/okbchain/app/codec"
-	"github.com/okx/okbchain/app/crypto/ethsecp256k1"
-	chain "github.com/okx/okbchain/app/types"
-	"github.com/okx/okbchain/cmd/client"
-	sdkclient "github.com/okx/okbchain/libs/cosmos-sdk/client"
-	"github.com/okx/okbchain/libs/cosmos-sdk/client/flags"
-	clientkeys "github.com/okx/okbchain/libs/cosmos-sdk/client/keys"
-	clientrpc "github.com/okx/okbchain/libs/cosmos-sdk/client/rpc"
-	sdkcodec "github.com/okx/okbchain/libs/cosmos-sdk/codec"
-	"github.com/okx/okbchain/libs/cosmos-sdk/crypto/keys"
-	"github.com/okx/okbchain/libs/cosmos-sdk/server"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	"github.com/okx/okbchain/libs/cosmos-sdk/version"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/auth"
-	authcmd "github.com/okx/okbchain/libs/cosmos-sdk/x/auth/client/cli"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/auth/client/utils"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/bank"
-	tmamino "github.com/okx/okbchain/libs/tendermint/crypto/encoding/amino"
-	"github.com/okx/okbchain/libs/tendermint/crypto/multisig"
-	"github.com/okx/okbchain/libs/tendermint/libs/cli"
-	evmtypes "github.com/okx/okbchain/x/evm/types"
-	tokencmd "github.com/okx/okbchain/x/token/client/cli"
+	authtypes "github.com/okx/brczero/libs/cosmos-sdk/x/auth/types"
+
 	"github.com/spf13/cobra"
+
+	"github.com/okx/brczero/app"
+	"github.com/okx/brczero/app/codec"
+	"github.com/okx/brczero/app/crypto/ethsecp256k1"
+	chain "github.com/okx/brczero/app/types"
+	"github.com/okx/brczero/cmd/client"
+	sdkclient "github.com/okx/brczero/libs/cosmos-sdk/client"
+	"github.com/okx/brczero/libs/cosmos-sdk/client/flags"
+	clientkeys "github.com/okx/brczero/libs/cosmos-sdk/client/keys"
+	clientrpc "github.com/okx/brczero/libs/cosmos-sdk/client/rpc"
+	sdkcodec "github.com/okx/brczero/libs/cosmos-sdk/codec"
+	"github.com/okx/brczero/libs/cosmos-sdk/crypto/keys"
+	"github.com/okx/brczero/libs/cosmos-sdk/server"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/version"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/auth"
+	authcmd "github.com/okx/brczero/libs/cosmos-sdk/x/auth/client/cli"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/auth/client/utils"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/bank"
+	tmamino "github.com/okx/brczero/libs/tendermint/crypto/encoding/amino"
+	"github.com/okx/brczero/libs/tendermint/crypto/multisig"
+	"github.com/okx/brczero/libs/tendermint/libs/cli"
+	evmtypes "github.com/okx/brczero/x/evm/types"
+	tokencmd "github.com/okx/brczero/x/token/client/cli"
 )
 
 var (
@@ -57,8 +59,8 @@ func main() {
 	config.Seal()
 
 	rootCmd := &cobra.Command{
-		Use:   "okbchaincli",
-		Short: "Command line interface for interacting with okbchaind",
+		Use:   "brczerocli",
+		Short: "Command line interface for interacting with brczerod",
 	}
 
 	// Add --chain-id to persistent flags and mark it required

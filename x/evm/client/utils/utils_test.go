@@ -4,9 +4,9 @@ import (
 	"os"
 	"testing"
 
-	chain "github.com/okx/okbchain/app/types"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	"github.com/okx/okbchain/x/evm/types"
+	chain "github.com/okx/brczero/app/types"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	"github.com/okx/brczero/x/evm/types"
 	"github.com/stretchr/testify/require"
 )
 

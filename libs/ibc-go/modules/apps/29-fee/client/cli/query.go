@@ -4,18 +4,18 @@ import (
 	"fmt"
 	"strconv"
 
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/client"
+	"github.com/okx/brczero/libs/cosmos-sdk/client"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/version"
+	"github.com/okx/brczero/libs/cosmos-sdk/version"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/client/context"
-	"github.com/okx/okbchain/libs/cosmos-sdk/client/flags"
-	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
-	interfacetypes "github.com/okx/okbchain/libs/cosmos-sdk/codec/types"
-	"github.com/okx/okbchain/libs/ibc-go/modules/apps/29-fee/types"
-	channeltypes "github.com/okx/okbchain/libs/ibc-go/modules/core/04-channel/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/client/context"
+	"github.com/okx/brczero/libs/cosmos-sdk/client/flags"
+	"github.com/okx/brczero/libs/cosmos-sdk/codec"
+	interfacetypes "github.com/okx/brczero/libs/cosmos-sdk/codec/types"
+	"github.com/okx/brczero/libs/ibc-go/modules/apps/29-fee/types"
+	channeltypes "github.com/okx/brczero/libs/ibc-go/modules/core/04-channel/types"
 	"github.com/spf13/cobra"
 )
 

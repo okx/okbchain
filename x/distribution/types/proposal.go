@@ -2,12 +2,12 @@ package types
 
 import (
 	"fmt"
-	"github.com/okx/okbchain/libs/system"
+	"github.com/okx/brczero/libs/system"
 	"strings"
 
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
 
-	govtypes "github.com/okx/okbchain/x/gov/types"
+	govtypes "github.com/okx/brczero/x/gov/types"
 )
 
 const (

@@ -15,17 +15,17 @@ import (
 	wasmvmtypes "github.com/CosmWasm/wasmvm/types"
 	"github.com/gogo/protobuf/proto"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
-	"github.com/okx/okbchain/libs/cosmos-sdk/store/prefix"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	sdkerrors "github.com/okx/okbchain/libs/cosmos-sdk/types/errors"
-	"github.com/okx/okbchain/libs/cosmos-sdk/types/innertx"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/auth/exported"
-	"github.com/okx/okbchain/libs/tendermint/libs/log"
-	paramtypes "github.com/okx/okbchain/x/params"
-	"github.com/okx/okbchain/x/wasm/ioutils"
-	"github.com/okx/okbchain/x/wasm/types"
-	"github.com/okx/okbchain/x/wasm/watcher"
+	"github.com/okx/brczero/libs/cosmos-sdk/codec"
+	"github.com/okx/brczero/libs/cosmos-sdk/store/prefix"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	sdkerrors "github.com/okx/brczero/libs/cosmos-sdk/types/errors"
+	"github.com/okx/brczero/libs/cosmos-sdk/types/innertx"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/auth/exported"
+	"github.com/okx/brczero/libs/tendermint/libs/log"
+	paramtypes "github.com/okx/brczero/x/params"
+	"github.com/okx/brczero/x/wasm/ioutils"
+	"github.com/okx/brczero/x/wasm/types"
+	"github.com/okx/brczero/x/wasm/watcher"
 )
 
 // contractMemoryLimit is the memory limit of each contract execution (in MiB)

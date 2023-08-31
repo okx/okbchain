@@ -3,12 +3,12 @@ package app
 import (
 	"github.com/spf13/viper"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
-	"github.com/okx/okbchain/libs/tendermint/libs/log"
-	"github.com/okx/okbchain/libs/tendermint/types"
-	dbm "github.com/okx/okbchain/libs/tm-db"
+	"github.com/okx/brczero/libs/cosmos-sdk/codec"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	abci "github.com/okx/brczero/libs/tendermint/abci/types"
+	"github.com/okx/brczero/libs/tendermint/libs/log"
+	"github.com/okx/brczero/libs/tendermint/types"
+	dbm "github.com/okx/brczero/libs/tm-db"
 )
 
 type Option func(option *SetupOption)
@@ -23,12 +23,12 @@ func WithChainId(chainId string) Option {
 	}
 }
 
-// Setup initializes a new OKBChainApp. A Nop logger is set in OKBChainApp.
-func Setup(isCheckTx bool, options ...Option) *OKBChainApp {
+// Setup initializes a new BRCZeroApp. A Nop logger is set in BRCZeroApp.
+func Setup(isCheckTx bool, options ...Option) *BRCZeroApp {
 	viper.Set(sdk.FlagDBBackend, string(dbm.MemDBBackend))
 	types.DBBackend = string(dbm.MemDBBackend)
 	db := dbm.NewMemDB()
-	app := NewOKBChainApp(log.NewNopLogger(), db, nil, true, map[int64]bool{}, 0)
+	app := NewBRCZeroApp(log.NewNopLogger(), db, nil, true, map[int64]bool{}, 0)
 
 	if !isCheckTx {
 		setupOption := &SetupOption{chainId: ""}

@@ -7,7 +7,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/core/vm"
 
-	"github.com/okx/okbchain/x/params"
+	"github.com/okx/brczero/x/params"
 )
 
 const (

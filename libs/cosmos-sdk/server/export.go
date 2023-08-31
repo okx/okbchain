@@ -7,14 +7,14 @@ import (
 	"io/ioutil"
 	"os"
 
-	tmtypes "github.com/okx/okbchain/libs/tendermint/types"
-	dbm "github.com/okx/okbchain/libs/tm-db"
+	tmtypes "github.com/okx/brczero/libs/tendermint/types"
+	dbm "github.com/okx/brczero/libs/tm-db"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/client/flags"
-	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/client/flags"
+	"github.com/okx/brczero/libs/cosmos-sdk/codec"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
 )
 
 const (

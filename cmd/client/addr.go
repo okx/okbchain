@@ -5,9 +5,9 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"strings"
 
-	"github.com/okx/okbchain/libs/system"
+	"github.com/okx/brczero/libs/system"
 
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
 	"github.com/spf13/cobra"
 )
 

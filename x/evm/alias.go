@@ -1,10 +1,10 @@
 package evm
 
 import (
-	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	"github.com/okx/okbchain/x/evm/keeper"
-	"github.com/okx/okbchain/x/evm/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/codec"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	"github.com/okx/brczero/x/evm/keeper"
+	"github.com/okx/brczero/x/evm/types"
 )
 
 // nolint

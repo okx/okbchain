@@ -7,8 +7,8 @@ import (
 
 	wasmvm "github.com/CosmWasm/wasmvm"
 	wasmvmtypes "github.com/CosmWasm/wasmvm/types"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	"github.com/okx/okbchain/x/wasm/keeper/wasmtesting"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	"github.com/okx/brczero/x/wasm/keeper/wasmtesting"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

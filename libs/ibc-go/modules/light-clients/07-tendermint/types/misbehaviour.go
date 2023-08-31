@@ -3,12 +3,12 @@ package types
 import (
 	"time"
 
-	sdkerrors "github.com/okx/okbchain/libs/cosmos-sdk/types/errors"
-	clienttypes "github.com/okx/okbchain/libs/ibc-go/modules/core/02-client/types"
-	host "github.com/okx/okbchain/libs/ibc-go/modules/core/24-host"
-	"github.com/okx/okbchain/libs/ibc-go/modules/core/exported"
-	tmproto "github.com/okx/okbchain/libs/tendermint/proto/types"
-	tmtypes "github.com/okx/okbchain/libs/tendermint/types"
+	sdkerrors "github.com/okx/brczero/libs/cosmos-sdk/types/errors"
+	clienttypes "github.com/okx/brczero/libs/ibc-go/modules/core/02-client/types"
+	host "github.com/okx/brczero/libs/ibc-go/modules/core/24-host"
+	"github.com/okx/brczero/libs/ibc-go/modules/core/exported"
+	tmproto "github.com/okx/brczero/libs/tendermint/proto/types"
+	tmtypes "github.com/okx/brczero/libs/tendermint/types"
 )
 
 var _ exported.Misbehaviour = &Misbehaviour{}

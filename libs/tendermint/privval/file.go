@@ -7,13 +7,13 @@ import (
 	"io/ioutil"
 	"time"
 
-	"github.com/okx/okbchain/libs/tendermint/crypto"
-	"github.com/okx/okbchain/libs/tendermint/crypto/ed25519"
-	tmbytes "github.com/okx/okbchain/libs/tendermint/libs/bytes"
-	tmos "github.com/okx/okbchain/libs/tendermint/libs/os"
-	"github.com/okx/okbchain/libs/tendermint/libs/tempfile"
-	"github.com/okx/okbchain/libs/tendermint/types"
-	tmtime "github.com/okx/okbchain/libs/tendermint/types/time"
+	"github.com/okx/brczero/libs/tendermint/crypto"
+	"github.com/okx/brczero/libs/tendermint/crypto/ed25519"
+	tmbytes "github.com/okx/brczero/libs/tendermint/libs/bytes"
+	tmos "github.com/okx/brczero/libs/tendermint/libs/os"
+	"github.com/okx/brczero/libs/tendermint/libs/tempfile"
+	"github.com/okx/brczero/libs/tendermint/types"
+	tmtime "github.com/okx/brczero/libs/tendermint/types/time"
 )
 
 // TODO: type ?

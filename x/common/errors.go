@@ -4,10 +4,10 @@ import (
 	"encoding/json"
 	"fmt"
 
-	sdkerrors "github.com/okx/okbchain/libs/cosmos-sdk/types/errors"
-	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
+	sdkerrors "github.com/okx/brczero/libs/cosmos-sdk/types/errors"
+	abci "github.com/okx/brczero/libs/tendermint/abci/types"
 
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
 )
 
 // const uint32

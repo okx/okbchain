@@ -6,7 +6,7 @@ import (
 	"sort"
 	"sync"
 
-	"github.com/okx/okbchain/libs/tendermint/libs/clist"
+	"github.com/okx/brczero/libs/tendermint/libs/clist"
 )
 
 type GasTxQueue struct {

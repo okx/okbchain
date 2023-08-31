@@ -7,17 +7,18 @@ import (
 
 	"strings"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/client"
-	"github.com/okx/okbchain/libs/cosmos-sdk/client/context"
-	"github.com/okx/okbchain/libs/cosmos-sdk/client/flags"
-	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	"github.com/okx/okbchain/libs/cosmos-sdk/version"
-	"github.com/okx/okbchain/x/evm/client/rest"
-	"github.com/okx/okbchain/x/evm/client/utils"
-	"github.com/okx/okbchain/x/evm/types"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
+
+	"github.com/okx/brczero/libs/cosmos-sdk/client"
+	"github.com/okx/brczero/libs/cosmos-sdk/client/context"
+	"github.com/okx/brczero/libs/cosmos-sdk/client/flags"
+	"github.com/okx/brczero/libs/cosmos-sdk/codec"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/version"
+	"github.com/okx/brczero/x/evm/client/rest"
+	"github.com/okx/brczero/x/evm/client/utils"
+	"github.com/okx/brczero/x/evm/types"
 )
 
 // GetQueryCmd defines evm module queries through the cli
@@ -279,7 +280,7 @@ func GetCmdQueryParams(queryRoute string, cdc *codec.Codec) *cobra.Command {
 		Short: "Query all the modifiable parameters of gov proposal",
 		Long: strings.TrimSpace(`Query the all the parameters for the governance process:
 
-$ okbchaincli query evm params
+$ brczerocli query evm params
 `),
 		Args: cobra.NoArgs,
 		RunE: func(_ *cobra.Command, _ []string) error {

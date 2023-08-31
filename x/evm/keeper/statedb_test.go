@@ -2,17 +2,17 @@ package keeper_test
 
 import (
 	"fmt"
-	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
+	abci "github.com/okx/brczero/libs/tendermint/abci/types"
 	"math/big"
 
 	ethcmn "github.com/ethereum/go-ethereum/common"
 	ethtypes "github.com/ethereum/go-ethereum/core/types"
 	ethcrypto "github.com/ethereum/go-ethereum/crypto"
 
-	"github.com/okx/okbchain/app/crypto/ethsecp256k1"
-	ethermint "github.com/okx/okbchain/app/types"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	"github.com/okx/okbchain/x/evm/types"
+	"github.com/okx/brczero/app/crypto/ethsecp256k1"
+	ethermint "github.com/okx/brczero/app/types"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	"github.com/okx/brczero/x/evm/types"
 )
 
 func (suite *KeeperTestSuite) TestBloomFilter() {

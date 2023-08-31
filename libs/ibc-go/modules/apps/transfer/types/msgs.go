@@ -1,14 +1,14 @@
 package types
 
 import (
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	sdkerrors "github.com/okx/okbchain/libs/cosmos-sdk/types/errors"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	sdkerrors "github.com/okx/brczero/libs/cosmos-sdk/types/errors"
 
-	//"github.com/okx/okbchain/libs/ibc-go/modules/core/02-client/types"
+	//"github.com/okx/brczero/libs/ibc-go/modules/core/02-client/types"
 	"strings"
 
-	clienttypes "github.com/okx/okbchain/libs/ibc-go/modules/core/02-client/types"
-	host "github.com/okx/okbchain/libs/ibc-go/modules/core/24-host"
+	clienttypes "github.com/okx/brczero/libs/ibc-go/modules/core/02-client/types"
+	host "github.com/okx/brczero/libs/ibc-go/modules/core/24-host"
 )
 
 // msg types

@@ -137,7 +137,7 @@ start() {
     seednode=$3
     ((restport = INPUT_INDEX * 100 + REST_PORT)) # for evm tx
 
-#     echo "${BIN_NAME} --home ${OKCHAIN_NET_CACHE}/${NAME}/okbchaind  start --p2p.laddr tcp://${IP}:${p2pport} --p2p.seeds ${seednode} --rpc.laddr tcp://${IP}:${rpcport}"
+#     echo "${BIN_NAME} --home ${OKCHAIN_NET_CACHE}/${NAME}/brczerod  start --p2p.laddr tcp://${IP}:${p2pport} --p2p.seeds ${seednode} --rpc.laddr tcp://${IP}:${rpcport}"
 
 #    LOG_LEVEL=main:info,*:error
     LOG_LEVEL=main:info,*:error,state:info

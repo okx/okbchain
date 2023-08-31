@@ -1,11 +1,11 @@
 package keeper
 
 import (
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	sdkerrors "github.com/okx/okbchain/libs/cosmos-sdk/types/errors"
-	icatypes "github.com/okx/okbchain/libs/ibc-go/modules/apps/27-interchain-accounts/types"
-	channeltypes "github.com/okx/okbchain/libs/ibc-go/modules/core/04-channel/types"
-	host "github.com/okx/okbchain/libs/ibc-go/modules/core/24-host"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	sdkerrors "github.com/okx/brczero/libs/cosmos-sdk/types/errors"
+	icatypes "github.com/okx/brczero/libs/ibc-go/modules/apps/27-interchain-accounts/types"
+	channeltypes "github.com/okx/brczero/libs/ibc-go/modules/core/04-channel/types"
+	host "github.com/okx/brczero/libs/ibc-go/modules/core/24-host"
 )
 
 // RegisterInterchainAccount is the entry point to registering an interchain account:

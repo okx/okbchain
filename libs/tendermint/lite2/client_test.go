@@ -8,14 +8,14 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	dbm "github.com/okx/okbchain/libs/tm-db"
+	dbm "github.com/okx/brczero/libs/tm-db"
 
-	"github.com/okx/okbchain/libs/tendermint/libs/log"
-	lite "github.com/okx/okbchain/libs/tendermint/lite2"
-	"github.com/okx/okbchain/libs/tendermint/lite2/provider"
-	mockp "github.com/okx/okbchain/libs/tendermint/lite2/provider/mock"
-	dbs "github.com/okx/okbchain/libs/tendermint/lite2/store/db"
-	"github.com/okx/okbchain/libs/tendermint/types"
+	"github.com/okx/brczero/libs/tendermint/libs/log"
+	lite "github.com/okx/brczero/libs/tendermint/lite2"
+	"github.com/okx/brczero/libs/tendermint/lite2/provider"
+	mockp "github.com/okx/brczero/libs/tendermint/lite2/provider/mock"
+	dbs "github.com/okx/brczero/libs/tendermint/lite2/store/db"
+	"github.com/okx/brczero/libs/tendermint/types"
 )
 
 const (

@@ -4,13 +4,13 @@ import (
 	"os"
 	"testing"
 
-	authkeeper "github.com/okx/okbchain/libs/cosmos-sdk/x/auth/keeper"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/params"
+	authkeeper "github.com/okx/brczero/libs/cosmos-sdk/x/auth/keeper"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/params"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/okx/okbchain/x/wasm/keeper/wasmtesting"
-	"github.com/okx/okbchain/x/wasm/types"
+	"github.com/okx/brczero/x/wasm/keeper/wasmtesting"
+	"github.com/okx/brczero/x/wasm/types"
 )
 
 func TestConstructorOptions(t *testing.T) {

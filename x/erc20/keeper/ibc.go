@@ -8,13 +8,13 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 
-	ethermint "github.com/okx/okbchain/app/types"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	ibctransfertypes "github.com/okx/okbchain/libs/ibc-go/modules/apps/transfer/types"
-	ibcclienttypes "github.com/okx/okbchain/libs/ibc-go/modules/core/02-client/types"
-	tmtypes "github.com/okx/okbchain/libs/tendermint/types"
-	"github.com/okx/okbchain/x/erc20/types"
-	evmtypes "github.com/okx/okbchain/x/evm/types"
+	ethermint "github.com/okx/brczero/app/types"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	ibctransfertypes "github.com/okx/brczero/libs/ibc-go/modules/apps/transfer/types"
+	ibcclienttypes "github.com/okx/brczero/libs/ibc-go/modules/core/02-client/types"
+	tmtypes "github.com/okx/brczero/libs/tendermint/types"
+	"github.com/okx/brczero/x/erc20/types"
+	evmtypes "github.com/okx/brczero/x/evm/types"
 )
 
 // OnMintVouchers after minting vouchers on this chain

@@ -1,9 +1,9 @@
 package common
 
 import (
-	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
-	conntypes "github.com/okx/okbchain/libs/ibc-go/modules/core/03-connection/types"
-	"github.com/okx/okbchain/libs/ibc-go/modules/core/04-channel/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/codec"
+	conntypes "github.com/okx/brczero/libs/ibc-go/modules/core/03-connection/types"
+	"github.com/okx/brczero/libs/ibc-go/modules/core/04-channel/types"
 )
 
 func MustMarshalChannel(cdc *codec.CodecProxy, c *types.Channel) []byte {

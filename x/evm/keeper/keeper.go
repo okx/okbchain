@@ -12,16 +12,16 @@ import (
 	"github.com/ethereum/go-ethereum/core/vm"
 	lru "github.com/hashicorp/golang-lru"
 
-	app "github.com/okx/okbchain/app/types"
-	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
-	"github.com/okx/okbchain/libs/cosmos-sdk/store"
-	"github.com/okx/okbchain/libs/cosmos-sdk/store/mpt"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/auth"
-	"github.com/okx/okbchain/libs/tendermint/libs/log"
-	"github.com/okx/okbchain/x/evm/types"
-	"github.com/okx/okbchain/x/evm/watcher"
-	"github.com/okx/okbchain/x/params"
+	app "github.com/okx/brczero/app/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/codec"
+	"github.com/okx/brczero/libs/cosmos-sdk/store"
+	"github.com/okx/brczero/libs/cosmos-sdk/store/mpt"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/auth"
+	"github.com/okx/brczero/libs/tendermint/libs/log"
+	"github.com/okx/brczero/x/evm/types"
+	"github.com/okx/brczero/x/evm/watcher"
+	"github.com/okx/brczero/x/params"
 )
 
 const (

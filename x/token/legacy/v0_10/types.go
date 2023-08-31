@@ -1,6 +1,6 @@
 package v0_10
 
-import sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
+import sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
 
 const ModuleName = "token"
 

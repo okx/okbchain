@@ -5,7 +5,7 @@
 package vesting
 
 import (
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/auth/vesting/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/auth/vesting/types"
 )
 
 var (

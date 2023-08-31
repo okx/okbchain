@@ -3,7 +3,7 @@ package keeper
 import (
 	"testing"
 
-	"github.com/okx/okbchain/x/distribution/types"
+	"github.com/okx/brczero/x/distribution/types"
 	"github.com/stretchr/testify/require"
 )
 

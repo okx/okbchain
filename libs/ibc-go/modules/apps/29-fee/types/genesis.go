@@ -3,9 +3,9 @@ package types
 import (
 	"strings"
 
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	sdkerrors "github.com/okx/okbchain/libs/cosmos-sdk/types/errors"
-	host "github.com/okx/okbchain/libs/ibc-go/modules/core/24-host"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	sdkerrors "github.com/okx/brczero/libs/cosmos-sdk/types/errors"
+	host "github.com/okx/brczero/libs/ibc-go/modules/core/24-host"
 )
 
 // NewGenesisState creates a 29-fee GenesisState instance.

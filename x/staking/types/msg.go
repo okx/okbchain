@@ -3,10 +3,10 @@ package types
 import (
 	"encoding/json"
 
-	"github.com/okx/okbchain/libs/tendermint/crypto"
-	"github.com/okx/okbchain/x/common"
+	"github.com/okx/brczero/libs/tendermint/crypto"
+	"github.com/okx/brczero/x/common"
 
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
 )
 
 // ensure Msg interface compliance at compile time

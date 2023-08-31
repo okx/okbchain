@@ -5,7 +5,7 @@ import (
 	_ "embed"
 	"fmt"
 	"github.com/ethereum/go-ethereum/accounts/abi"
-	evm_types "github.com/okx/okbchain/x/evm/types"
+	evm_types "github.com/okx/brczero/x/evm/types"
 )
 
 const (

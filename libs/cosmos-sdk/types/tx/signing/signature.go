@@ -3,8 +3,8 @@ package signing
 import (
 	"fmt"
 
-	codectypes "github.com/okx/okbchain/libs/cosmos-sdk/codec/types"
-	cryptotypes "github.com/okx/okbchain/libs/cosmos-sdk/crypto/types"
+	codectypes "github.com/okx/brczero/libs/cosmos-sdk/codec/types"
+	cryptotypes "github.com/okx/brczero/libs/cosmos-sdk/crypto/types"
 )
 
 // SignatureV2 is a convenience type that is easier to use in application logic

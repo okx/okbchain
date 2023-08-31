@@ -3,15 +3,15 @@ package sanity
 import (
 	"github.com/spf13/viper"
 
-	"github.com/okx/okbchain/app/config"
-	apptype "github.com/okx/okbchain/app/types"
-	"github.com/okx/okbchain/libs/cosmos-sdk/server"
-	cosmost "github.com/okx/okbchain/libs/cosmos-sdk/store/types"
-	"github.com/okx/okbchain/libs/tendermint/consensus"
-	"github.com/okx/okbchain/libs/tendermint/state"
-	"github.com/okx/okbchain/libs/tendermint/types"
-	"github.com/okx/okbchain/x/evm/watcher"
-	"github.com/okx/okbchain/x/infura"
+	"github.com/okx/brczero/app/config"
+	apptype "github.com/okx/brczero/app/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/server"
+	cosmost "github.com/okx/brczero/libs/cosmos-sdk/store/types"
+	"github.com/okx/brczero/libs/tendermint/consensus"
+	"github.com/okx/brczero/libs/tendermint/state"
+	"github.com/okx/brczero/libs/tendermint/types"
+	"github.com/okx/brczero/x/evm/watcher"
+	"github.com/okx/brczero/x/infura"
 )
 
 // CheckStart check start command's flags. if user set conflict flags return error.

@@ -2,17 +2,17 @@ package cli
 
 import (
 	"encoding/json"
-	"github.com/okx/okbchain/libs/cosmos-sdk/client/flags"
+	"github.com/okx/brczero/libs/cosmos-sdk/client/flags"
 	"path/filepath"
 
-	"github.com/okx/okbchain/libs/tendermint/libs/cli"
-	tmtypes "github.com/okx/okbchain/libs/tendermint/types"
+	"github.com/okx/brczero/libs/tendermint/libs/cli"
+	tmtypes "github.com/okx/brczero/libs/tendermint/types"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
-	"github.com/okx/okbchain/libs/cosmos-sdk/server"
-	"github.com/okx/okbchain/x/genutil"
+	"github.com/okx/brczero/libs/cosmos-sdk/codec"
+	"github.com/okx/brczero/libs/cosmos-sdk/server"
+	"github.com/okx/brczero/x/genutil"
 )
 
 const flagGenTxDir = "gentx-dir"

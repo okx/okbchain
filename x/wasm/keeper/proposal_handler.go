@@ -6,11 +6,11 @@ import (
 	"sort"
 	"strings"
 
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	sdkerrors "github.com/okx/okbchain/libs/cosmos-sdk/types/errors"
-	types2 "github.com/okx/okbchain/libs/tendermint/types"
-	govtypes "github.com/okx/okbchain/x/gov/types"
-	"github.com/okx/okbchain/x/wasm/types"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	sdkerrors "github.com/okx/brczero/libs/cosmos-sdk/types/errors"
+	types2 "github.com/okx/brczero/libs/tendermint/types"
+	govtypes "github.com/okx/brczero/x/gov/types"
+	"github.com/okx/brczero/x/wasm/types"
 )
 
 // NewWasmProposalHandler creates a new governance Handler for wasm proposals

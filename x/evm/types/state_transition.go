@@ -14,11 +14,11 @@ import (
 	ethtypes "github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/core/vm"
 
-	types2 "github.com/okx/okbchain/libs/cosmos-sdk/store/types"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	sdkerrors "github.com/okx/okbchain/libs/cosmos-sdk/types/errors"
-	"github.com/okx/okbchain/libs/cosmos-sdk/types/innertx"
-	"github.com/okx/okbchain/libs/system/trace"
+	types2 "github.com/okx/brczero/libs/cosmos-sdk/store/types"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	sdkerrors "github.com/okx/brczero/libs/cosmos-sdk/types/errors"
+	"github.com/okx/brczero/libs/cosmos-sdk/types/innertx"
+	"github.com/okx/brczero/libs/system/trace"
 )
 
 // StateTransition defines data to transitionDB in evm

@@ -6,8 +6,8 @@ import (
 	"testing"
 
 	"github.com/ethereum/go-ethereum/common"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	etypes "github.com/okx/okbchain/x/evm/types"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	etypes "github.com/okx/brczero/x/evm/types"
 	"github.com/stretchr/testify/require"
 )
 

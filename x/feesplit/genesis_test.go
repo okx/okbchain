@@ -5,19 +5,20 @@ import (
 	"testing"
 	"time"
 
-	"github.com/okx/okbchain/app"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
-	"github.com/okx/okbchain/x/feesplit"
-	"github.com/okx/okbchain/x/feesplit/types"
 	"github.com/stretchr/testify/suite"
+
+	"github.com/okx/brczero/app"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	abci "github.com/okx/brczero/libs/tendermint/abci/types"
+	"github.com/okx/brczero/x/feesplit"
+	"github.com/okx/brczero/x/feesplit/types"
 )
 
 type GenesisTestSuite struct {
 	suite.Suite
 
 	ctx     sdk.Context
-	app     *app.OKBChainApp
+	app     *app.BRCZeroApp
 	genesis types.GenesisState
 }
 

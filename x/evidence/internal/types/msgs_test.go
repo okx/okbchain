@@ -3,11 +3,11 @@ package types_test
 import (
 	"testing"
 
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	"github.com/okx/okbchain/x/evidence/exported"
-	"github.com/okx/okbchain/x/evidence/internal/types"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	"github.com/okx/brczero/x/evidence/exported"
+	"github.com/okx/brczero/x/evidence/internal/types"
 
-	"github.com/okx/okbchain/libs/tendermint/crypto/ed25519"
+	"github.com/okx/brczero/libs/tendermint/crypto/ed25519"
 	"github.com/stretchr/testify/require"
 )
 

@@ -13,17 +13,17 @@ import (
 	ethcrypto "github.com/ethereum/go-ethereum/crypto"
 	"github.com/spf13/viper"
 
-	ethermint "github.com/okx/okbchain/app/types"
-	clientCtx "github.com/okx/okbchain/libs/cosmos-sdk/client/context"
-	"github.com/okx/okbchain/libs/cosmos-sdk/server"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	sdkerror "github.com/okx/okbchain/libs/cosmos-sdk/types/errors"
-	authexported "github.com/okx/okbchain/libs/cosmos-sdk/x/auth/exported"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/supply"
-	"github.com/okx/okbchain/x/evm/types"
-	"github.com/okx/okbchain/x/token"
-	wasmkeeper "github.com/okx/okbchain/x/wasm/keeper"
-	wasmtypes "github.com/okx/okbchain/x/wasm/types"
+	ethermint "github.com/okx/brczero/app/types"
+	clientCtx "github.com/okx/brczero/libs/cosmos-sdk/client/context"
+	"github.com/okx/brczero/libs/cosmos-sdk/server"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	sdkerror "github.com/okx/brczero/libs/cosmos-sdk/types/errors"
+	authexported "github.com/okx/brczero/libs/cosmos-sdk/x/auth/exported"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/supply"
+	"github.com/okx/brczero/x/evm/types"
+	"github.com/okx/brczero/x/token"
+	wasmkeeper "github.com/okx/brczero/x/wasm/keeper"
+	wasmtypes "github.com/okx/brczero/x/wasm/types"
 )
 
 const (

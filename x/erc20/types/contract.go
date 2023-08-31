@@ -8,8 +8,8 @@ import (
 
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/common"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	authtypes "github.com/okx/okbchain/libs/cosmos-sdk/x/auth/types"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	authtypes "github.com/okx/brczero/libs/cosmos-sdk/x/auth/types"
 )
 
 // CompiledContract contains compiled bytecode and abi

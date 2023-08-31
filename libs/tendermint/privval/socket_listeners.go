@@ -4,8 +4,8 @@ import (
 	"net"
 	"time"
 
-	"github.com/okx/okbchain/libs/tendermint/crypto/ed25519"
-	p2pconn "github.com/okx/okbchain/libs/tendermint/p2p/conn"
+	"github.com/okx/brczero/libs/tendermint/crypto/ed25519"
+	p2pconn "github.com/okx/brczero/libs/tendermint/p2p/conn"
 )
 
 const (

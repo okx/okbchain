@@ -4,21 +4,22 @@ import (
 	"testing"
 
 	ethcrypto "github.com/ethereum/go-ethereum/crypto"
-	chain "github.com/okx/okbchain/app"
-	app "github.com/okx/okbchain/app/types"
-	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/auth"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/mock"
-	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
-	"github.com/okx/okbchain/libs/tendermint/crypto/secp256k1"
-	"github.com/okx/okbchain/libs/tendermint/libs/log"
-	dbm "github.com/okx/okbchain/libs/tm-db"
-	"github.com/okx/okbchain/x/common"
-	"github.com/okx/okbchain/x/common/version"
-	"github.com/okx/okbchain/x/token"
-	"github.com/okx/okbchain/x/token/types"
 	"github.com/stretchr/testify/require"
+
+	chain "github.com/okx/brczero/app"
+	app "github.com/okx/brczero/app/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/codec"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/auth"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/mock"
+	abci "github.com/okx/brczero/libs/tendermint/abci/types"
+	"github.com/okx/brczero/libs/tendermint/crypto/secp256k1"
+	"github.com/okx/brczero/libs/tendermint/libs/log"
+	dbm "github.com/okx/brczero/libs/tm-db"
+	"github.com/okx/brczero/x/common"
+	"github.com/okx/brczero/x/common/version"
+	"github.com/okx/brczero/x/token"
+	"github.com/okx/brczero/x/token/types"
 )
 
 func TestHandlerBlockedContractAddrSend(t *testing.T) {
@@ -72,10 +73,10 @@ func TestHandlerBlockedContractAddrSend(t *testing.T) {
 	}
 }
 
-// Setup initializes a new OKBChainApp. A Nop logger is set in OKBChainApp.
-func initApp(isCheckTx bool) *chain.OKBChainApp {
+// Setup initializes a new BRCZeroApp. A Nop logger is set in BRCZeroApp.
+func initApp(isCheckTx bool) *chain.BRCZeroApp {
 	db := dbm.NewMemDB()
-	app := chain.NewOKBChainApp(log.NewNopLogger(), db, nil, true, map[int64]bool{}, 0)
+	app := chain.NewBRCZeroApp(log.NewNopLogger(), db, nil, true, map[int64]bool{}, 0)
 
 	if !isCheckTx {
 		// init chain must be called to stop deliverState from being nil

@@ -2,17 +2,17 @@ package simapp
 
 import (
 	"fmt"
-	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
-	ibc_tx "github.com/okx/okbchain/libs/cosmos-sdk/x/auth/ibc-tx"
-	tmkv "github.com/okx/okbchain/libs/tendermint/libs/kv"
+	"github.com/okx/brczero/libs/cosmos-sdk/codec"
+	ibc_tx "github.com/okx/brczero/libs/cosmos-sdk/x/auth/ibc-tx"
+	tmkv "github.com/okx/brczero/libs/tendermint/libs/kv"
 	"testing"
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/codec/types"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	"github.com/okx/okbchain/libs/cosmos-sdk/types/module"
-	authtypes "github.com/okx/okbchain/libs/cosmos-sdk/x/auth/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/codec/types"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/types/module"
+	authtypes "github.com/okx/brczero/libs/cosmos-sdk/x/auth/types"
 )
 
 func makeCodec(bm module.BasicManager) types.InterfaceRegistry {

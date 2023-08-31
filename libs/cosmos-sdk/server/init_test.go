@@ -5,10 +5,10 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/client/keys"
-	crkeys "github.com/okx/okbchain/libs/cosmos-sdk/crypto/keys"
-	"github.com/okx/okbchain/libs/cosmos-sdk/server"
-	"github.com/okx/okbchain/libs/cosmos-sdk/tests"
+	"github.com/okx/brczero/libs/cosmos-sdk/client/keys"
+	crkeys "github.com/okx/brczero/libs/cosmos-sdk/crypto/keys"
+	"github.com/okx/brczero/libs/cosmos-sdk/server"
+	"github.com/okx/brczero/libs/cosmos-sdk/tests"
 )
 
 func TestGenerateCoinKey(t *testing.T) {

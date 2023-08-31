@@ -12,12 +12,12 @@ import (
 
 	amino "github.com/tendermint/go-amino"
 
-	auto "github.com/okx/okbchain/libs/tendermint/libs/autofile"
-	"github.com/okx/okbchain/libs/tendermint/libs/log"
-	tmos "github.com/okx/okbchain/libs/tendermint/libs/os"
-	"github.com/okx/okbchain/libs/tendermint/libs/service"
-	"github.com/okx/okbchain/libs/tendermint/types"
-	tmtime "github.com/okx/okbchain/libs/tendermint/types/time"
+	auto "github.com/okx/brczero/libs/tendermint/libs/autofile"
+	"github.com/okx/brczero/libs/tendermint/libs/log"
+	tmos "github.com/okx/brczero/libs/tendermint/libs/os"
+	"github.com/okx/brczero/libs/tendermint/libs/service"
+	"github.com/okx/brczero/libs/tendermint/types"
+	tmtime "github.com/okx/brczero/libs/tendermint/types/time"
 )
 
 const (

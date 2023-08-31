@@ -3,10 +3,10 @@ package keeper
 import (
 	"fmt"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/client"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	sdkerrors "github.com/okx/okbchain/libs/cosmos-sdk/types/errors"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/gov/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/client"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	sdkerrors "github.com/okx/brczero/libs/cosmos-sdk/types/errors"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/gov/types"
 )
 
 // SubmitProposal create new proposal given a content

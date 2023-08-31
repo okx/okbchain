@@ -3,15 +3,15 @@ package rest
 import (
 	"net/http"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/client/context"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	"github.com/okx/okbchain/libs/cosmos-sdk/types/rest"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/auth/client/utils"
+	"github.com/okx/brczero/libs/cosmos-sdk/client/context"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/types/rest"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/auth/client/utils"
 
-	comm "github.com/okx/okbchain/x/common"
-	"github.com/okx/okbchain/x/distribution/types"
-	"github.com/okx/okbchain/x/gov"
-	govrest "github.com/okx/okbchain/x/gov/client/rest"
+	comm "github.com/okx/brczero/x/common"
+	"github.com/okx/brczero/x/distribution/types"
+	"github.com/okx/brczero/x/gov"
+	govrest "github.com/okx/brczero/x/gov/client/rest"
 )
 
 // ChangeDistributionTypeProposalRESTHandler returns a ChangeDistributionTypeProposal that exposes the change distribution type REST handler with a given sub-route.

@@ -1,6 +1,6 @@
 package merkle
 
-import "github.com/okx/okbchain/libs/tendermint/crypto/tmhash"
+import "github.com/okx/brczero/libs/tendermint/crypto/tmhash"
 
 func HashFromByteSlices(items [][]byte) []byte {
 	switch len(items) {

@@ -7,24 +7,24 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 
-	"github.com/okx/okbchain/app/crypto/ethsecp256k1"
-	ethermint "github.com/okx/okbchain/app/types"
-	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/auth"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/bank"
-	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
-	"github.com/okx/okbchain/libs/tendermint/crypto/ed25519"
-	"github.com/okx/okbchain/libs/tendermint/crypto/secp256k1"
-	distr "github.com/okx/okbchain/x/distribution"
-	"github.com/okx/okbchain/x/distribution/keeper"
-	"github.com/okx/okbchain/x/evm"
-	evm_types "github.com/okx/okbchain/x/evm/types"
-	"github.com/okx/okbchain/x/gov"
-	"github.com/okx/okbchain/x/gov/types"
-	"github.com/okx/okbchain/x/staking"
-	staking_keeper "github.com/okx/okbchain/x/staking/keeper"
-	staking_types "github.com/okx/okbchain/x/staking/types"
+	"github.com/okx/brczero/app/crypto/ethsecp256k1"
+	ethermint "github.com/okx/brczero/app/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/codec"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/auth"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/bank"
+	abci "github.com/okx/brczero/libs/tendermint/abci/types"
+	"github.com/okx/brczero/libs/tendermint/crypto/ed25519"
+	"github.com/okx/brczero/libs/tendermint/crypto/secp256k1"
+	distr "github.com/okx/brczero/x/distribution"
+	"github.com/okx/brczero/x/distribution/keeper"
+	"github.com/okx/brczero/x/evm"
+	evm_types "github.com/okx/brczero/x/evm/types"
+	"github.com/okx/brczero/x/gov"
+	"github.com/okx/brczero/x/gov/types"
+	"github.com/okx/brczero/x/staking"
+	staking_keeper "github.com/okx/brczero/x/staking/keeper"
+	staking_types "github.com/okx/brczero/x/staking/types"
 
 	"github.com/stretchr/testify/suite"
 )
@@ -47,7 +47,7 @@ type InnerTxTestSuite struct {
 	suite.Suite
 
 	ctx     sdk.Context
-	app     *OKBChainApp
+	app     *BRCZeroApp
 	stateDB *evm_types.CommitStateDB
 	codec   *codec.Codec
 

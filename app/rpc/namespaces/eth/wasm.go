@@ -7,16 +7,16 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/okx/okbchain/x/wasm/ioutils"
+	"github.com/okx/brczero/x/wasm/ioutils"
 
-	clientcontext "github.com/okx/okbchain/libs/cosmos-sdk/client/context"
-	"github.com/okx/okbchain/x/evm"
-	evmtypes "github.com/okx/okbchain/x/evm/types"
+	clientcontext "github.com/okx/brczero/libs/cosmos-sdk/client/context"
+	"github.com/okx/brczero/x/evm"
+	evmtypes "github.com/okx/brczero/x/evm/types"
 
-	wasmtypes "github.com/okx/okbchain/x/wasm/types"
+	wasmtypes "github.com/okx/brczero/x/wasm/types"
 
 	"github.com/ethereum/go-ethereum/common/hexutil"
-	rpctypes "github.com/okx/okbchain/app/rpc/types"
+	rpctypes "github.com/okx/brczero/app/rpc/types"
 )
 
 const (

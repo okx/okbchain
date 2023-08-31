@@ -3,9 +3,9 @@ package keeper
 import (
 	"testing"
 
-	types2 "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
-	"github.com/okx/okbchain/x/staking/types"
+	types2 "github.com/okx/brczero/libs/cosmos-sdk/types"
+	abci "github.com/okx/brczero/libs/tendermint/abci/types"
+	"github.com/okx/brczero/x/staking/types"
 
 	"github.com/stretchr/testify/require"
 	"github.com/tendermint/go-amino"

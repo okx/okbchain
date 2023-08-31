@@ -6,10 +6,10 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/okx/okbchain/libs/tendermint/lite2/provider"
-	rpcclient "github.com/okx/okbchain/libs/tendermint/rpc/client"
-	rpchttp "github.com/okx/okbchain/libs/tendermint/rpc/client/http"
-	"github.com/okx/okbchain/libs/tendermint/types"
+	"github.com/okx/brczero/libs/tendermint/lite2/provider"
+	rpcclient "github.com/okx/brczero/libs/tendermint/rpc/client"
+	rpchttp "github.com/okx/brczero/libs/tendermint/rpc/client/http"
+	"github.com/okx/brczero/libs/tendermint/types"
 )
 
 // This is very brittle, see: https://github.com/tendermint/tendermint/issues/4740

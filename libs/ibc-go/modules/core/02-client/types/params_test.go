@@ -5,7 +5,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/okx/okbchain/libs/ibc-go/modules/core/exported"
+	"github.com/okx/brczero/libs/ibc-go/modules/core/exported"
 )
 
 func TestValidateParams(t *testing.T) {

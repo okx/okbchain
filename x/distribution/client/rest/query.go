@@ -6,13 +6,13 @@ import (
 
 	"github.com/gorilla/mux"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/client/context"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	"github.com/okx/okbchain/libs/cosmos-sdk/types/rest"
+	"github.com/okx/brczero/libs/cosmos-sdk/client/context"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/types/rest"
 
-	comm "github.com/okx/okbchain/x/common"
-	"github.com/okx/okbchain/x/distribution/client/common"
-	"github.com/okx/okbchain/x/distribution/types"
+	comm "github.com/okx/brczero/x/common"
+	"github.com/okx/brczero/x/distribution/client/common"
+	"github.com/okx/brczero/x/distribution/types"
 )
 
 func registerQueryRoutes(cliCtx context.CLIContext, r *mux.Router, queryRoute string) {

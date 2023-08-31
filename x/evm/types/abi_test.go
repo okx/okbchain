@@ -3,7 +3,7 @@ package types
 import (
 	"fmt"
 	"github.com/ethereum/go-ethereum/accounts/abi"
-	"github.com/okx/okbchain/libs/tendermint/libs/rand"
+	"github.com/okx/brczero/libs/tendermint/libs/rand"
 	"github.com/stretchr/testify/require"
 	"testing"
 )

@@ -3,10 +3,6 @@ package main
 import (
 	"encoding/binary"
 	"fmt"
-	ethcmn "github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/core/state/pruner"
-	"github.com/okx/okbchain/cmd/okbchaind/base"
-	"github.com/okx/okbchain/libs/cosmos-sdk/store/mpt"
 	"io/ioutil"
 	"log"
 	"os"
@@ -16,36 +12,43 @@ import (
 	"sync"
 	"time"
 
-	bam "github.com/okx/okbchain/libs/cosmos-sdk/baseapp"
-	"github.com/okx/okbchain/libs/cosmos-sdk/client/flags"
-	"github.com/okx/okbchain/libs/cosmos-sdk/server"
-	cmstore "github.com/okx/okbchain/libs/cosmos-sdk/store"
-	"github.com/okx/okbchain/libs/cosmos-sdk/store/iavl"
-	"github.com/okx/okbchain/libs/cosmos-sdk/store/rootmulti"
-	"github.com/okx/okbchain/libs/cosmos-sdk/store/types"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/auth"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/mint"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/supply"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/upgrade"
-	"github.com/okx/okbchain/libs/system"
-	cfg "github.com/okx/okbchain/libs/tendermint/config"
-	"github.com/okx/okbchain/libs/tendermint/node"
-	sm "github.com/okx/okbchain/libs/tendermint/state"
-	"github.com/okx/okbchain/libs/tendermint/store"
-	tmtypes "github.com/okx/okbchain/libs/tendermint/types"
-	dbm "github.com/okx/okbchain/libs/tm-db"
+	ethcmn "github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/core/state/pruner"
+
+	"github.com/okx/brczero/cmd/brczerod/base"
+	"github.com/okx/brczero/libs/cosmos-sdk/store/mpt"
+
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/syndtr/goleveldb/leveldb/util"
 
-	distr "github.com/okx/okbchain/x/distribution"
-	"github.com/okx/okbchain/x/evidence"
-	"github.com/okx/okbchain/x/gov"
-	"github.com/okx/okbchain/x/params"
-	"github.com/okx/okbchain/x/slashing"
-	"github.com/okx/okbchain/x/staking"
-	"github.com/okx/okbchain/x/token"
+	bam "github.com/okx/brczero/libs/cosmos-sdk/baseapp"
+	"github.com/okx/brczero/libs/cosmos-sdk/client/flags"
+	"github.com/okx/brczero/libs/cosmos-sdk/server"
+	cmstore "github.com/okx/brczero/libs/cosmos-sdk/store"
+	"github.com/okx/brczero/libs/cosmos-sdk/store/iavl"
+	"github.com/okx/brczero/libs/cosmos-sdk/store/rootmulti"
+	"github.com/okx/brczero/libs/cosmos-sdk/store/types"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/auth"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/mint"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/supply"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/upgrade"
+	"github.com/okx/brczero/libs/system"
+	cfg "github.com/okx/brczero/libs/tendermint/config"
+	"github.com/okx/brczero/libs/tendermint/node"
+	sm "github.com/okx/brczero/libs/tendermint/state"
+	"github.com/okx/brczero/libs/tendermint/store"
+	tmtypes "github.com/okx/brczero/libs/tendermint/types"
+	dbm "github.com/okx/brczero/libs/tm-db"
+
+	distr "github.com/okx/brczero/x/distribution"
+	"github.com/okx/brczero/x/evidence"
+	"github.com/okx/brczero/x/gov"
+	"github.com/okx/brczero/x/params"
+	"github.com/okx/brczero/x/slashing"
+	"github.com/okx/brczero/x/staking"
+	"github.com/okx/brczero/x/token"
 )
 
 const (
@@ -316,7 +319,7 @@ func getPruneBlockParams(blockStoreDB dbm.DB) (baseHeight, retainHeight int64) {
 
 func getPruneAppParams(appDB dbm.DB) (retainHeight int64) {
 	rootmulti.IgPruneHeightsLen = true
-	
+
 	rs := initAppStore(appDB)
 	latestV := rs.GetLatestVersion()
 

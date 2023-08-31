@@ -7,10 +7,10 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/client/flags"
-	"github.com/okx/okbchain/libs/cosmos-sdk/client/input"
-	"github.com/okx/okbchain/libs/cosmos-sdk/crypto/keys"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/client/flags"
+	"github.com/okx/brczero/libs/cosmos-sdk/client/input"
+	"github.com/okx/brczero/libs/cosmos-sdk/crypto/keys"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
 )
 
 // ImportKeyCommand imports private keys from a keyfile.

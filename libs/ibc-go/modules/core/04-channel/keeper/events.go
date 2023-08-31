@@ -4,10 +4,10 @@ import (
 	"encoding/hex"
 	"fmt"
 
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
 
-	"github.com/okx/okbchain/libs/ibc-go/modules/core/04-channel/types"
-	"github.com/okx/okbchain/libs/ibc-go/modules/core/exported"
+	"github.com/okx/brczero/libs/ibc-go/modules/core/04-channel/types"
+	"github.com/okx/brczero/libs/ibc-go/modules/core/exported"
 )
 
 // EmitSendPacketEvent emits an event with packet data along with other packet information for relayer

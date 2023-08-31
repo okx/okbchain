@@ -4,13 +4,13 @@ import (
 	"sync"
 	"time"
 
-	"github.com/okx/okbchain/libs/tendermint/version"
+	"github.com/okx/brczero/libs/tendermint/version"
 
-	ce "github.com/okx/okbchain/libs/tendermint/crypto/encoding"
-	"github.com/okx/okbchain/libs/tendermint/libs/bits"
-	tmbytes "github.com/okx/okbchain/libs/tendermint/libs/bytes"
-	tmproto "github.com/okx/okbchain/libs/tendermint/proto/types"
-	tmversion "github.com/okx/okbchain/libs/tendermint/proto/version"
+	ce "github.com/okx/brczero/libs/tendermint/crypto/encoding"
+	"github.com/okx/brczero/libs/tendermint/libs/bits"
+	tmbytes "github.com/okx/brczero/libs/tendermint/libs/bytes"
+	tmproto "github.com/okx/brczero/libs/tendermint/proto/types"
+	tmversion "github.com/okx/brczero/libs/tendermint/proto/version"
 )
 
 type CM40Block struct {

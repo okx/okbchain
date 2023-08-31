@@ -7,16 +7,16 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/okx/okbchain/libs/tendermint/libs/bytes"
-	"github.com/okx/okbchain/libs/tendermint/libs/log"
-	tmpubsub "github.com/okx/okbchain/libs/tendermint/libs/pubsub"
-	tmquery "github.com/okx/okbchain/libs/tendermint/libs/pubsub/query"
-	nm "github.com/okx/okbchain/libs/tendermint/node"
-	rpcclient "github.com/okx/okbchain/libs/tendermint/rpc/client"
-	"github.com/okx/okbchain/libs/tendermint/rpc/core"
-	ctypes "github.com/okx/okbchain/libs/tendermint/rpc/core/types"
-	rpctypes "github.com/okx/okbchain/libs/tendermint/rpc/jsonrpc/types"
-	"github.com/okx/okbchain/libs/tendermint/types"
+	"github.com/okx/brczero/libs/tendermint/libs/bytes"
+	"github.com/okx/brczero/libs/tendermint/libs/log"
+	tmpubsub "github.com/okx/brczero/libs/tendermint/libs/pubsub"
+	tmquery "github.com/okx/brczero/libs/tendermint/libs/pubsub/query"
+	nm "github.com/okx/brczero/libs/tendermint/node"
+	rpcclient "github.com/okx/brczero/libs/tendermint/rpc/client"
+	"github.com/okx/brczero/libs/tendermint/rpc/core"
+	ctypes "github.com/okx/brczero/libs/tendermint/rpc/core/types"
+	rpctypes "github.com/okx/brczero/libs/tendermint/rpc/jsonrpc/types"
+	"github.com/okx/brczero/libs/tendermint/types"
 )
 
 /*

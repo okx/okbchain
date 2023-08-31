@@ -7,12 +7,12 @@ import (
 	"io/ioutil"
 	"testing"
 
-	dbm "github.com/okx/okbchain/libs/tm-db"
+	dbm "github.com/okx/brczero/libs/tm-db"
 
-	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
-	"github.com/okx/okbchain/libs/tendermint/libs/kv"
-	"github.com/okx/okbchain/libs/tendermint/libs/pubsub/query"
-	"github.com/okx/okbchain/libs/tendermint/types"
+	abci "github.com/okx/brczero/libs/tendermint/abci/types"
+	"github.com/okx/brczero/libs/tendermint/libs/kv"
+	"github.com/okx/brczero/libs/tendermint/libs/pubsub/query"
+	"github.com/okx/brczero/libs/tendermint/types"
 )
 
 func BenchmarkTxSearch(b *testing.B) {

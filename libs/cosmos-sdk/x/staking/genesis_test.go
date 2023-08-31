@@ -4,16 +4,16 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/okx/okbchain/libs/tendermint/crypto/ed25519"
+	"github.com/okx/brczero/libs/tendermint/crypto/ed25519"
 
 	"github.com/stretchr/testify/assert"
 
-	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
+	abci "github.com/okx/brczero/libs/tendermint/abci/types"
 	"github.com/stretchr/testify/require"
 
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	keep "github.com/okx/okbchain/libs/cosmos-sdk/x/staking/keeper"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/staking/types"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	keep "github.com/okx/brczero/libs/cosmos-sdk/x/staking/keeper"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/staking/types"
 )
 
 func TestInitGenesis(t *testing.T) {

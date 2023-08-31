@@ -7,10 +7,10 @@
 package auth
 
 import (
-	"github.com/okx/okbchain/libs/cosmos-sdk/store/mpt"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/auth/ante"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/auth/keeper"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/auth/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/store/mpt"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/auth/ante"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/auth/keeper"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/auth/types"
 )
 
 const (

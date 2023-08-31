@@ -9,8 +9,8 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/okx/okbchain/libs/iavl"
-	db "github.com/okx/okbchain/libs/tm-db"
+	"github.com/okx/brczero/libs/iavl"
+	db "github.com/okx/brczero/libs/tm-db"
 )
 
 const historySize = 20

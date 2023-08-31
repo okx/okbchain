@@ -3,13 +3,13 @@ package types
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/okx/okbchain/libs/tendermint/types"
+	"github.com/okx/brczero/libs/tendermint/types"
 	"strings"
 
 	"github.com/gogo/protobuf/jsonpb"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	sdkerrors "github.com/okx/okbchain/libs/cosmos-sdk/types/errors"
-	paramtypes "github.com/okx/okbchain/x/params"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	sdkerrors "github.com/okx/brczero/libs/cosmos-sdk/types/errors"
+	paramtypes "github.com/okx/brczero/x/params"
 	"github.com/pkg/errors"
 	"gopkg.in/yaml.v2"
 )

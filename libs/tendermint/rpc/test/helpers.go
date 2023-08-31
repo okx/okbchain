@@ -8,18 +8,18 @@ import (
 	"strings"
 	"time"
 
-	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
-	"github.com/okx/okbchain/libs/tendermint/libs/log"
+	abci "github.com/okx/brczero/libs/tendermint/abci/types"
+	"github.com/okx/brczero/libs/tendermint/libs/log"
 
-	cfg "github.com/okx/okbchain/libs/tendermint/config"
-	tmnet "github.com/okx/okbchain/libs/tendermint/libs/net"
-	nm "github.com/okx/okbchain/libs/tendermint/node"
-	"github.com/okx/okbchain/libs/tendermint/p2p"
-	"github.com/okx/okbchain/libs/tendermint/privval"
-	"github.com/okx/okbchain/libs/tendermint/proxy"
-	ctypes "github.com/okx/okbchain/libs/tendermint/rpc/core/types"
-	core_grpc "github.com/okx/okbchain/libs/tendermint/rpc/grpc"
-	rpcclient "github.com/okx/okbchain/libs/tendermint/rpc/jsonrpc/client"
+	cfg "github.com/okx/brczero/libs/tendermint/config"
+	tmnet "github.com/okx/brczero/libs/tendermint/libs/net"
+	nm "github.com/okx/brczero/libs/tendermint/node"
+	"github.com/okx/brczero/libs/tendermint/p2p"
+	"github.com/okx/brczero/libs/tendermint/privval"
+	"github.com/okx/brczero/libs/tendermint/proxy"
+	ctypes "github.com/okx/brczero/libs/tendermint/rpc/core/types"
+	core_grpc "github.com/okx/brczero/libs/tendermint/rpc/grpc"
+	rpcclient "github.com/okx/brczero/libs/tendermint/rpc/jsonrpc/client"
 )
 
 // Options helps with specifying some parameters for our RPC testing for greater

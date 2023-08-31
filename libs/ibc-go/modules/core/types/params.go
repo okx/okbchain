@@ -3,7 +3,7 @@ package types
 import (
 	"fmt"
 
-	paramtypes "github.com/okx/okbchain/libs/cosmos-sdk/x/params"
+	paramtypes "github.com/okx/brczero/libs/cosmos-sdk/x/params"
 )
 
 // DefaultIbcEnabled enabled

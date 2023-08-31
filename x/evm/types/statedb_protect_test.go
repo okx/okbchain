@@ -2,26 +2,28 @@ package types_test
 
 import (
 	"bytes"
+	"testing"
+
 	ethcmn "github.com/ethereum/go-ethereum/common"
 	ethcrypto "github.com/ethereum/go-ethereum/crypto"
-	"github.com/okx/okbchain/app"
-	"github.com/okx/okbchain/app/crypto/ethsecp256k1"
-	ethermint "github.com/okx/okbchain/app/types"
-	"github.com/okx/okbchain/cmd/okbchaind/mpt"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/auth"
-	authexported "github.com/okx/okbchain/libs/cosmos-sdk/x/auth/exported"
-	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
-	"github.com/okx/okbchain/x/evm/types"
 	"github.com/stretchr/testify/suite"
-	"testing"
+
+	"github.com/okx/brczero/app"
+	"github.com/okx/brczero/app/crypto/ethsecp256k1"
+	ethermint "github.com/okx/brczero/app/types"
+	"github.com/okx/brczero/cmd/brczerod/mpt"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/auth"
+	authexported "github.com/okx/brczero/libs/cosmos-sdk/x/auth/exported"
+	abci "github.com/okx/brczero/libs/tendermint/abci/types"
+	"github.com/okx/brczero/x/evm/types"
 )
 
 type StateDB_ProtectTestSuite struct {
 	suite.Suite
 
 	ctx         sdk.Context
-	app         *app.OKBChainApp
+	app         *app.BRCZeroApp
 	stateDB     *types.CommitStateDB
 	address     ethcmn.Address
 	stateObject types.StateObject

@@ -4,14 +4,14 @@ import (
 	"encoding/json"
 	"log"
 
-	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
-	tmtypes "github.com/okx/okbchain/libs/tendermint/types"
+	abci "github.com/okx/brczero/libs/tendermint/abci/types"
+	tmtypes "github.com/okx/brczero/libs/tendermint/types"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/slashing"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/staking"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/staking/exported"
+	"github.com/okx/brczero/libs/cosmos-sdk/codec"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/slashing"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/staking"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/staking/exported"
 )
 
 // ExportAppStateAndValidators exports the state of the application for a genesis

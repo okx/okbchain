@@ -1,7 +1,7 @@
 package keeper_test
 
 import (
-	"github.com/okx/okbchain/libs/ibc-go/modules/core/02-client/types"
+	"github.com/okx/brczero/libs/ibc-go/modules/core/02-client/types"
 )
 
 func (suite *KeeperTestSuite) TestParams() {

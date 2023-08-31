@@ -2,13 +2,13 @@ package erc20
 
 import (
 	ethcmm "github.com/ethereum/go-ethereum/common"
-	"github.com/okx/okbchain/libs/system"
+	"github.com/okx/brczero/libs/system"
 
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	sdkerrors "github.com/okx/okbchain/libs/cosmos-sdk/types/errors"
-	"github.com/okx/okbchain/x/common"
-	"github.com/okx/okbchain/x/erc20/types"
-	govTypes "github.com/okx/okbchain/x/gov/types"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	sdkerrors "github.com/okx/brczero/libs/cosmos-sdk/types/errors"
+	"github.com/okx/brczero/x/common"
+	"github.com/okx/brczero/x/erc20/types"
+	govTypes "github.com/okx/brczero/x/gov/types"
 )
 
 // NewProposalHandler handles "gov" type message in "erc20"

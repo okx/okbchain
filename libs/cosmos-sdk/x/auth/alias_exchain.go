@@ -1,8 +1,8 @@
 package auth
 
 import (
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/auth/exported"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/auth/keeper"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/auth/exported"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/auth/keeper"
 )
 
 type (

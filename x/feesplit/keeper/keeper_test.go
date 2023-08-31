@@ -4,13 +4,14 @@ import (
 	"testing"
 	"time"
 
-	"github.com/okx/okbchain/app"
-	"github.com/okx/okbchain/app/crypto/ethsecp256k1"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
-	"github.com/okx/okbchain/x/feesplit/keeper"
-	"github.com/okx/okbchain/x/feesplit/types"
 	"github.com/stretchr/testify/suite"
+
+	"github.com/okx/brczero/app"
+	"github.com/okx/brczero/app/crypto/ethsecp256k1"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	abci "github.com/okx/brczero/libs/tendermint/abci/types"
+	"github.com/okx/brczero/x/feesplit/keeper"
+	"github.com/okx/brczero/x/feesplit/types"
 )
 
 var (
@@ -27,7 +28,7 @@ type KeeperTestSuite struct {
 	suite.Suite
 
 	ctx sdk.Context
-	app *app.OKBChainApp
+	app *app.BRCZeroApp
 
 	querier sdk.Querier
 }

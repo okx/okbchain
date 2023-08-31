@@ -1,9 +1,9 @@
 package client
 
 import (
-	"github.com/okx/okbchain/x/feesplit/client/cli"
-	"github.com/okx/okbchain/x/feesplit/client/rest"
-	govcli "github.com/okx/okbchain/x/gov/client"
+	"github.com/okx/brczero/x/feesplit/client/cli"
+	"github.com/okx/brczero/x/feesplit/client/rest"
+	govcli "github.com/okx/brczero/x/gov/client"
 )
 
 var (

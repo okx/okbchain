@@ -4,10 +4,10 @@ import (
 	wasmvmtypes "github.com/CosmWasm/wasmvm/types"
 	ethcmn "github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/vm"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	authexported "github.com/okx/okbchain/libs/cosmos-sdk/x/auth/exported"
-	evmtypes "github.com/okx/okbchain/x/evm/types"
-	wasmtypes "github.com/okx/okbchain/x/wasm/types"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	authexported "github.com/okx/brczero/libs/cosmos-sdk/x/auth/exported"
+	evmtypes "github.com/okx/brczero/x/evm/types"
+	wasmtypes "github.com/okx/brczero/x/wasm/types"
 )
 
 type EVMKeeper interface {

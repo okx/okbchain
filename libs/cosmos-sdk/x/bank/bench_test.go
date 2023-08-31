@@ -3,14 +3,14 @@ package bank_test
 import (
 	"testing"
 
-	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
+	abci "github.com/okx/brczero/libs/tendermint/abci/types"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/simapp"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/auth"
-	authexported "github.com/okx/okbchain/libs/cosmos-sdk/x/auth/exported"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/staking"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/supply"
+	"github.com/okx/brczero/libs/cosmos-sdk/simapp"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/auth"
+	authexported "github.com/okx/brczero/libs/cosmos-sdk/x/auth/exported"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/staking"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/supply"
 )
 
 var moduleAccAddr = supply.NewModuleAddress(staking.BondedPoolName)

@@ -8,7 +8,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	cmn "github.com/okx/okbchain/libs/iavl/common"
+	cmn "github.com/okx/brczero/libs/iavl/common"
 )
 
 // This file implement fuzz testing by generating programs and then running

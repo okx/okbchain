@@ -5,7 +5,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/okx/okbchain/libs/tendermint/version"
+	"github.com/okx/brczero/libs/tendermint/version"
 )
 
 // VersionCmd ...

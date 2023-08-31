@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"sort"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/auth/exported"
+	"github.com/okx/brczero/libs/cosmos-sdk/codec"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/auth/exported"
 )
 
 // GenesisState - all auth state that must be provided at genesis

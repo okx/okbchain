@@ -1,20 +1,20 @@
 package baseapp_test
 
 import (
-	chaincodec "github.com/okx/okbchain/app/codec"
-	"github.com/okx/okbchain/libs/ibc-go/testing/simapp"
-	"github.com/okx/okbchain/x/evm"
+	chaincodec "github.com/okx/brczero/app/codec"
+	"github.com/okx/brczero/libs/ibc-go/testing/simapp"
+	"github.com/okx/brczero/x/evm"
 	"os"
 	"testing"
 
-	"github.com/okx/okbchain/libs/tendermint/libs/log"
+	"github.com/okx/brczero/libs/tendermint/libs/log"
 
-	dbm "github.com/okx/okbchain/libs/tm-db"
+	dbm "github.com/okx/brczero/libs/tm-db"
 	"github.com/stretchr/testify/require"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/baseapp"
+	"github.com/okx/brczero/libs/cosmos-sdk/baseapp"
 
-	"github.com/okx/okbchain/x/evm/types/testdata"
+	"github.com/okx/brczero/x/evm/types/testdata"
 )
 
 func TestRegisterMsgService(t *testing.T) {

@@ -19,22 +19,23 @@ import (
 	ethcmn "github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	gorpc "github.com/ethereum/go-ethereum/rpc"
-	"github.com/okx/okbchain/app/crypto/ethsecp256k1"
-	"github.com/okx/okbchain/app/rpc"
-	"github.com/okx/okbchain/app/rpc/backend"
-	util "github.com/okx/okbchain/app/rpc/tests"
-	cosmos_context "github.com/okx/okbchain/libs/cosmos-sdk/client/context"
-	"github.com/okx/okbchain/libs/cosmos-sdk/client/flags"
-	cmserver "github.com/okx/okbchain/libs/cosmos-sdk/server"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	apptesting "github.com/okx/okbchain/libs/ibc-go/testing"
-	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
-	tmamino "github.com/okx/okbchain/libs/tendermint/crypto/encoding/amino"
-	"github.com/okx/okbchain/libs/tendermint/crypto/multisig"
-	"github.com/okx/okbchain/libs/tendermint/libs/log"
-	"github.com/okx/okbchain/x/evm/watcher"
 	"github.com/spf13/viper"
 	"github.com/stretchr/testify/suite"
+
+	"github.com/okx/brczero/app/crypto/ethsecp256k1"
+	"github.com/okx/brczero/app/rpc"
+	"github.com/okx/brczero/app/rpc/backend"
+	util "github.com/okx/brczero/app/rpc/tests"
+	cosmos_context "github.com/okx/brczero/libs/cosmos-sdk/client/context"
+	"github.com/okx/brczero/libs/cosmos-sdk/client/flags"
+	cmserver "github.com/okx/brczero/libs/cosmos-sdk/server"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	apptesting "github.com/okx/brczero/libs/ibc-go/testing"
+	abci "github.com/okx/brczero/libs/tendermint/abci/types"
+	tmamino "github.com/okx/brczero/libs/tendermint/crypto/encoding/amino"
+	"github.com/okx/brczero/libs/tendermint/crypto/multisig"
+	"github.com/okx/brczero/libs/tendermint/libs/log"
+	"github.com/okx/brczero/x/evm/watcher"
 )
 
 const (
@@ -101,17 +102,17 @@ func commitBlock(suite *RPCPendingTestSuite) {
 	mck.CommitBlock()
 }
 func (suite *RPCPendingTestSuite) SetupTest() {
-	// set okbchaincli path
+	// set brczerocli path
 	viper.Set("tx_index.indexer", "kv")
-	cliDir, err := ioutil.TempDir("", ".okbchaincli")
+	cliDir, err := ioutil.TempDir("", ".brczerocli")
 	if err != nil {
 		panic(err)
 	}
 	defer os.RemoveAll(cliDir)
 	viper.Set(cmserver.FlagUlockKeyHome, cliDir)
 
-	// set okbchaind path
-	serverDir, err := ioutil.TempDir("", ".okbchaind")
+	// set brczerod path
+	serverDir, err := ioutil.TempDir("", ".brczerod")
 	if err != nil {
 		panic(err)
 	}

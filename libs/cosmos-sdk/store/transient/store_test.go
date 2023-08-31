@@ -1,7 +1,7 @@
 package transient
 
 import (
-	"github.com/okx/okbchain/libs/iavl"
+	"github.com/okx/brczero/libs/iavl"
 	"testing"
 
 	"github.com/stretchr/testify/require"

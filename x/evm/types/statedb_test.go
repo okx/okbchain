@@ -2,29 +2,32 @@ package types_test
 
 import (
 	"fmt"
-	dbm "github.com/okx/okbchain/libs/tm-db"
-	"github.com/spf13/viper"
 	"math/big"
 	"testing"
+
+	"github.com/spf13/viper"
+
+	dbm "github.com/okx/brczero/libs/tm-db"
 
 	ethcmn "github.com/ethereum/go-ethereum/common"
 	ethtypes "github.com/ethereum/go-ethereum/core/types"
 	ethcrypto "github.com/ethereum/go-ethereum/crypto"
-	"github.com/okx/okbchain/app"
-	"github.com/okx/okbchain/app/crypto/ethsecp256k1"
-	ethermint "github.com/okx/okbchain/app/types"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/auth"
-	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
-	"github.com/okx/okbchain/x/evm/types"
 	"github.com/stretchr/testify/suite"
+
+	"github.com/okx/brczero/app"
+	"github.com/okx/brczero/app/crypto/ethsecp256k1"
+	ethermint "github.com/okx/brczero/app/types"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/auth"
+	abci "github.com/okx/brczero/libs/tendermint/abci/types"
+	"github.com/okx/brczero/x/evm/types"
 )
 
 type StateDBTestSuite struct {
 	suite.Suite
 
 	ctx         sdk.Context
-	app         *app.OKBChainApp
+	app         *app.BRCZeroApp
 	stateDB     *types.CommitStateDB
 	address     ethcmn.Address
 	stateObject types.StateObject

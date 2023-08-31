@@ -1,11 +1,11 @@
 package types
 
 import (
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	supplyexported "github.com/okx/okbchain/libs/cosmos-sdk/x/supply/exported"
-	"github.com/okx/okbchain/x/common"
-	govtypes "github.com/okx/okbchain/x/gov/types"
-	stakingexported "github.com/okx/okbchain/x/staking/exported"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	supplyexported "github.com/okx/brczero/libs/cosmos-sdk/x/supply/exported"
+	"github.com/okx/brczero/x/common"
+	govtypes "github.com/okx/brczero/x/gov/types"
+	stakingexported "github.com/okx/brczero/x/staking/exported"
 )
 
 // StakingKeeper expected staking keeper (noalias)

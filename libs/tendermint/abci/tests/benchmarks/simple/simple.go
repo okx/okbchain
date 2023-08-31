@@ -7,8 +7,8 @@ import (
 	"log"
 	"reflect"
 
-	"github.com/okx/okbchain/libs/tendermint/abci/types"
-	tmnet "github.com/okx/okbchain/libs/tendermint/libs/net"
+	"github.com/okx/brczero/libs/tendermint/abci/types"
+	tmnet "github.com/okx/brczero/libs/tendermint/libs/net"
 )
 
 func main() {

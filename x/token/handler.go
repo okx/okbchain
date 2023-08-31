@@ -3,13 +3,13 @@ package token
 import (
 	"fmt"
 
-	"github.com/okx/okbchain/x/common"
+	"github.com/okx/brczero/x/common"
 
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	"github.com/okx/okbchain/libs/tendermint/libs/log"
-	"github.com/okx/okbchain/x/common/perf"
-	"github.com/okx/okbchain/x/common/version"
-	"github.com/okx/okbchain/x/token/types"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	"github.com/okx/brczero/libs/tendermint/libs/log"
+	"github.com/okx/brczero/x/common/perf"
+	"github.com/okx/brczero/x/common/version"
+	"github.com/okx/brczero/x/token/types"
 )
 
 // NewTokenHandler returns a handler for "token" type messages.

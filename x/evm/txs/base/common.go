@@ -5,10 +5,10 @@ import (
 	"sync"
 
 	"github.com/ethereum/go-ethereum/common"
-	ethermint "github.com/okx/okbchain/app/types"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	tmtypes "github.com/okx/okbchain/libs/tendermint/types"
-	"github.com/okx/okbchain/x/evm/types"
+	ethermint "github.com/okx/brczero/app/types"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	tmtypes "github.com/okx/brczero/libs/tendermint/types"
+	"github.com/okx/brczero/x/evm/types"
 )
 
 var commitStateDBPool = &sync.Pool{

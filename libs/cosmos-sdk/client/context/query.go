@@ -7,16 +7,16 @@ import (
 
 	"github.com/pkg/errors"
 
-	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
-	"github.com/okx/okbchain/libs/tendermint/crypto/merkle"
-	tmbytes "github.com/okx/okbchain/libs/tendermint/libs/bytes"
-	tmliteErr "github.com/okx/okbchain/libs/tendermint/lite/errors"
-	tmliteProxy "github.com/okx/okbchain/libs/tendermint/lite/proxy"
-	rpcclient "github.com/okx/okbchain/libs/tendermint/rpc/client"
-	tmtypes "github.com/okx/okbchain/libs/tendermint/types"
+	abci "github.com/okx/brczero/libs/tendermint/abci/types"
+	"github.com/okx/brczero/libs/tendermint/crypto/merkle"
+	tmbytes "github.com/okx/brczero/libs/tendermint/libs/bytes"
+	tmliteErr "github.com/okx/brczero/libs/tendermint/lite/errors"
+	tmliteProxy "github.com/okx/brczero/libs/tendermint/lite/proxy"
+	rpcclient "github.com/okx/brczero/libs/tendermint/rpc/client"
+	tmtypes "github.com/okx/brczero/libs/tendermint/types"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/store/rootmulti"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/store/rootmulti"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
 )
 
 // GetNode returns an RPC client. If the context's client is not defined, an

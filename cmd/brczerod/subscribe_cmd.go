@@ -2,11 +2,11 @@ package main
 
 import (
 	"fmt"
-	"github.com/okx/okbchain/app/logevents"
-	"github.com/okx/okbchain/libs/system"
+	"github.com/okx/brczero/app/logevents"
+	"github.com/okx/brczero/libs/system"
 	"github.com/spf13/cobra"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
+	"github.com/okx/brczero/libs/cosmos-sdk/codec"
 )
 
 func subscribeCmd(cdc *codec.Codec) *cobra.Command {

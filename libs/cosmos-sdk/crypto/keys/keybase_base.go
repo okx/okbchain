@@ -8,13 +8,13 @@ import (
 	"strings"
 
 	"github.com/cosmos/go-bip39"
-	tmcrypto "github.com/okx/okbchain/libs/tendermint/crypto"
-	"github.com/okx/okbchain/libs/tendermint/crypto/secp256k1"
+	tmcrypto "github.com/okx/brczero/libs/tendermint/crypto"
+	"github.com/okx/brczero/libs/tendermint/crypto/secp256k1"
 	"github.com/pkg/errors"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/crypto"
-	"github.com/okx/okbchain/libs/cosmos-sdk/crypto/keys/hd"
-	"github.com/okx/okbchain/libs/cosmos-sdk/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/crypto"
+	"github.com/okx/brczero/libs/cosmos-sdk/crypto/keys/hd"
+	"github.com/okx/brczero/libs/cosmos-sdk/types"
 )
 
 type (

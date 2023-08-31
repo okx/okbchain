@@ -8,18 +8,18 @@ import (
 
 	ethcmn "github.com/ethereum/go-ethereum/common"
 
-	"github.com/okx/okbchain/libs/tendermint/libs/kv"
+	"github.com/okx/brczero/libs/tendermint/libs/kv"
 
-	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
+	abci "github.com/okx/brczero/libs/tendermint/abci/types"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	dbm "github.com/okx/okbchain/libs/tm-db"
+	dbm "github.com/okx/brczero/libs/tm-db"
 
-	cfg "github.com/okx/okbchain/libs/tendermint/config"
-	sm "github.com/okx/okbchain/libs/tendermint/state"
-	"github.com/okx/okbchain/libs/tendermint/types"
+	cfg "github.com/okx/brczero/libs/tendermint/config"
+	sm "github.com/okx/brczero/libs/tendermint/state"
+	"github.com/okx/brczero/libs/tendermint/types"
 )
 
 func TestStoreLoadValidators(t *testing.T) {

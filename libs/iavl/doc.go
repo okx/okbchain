@@ -9,8 +9,8 @@
 //
 // Basic usage of MutableTree:
 //
-//  import "github.com/okx/okbchain/libs/iavl"
-//  import "github.com/okx/okbchain/libs/tm-db"
+//  import "github.com/okx/brczero/libs/iavl"
+//  import "github.com/okx/brczero/libs/tm-db"
 //  ...
 //
 //  tree := iavl.NewMutableTree(db.NewMemDB(), 128)

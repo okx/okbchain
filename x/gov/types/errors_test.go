@@ -1,7 +1,7 @@
 package types
 
 import (
-	sdkerror "github.com/okx/okbchain/libs/cosmos-sdk/types/errors"
+	sdkerror "github.com/okx/brczero/libs/cosmos-sdk/types/errors"
 	"testing"
 
 	"github.com/stretchr/testify/require"

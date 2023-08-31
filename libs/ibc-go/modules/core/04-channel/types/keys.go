@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"regexp"
 
-	sdkerrors "github.com/okx/okbchain/libs/cosmos-sdk/types/errors"
-	host "github.com/okx/okbchain/libs/ibc-go/modules/core/24-host"
+	sdkerrors "github.com/okx/brczero/libs/cosmos-sdk/types/errors"
+	host "github.com/okx/brczero/libs/ibc-go/modules/core/24-host"
 )
 
 const (

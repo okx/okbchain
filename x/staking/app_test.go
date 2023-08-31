@@ -5,20 +5,20 @@ import (
 	"os"
 	"testing"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/client/context"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/auth"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/auth/client/utils"
+	"github.com/okx/brczero/libs/cosmos-sdk/client/context"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/auth"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/auth/client/utils"
 
-	"github.com/okx/okbchain/libs/tendermint/libs/log"
-	"github.com/okx/okbchain/x/staking/keeper"
-	"github.com/okx/okbchain/x/staking/types"
+	"github.com/okx/brczero/libs/tendermint/libs/log"
+	"github.com/okx/brczero/x/staking/keeper"
+	"github.com/okx/brczero/x/staking/types"
 
-	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
+	abci "github.com/okx/brczero/libs/tendermint/abci/types"
 	"github.com/stretchr/testify/require"
 
-	cliLcd "github.com/okx/okbchain/libs/cosmos-sdk/client/lcd"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/mock"
+	cliLcd "github.com/okx/brczero/libs/cosmos-sdk/client/lcd"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/mock"
 )
 
 // getMockApp returns an initialized mock application for this module.

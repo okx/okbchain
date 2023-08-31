@@ -3,18 +3,18 @@ package config
 import (
 	"testing"
 
-	iavlconfig "github.com/okx/okbchain/libs/iavl/config"
+	iavlconfig "github.com/okx/brczero/libs/iavl/config"
 
 	"github.com/spf13/viper"
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/server"
-	tm "github.com/okx/okbchain/libs/tendermint/config"
+	"github.com/okx/brczero/libs/cosmos-sdk/server"
+	tm "github.com/okx/brczero/libs/tendermint/config"
 )
 
 func TestConfig(t *testing.T) {
-	c := GetOkbcConfig()
+	c := GetBRCZeroConfig()
 
 	tm.SetDynamicConfig(c)
 	require.Equal(t, 0, tm.DynamicConfig.GetMempoolSize())

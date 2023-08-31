@@ -4,9 +4,9 @@ import (
 	"context"
 	"errors"
 
-	"github.com/okx/okbchain/libs/tendermint/libs/pubsub/query"
-	"github.com/okx/okbchain/libs/tendermint/state/indexer"
-	"github.com/okx/okbchain/libs/tendermint/types"
+	"github.com/okx/brczero/libs/tendermint/libs/pubsub/query"
+	"github.com/okx/brczero/libs/tendermint/state/indexer"
+	"github.com/okx/brczero/libs/tendermint/types"
 )
 
 var _ indexer.BlockIndexer = (*BlockerIndexer)(nil)

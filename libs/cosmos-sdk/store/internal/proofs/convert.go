@@ -2,7 +2,7 @@ package proofs
 
 import (
 	"fmt"
-	"github.com/okx/okbchain/libs/tendermint/proto/crypto/merkle"
+	"github.com/okx/brczero/libs/tendermint/proto/crypto/merkle"
 	"math/bits"
 
 	ics23 "github.com/confio/ics23/go"

@@ -1,12 +1,12 @@
 package types
 
 import (
-	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
-	codectypes "github.com/okx/okbchain/libs/cosmos-sdk/codec/types"
-	sdkerrors "github.com/okx/okbchain/libs/cosmos-sdk/types/errors"
-	"github.com/okx/okbchain/libs/cosmos-sdk/types/tx/signing"
-	clienttypes "github.com/okx/okbchain/libs/ibc-go/modules/core/02-client/types"
-	"github.com/okx/okbchain/libs/ibc-go/modules/core/exported"
+	"github.com/okx/brczero/libs/cosmos-sdk/codec"
+	codectypes "github.com/okx/brczero/libs/cosmos-sdk/codec/types"
+	sdkerrors "github.com/okx/brczero/libs/cosmos-sdk/types/errors"
+	"github.com/okx/brczero/libs/cosmos-sdk/types/tx/signing"
+	clienttypes "github.com/okx/brczero/libs/ibc-go/modules/core/02-client/types"
+	"github.com/okx/brczero/libs/ibc-go/modules/core/exported"
 )
 
 // RegisterInterfaces register the ibc channel submodule interfaces to protobuf

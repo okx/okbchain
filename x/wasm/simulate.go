@@ -1,16 +1,16 @@
 package wasm
 
 import (
-	"github.com/okx/okbchain/app/rpc/simulator"
-	"github.com/okx/okbchain/libs/cosmos-sdk/baseapp"
-	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
-	types2 "github.com/okx/okbchain/libs/cosmos-sdk/codec/types"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/bank"
-	"github.com/okx/okbchain/x/wasm/keeper"
-	"github.com/okx/okbchain/x/wasm/proxy"
-	"github.com/okx/okbchain/x/wasm/types"
-	"github.com/okx/okbchain/x/wasm/watcher"
+	"github.com/okx/brczero/app/rpc/simulator"
+	"github.com/okx/brczero/libs/cosmos-sdk/baseapp"
+	"github.com/okx/brczero/libs/cosmos-sdk/codec"
+	types2 "github.com/okx/brczero/libs/cosmos-sdk/codec/types"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/bank"
+	"github.com/okx/brczero/x/wasm/keeper"
+	"github.com/okx/brczero/x/wasm/proxy"
+	"github.com/okx/brczero/x/wasm/types"
+	"github.com/okx/brczero/x/wasm/watcher"
 	"sync"
 )
 

@@ -8,14 +8,14 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/okx/okbchain/libs/tendermint/crypto/secp256k1"
-	tmtypes "github.com/okx/okbchain/libs/tendermint/types"
+	"github.com/okx/brczero/libs/tendermint/crypto/secp256k1"
+	tmtypes "github.com/okx/brczero/libs/tendermint/types"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
-	simapparams "github.com/okx/okbchain/libs/cosmos-sdk/simapp/params"
-	"github.com/okx/okbchain/libs/cosmos-sdk/types/module"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/auth"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/simulation"
+	"github.com/okx/brczero/libs/cosmos-sdk/codec"
+	simapparams "github.com/okx/brczero/libs/cosmos-sdk/simapp/params"
+	"github.com/okx/brczero/libs/cosmos-sdk/types/module"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/auth"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/simulation"
 )
 
 // AppStateFn returns the initial application state using a genesis or the simulation parameters.

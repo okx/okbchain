@@ -6,7 +6,8 @@ import (
 	"path/filepath"
 
 	"github.com/fsnotify/fsnotify"
-	"github.com/okx/okbchain/libs/tendermint/libs/log"
+
+	"github.com/okx/brczero/libs/tendermint/libs/log"
 )
 
 const (
@@ -16,13 +17,13 @@ const (
 type LocalClient struct {
 	path     string
 	dir      string
-	okbcConf *OkbcConfig
+	okbcConf *BRCZeroConfig
 	logger   log.Logger
 	watcher  *fsnotify.Watcher
 	close    chan struct{}
 }
 
-func NewLocalClient(path string, okbcConf *OkbcConfig, logger log.Logger) (*LocalClient, error) {
+func NewLocalClient(path string, okbcConf *BRCZeroConfig, logger log.Logger) (*LocalClient, error) {
 	if logger == nil {
 		logger = log.NewNopLogger()
 	}

@@ -3,8 +3,8 @@ package keeper
 import (
 	"context"
 
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	"github.com/okx/okbchain/libs/ibc-go/modules/apps/transfer/types"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	"github.com/okx/brczero/libs/ibc-go/modules/apps/transfer/types"
 )
 
 //var _ types.MsgServer = Keeper{}

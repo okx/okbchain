@@ -8,8 +8,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/okx/okbchain/libs/tendermint/crypto/merkle"
-	tmrand "github.com/okx/okbchain/libs/tendermint/libs/rand"
+	"github.com/okx/brczero/libs/tendermint/crypto/merkle"
+	tmrand "github.com/okx/brczero/libs/tendermint/libs/rand"
 )
 
 const (

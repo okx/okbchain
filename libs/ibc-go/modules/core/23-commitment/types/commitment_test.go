@@ -3,10 +3,10 @@ package types_test
 import (
 	"testing"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/store/iavl"
-	"github.com/okx/okbchain/libs/cosmos-sdk/store/rootmulti"
-	storetypes "github.com/okx/okbchain/libs/cosmos-sdk/store/types"
-	dbm "github.com/okx/okbchain/libs/tm-db"
+	"github.com/okx/brczero/libs/cosmos-sdk/store/iavl"
+	"github.com/okx/brczero/libs/cosmos-sdk/store/rootmulti"
+	storetypes "github.com/okx/brczero/libs/cosmos-sdk/store/types"
+	dbm "github.com/okx/brczero/libs/tm-db"
 
 	"github.com/stretchr/testify/suite"
 	// "github.com/cosmos/cosmos-sdk/store/iavl"

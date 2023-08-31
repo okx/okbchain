@@ -1,8 +1,8 @@
 package proxy
 
 import (
-	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
-	"github.com/okx/okbchain/libs/tendermint/version"
+	abci "github.com/okx/brczero/libs/tendermint/abci/types"
+	"github.com/okx/brczero/libs/tendermint/version"
 )
 
 // RequestInfo contains all the information for sending

@@ -1,8 +1,8 @@
 package types
 
 import (
-	"github.com/okx/okbchain/libs/tendermint/crypto/ed25519"
-	tmmath "github.com/okx/okbchain/libs/tendermint/libs/math"
+	"github.com/okx/brczero/libs/tendermint/crypto/ed25519"
+	tmmath "github.com/okx/brczero/libs/tendermint/libs/math"
 )
 
 var (

@@ -1,19 +1,21 @@
 package keeper_test
 
 import (
-	"github.com/okx/okbchain/x/wasm"
-	"github.com/okx/okbchain/x/wasm/keeper"
 	"testing"
 	"time"
 
-	"github.com/okx/okbchain/app"
-	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
-	tmtypes "github.com/okx/okbchain/libs/tendermint/types"
-	govtypes "github.com/okx/okbchain/x/gov/types"
-	"github.com/okx/okbchain/x/wasm/types"
+	"github.com/okx/brczero/x/wasm"
+	"github.com/okx/brczero/x/wasm/keeper"
+
 	"github.com/stretchr/testify/suite"
+
+	"github.com/okx/brczero/app"
+	"github.com/okx/brczero/libs/cosmos-sdk/codec"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	abci "github.com/okx/brczero/libs/tendermint/abci/types"
+	tmtypes "github.com/okx/brczero/libs/tendermint/types"
+	govtypes "github.com/okx/brczero/x/gov/types"
+	"github.com/okx/brczero/x/wasm/types"
 )
 
 //import (
@@ -24,19 +26,19 @@ import (
 //	"io/ioutil"
 //	"testing"
 //
-//	"github.com/okx/okbchain/libs/cosmos-sdk/x/params/client/utils"
+//	"github.com/okx/brczero/libs/cosmos-sdk/x/params/client/utils"
 //
 //	wasmvm "github.com/CosmWasm/wasmvm"
 //
-//	"github.com/okx/okbchain/x/wasm/keeper/wasmtesting"
+//	"github.com/okx/brczero/x/wasm/keeper/wasmtesting"
 //
-//	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-//	govtypes "github.com/okx/okbchain/libs/cosmos-sdk/x/gov/types"
-//	"github.com/okx/okbchain/libs/cosmos-sdk/x/params/types/proposal"
+//	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+//	govtypes "github.com/okx/brczero/libs/cosmos-sdk/x/gov/types"
+//	"github.com/okx/brczero/libs/cosmos-sdk/x/params/types/proposal"
 //	"github.com/stretchr/testify/assert"
 //	"github.com/stretchr/testify/require"
 //
-//	"github.com/okx/okbchain/x/wasm/types"
+//	"github.com/okx/brczero/x/wasm/types"
 //)
 //
 //func TestStoreCodeProposal(t *testing.T) {
@@ -876,7 +878,7 @@ type ProposalTestSuite struct {
 
 	ctx         sdk.Context
 	wasmHandler govtypes.Handler
-	app         *app.OKBChainApp
+	app         *app.BRCZeroApp
 	codec       *codec.Codec
 }
 

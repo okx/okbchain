@@ -4,15 +4,15 @@ import (
 	"fmt"
 	"time"
 
-	supplyexported "github.com/okx/okbchain/libs/cosmos-sdk/x/supply/exported"
-	"github.com/okx/okbchain/x/common"
-	"github.com/okx/okbchain/x/gov/types"
-	"github.com/okx/okbchain/x/staking/exported"
+	supplyexported "github.com/okx/brczero/libs/cosmos-sdk/x/supply/exported"
+	"github.com/okx/brczero/x/common"
+	"github.com/okx/brczero/x/gov/types"
+	"github.com/okx/brczero/x/staking/exported"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	"github.com/okx/okbchain/libs/tendermint/libs/log"
-	"github.com/okx/okbchain/x/params"
+	"github.com/okx/brczero/libs/cosmos-sdk/codec"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	"github.com/okx/brczero/libs/tendermint/libs/log"
+	"github.com/okx/brczero/x/params"
 )
 
 // Keeper defines governance keeper

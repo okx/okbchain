@@ -4,20 +4,20 @@ import (
 	"runtime"
 	"time"
 
-	appconfig "github.com/okx/okbchain/app/config"
-	"github.com/okx/okbchain/libs/system/trace"
-	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
-	"github.com/okx/okbchain/x/wasm/watcher"
+	appconfig "github.com/okx/brczero/app/config"
+	"github.com/okx/brczero/libs/system/trace"
+	abci "github.com/okx/brczero/libs/tendermint/abci/types"
+	"github.com/okx/brczero/x/wasm/watcher"
 )
 
 // BeginBlock implements the Application interface
-func (app *OKBChainApp) BeginBlock(req abci.RequestBeginBlock) (res abci.ResponseBeginBlock) {
+func (app *BRCZeroApp) BeginBlock(req abci.RequestBeginBlock) (res abci.ResponseBeginBlock) {
 	trace.OnAppBeginBlockEnter(app.LastBlockHeight() + 1)
 	app.EvmKeeper.Watcher.DelayEraseKey()
 	return app.BaseApp.BeginBlock(req)
 }
 
-func (app *OKBChainApp) DeliverTx(req abci.RequestDeliverTx) (res abci.ResponseDeliverTx) {
+func (app *BRCZeroApp) DeliverTx(req abci.RequestDeliverTx) (res abci.ResponseDeliverTx) {
 
 	trace.OnAppDeliverTxEnter()
 
@@ -26,11 +26,11 @@ func (app *OKBChainApp) DeliverTx(req abci.RequestDeliverTx) (res abci.ResponseD
 	return resp
 }
 
-func (app *OKBChainApp) PreDeliverRealTx(req []byte) (res abci.TxEssentials) {
+func (app *BRCZeroApp) PreDeliverRealTx(req []byte) (res abci.TxEssentials) {
 	return app.BaseApp.PreDeliverRealTx(req)
 }
 
-func (app *OKBChainApp) DeliverRealTx(req abci.TxEssentials) (res abci.ResponseDeliverTx) {
+func (app *BRCZeroApp) DeliverRealTx(req abci.TxEssentials) (res abci.ResponseDeliverTx) {
 	trace.OnAppDeliverTxEnter()
 	resp := app.BaseApp.DeliverRealTx(req)
 	app.EvmKeeper.Watcher.RecordTxAndFailedReceipt(req, &resp, app.GetTxDecoder())
@@ -39,13 +39,13 @@ func (app *OKBChainApp) DeliverRealTx(req abci.TxEssentials) (res abci.ResponseD
 }
 
 // EndBlock implements the Application interface
-func (app *OKBChainApp) EndBlock(req abci.RequestEndBlock) (res abci.ResponseEndBlock) {
+func (app *BRCZeroApp) EndBlock(req abci.RequestEndBlock) (res abci.ResponseEndBlock) {
 	return app.BaseApp.EndBlock(req)
 }
 
 // Commit implements the Application interface
-func (app *OKBChainApp) Commit(req abci.RequestCommit) abci.ResponseCommit {
-	if gcInterval := appconfig.GetOkbcConfig().GetGcInterval(); gcInterval > 0 {
+func (app *BRCZeroApp) Commit(req abci.RequestCommit) abci.ResponseCommit {
+	if gcInterval := appconfig.GetBRCZeroConfig().GetGcInterval(); gcInterval > 0 {
 		if (app.BaseApp.LastBlockHeight()+1)%int64(gcInterval) == 0 {
 			startTime := time.Now()
 			runtime.GC()

@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"math/rand"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/simulation"
-	"github.com/okx/okbchain/x/slashing/internal/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/simulation"
+	"github.com/okx/brczero/x/slashing/internal/types"
 )
 
 const (

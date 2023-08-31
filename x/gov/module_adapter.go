@@ -2,16 +2,16 @@ package gov
 
 import (
 	"github.com/gorilla/mux"
-	"github.com/okx/okbchain/libs/cosmos-sdk/client/context"
-	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
-	"github.com/okx/okbchain/libs/cosmos-sdk/types/module"
+	"github.com/okx/brczero/libs/cosmos-sdk/client/context"
+	"github.com/okx/brczero/libs/cosmos-sdk/codec"
+	"github.com/okx/brczero/libs/cosmos-sdk/types/module"
 	"github.com/spf13/cobra"
 
-	"github.com/okx/okbchain/x/gov/types"
+	"github.com/okx/brczero/x/gov/types"
 
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
-	anytypes "github.com/okx/okbchain/libs/cosmos-sdk/codec/types"
-	GovCli "github.com/okx/okbchain/x/gov/client/cli"
+	anytypes "github.com/okx/brczero/libs/cosmos-sdk/codec/types"
+	GovCli "github.com/okx/brczero/x/gov/client/cli"
 )
 
 var (

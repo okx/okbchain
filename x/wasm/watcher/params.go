@@ -4,7 +4,7 @@ import (
 	"log"
 
 	"github.com/golang/protobuf/proto"
-	"github.com/okx/okbchain/x/wasm/types"
+	"github.com/okx/brczero/x/wasm/types"
 )
 
 var (

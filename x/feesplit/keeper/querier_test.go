@@ -3,11 +3,11 @@ package keeper_test
 import (
 	"fmt"
 
-	"github.com/okx/okbchain/app/crypto/ethsecp256k1"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	"github.com/okx/okbchain/libs/cosmos-sdk/types/query"
-	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
-	"github.com/okx/okbchain/x/feesplit/types"
+	"github.com/okx/brczero/app/crypto/ethsecp256k1"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/types/query"
+	abci "github.com/okx/brczero/libs/tendermint/abci/types"
+	"github.com/okx/brczero/x/feesplit/types"
 )
 
 func (suite *KeeperTestSuite) TestFeeSplits() {

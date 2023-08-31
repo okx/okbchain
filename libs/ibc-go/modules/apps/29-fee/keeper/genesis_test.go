@@ -1,9 +1,9 @@
 package keeper_test
 
 import (
-	"github.com/okx/okbchain/libs/ibc-go/modules/apps/29-fee/types"
-	channeltypes "github.com/okx/okbchain/libs/ibc-go/modules/core/04-channel/types"
-	ibctesting "github.com/okx/okbchain/libs/ibc-go/testing"
+	"github.com/okx/brczero/libs/ibc-go/modules/apps/29-fee/types"
+	channeltypes "github.com/okx/brczero/libs/ibc-go/modules/core/04-channel/types"
+	ibctesting "github.com/okx/brczero/libs/ibc-go/testing"
 )
 
 func (suite *KeeperTestSuite) TestInitGenesis() {

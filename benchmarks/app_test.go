@@ -5,34 +5,36 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"errors"
-	"github.com/okx/okbchain/libs/system"
 	"math/big"
 	"strconv"
 	"strings"
 	"testing"
 	"time"
 
+	"github.com/okx/brczero/libs/system"
+
 	ethcmn "github.com/ethereum/go-ethereum/common"
 	ethcrypto "github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/rlp"
-	"github.com/okx/okbchain/app"
-	types3 "github.com/okx/okbchain/app/types"
-	"github.com/okx/okbchain/libs/cosmos-sdk/simapp"
-	"github.com/okx/okbchain/libs/cosmos-sdk/simapp/helpers"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	authtypes "github.com/okx/okbchain/libs/cosmos-sdk/x/auth"
-	authexported "github.com/okx/okbchain/libs/cosmos-sdk/x/auth/exported"
-	banktypes "github.com/okx/okbchain/libs/cosmos-sdk/x/bank"
-	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
-	"github.com/okx/okbchain/libs/tendermint/crypto"
-	"github.com/okx/okbchain/libs/tendermint/crypto/secp256k1"
-	"github.com/okx/okbchain/libs/tendermint/global"
-	"github.com/okx/okbchain/libs/tendermint/libs/log"
-	"github.com/okx/okbchain/libs/tendermint/types"
-	dbm "github.com/okx/okbchain/libs/tm-db"
-	types2 "github.com/okx/okbchain/x/evm/types"
-	wasmtypes "github.com/okx/okbchain/x/wasm/types"
 	"github.com/stretchr/testify/require"
+
+	"github.com/okx/brczero/app"
+	types3 "github.com/okx/brczero/app/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/simapp"
+	"github.com/okx/brczero/libs/cosmos-sdk/simapp/helpers"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	authtypes "github.com/okx/brczero/libs/cosmos-sdk/x/auth"
+	authexported "github.com/okx/brczero/libs/cosmos-sdk/x/auth/exported"
+	banktypes "github.com/okx/brczero/libs/cosmos-sdk/x/bank"
+	abci "github.com/okx/brczero/libs/tendermint/abci/types"
+	"github.com/okx/brczero/libs/tendermint/crypto"
+	"github.com/okx/brczero/libs/tendermint/crypto/secp256k1"
+	"github.com/okx/brczero/libs/tendermint/global"
+	"github.com/okx/brczero/libs/tendermint/libs/log"
+	"github.com/okx/brczero/libs/tendermint/types"
+	dbm "github.com/okx/brczero/libs/tm-db"
+	types2 "github.com/okx/brczero/x/evm/types"
+	wasmtypes "github.com/okx/brczero/x/wasm/types"
 )
 
 func TestTxSending(t *testing.T) {
@@ -95,7 +97,7 @@ func TestCw20TxSending(t *testing.T) {
 type AppInfo struct {
 	height int64
 
-	App              *app.OKBChainApp
+	App              *app.BRCZeroApp
 	evmMintKey       *ecdsa.PrivateKey
 	evmMintAddr      sdk.AccAddress
 	MinterKey        crypto.PrivKey
@@ -161,17 +163,17 @@ func InitializeOKXApp(b testing.TB, db dbm.DB, numAccounts int) AppInfo {
 	return info
 }
 
-func setup(db dbm.DB, withGenesis bool, invCheckPeriod uint) (*app.OKBChainApp, simapp.GenesisState) {
-	okxApp := app.NewOKBChainApp(log.NewNopLogger(), db, nil, true, map[int64]bool{}, invCheckPeriod)
+func setup(db dbm.DB, withGenesis bool, invCheckPeriod uint) (*app.BRCZeroApp, simapp.GenesisState) {
+	okxApp := app.NewBRCZeroApp(log.NewNopLogger(), db, nil, true, map[int64]bool{}, invCheckPeriod)
 	if withGenesis {
 		return okxApp, app.NewDefaultGenesisState()
 	}
 	return okxApp, simapp.GenesisState{}
 }
 
-// SetupWithGenesisAccounts initializes a new OKBChainApp with the provided genesis
+// SetupWithGenesisAccounts initializes a new BRCZeroApp with the provided genesis
 // accounts and possible balances.
-func SetupWithGenesisAccounts(b testing.TB, db dbm.DB, genAccs []authexported.GenesisAccount) *app.OKBChainApp {
+func SetupWithGenesisAccounts(b testing.TB, db dbm.DB, genAccs []authexported.GenesisAccount) *app.BRCZeroApp {
 	okxApp, genesisState := setup(db, true, 0)
 	authGenesis := authtypes.NewGenesisState(authtypes.DefaultParams(), genAccs)
 	appCodec := okxApp.Codec()

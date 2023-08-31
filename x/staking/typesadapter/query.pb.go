@@ -10,7 +10,7 @@ import (
 	math "math"
 	math_bits "math/bits"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/types/query"
+	"github.com/okx/brczero/libs/cosmos-sdk/types/query"
 
 	_ "github.com/cosmos/cosmos-proto"
 	_ "github.com/gogo/protobuf/gogoproto"

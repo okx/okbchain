@@ -1,10 +1,10 @@
 package signing
 
 import (
-	types3 "github.com/okx/okbchain/libs/cosmos-sdk/crypto/types"
-	types2 "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	txmsg "github.com/okx/okbchain/libs/cosmos-sdk/types/ibc-adapter"
-	signing2 "github.com/okx/okbchain/libs/cosmos-sdk/types/tx/signing"
+	types3 "github.com/okx/brczero/libs/cosmos-sdk/crypto/types"
+	types2 "github.com/okx/brczero/libs/cosmos-sdk/types"
+	txmsg "github.com/okx/brczero/libs/cosmos-sdk/types/ibc-adapter"
+	signing2 "github.com/okx/brczero/libs/cosmos-sdk/types/tx/signing"
 )
 
 // SigVerifiableTx defines a transaction interface for all signature verification

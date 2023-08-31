@@ -11,12 +11,12 @@ import (
 
 	"github.com/pkg/errors"
 
-	dbm "github.com/okx/okbchain/libs/tm-db"
+	dbm "github.com/okx/brczero/libs/tm-db"
 
-	"github.com/okx/okbchain/libs/tendermint/libs/pubsub/query"
-	tmstring "github.com/okx/okbchain/libs/tendermint/libs/strings"
-	"github.com/okx/okbchain/libs/tendermint/state/txindex"
-	"github.com/okx/okbchain/libs/tendermint/types"
+	"github.com/okx/brczero/libs/tendermint/libs/pubsub/query"
+	tmstring "github.com/okx/brczero/libs/tendermint/libs/strings"
+	"github.com/okx/brczero/libs/tendermint/state/txindex"
+	"github.com/okx/brczero/libs/tendermint/types"
 )
 
 const (

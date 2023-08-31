@@ -1,9 +1,9 @@
 package proofs
 
 import (
-	"github.com/okx/okbchain/libs/cosmos-sdk/store/internal/maps"
-	"github.com/okx/okbchain/libs/tendermint/libs/rand"
-	"github.com/okx/okbchain/libs/tendermint/proto/crypto/merkle"
+	"github.com/okx/brczero/libs/cosmos-sdk/store/internal/maps"
+	"github.com/okx/brczero/libs/tendermint/libs/rand"
+	"github.com/okx/brczero/libs/tendermint/proto/crypto/merkle"
 	"sort"
 )
 

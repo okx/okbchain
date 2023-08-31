@@ -1,10 +1,10 @@
 package keeper
 
 import (
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	authtypes "github.com/okx/okbchain/libs/cosmos-sdk/x/auth"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/supply/exported"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/supply/internal/types"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	authtypes "github.com/okx/brczero/libs/cosmos-sdk/x/auth"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/supply/exported"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/supply/internal/types"
 )
 
 // GetModuleAddress returns an address based on the module name

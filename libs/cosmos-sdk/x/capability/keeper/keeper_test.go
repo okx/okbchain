@@ -4,15 +4,15 @@ import (
 	"fmt"
 	"testing"
 
-	chaincodec "github.com/okx/okbchain/app/codec"
-	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
-	tmtypes "github.com/okx/okbchain/libs/tendermint/types"
+	chaincodec "github.com/okx/brczero/app/codec"
+	abci "github.com/okx/brczero/libs/tendermint/abci/types"
+	tmtypes "github.com/okx/brczero/libs/tendermint/types"
 
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/capability/keeper"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/capability/types"
-	stakingtypes "github.com/okx/okbchain/libs/cosmos-sdk/x/staking/types"
-	"github.com/okx/okbchain/libs/ibc-go/testing/simapp"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/capability/keeper"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/capability/types"
+	stakingtypes "github.com/okx/brczero/libs/cosmos-sdk/x/staking/types"
+	"github.com/okx/brczero/libs/ibc-go/testing/simapp"
 	"github.com/stretchr/testify/suite"
 )
 

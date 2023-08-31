@@ -3,8 +3,8 @@ package lite
 import (
 	"time"
 
-	tmmath "github.com/okx/okbchain/libs/tendermint/libs/math"
-	"github.com/okx/okbchain/libs/tendermint/types"
+	tmmath "github.com/okx/brczero/libs/tendermint/libs/math"
+	"github.com/okx/brczero/libs/tendermint/types"
 )
 
 func IBCVerify(

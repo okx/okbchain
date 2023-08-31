@@ -9,11 +9,11 @@ import (
 	"github.com/ethereum/go-ethereum/core/rawdb"
 	ethtypes "github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/trie"
-	apptypes "github.com/okx/okbchain/app/types"
-	"github.com/okx/okbchain/libs/cosmos-sdk/server"
-	"github.com/okx/okbchain/libs/cosmos-sdk/store/mpt"
-	authexported "github.com/okx/okbchain/libs/cosmos-sdk/x/auth/exported"
-	authtypes "github.com/okx/okbchain/libs/cosmos-sdk/x/auth/types"
+	apptypes "github.com/okx/brczero/app/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/server"
+	"github.com/okx/brczero/libs/cosmos-sdk/store/mpt"
+	authexported "github.com/okx/brczero/libs/cosmos-sdk/x/auth/exported"
+	authtypes "github.com/okx/brczero/libs/cosmos-sdk/x/auth/types"
 	"github.com/spf13/cobra"
 )
 

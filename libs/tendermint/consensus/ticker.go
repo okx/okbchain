@@ -3,8 +3,8 @@ package consensus
 import (
 	"time"
 
-	"github.com/okx/okbchain/libs/tendermint/libs/log"
-	"github.com/okx/okbchain/libs/tendermint/libs/service"
+	"github.com/okx/brczero/libs/tendermint/libs/log"
+	"github.com/okx/brczero/libs/tendermint/libs/service"
 )
 
 var (

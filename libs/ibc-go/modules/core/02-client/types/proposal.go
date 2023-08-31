@@ -2,12 +2,12 @@ package types
 
 import (
 	"fmt"
-	codectypes "github.com/okx/okbchain/libs/cosmos-sdk/codec/types"
-	sdkerrors "github.com/okx/okbchain/libs/cosmos-sdk/types/errors"
-	govtypes "github.com/okx/okbchain/libs/cosmos-sdk/x/gov/types"
-	types "github.com/okx/okbchain/libs/cosmos-sdk/x/upgrade/typesadapter"
-	"github.com/okx/okbchain/libs/ibc-go/modules/core/exported"
-	chaingov "github.com/okx/okbchain/x/gov/types"
+	codectypes "github.com/okx/brczero/libs/cosmos-sdk/codec/types"
+	sdkerrors "github.com/okx/brczero/libs/cosmos-sdk/types/errors"
+	govtypes "github.com/okx/brczero/libs/cosmos-sdk/x/gov/types"
+	types "github.com/okx/brczero/libs/cosmos-sdk/x/upgrade/typesadapter"
+	"github.com/okx/brczero/libs/ibc-go/modules/core/exported"
+	chaingov "github.com/okx/brczero/x/gov/types"
 )
 
 const (

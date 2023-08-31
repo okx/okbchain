@@ -3,8 +3,8 @@ package remotedb
 import (
 	"github.com/pkg/errors"
 
-	db "github.com/okx/okbchain/libs/tm-db"
-	protodb "github.com/okx/okbchain/libs/tm-db/remotedb/proto"
+	db "github.com/okx/brczero/libs/tm-db"
+	protodb "github.com/okx/brczero/libs/tm-db/remotedb/proto"
 )
 
 type batch struct {

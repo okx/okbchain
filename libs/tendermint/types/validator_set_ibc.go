@@ -3,8 +3,8 @@ package types
 import (
 	"bytes"
 
-	"github.com/okx/okbchain/libs/tendermint/crypto/merkle"
-	tmmath "github.com/okx/okbchain/libs/tendermint/libs/math"
+	"github.com/okx/brczero/libs/tendermint/crypto/merkle"
+	tmmath "github.com/okx/brczero/libs/tendermint/libs/math"
 )
 
 func (vals *ValidatorSet) IBCVerifyCommitLightTrusting(chainID string, blockID BlockID,

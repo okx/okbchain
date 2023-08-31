@@ -1,12 +1,12 @@
 package types
 
 import (
-	"github.com/okx/okbchain/libs/ibc-go/modules/core/common"
+	"github.com/okx/brczero/libs/ibc-go/modules/core/common"
 
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	capabilitytypes "github.com/okx/okbchain/libs/cosmos-sdk/x/capability/types"
-	channeltypes "github.com/okx/okbchain/libs/ibc-go/modules/core/04-channel/types"
-	"github.com/okx/okbchain/libs/ibc-go/modules/core/exported"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	capabilitytypes "github.com/okx/brczero/libs/cosmos-sdk/x/capability/types"
+	channeltypes "github.com/okx/brczero/libs/ibc-go/modules/core/04-channel/types"
+	"github.com/okx/brczero/libs/ibc-go/modules/core/exported"
 )
 
 var (

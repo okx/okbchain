@@ -3,17 +3,17 @@ package keys
 import (
 	"testing"
 
-	"github.com/okx/okbchain/libs/tendermint/crypto"
-	"github.com/okx/okbchain/libs/tendermint/crypto/ed25519"
-	tmamino "github.com/okx/okbchain/libs/tendermint/crypto/encoding/amino"
+	"github.com/okx/brczero/libs/tendermint/crypto"
+	"github.com/okx/brczero/libs/tendermint/crypto/ed25519"
+	tmamino "github.com/okx/brczero/libs/tendermint/crypto/encoding/amino"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	amino "github.com/tendermint/go-amino"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
-	"github.com/okx/okbchain/libs/cosmos-sdk/crypto/keys/hd"
-	"github.com/okx/okbchain/libs/cosmos-sdk/tests"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/codec"
+	"github.com/okx/brczero/libs/cosmos-sdk/crypto/keys/hd"
+	"github.com/okx/brczero/libs/cosmos-sdk/tests"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
 )
 
 func TestNew(t *testing.T) {

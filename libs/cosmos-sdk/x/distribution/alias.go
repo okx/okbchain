@@ -1,9 +1,9 @@
 package distribution
 
 import (
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/distribution/client"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/distribution/keeper"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/distribution/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/distribution/client"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/distribution/keeper"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/distribution/types"
 )
 
 // nolint

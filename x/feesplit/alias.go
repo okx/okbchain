@@ -1,8 +1,8 @@
 package feesplit
 
 import (
-	"github.com/okx/okbchain/x/feesplit/keeper"
-	"github.com/okx/okbchain/x/feesplit/types"
+	"github.com/okx/brczero/x/feesplit/keeper"
+	"github.com/okx/brczero/x/feesplit/types"
 )
 
 const (

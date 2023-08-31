@@ -9,12 +9,12 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/okx/okbchain/libs/tendermint/crypto"
+	"github.com/okx/brczero/libs/tendermint/crypto"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	v034auth "github.com/okx/okbchain/libs/cosmos-sdk/x/auth/legacy/v0_34"
-	v038auth "github.com/okx/okbchain/libs/cosmos-sdk/x/auth/legacy/v0_38"
+	"github.com/okx/brczero/libs/cosmos-sdk/codec"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	v034auth "github.com/okx/brczero/libs/cosmos-sdk/x/auth/legacy/v0_34"
+	v038auth "github.com/okx/brczero/libs/cosmos-sdk/x/auth/legacy/v0_38"
 )
 
 const (

@@ -981,14 +981,14 @@ fi;
 
 echo "all tests passed! congratulations~"
 
-#okbchaincli query wasm list-code --limit=5 | jq
-#okbchaincli query wasm list-contract-by-code "$cw20_code_id1" | jq
-#okbchaincli query wasm contract-history "$cw20contractAddr" | jq
-#okbchaincli query wasm contract-state all "$cw20contractAddr" | jq
-#okbchaincli query wasm contract-state raw "$cw20contractAddr" | jq
+#brczerocli query wasm list-code --limit=5 | jq
+#brczerocli query wasm list-contract-by-code "$cw20_code_id1" | jq
+#brczerocli query wasm contract-history "$cw20contractAddr" | jq
+#brczerocli query wasm contract-state all "$cw20contractAddr" | jq
+#brczerocli query wasm contract-state raw "$cw20contractAddr" | jq
 #
-#okbchaincli query wasm code-info "$cw20_code_id1" | jq
-#okbchaincli query wasm contract "$cw20contractAddr" | jq
+#brczerocli query wasm code-info "$cw20_code_id1" | jq
+#brczerocli query wasm contract "$cw20contractAddr" | jq
 
 
 # ===============

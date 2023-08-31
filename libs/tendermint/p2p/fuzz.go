@@ -5,8 +5,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/okx/okbchain/libs/tendermint/config"
-	tmrand "github.com/okx/okbchain/libs/tendermint/libs/rand"
+	"github.com/okx/brczero/libs/tendermint/config"
+	tmrand "github.com/okx/brczero/libs/tendermint/libs/rand"
 )
 
 // FuzzedConnection wraps any net.Conn and depending on the mode either delays

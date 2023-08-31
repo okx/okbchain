@@ -1,10 +1,10 @@
 package watcher
 
 import (
-	cryptocodec "github.com/okx/okbchain/app/crypto/ethsecp256k1"
-	app "github.com/okx/okbchain/app/types"
-	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/auth/exported"
+	cryptocodec "github.com/okx/brczero/app/crypto/ethsecp256k1"
+	app "github.com/okx/brczero/app/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/codec"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/auth/exported"
 )
 
 var WatchCdc *codec.Codec

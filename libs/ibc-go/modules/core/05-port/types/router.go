@@ -3,7 +3,7 @@ package types
 import (
 	"fmt"
 
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
 )
 
 // The router is a map from module name to the IBCModule

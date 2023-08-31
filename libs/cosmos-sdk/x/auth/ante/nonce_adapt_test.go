@@ -4,9 +4,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/baseapp"
-	sdkerrors "github.com/okx/okbchain/libs/cosmos-sdk/types/errors"
-	"github.com/okx/okbchain/libs/tendermint/mock"
+	"github.com/okx/brczero/libs/cosmos-sdk/baseapp"
+	sdkerrors "github.com/okx/brczero/libs/cosmos-sdk/types/errors"
+	"github.com/okx/brczero/libs/tendermint/mock"
 	"github.com/stretchr/testify/assert"
 )
 

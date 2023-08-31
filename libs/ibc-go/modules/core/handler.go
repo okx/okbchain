@@ -1,13 +1,13 @@
 package ibc
 
 import (
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	sdkerrors "github.com/okx/okbchain/libs/cosmos-sdk/types/errors"
-	clienttypes "github.com/okx/okbchain/libs/ibc-go/modules/core/02-client/types"
-	connectiontypes "github.com/okx/okbchain/libs/ibc-go/modules/core/03-connection/types"
-	channeltypes "github.com/okx/okbchain/libs/ibc-go/modules/core/04-channel/types"
-	"github.com/okx/okbchain/libs/ibc-go/modules/core/keeper"
-	"github.com/okx/okbchain/libs/ibc-go/modules/core/types"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	sdkerrors "github.com/okx/brczero/libs/cosmos-sdk/types/errors"
+	clienttypes "github.com/okx/brczero/libs/ibc-go/modules/core/02-client/types"
+	connectiontypes "github.com/okx/brczero/libs/ibc-go/modules/core/03-connection/types"
+	channeltypes "github.com/okx/brczero/libs/ibc-go/modules/core/04-channel/types"
+	"github.com/okx/brczero/libs/ibc-go/modules/core/keeper"
+	"github.com/okx/brczero/libs/ibc-go/modules/core/types"
 )
 
 // NewHandler defines the IBC handler

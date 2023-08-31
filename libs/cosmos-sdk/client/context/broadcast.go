@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/client/flags"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	sdkerrors "github.com/okx/okbchain/libs/cosmos-sdk/types/errors"
-	"github.com/okx/okbchain/libs/tendermint/mempool"
-	"github.com/okx/okbchain/libs/tendermint/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/client/flags"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	sdkerrors "github.com/okx/brczero/libs/cosmos-sdk/types/errors"
+	"github.com/okx/brczero/libs/tendermint/mempool"
+	"github.com/okx/brczero/libs/tendermint/types"
 )
 
 // BroadcastTx broadcasts a transactions either synchronously or asynchronously

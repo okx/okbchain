@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"github.com/okx/okbchain/libs/system"
 	"log"
 	"net/http"
 	_ "net/http/pprof"
@@ -12,33 +11,36 @@ import (
 	"runtime/pprof"
 	"time"
 
-	evmtypes "github.com/okx/okbchain/x/evm/types"
-	"github.com/okx/okbchain/x/evm/watcher"
+	"github.com/okx/brczero/libs/system"
+
+	evmtypes "github.com/okx/brczero/x/evm/types"
+	"github.com/okx/brczero/x/evm/watcher"
 
 	"github.com/gogo/protobuf/jsonpb"
-	"github.com/okx/okbchain/app/config"
-	chain "github.com/okx/okbchain/app/types"
-	"github.com/okx/okbchain/app/utils/appstatus"
-	"github.com/okx/okbchain/app/utils/sanity"
-	"github.com/okx/okbchain/libs/cosmos-sdk/baseapp"
-	"github.com/okx/okbchain/libs/cosmos-sdk/client/lcd"
-	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
-	"github.com/okx/okbchain/libs/cosmos-sdk/server"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	"github.com/okx/okbchain/libs/iavl"
-	"github.com/okx/okbchain/libs/system/trace"
-	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
-	tcmd "github.com/okx/okbchain/libs/tendermint/cmd/tendermint/commands"
-	"github.com/okx/okbchain/libs/tendermint/global"
-	"github.com/okx/okbchain/libs/tendermint/mock"
-	"github.com/okx/okbchain/libs/tendermint/node"
-	"github.com/okx/okbchain/libs/tendermint/proxy"
-	sm "github.com/okx/okbchain/libs/tendermint/state"
-	"github.com/okx/okbchain/libs/tendermint/store"
-	"github.com/okx/okbchain/libs/tendermint/types"
-	dbm "github.com/okx/okbchain/libs/tm-db"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+
+	"github.com/okx/brczero/app/config"
+	chain "github.com/okx/brczero/app/types"
+	"github.com/okx/brczero/app/utils/appstatus"
+	"github.com/okx/brczero/app/utils/sanity"
+	"github.com/okx/brczero/libs/cosmos-sdk/baseapp"
+	"github.com/okx/brczero/libs/cosmos-sdk/client/lcd"
+	"github.com/okx/brczero/libs/cosmos-sdk/codec"
+	"github.com/okx/brczero/libs/cosmos-sdk/server"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	"github.com/okx/brczero/libs/iavl"
+	"github.com/okx/brczero/libs/system/trace"
+	abci "github.com/okx/brczero/libs/tendermint/abci/types"
+	tcmd "github.com/okx/brczero/libs/tendermint/cmd/tendermint/commands"
+	"github.com/okx/brczero/libs/tendermint/global"
+	"github.com/okx/brczero/libs/tendermint/mock"
+	"github.com/okx/brczero/libs/tendermint/node"
+	"github.com/okx/brczero/libs/tendermint/proxy"
+	sm "github.com/okx/brczero/libs/tendermint/state"
+	"github.com/okx/brczero/libs/tendermint/store"
+	"github.com/okx/brczero/libs/tendermint/types"
+	dbm "github.com/okx/brczero/libs/tm-db"
 )
 
 const (
@@ -342,9 +344,9 @@ func doReplay(ctx *server.Context, state sm.State, stateStoreDB dbm.DB, blockSto
 		block := originBlockStore.LoadBlock(lastBlockHeight)
 		meta := originBlockStore.LoadBlockMeta(lastBlockHeight)
 		blockExec := sm.NewBlockExecutor(stateStoreDB, ctx.Logger, mockApp, mock.Mempool{}, sm.MockEvidencePool{})
-		config.GetOkbcConfig().SetDeliverTxsExecuteMode(0) // mockApp not support parallel tx
+		config.GetBRCZeroConfig().SetDeliverTxsExecuteMode(0) // mockApp not support parallel tx
 		state, _, err = blockExec.ApplyBlockWithTrace(state, meta.BlockID, block)
-		config.GetOkbcConfig().SetDeliverTxsExecuteMode(viper.GetInt(sm.FlagDeliverTxsExecMode))
+		config.GetBRCZeroConfig().SetDeliverTxsExecuteMode(viper.GetInt(sm.FlagDeliverTxsExecMode))
 		panicError(err)
 	}
 

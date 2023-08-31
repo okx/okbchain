@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/okx/okbchain/libs/tendermint/libs/bits"
-	"github.com/okx/okbchain/libs/tendermint/types"
+	"github.com/okx/brczero/libs/tendermint/libs/bits"
+	"github.com/okx/brczero/libs/tendermint/types"
 )
 
 //-----------------------------------------------------------------------------

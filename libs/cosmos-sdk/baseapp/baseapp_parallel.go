@@ -8,11 +8,11 @@ import (
 
 	"github.com/spf13/viper"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/store/types"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	sdkerrors "github.com/okx/okbchain/libs/cosmos-sdk/types/errors"
-	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
-	sm "github.com/okx/okbchain/libs/tendermint/state"
+	"github.com/okx/brczero/libs/cosmos-sdk/store/types"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	sdkerrors "github.com/okx/brczero/libs/cosmos-sdk/types/errors"
+	abci "github.com/okx/brczero/libs/tendermint/abci/types"
+	sm "github.com/okx/brczero/libs/tendermint/state"
 )
 
 var (

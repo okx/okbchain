@@ -2,9 +2,9 @@ package ante
 
 import (
 	"fmt"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	sdkerrors "github.com/okx/okbchain/libs/cosmos-sdk/types/errors"
-	evmtypes "github.com/okx/okbchain/x/evm/types"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	sdkerrors "github.com/okx/brczero/libs/cosmos-sdk/types/errors"
+	evmtypes "github.com/okx/brczero/x/evm/types"
 	"math/big"
 	"sync"
 )

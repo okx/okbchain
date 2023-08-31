@@ -1,8 +1,8 @@
 package bank
 
 import (
-	"github.com/okx/okbchain/libs/cosmos-sdk/types/module"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/bank/internal/keeperadapter"
+	"github.com/okx/brczero/libs/cosmos-sdk/types/module"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/bank/internal/keeperadapter"
 )
 
 var (

@@ -11,12 +11,12 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	cliContext "github.com/okx/okbchain/libs/cosmos-sdk/client/context"
-	codectypes "github.com/okx/okbchain/libs/cosmos-sdk/codec/types"
-	"github.com/okx/okbchain/libs/cosmos-sdk/types"
-	typeadapter "github.com/okx/okbchain/libs/cosmos-sdk/types/ibc-adapter"
-	"github.com/okx/okbchain/libs/cosmos-sdk/types/query"
-	"github.com/okx/okbchain/libs/cosmos-sdk/types/tx"
+	cliContext "github.com/okx/brczero/libs/cosmos-sdk/client/context"
+	codectypes "github.com/okx/brczero/libs/cosmos-sdk/codec/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/types"
+	typeadapter "github.com/okx/brczero/libs/cosmos-sdk/types/ibc-adapter"
+	"github.com/okx/brczero/libs/cosmos-sdk/types/query"
+	"github.com/okx/brczero/libs/cosmos-sdk/types/tx"
 )
 
 var _ tx.ServiceServer = txServer{}

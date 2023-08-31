@@ -6,13 +6,13 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
+	abci "github.com/okx/brczero/libs/tendermint/abci/types"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/distribution/types"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/staking"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/supply"
+	"github.com/okx/brczero/libs/cosmos-sdk/codec"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/distribution/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/staking"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/supply"
 )
 
 const custom = "custom"

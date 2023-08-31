@@ -1,10 +1,10 @@
 package infura
 
 import (
-	"github.com/okx/okbchain/libs/tendermint/libs/log"
-	"github.com/okx/okbchain/x/common/monitor"
-	evmtypes "github.com/okx/okbchain/x/evm/types"
-	evm "github.com/okx/okbchain/x/evm/watcher"
+	"github.com/okx/brczero/libs/tendermint/libs/log"
+	"github.com/okx/brczero/x/common/monitor"
+	evmtypes "github.com/okx/brczero/x/evm/types"
+	evm "github.com/okx/brczero/x/evm/watcher"
 )
 
 // nolint

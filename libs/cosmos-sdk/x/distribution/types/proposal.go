@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strings"
 
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	govtypes "github.com/okx/okbchain/libs/cosmos-sdk/x/gov/types"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	govtypes "github.com/okx/brczero/libs/cosmos-sdk/x/gov/types"
 )
 
 const (

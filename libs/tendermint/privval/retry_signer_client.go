@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/okx/okbchain/libs/tendermint/crypto"
-	"github.com/okx/okbchain/libs/tendermint/types"
+	"github.com/okx/brczero/libs/tendermint/crypto"
+	"github.com/okx/brczero/libs/tendermint/types"
 )
 
 // RetrySignerClient wraps SignerClient adding retry for each operation (except

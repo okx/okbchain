@@ -3,12 +3,12 @@ package mock
 import (
 	"testing"
 
-	appconfig "github.com/okx/okbchain/app/config"
-	"github.com/okx/okbchain/libs/tendermint/types"
+	appconfig "github.com/okx/brczero/app/config"
+	"github.com/okx/brczero/libs/tendermint/types"
 
 	"github.com/stretchr/testify/require"
 
-	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
+	abci "github.com/okx/brczero/libs/tendermint/abci/types"
 )
 
 // TestInitApp makes sure we can initialize this thing without an error
@@ -45,7 +45,7 @@ func TestInitApp(t *testing.T) {
 
 // TextDeliverTx ensures we can write a tx
 func TestDeliverTx(t *testing.T) {
-	appconfig.GetOkbcConfig().SetDynamicGpMode(0)
+	appconfig.GetBRCZeroConfig().SetDynamicGpMode(0)
 	// set up an app
 	app, closer, err := SetupApp()
 	// closer may need to be run, even when error in later stage

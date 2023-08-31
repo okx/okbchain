@@ -3,9 +3,9 @@ package mint
 // nolint
 
 import (
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/mint/internal/keeper"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/mint/internal/types"
-	govtypes "github.com/okx/okbchain/x/gov/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/mint/internal/keeper"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/mint/internal/types"
+	govtypes "github.com/okx/brczero/x/gov/types"
 )
 
 const (

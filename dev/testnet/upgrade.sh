@@ -26,7 +26,7 @@ function build_okbchain() {
   version=$1
   (cd ../.. && git checkout dev && git pull && git checkout $version && make install)
   echo "okbchaind version ////"
-  okbchaind version
+  brczerod version
 }
 
 function get_latest_height() {
@@ -131,7 +131,7 @@ function start_node() {
   
   nohup ${BIN_NAME} start \
     --chain-id ${CHAIN_ID} \
-    --home cache/node${index}/okbchaind \
+    --home cache/node${index}/brczerod \
     --p2p.laddr tcp://${IP}:${p2pport} \
     --rpc.laddr tcp://${IP}:${rpcport} \
     --rest.laddr tcp://${IP}:${restport} \
@@ -147,7 +147,7 @@ function start_node() {
 function add_val() {
   index=$1
   node_name=val${index}
-  seed_addr=$(okbchaind tendermint show-node-id --home cache/node0/okbchaind)@${IP}:${seedp2pport}
+  seed_addr=$(brczerod tendermint show-node-id --home cache/node0/brczerod)@${IP}:${seedp2pport}
   echo "add val >>> "$node_name
 
   okbchaind_opts="--p2p.allow_duplicate_ip  --p2p.pex=false  --p2p.addr_book_strict=false  --consensus.timeout_commit 600ms    --upload-delta=false  --elapsed DeliverTxs=0,Round=1,CommitRound=1,Produce=1  --consensus-role=v${index}  --p2p.seeds ${seed_addr} "
@@ -170,7 +170,7 @@ function add_rpc() {
   node_name=rpc${index}
   echo "add rpc >>> "$node_name
   
-  seed_addr=$(okbchaind tendermint show-node-id --home cache/node0/okbchaind)@${IP}:${seedp2pport}
+  seed_addr=$(brczerod tendermint show-node-id --home cache/node0/brczerod)@${IP}:${seedp2pport}
 
   okbchaind_opts="--p2p.seeds ${seed_addr} "
   start_node $index $node_name $okbchaind_opts

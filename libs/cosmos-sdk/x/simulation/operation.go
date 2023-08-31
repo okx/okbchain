@@ -6,8 +6,8 @@ import (
 	"sort"
 	"time"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/baseapp"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/baseapp"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
 )
 
 // Operation runs a state machine transition, and ensures the transition

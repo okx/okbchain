@@ -1,12 +1,12 @@
 package cli
 
 import (
-	"github.com/okx/okbchain/libs/cosmos-sdk/client"
-	"github.com/okx/okbchain/libs/cosmos-sdk/client/context"
-	"github.com/okx/okbchain/libs/cosmos-sdk/client/flags"
-	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
-	interfacetypes "github.com/okx/okbchain/libs/cosmos-sdk/codec/types"
-	"github.com/okx/okbchain/x/icamauth/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/client"
+	"github.com/okx/brczero/libs/cosmos-sdk/client/context"
+	"github.com/okx/brczero/libs/cosmos-sdk/client/flags"
+	"github.com/okx/brczero/libs/cosmos-sdk/codec"
+	interfacetypes "github.com/okx/brczero/libs/cosmos-sdk/codec/types"
+	"github.com/okx/brczero/x/icamauth/types"
 	"github.com/spf13/cobra"
 )
 

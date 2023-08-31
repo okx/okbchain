@@ -1,8 +1,8 @@
 package types
 
 import (
-	sdkerrors "github.com/okx/okbchain/libs/cosmos-sdk/types/errors"
-	host "github.com/okx/okbchain/libs/ibc-go/modules/core/24-host"
+	sdkerrors "github.com/okx/brczero/libs/cosmos-sdk/types/errors"
+	host "github.com/okx/brczero/libs/ibc-go/modules/core/24-host"
 )
 
 var ErrIbcDisabled = sdkerrors.Register(host.ModuleName, 1, "IBC are disabled")

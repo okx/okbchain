@@ -6,11 +6,11 @@ import (
 	"sync"
 	"time"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/server"
-	tmquery "github.com/okx/okbchain/libs/tendermint/libs/pubsub/query"
-	rpcclient "github.com/okx/okbchain/libs/tendermint/rpc/client"
-	coretypes "github.com/okx/okbchain/libs/tendermint/rpc/core/types"
-	tmtypes "github.com/okx/okbchain/libs/tendermint/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/server"
+	tmquery "github.com/okx/brczero/libs/tendermint/libs/pubsub/query"
+	rpcclient "github.com/okx/brczero/libs/tendermint/rpc/client"
+	coretypes "github.com/okx/brczero/libs/tendermint/rpc/core/types"
+	tmtypes "github.com/okx/brczero/libs/tendermint/types"
 	"github.com/spf13/viper"
 
 	"github.com/ethereum/go-ethereum/common"
@@ -18,10 +18,10 @@ import (
 	"github.com/ethereum/go-ethereum/eth/filters"
 	"github.com/ethereum/go-ethereum/rpc"
 
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
 
-	rpctypes "github.com/okx/okbchain/app/rpc/types"
-	evmtypes "github.com/okx/okbchain/x/evm/types"
+	rpctypes "github.com/okx/brczero/app/rpc/types"
+	evmtypes "github.com/okx/brczero/x/evm/types"
 )
 
 var (

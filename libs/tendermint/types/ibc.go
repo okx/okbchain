@@ -1,8 +1,8 @@
 package types
 
 import (
-	"github.com/okx/okbchain/libs/tendermint/libs/protoio"
-	tmproto "github.com/okx/okbchain/libs/tendermint/proto/types"
+	"github.com/okx/brczero/libs/tendermint/libs/protoio"
+	tmproto "github.com/okx/brczero/libs/tendermint/proto/types"
 )
 
 // CanonicalizeVote transforms the given Proposal to a CanonicalProposal.

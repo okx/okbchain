@@ -2,19 +2,19 @@ package watcher
 
 import (
 	"encoding/json"
-	"github.com/okx/okbchain/libs/cosmos-sdk/store/prefix"
-	cosmost "github.com/okx/okbchain/libs/cosmos-sdk/store/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/store/prefix"
+	cosmost "github.com/okx/brczero/libs/cosmos-sdk/store/types"
 	"io"
 	"log"
 	"path/filepath"
 	"sync"
 
-	"github.com/okx/okbchain/app/types"
-	"github.com/okx/okbchain/libs/cosmos-sdk/client/flags"
-	"github.com/okx/okbchain/libs/cosmos-sdk/store/dbadapter"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	dbm "github.com/okx/okbchain/libs/tm-db"
-	"github.com/okx/okbchain/x/evm/watcher"
+	"github.com/okx/brczero/app/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/client/flags"
+	"github.com/okx/brczero/libs/cosmos-sdk/store/dbadapter"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	dbm "github.com/okx/brczero/libs/tm-db"
+	"github.com/okx/brczero/x/evm/watcher"
 	"github.com/spf13/viper"
 )
 

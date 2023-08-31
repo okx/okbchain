@@ -4,24 +4,24 @@ import (
 	"fmt"
 	"testing"
 
-	types3 "github.com/okx/okbchain/libs/tendermint/types"
+	types3 "github.com/okx/brczero/libs/tendermint/types"
 
-	types2 "github.com/okx/okbchain/libs/cosmos-sdk/types/ibc-adapter"
+	types2 "github.com/okx/brczero/libs/cosmos-sdk/types/ibc-adapter"
 
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
 
-	banktypes "github.com/okx/okbchain/libs/cosmos-sdk/x/bank"
-	clienttypes "github.com/okx/okbchain/libs/ibc-go/modules/core/02-client/types"
-	channeltypes "github.com/okx/okbchain/libs/ibc-go/modules/core/04-channel/types"
-	"github.com/okx/okbchain/libs/ibc-go/modules/core/exported"
+	banktypes "github.com/okx/brczero/libs/cosmos-sdk/x/bank"
+	clienttypes "github.com/okx/brczero/libs/ibc-go/modules/core/02-client/types"
+	channeltypes "github.com/okx/brczero/libs/ibc-go/modules/core/04-channel/types"
+	"github.com/okx/brczero/libs/ibc-go/modules/core/exported"
 
 	"github.com/gogo/protobuf/proto"
-	capabilitytypes "github.com/okx/okbchain/libs/cosmos-sdk/x/capability/types"
-	"github.com/okx/okbchain/libs/ibc-go/modules/apps/27-interchain-accounts/host/types"
-	icatypes "github.com/okx/okbchain/libs/ibc-go/modules/apps/27-interchain-accounts/types"
-	host "github.com/okx/okbchain/libs/ibc-go/modules/core/24-host"
-	ibctesting "github.com/okx/okbchain/libs/ibc-go/testing"
-	"github.com/okx/okbchain/libs/tendermint/crypto"
+	capabilitytypes "github.com/okx/brczero/libs/cosmos-sdk/x/capability/types"
+	"github.com/okx/brczero/libs/ibc-go/modules/apps/27-interchain-accounts/host/types"
+	icatypes "github.com/okx/brczero/libs/ibc-go/modules/apps/27-interchain-accounts/types"
+	host "github.com/okx/brczero/libs/ibc-go/modules/core/24-host"
+	ibctesting "github.com/okx/brczero/libs/ibc-go/testing"
+	"github.com/okx/brczero/libs/tendermint/crypto"
 	"github.com/stretchr/testify/suite"
 )
 

@@ -1,10 +1,10 @@
 package cli
 
 import (
-	"github.com/okx/okbchain/libs/cosmos-sdk/client"
-	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
-	interfacetypes "github.com/okx/okbchain/libs/cosmos-sdk/codec/types"
-	"github.com/okx/okbchain/libs/ibc-go/modules/core/04-channel/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/client"
+	"github.com/okx/brczero/libs/cosmos-sdk/codec"
+	interfacetypes "github.com/okx/brczero/libs/cosmos-sdk/codec/types"
+	"github.com/okx/brczero/libs/ibc-go/modules/core/04-channel/types"
 	"github.com/spf13/cobra"
 )
 

@@ -8,34 +8,35 @@ import (
 	"strings"
 	"time"
 
-	"github.com/okx/okbchain/app/config"
-	"github.com/okx/okbchain/app/utils/appstatus"
-	"github.com/okx/okbchain/libs/cosmos-sdk/server"
-	"github.com/okx/okbchain/libs/cosmos-sdk/store/flatkv"
-	mpttypes "github.com/okx/okbchain/libs/cosmos-sdk/store/mpt"
-	"github.com/okx/okbchain/libs/cosmos-sdk/store/rootmulti"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	"github.com/okx/okbchain/libs/iavl"
-	"github.com/okx/okbchain/libs/system"
-	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
-	cfg "github.com/okx/okbchain/libs/tendermint/config"
-	"github.com/okx/okbchain/libs/tendermint/global"
-	tmlog "github.com/okx/okbchain/libs/tendermint/libs/log"
-	"github.com/okx/okbchain/libs/tendermint/mock"
-	"github.com/okx/okbchain/libs/tendermint/node"
-	"github.com/okx/okbchain/libs/tendermint/proxy"
-	sm "github.com/okx/okbchain/libs/tendermint/state"
-	blockindex "github.com/okx/okbchain/libs/tendermint/state/indexer"
-	blockindexer "github.com/okx/okbchain/libs/tendermint/state/indexer/block/kv"
-	bloxkindexnull "github.com/okx/okbchain/libs/tendermint/state/indexer/block/null"
-	"github.com/okx/okbchain/libs/tendermint/state/txindex"
-	"github.com/okx/okbchain/libs/tendermint/state/txindex/kv"
-	"github.com/okx/okbchain/libs/tendermint/state/txindex/null"
-	"github.com/okx/okbchain/libs/tendermint/store"
-	"github.com/okx/okbchain/libs/tendermint/types"
-	dbm "github.com/okx/okbchain/libs/tm-db"
-	evmtypes "github.com/okx/okbchain/x/evm/types"
 	"github.com/spf13/viper"
+
+	"github.com/okx/brczero/app/config"
+	"github.com/okx/brczero/app/utils/appstatus"
+	"github.com/okx/brczero/libs/cosmos-sdk/server"
+	"github.com/okx/brczero/libs/cosmos-sdk/store/flatkv"
+	mpttypes "github.com/okx/brczero/libs/cosmos-sdk/store/mpt"
+	"github.com/okx/brczero/libs/cosmos-sdk/store/rootmulti"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	"github.com/okx/brczero/libs/iavl"
+	"github.com/okx/brczero/libs/system"
+	abci "github.com/okx/brczero/libs/tendermint/abci/types"
+	cfg "github.com/okx/brczero/libs/tendermint/config"
+	"github.com/okx/brczero/libs/tendermint/global"
+	tmlog "github.com/okx/brczero/libs/tendermint/libs/log"
+	"github.com/okx/brczero/libs/tendermint/mock"
+	"github.com/okx/brczero/libs/tendermint/node"
+	"github.com/okx/brczero/libs/tendermint/proxy"
+	sm "github.com/okx/brczero/libs/tendermint/state"
+	blockindex "github.com/okx/brczero/libs/tendermint/state/indexer"
+	blockindexer "github.com/okx/brczero/libs/tendermint/state/indexer/block/kv"
+	bloxkindexnull "github.com/okx/brczero/libs/tendermint/state/indexer/block/null"
+	"github.com/okx/brczero/libs/tendermint/state/txindex"
+	"github.com/okx/brczero/libs/tendermint/state/txindex/kv"
+	"github.com/okx/brczero/libs/tendermint/state/txindex/null"
+	"github.com/okx/brczero/libs/tendermint/store"
+	"github.com/okx/brczero/libs/tendermint/types"
+	dbm "github.com/okx/brczero/libs/tm-db"
+	evmtypes "github.com/okx/brczero/x/evm/types"
 )
 
 const (
@@ -51,7 +52,7 @@ const (
 
 type repairApp struct {
 	db dbm.DB
-	*OKBChainApp
+	*BRCZeroApp
 }
 
 func (app *repairApp) getLatestVersion() int64 {
@@ -174,7 +175,7 @@ func createRepairApp(ctx *server.Context) (proxy.AppConns, *repairApp, error) {
 }
 
 func newRepairApp(logger tmlog.Logger, db dbm.DB, traceStore io.Writer) *repairApp {
-	return &repairApp{db, NewOKBChainApp(
+	return &repairApp{db, NewBRCZeroApp(
 		logger,
 		db,
 		traceStore,

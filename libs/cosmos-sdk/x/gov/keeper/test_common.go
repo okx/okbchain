@@ -10,23 +10,23 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/okx/okbchain/libs/tendermint/crypto"
-	"github.com/okx/okbchain/libs/tendermint/crypto/ed25519"
+	"github.com/okx/brczero/libs/tendermint/crypto"
+	"github.com/okx/brczero/libs/tendermint/crypto/ed25519"
 
-	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
-	"github.com/okx/okbchain/libs/tendermint/libs/log"
-	tmtypes "github.com/okx/okbchain/libs/tendermint/types"
-	dbm "github.com/okx/okbchain/libs/tm-db"
+	abci "github.com/okx/brczero/libs/tendermint/abci/types"
+	"github.com/okx/brczero/libs/tendermint/libs/log"
+	tmtypes "github.com/okx/brczero/libs/tendermint/types"
+	dbm "github.com/okx/brczero/libs/tm-db"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
-	"github.com/okx/okbchain/libs/cosmos-sdk/store"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/auth"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/bank"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/gov/types"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/params"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/staking"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/supply"
+	"github.com/okx/brczero/libs/cosmos-sdk/codec"
+	"github.com/okx/brczero/libs/cosmos-sdk/store"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/auth"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/bank"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/gov/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/params"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/staking"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/supply"
 )
 
 // dummy addresses used for testing

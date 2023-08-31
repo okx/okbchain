@@ -1,15 +1,15 @@
 package codec
 
 import (
-	codectypes "github.com/okx/okbchain/libs/cosmos-sdk/codec/types"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/auth/ibc-tx/internal/ethsecp256k1"
-	ibckey "github.com/okx/okbchain/libs/cosmos-sdk/x/auth/ibc-tx/internal/secp256k1"
+	codectypes "github.com/okx/brczero/libs/cosmos-sdk/codec/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/auth/ibc-tx/internal/ethsecp256k1"
+	ibckey "github.com/okx/brczero/libs/cosmos-sdk/x/auth/ibc-tx/internal/secp256k1"
 
-	//"github.com/okx/okbchain/libs/cosmos-sdk/crypto/keys/ed25519"
-	//"github.com/okx/okbchain/libs/cosmos-sdk/crypto/keys/multisig"
-	//"github.com/okx/okbchain/libs/cosmos-sdk/crypto/keys/secp256k1"
-	//"github.com/okx/okbchain/libs/cosmos-sdk/crypto/keys/secp256r1"
-	cryptotypes "github.com/okx/okbchain/libs/cosmos-sdk/crypto/types"
+	//"github.com/okx/brczero/libs/cosmos-sdk/crypto/keys/ed25519"
+	//"github.com/okx/brczero/libs/cosmos-sdk/crypto/keys/multisig"
+	//"github.com/okx/brczero/libs/cosmos-sdk/crypto/keys/secp256k1"
+	//"github.com/okx/brczero/libs/cosmos-sdk/crypto/keys/secp256r1"
+	cryptotypes "github.com/okx/brczero/libs/cosmos-sdk/crypto/types"
 )
 
 // RegisterInterfaces registers the sdk.Tx interface.

@@ -3,10 +3,10 @@ package context
 import (
 	"path/filepath"
 
-	"github.com/okx/okbchain/libs/tendermint/libs/log"
-	tmlite "github.com/okx/okbchain/libs/tendermint/lite"
-	tmliteproxy "github.com/okx/okbchain/libs/tendermint/lite/proxy"
-	rpchttp "github.com/okx/okbchain/libs/tendermint/rpc/client/http"
+	"github.com/okx/brczero/libs/tendermint/libs/log"
+	tmlite "github.com/okx/brczero/libs/tendermint/lite"
+	tmliteproxy "github.com/okx/brczero/libs/tendermint/lite/proxy"
+	rpchttp "github.com/okx/brczero/libs/tendermint/rpc/client/http"
 	"github.com/pkg/errors"
 )
 

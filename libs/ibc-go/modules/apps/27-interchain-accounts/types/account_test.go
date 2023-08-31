@@ -3,8 +3,8 @@ package types_test
 import (
 	"testing"
 
-	"github.com/okx/okbchain/libs/ibc-go/modules/apps/27-interchain-accounts/types"
-	ibctesting "github.com/okx/okbchain/libs/ibc-go/testing"
+	"github.com/okx/brczero/libs/ibc-go/modules/apps/27-interchain-accounts/types"
+	ibctesting "github.com/okx/brczero/libs/ibc-go/testing"
 	"github.com/stretchr/testify/suite"
 )
 

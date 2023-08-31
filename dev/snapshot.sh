@@ -2,7 +2,7 @@
 
 HOME=$1
 VERSION=$2
-CMD=okbchaind
+CMD=brczerod
 NUM_EXECUTIONS=2
 
 set -e
@@ -18,7 +18,7 @@ killbyname() {
 }
 
 
-killbyname okbchaind
+killbyname brczerod
 killbyname okbchaincli
 
 set -x # activate debugging

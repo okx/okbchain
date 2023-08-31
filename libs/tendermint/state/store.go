@@ -7,11 +7,11 @@ import (
 
 	"github.com/tendermint/go-amino"
 
-	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
-	tmmath "github.com/okx/okbchain/libs/tendermint/libs/math"
-	tmos "github.com/okx/okbchain/libs/tendermint/libs/os"
-	"github.com/okx/okbchain/libs/tendermint/types"
-	dbm "github.com/okx/okbchain/libs/tm-db"
+	abci "github.com/okx/brczero/libs/tendermint/abci/types"
+	tmmath "github.com/okx/brczero/libs/tendermint/libs/math"
+	tmos "github.com/okx/brczero/libs/tendermint/libs/os"
+	"github.com/okx/brczero/libs/tendermint/types"
+	dbm "github.com/okx/brczero/libs/tm-db"
 	"github.com/pkg/errors"
 )
 

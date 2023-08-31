@@ -3,16 +3,16 @@ package keeper
 import (
 	"fmt"
 
-	tmbytes "github.com/okx/okbchain/libs/tendermint/libs/bytes"
-	"github.com/okx/okbchain/libs/tendermint/libs/log"
+	tmbytes "github.com/okx/brczero/libs/tendermint/libs/bytes"
+	"github.com/okx/brczero/libs/tendermint/libs/log"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
-	"github.com/okx/okbchain/libs/cosmos-sdk/store/prefix"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	sdkerrors "github.com/okx/okbchain/libs/cosmos-sdk/types/errors"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/evidence/exported"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/evidence/internal/types"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/params"
+	"github.com/okx/brczero/libs/cosmos-sdk/codec"
+	"github.com/okx/brczero/libs/cosmos-sdk/store/prefix"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	sdkerrors "github.com/okx/brczero/libs/cosmos-sdk/types/errors"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/evidence/exported"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/evidence/internal/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/params"
 )
 
 // Keeper defines the evidence module's keeper. The keeper is responsible for

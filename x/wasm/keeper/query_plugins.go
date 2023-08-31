@@ -4,17 +4,17 @@ import (
 	"encoding/json"
 	"errors"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/baseapp"
+	"github.com/okx/brczero/libs/cosmos-sdk/baseapp"
 
-	channeltypes "github.com/okx/okbchain/libs/ibc-go/modules/core/04-channel/types"
+	channeltypes "github.com/okx/brczero/libs/ibc-go/modules/core/04-channel/types"
 
-	"github.com/okx/okbchain/x/wasm/types"
+	"github.com/okx/brczero/x/wasm/types"
 
 	wasmvmtypes "github.com/CosmWasm/wasmvm/types"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	sdkerrors "github.com/okx/okbchain/libs/cosmos-sdk/types/errors"
-	distributiontypes "github.com/okx/okbchain/libs/cosmos-sdk/x/distribution/types"
-	stakingtypes "github.com/okx/okbchain/libs/cosmos-sdk/x/staking/types"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	sdkerrors "github.com/okx/brczero/libs/cosmos-sdk/types/errors"
+	distributiontypes "github.com/okx/brczero/libs/cosmos-sdk/x/distribution/types"
+	stakingtypes "github.com/okx/brczero/libs/cosmos-sdk/x/staking/types"
 )
 
 type QueryHandler struct {

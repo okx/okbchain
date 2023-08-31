@@ -4,14 +4,14 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/store/mpt"
+	"github.com/okx/brczero/libs/cosmos-sdk/store/mpt"
 
 	"github.com/spf13/viper"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/store"
-	"github.com/okx/okbchain/libs/cosmos-sdk/store/types"
-	tmiavl "github.com/okx/okbchain/libs/iavl"
-	iavlcfg "github.com/okx/okbchain/libs/iavl/config"
+	"github.com/okx/brczero/libs/cosmos-sdk/store"
+	"github.com/okx/brczero/libs/cosmos-sdk/store/types"
+	tmiavl "github.com/okx/brczero/libs/iavl"
+	iavlcfg "github.com/okx/brczero/libs/iavl/config"
 )
 
 // GetPruningOptionsFromFlags parses command flags and returns the correct

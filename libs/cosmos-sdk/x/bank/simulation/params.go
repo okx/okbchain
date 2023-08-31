@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"math/rand"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/bank/internal/types"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/simulation"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/bank/internal/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/simulation"
 )
 
 const keySendEnabled = "sendenabled"

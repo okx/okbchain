@@ -9,10 +9,10 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/okx/okbchain/libs/tendermint/crypto"
-	tmbytes "github.com/okx/okbchain/libs/tendermint/libs/bytes"
-	tmos "github.com/okx/okbchain/libs/tendermint/libs/os"
-	tmtime "github.com/okx/okbchain/libs/tendermint/types/time"
+	"github.com/okx/brczero/libs/tendermint/crypto"
+	tmbytes "github.com/okx/brczero/libs/tendermint/libs/bytes"
+	tmos "github.com/okx/brczero/libs/tendermint/libs/os"
+	tmtime "github.com/okx/brczero/libs/tendermint/types/time"
 )
 
 const (

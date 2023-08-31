@@ -3,11 +3,11 @@ package keys
 import (
 	"fmt"
 
-	"github.com/okx/okbchain/libs/tendermint/crypto"
-	"github.com/okx/okbchain/libs/tendermint/crypto/multisig"
+	"github.com/okx/brczero/libs/tendermint/crypto"
+	"github.com/okx/brczero/libs/tendermint/crypto/multisig"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/crypto/keys/hd"
-	"github.com/okx/okbchain/libs/cosmos-sdk/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/crypto/keys/hd"
+	"github.com/okx/brczero/libs/cosmos-sdk/types"
 )
 
 // Keybase exposes operations on a generic keystore

@@ -1,12 +1,12 @@
 package mock
 
 import (
-	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
-	"github.com/okx/okbchain/libs/tendermint/libs/bytes"
-	"github.com/okx/okbchain/libs/tendermint/proxy"
-	"github.com/okx/okbchain/libs/tendermint/rpc/client"
-	ctypes "github.com/okx/okbchain/libs/tendermint/rpc/core/types"
-	"github.com/okx/okbchain/libs/tendermint/types"
+	abci "github.com/okx/brczero/libs/tendermint/abci/types"
+	"github.com/okx/brczero/libs/tendermint/libs/bytes"
+	"github.com/okx/brczero/libs/tendermint/proxy"
+	"github.com/okx/brczero/libs/tendermint/rpc/client"
+	ctypes "github.com/okx/brczero/libs/tendermint/rpc/core/types"
+	"github.com/okx/brczero/libs/tendermint/types"
 )
 
 // ABCIApp will send all abci related request to the named app,

@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"time"
 
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	"github.com/okx/okbchain/x/distribution/types"
-	govTypes "github.com/okx/okbchain/x/gov/types"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	"github.com/okx/brczero/x/distribution/types"
+	govTypes "github.com/okx/brczero/x/gov/types"
 )
 
 // withdraw rewards from a delegation

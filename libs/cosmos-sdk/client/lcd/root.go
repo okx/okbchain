@@ -5,7 +5,7 @@ import (
 	"github.com/gogo/gateway"
 	"github.com/gogo/protobuf/jsonpb"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
-	grpctypes "github.com/okx/okbchain/libs/cosmos-sdk/types/grpc"
+	grpctypes "github.com/okx/brczero/libs/cosmos-sdk/types/grpc"
 	"net"
 	"net/http"
 	"os"
@@ -14,21 +14,21 @@ import (
 
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
-	"github.com/okx/okbchain/libs/tendermint/libs/log"
-	"github.com/okx/okbchain/libs/tendermint/node"
-	"github.com/okx/okbchain/libs/tendermint/rpc/client/local"
-	tmrpcserver "github.com/okx/okbchain/libs/tendermint/rpc/jsonrpc/server"
+	"github.com/okx/brczero/libs/tendermint/libs/log"
+	"github.com/okx/brczero/libs/tendermint/node"
+	"github.com/okx/brczero/libs/tendermint/rpc/client/local"
+	tmrpcserver "github.com/okx/brczero/libs/tendermint/rpc/jsonrpc/server"
 	"github.com/rakyll/statik/fs"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/client/context"
-	"github.com/okx/okbchain/libs/cosmos-sdk/client/flags"
-	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
-	keybase "github.com/okx/okbchain/libs/cosmos-sdk/crypto/keys"
+	"github.com/okx/brczero/libs/cosmos-sdk/client/context"
+	"github.com/okx/brczero/libs/cosmos-sdk/client/flags"
+	"github.com/okx/brczero/libs/cosmos-sdk/codec"
+	keybase "github.com/okx/brczero/libs/cosmos-sdk/crypto/keys"
 
 	// unnamed import of statik for swagger UI support
-	_ "github.com/okx/okbchain/libs/cosmos-sdk/client/lcd/statik"
+	_ "github.com/okx/brczero/libs/cosmos-sdk/client/lcd/statik"
 )
 
 // RestServer represents the Light Client Rest server

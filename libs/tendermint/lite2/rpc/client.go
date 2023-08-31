@@ -9,16 +9,16 @@ import (
 	"strings"
 	"time"
 
-	"github.com/okx/okbchain/libs/tendermint/mempool"
+	"github.com/okx/brczero/libs/tendermint/mempool"
 
-	"github.com/okx/okbchain/libs/tendermint/crypto/merkle"
-	tmbytes "github.com/okx/okbchain/libs/tendermint/libs/bytes"
-	service "github.com/okx/okbchain/libs/tendermint/libs/service"
-	lite "github.com/okx/okbchain/libs/tendermint/lite2"
-	rpcclient "github.com/okx/okbchain/libs/tendermint/rpc/client"
-	ctypes "github.com/okx/okbchain/libs/tendermint/rpc/core/types"
-	rpctypes "github.com/okx/okbchain/libs/tendermint/rpc/jsonrpc/types"
-	"github.com/okx/okbchain/libs/tendermint/types"
+	"github.com/okx/brczero/libs/tendermint/crypto/merkle"
+	tmbytes "github.com/okx/brczero/libs/tendermint/libs/bytes"
+	service "github.com/okx/brczero/libs/tendermint/libs/service"
+	lite "github.com/okx/brczero/libs/tendermint/lite2"
+	rpcclient "github.com/okx/brczero/libs/tendermint/rpc/client"
+	ctypes "github.com/okx/brczero/libs/tendermint/rpc/core/types"
+	rpctypes "github.com/okx/brczero/libs/tendermint/rpc/jsonrpc/types"
+	"github.com/okx/brczero/libs/tendermint/types"
 )
 
 var errNegOrZeroHeight = errors.New("negative or zero height")

@@ -8,8 +8,8 @@ import (
 
 	ethcmm "github.com/ethereum/go-ethereum/common"
 
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	sdkerrors "github.com/okx/okbchain/libs/cosmos-sdk/types/errors"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	sdkerrors "github.com/okx/brczero/libs/cosmos-sdk/types/errors"
 )
 
 // RawContractMessage defines a json message that is sent or returned by a wasm contract.

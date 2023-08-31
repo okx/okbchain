@@ -7,7 +7,7 @@ import (
 
 	"github.com/tendermint/go-amino"
 
-	"github.com/okx/okbchain/app/utils"
+	"github.com/okx/brczero/app/utils"
 
 	ethcmn "github.com/ethereum/go-ethereum/common"
 )

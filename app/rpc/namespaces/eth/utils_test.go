@@ -3,7 +3,7 @@ package eth
 import (
 	"testing"
 
-	evmtypes "github.com/okx/okbchain/x/evm/types"
+	evmtypes "github.com/okx/brczero/x/evm/types"
 
 	"github.com/stretchr/testify/require"
 )

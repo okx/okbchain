@@ -27,7 +27,7 @@ v    Please also ensure that this is not a duplicate issue :)
 
 ## Version
 
-<!-- git commit hash, output of `okbchaincli --version`, output of `okbchaind --version` -->
+<!-- git commit hash, output of `brczerocli --version`, output of `brczerod --version` -->
 
 ## Steps to Reproduce
 

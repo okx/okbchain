@@ -4,10 +4,10 @@ import (
 	"fmt"
 
 	"github.com/ethereum/go-ethereum/common"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	tm "github.com/okx/okbchain/libs/tendermint/abci/types"
-	ctypes "github.com/okx/okbchain/libs/tendermint/rpc/core/types"
-	"github.com/okx/okbchain/x/evm/types"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	tm "github.com/okx/brczero/libs/tendermint/abci/types"
+	ctypes "github.com/okx/brczero/libs/tendermint/rpc/core/types"
+	"github.com/okx/brczero/x/evm/types"
 )
 
 type WatchTx interface {

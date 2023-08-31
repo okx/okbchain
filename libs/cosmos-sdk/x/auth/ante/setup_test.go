@@ -3,13 +3,13 @@ package ante_test
 import (
 	"testing"
 
-	"github.com/okx/okbchain/libs/tendermint/crypto"
+	"github.com/okx/brczero/libs/tendermint/crypto"
 	"github.com/stretchr/testify/require"
 
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	sdkerrors "github.com/okx/okbchain/libs/cosmos-sdk/types/errors"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/auth/ante"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/auth/types"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	sdkerrors "github.com/okx/brczero/libs/cosmos-sdk/types/errors"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/auth/ante"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/auth/types"
 )
 
 func TestSetup(t *testing.T) {

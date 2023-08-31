@@ -3,9 +3,9 @@ package keeper
 import (
 	"fmt"
 
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
 
-	"github.com/okx/okbchain/x/evidence/internal/types"
+	"github.com/okx/brczero/x/evidence/internal/types"
 )
 
 // HandleDoubleSign implements an equivocation evidence handler. Assuming the

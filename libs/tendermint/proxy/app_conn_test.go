@@ -1,8 +1,8 @@
 package proxy
 
 import (
-	abcicli "github.com/okx/okbchain/libs/tendermint/abci/client"
-	"github.com/okx/okbchain/libs/tendermint/abci/types"
+	abcicli "github.com/okx/brczero/libs/tendermint/abci/client"
+	"github.com/okx/brczero/libs/tendermint/abci/types"
 )
 
 //----------------------------------------

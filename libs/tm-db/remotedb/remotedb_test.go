@@ -7,8 +7,8 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/okx/okbchain/libs/tm-db/remotedb"
-	"github.com/okx/okbchain/libs/tm-db/remotedb/grpcdb"
+	"github.com/okx/brczero/libs/tm-db/remotedb"
+	"github.com/okx/brczero/libs/tm-db/remotedb/grpcdb"
 )
 
 func TestRemoteDB(t *testing.T) {

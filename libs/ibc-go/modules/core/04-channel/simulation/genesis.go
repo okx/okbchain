@@ -3,8 +3,8 @@ package simulation
 import (
 	"math/rand"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/simulation"
-	"github.com/okx/okbchain/libs/ibc-go/modules/core/04-channel/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/simulation"
+	"github.com/okx/brczero/libs/ibc-go/modules/core/04-channel/types"
 )
 
 // GenChannelGenesis returns the default channel genesis state.

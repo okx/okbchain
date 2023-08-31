@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"time"
 
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	"github.com/okx/okbchain/x/erc20/types"
-	sdkGov "github.com/okx/okbchain/x/gov"
-	govKeeper "github.com/okx/okbchain/x/gov/keeper"
-	govTypes "github.com/okx/okbchain/x/gov/types"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	"github.com/okx/brczero/x/erc20/types"
+	sdkGov "github.com/okx/brczero/x/gov"
+	govKeeper "github.com/okx/brczero/x/gov/keeper"
+	govTypes "github.com/okx/brczero/x/gov/types"
 )
 
 var _ govKeeper.ProposalHandler = (*Keeper)(nil)

@@ -1,7 +1,7 @@
 package state
 
 import (
-	"github.com/okx/okbchain/libs/tendermint/version"
+	"github.com/okx/brczero/libs/tendermint/version"
 )
 
 func (v Version) UpgradeToIBCVersion() Version {

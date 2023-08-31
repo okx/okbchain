@@ -1,18 +1,18 @@
 package keeper
 
 import (
-	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	sdkerrors "github.com/okx/okbchain/libs/cosmos-sdk/types/errors"
+	"github.com/okx/brczero/libs/cosmos-sdk/codec"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	sdkerrors "github.com/okx/brczero/libs/cosmos-sdk/types/errors"
 
-	paramtypes "github.com/okx/okbchain/libs/cosmos-sdk/x/params/subspace"
-	clienttypes "github.com/okx/okbchain/libs/ibc-go/modules/core/02-client/types"
-	"github.com/okx/okbchain/libs/ibc-go/modules/core/03-connection/types"
-	commitmenttypes "github.com/okx/okbchain/libs/ibc-go/modules/core/23-commitment/types"
-	host "github.com/okx/okbchain/libs/ibc-go/modules/core/24-host"
-	"github.com/okx/okbchain/libs/ibc-go/modules/core/common"
-	"github.com/okx/okbchain/libs/ibc-go/modules/core/exported"
-	"github.com/okx/okbchain/libs/tendermint/libs/log"
+	paramtypes "github.com/okx/brczero/libs/cosmos-sdk/x/params/subspace"
+	clienttypes "github.com/okx/brczero/libs/ibc-go/modules/core/02-client/types"
+	"github.com/okx/brczero/libs/ibc-go/modules/core/03-connection/types"
+	commitmenttypes "github.com/okx/brczero/libs/ibc-go/modules/core/23-commitment/types"
+	host "github.com/okx/brczero/libs/ibc-go/modules/core/24-host"
+	"github.com/okx/brczero/libs/ibc-go/modules/core/common"
+	"github.com/okx/brczero/libs/ibc-go/modules/core/exported"
+	"github.com/okx/brczero/libs/tendermint/libs/log"
 )
 
 // Keeper defines the IBC connection keeper

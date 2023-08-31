@@ -10,8 +10,8 @@ import (
 
 	"github.com/pkg/errors"
 
-	cfg "github.com/okx/okbchain/libs/tendermint/config"
-	rpchttp "github.com/okx/okbchain/libs/tendermint/rpc/client/http"
+	cfg "github.com/okx/brczero/libs/tendermint/config"
+	rpchttp "github.com/okx/brczero/libs/tendermint/rpc/client/http"
 )
 
 // dumpStatus gets node status state dump from the Tendermint RPC and writes it

@@ -3,10 +3,10 @@ package keeper_test
 import (
 	"strings"
 
-	"github.com/okx/okbchain/x/evidence/exported"
-	"github.com/okx/okbchain/x/evidence/internal/types"
+	"github.com/okx/brczero/x/evidence/exported"
+	"github.com/okx/brczero/x/evidence/internal/types"
 
-	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
+	abci "github.com/okx/brczero/libs/tendermint/abci/types"
 )
 
 const (

@@ -1,7 +1,7 @@
 package types
 
 import (
-	"github.com/okx/okbchain/libs/system"
+	"github.com/okx/brczero/libs/system"
 )
 
 // Disable followings after milestoneMercuryHeight

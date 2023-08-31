@@ -1,11 +1,11 @@
 package txs
 
 import (
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	authexported "github.com/okx/okbchain/libs/cosmos-sdk/x/auth/exported"
-	bam "github.com/okx/okbchain/libs/system/trace"
-	"github.com/okx/okbchain/x/evm/txs/base"
-	"github.com/okx/okbchain/x/evm/types"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	authexported "github.com/okx/brczero/libs/cosmos-sdk/x/auth/exported"
+	bam "github.com/okx/brczero/libs/system/trace"
+	"github.com/okx/brczero/x/evm/txs/base"
+	"github.com/okx/brczero/x/evm/types"
 )
 
 type Tx interface {

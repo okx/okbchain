@@ -3,7 +3,7 @@ package indexer
 import (
 	"time"
 
-	"github.com/okx/okbchain/libs/tendermint/libs/pubsub/query"
+	"github.com/okx/brczero/libs/tendermint/libs/pubsub/query"
 )
 
 type QueryRanges map[string]QueryRange

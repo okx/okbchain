@@ -1,7 +1,7 @@
 package app
 
 import (
-	"github.com/okx/okbchain/x/common/monitor"
+	"github.com/okx/brczero/x/common/monitor"
 )
 
 var (

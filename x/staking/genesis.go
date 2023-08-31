@@ -2,14 +2,14 @@ package staking
 
 import (
 	"fmt"
-	"github.com/okx/okbchain/libs/system"
+	"github.com/okx/brczero/libs/system"
 
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	supplyexported "github.com/okx/okbchain/libs/cosmos-sdk/x/supply/exported"
-	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
-	tmtypes "github.com/okx/okbchain/libs/tendermint/types"
-	"github.com/okx/okbchain/x/staking/exported"
-	"github.com/okx/okbchain/x/staking/types"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	supplyexported "github.com/okx/brczero/libs/cosmos-sdk/x/supply/exported"
+	abci "github.com/okx/brczero/libs/tendermint/abci/types"
+	tmtypes "github.com/okx/brczero/libs/tendermint/types"
+	"github.com/okx/brczero/x/staking/exported"
+	"github.com/okx/brczero/x/staking/types"
 )
 
 // InitGenesis sets the pool and parameters for the provided keeper

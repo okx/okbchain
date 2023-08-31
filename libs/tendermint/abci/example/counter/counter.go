@@ -6,10 +6,10 @@ import (
 	"fmt"
 	"math/big"
 
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
 
-	"github.com/okx/okbchain/libs/tendermint/abci/example/code"
-	"github.com/okx/okbchain/libs/tendermint/abci/types"
+	"github.com/okx/brczero/libs/tendermint/abci/example/code"
+	"github.com/okx/brczero/libs/tendermint/abci/types"
 )
 
 type MockExTxInfo struct {

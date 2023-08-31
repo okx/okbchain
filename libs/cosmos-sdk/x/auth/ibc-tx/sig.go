@@ -2,11 +2,11 @@ package ibc_tx
 
 import (
 	"fmt"
-	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
-	codectypes "github.com/okx/okbchain/libs/cosmos-sdk/codec/types"
-	cryptotypes "github.com/okx/okbchain/libs/cosmos-sdk/crypto/types"
-	"github.com/okx/okbchain/libs/cosmos-sdk/types/tx"
-	"github.com/okx/okbchain/libs/cosmos-sdk/types/tx/signing"
+	"github.com/okx/brczero/libs/cosmos-sdk/codec"
+	codectypes "github.com/okx/brczero/libs/cosmos-sdk/codec/types"
+	cryptotypes "github.com/okx/brczero/libs/cosmos-sdk/crypto/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/types/tx"
+	"github.com/okx/brczero/libs/cosmos-sdk/types/tx/signing"
 )
 
 // SignatureDataToModeInfoAndSig converts a SignatureData to a ModeInfo and raw bytes signature

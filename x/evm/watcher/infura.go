@@ -1,6 +1,6 @@
 package watcher
 
-import "github.com/okx/okbchain/x/evm/types"
+import "github.com/okx/brczero/x/evm/types"
 
 type InfuraKeeper interface {
 	OnSaveTransactionReceipt(*TransactionReceipt)

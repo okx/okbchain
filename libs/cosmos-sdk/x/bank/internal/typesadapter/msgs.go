@@ -1,12 +1,12 @@
 package typesadapter
 
 import (
-	"github.com/okx/okbchain/libs/cosmos-sdk/types"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	sdkerrors "github.com/okx/okbchain/libs/cosmos-sdk/types/errors"
-	txmsg "github.com/okx/okbchain/libs/cosmos-sdk/types/ibc-adapter"
-	okbc_types "github.com/okx/okbchain/libs/cosmos-sdk/x/bank/internal/types"
-	"github.com/okx/okbchain/libs/system"
+	"github.com/okx/brczero/libs/cosmos-sdk/types"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	sdkerrors "github.com/okx/brczero/libs/cosmos-sdk/types/errors"
+	txmsg "github.com/okx/brczero/libs/cosmos-sdk/types/ibc-adapter"
+	okbc_types "github.com/okx/brczero/libs/cosmos-sdk/x/bank/internal/types"
+	"github.com/okx/brczero/libs/system"
 )
 
 var (

@@ -5,8 +5,8 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 
-	"github.com/okx/okbchain/app/crypto/ethsecp256k1"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
+	"github.com/okx/brczero/app/crypto/ethsecp256k1"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
 	"github.com/stretchr/testify/suite"
 )
 

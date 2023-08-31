@@ -1,9 +1,9 @@
 package capability
 
 import (
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/capability/keeper"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/capability/types"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/capability/keeper"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/capability/types"
 )
 
 // InitGenesis initializes the capability module's state from a provided genesis

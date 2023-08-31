@@ -2,15 +2,17 @@ package cli
 
 import (
 	"fmt"
-	"github.com/okx/okbchain/libs/cosmos-sdk/client/flags"
 	"strings"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/client"
-	"github.com/okx/okbchain/libs/cosmos-sdk/client/context"
-	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/auth"
-	"github.com/okx/okbchain/x/token/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/client/flags"
+
 	"github.com/spf13/cobra"
+
+	"github.com/okx/brczero/libs/cosmos-sdk/client"
+	"github.com/okx/brczero/libs/cosmos-sdk/client/context"
+	"github.com/okx/brczero/libs/cosmos-sdk/codec"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/auth"
+	"github.com/okx/brczero/x/token/types"
 )
 
 // GetQueryCmd returns the cli query commands for this module
@@ -86,7 +88,7 @@ func getCmdQueryParams(queryRoute string, cdc *codec.Codec) *cobra.Command {
 		Short: "Query the parameters of the token process",
 		Long: strings.TrimSpace(`Query the all the parameters for the governance process:
 
-$ okbchaincli query token params
+$ brczerocli query token params
 `),
 		Args: cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {

@@ -4,8 +4,8 @@ import (
 	"crypto/sha256"
 	"sync"
 
-	"github.com/okx/okbchain/libs/tendermint/libs/clist"
-	"github.com/okx/okbchain/libs/tendermint/types"
+	"github.com/okx/brczero/libs/tendermint/libs/clist"
+	"github.com/okx/brczero/libs/tendermint/types"
 )
 
 type ITransactionQueue interface {

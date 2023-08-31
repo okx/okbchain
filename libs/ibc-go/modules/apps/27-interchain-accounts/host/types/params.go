@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	paramtypes "github.com/okx/okbchain/x/params"
+	paramtypes "github.com/okx/brczero/x/params"
 )
 
 const (

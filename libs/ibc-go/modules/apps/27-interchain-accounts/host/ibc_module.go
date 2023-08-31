@@ -1,15 +1,15 @@
 package host
 
 import (
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	sdkerrors "github.com/okx/okbchain/libs/cosmos-sdk/types/errors"
-	capabilitytypes "github.com/okx/okbchain/libs/cosmos-sdk/x/capability/types"
-	"github.com/okx/okbchain/libs/ibc-go/modules/apps/27-interchain-accounts/host/keeper"
-	"github.com/okx/okbchain/libs/ibc-go/modules/apps/27-interchain-accounts/host/types"
-	icatypes "github.com/okx/okbchain/libs/ibc-go/modules/apps/27-interchain-accounts/types"
-	channeltypes "github.com/okx/okbchain/libs/ibc-go/modules/core/04-channel/types"
-	ibcporttypes "github.com/okx/okbchain/libs/ibc-go/modules/core/05-port/types"
-	ibcexported "github.com/okx/okbchain/libs/ibc-go/modules/core/exported"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	sdkerrors "github.com/okx/brczero/libs/cosmos-sdk/types/errors"
+	capabilitytypes "github.com/okx/brczero/libs/cosmos-sdk/x/capability/types"
+	"github.com/okx/brczero/libs/ibc-go/modules/apps/27-interchain-accounts/host/keeper"
+	"github.com/okx/brczero/libs/ibc-go/modules/apps/27-interchain-accounts/host/types"
+	icatypes "github.com/okx/brczero/libs/ibc-go/modules/apps/27-interchain-accounts/types"
+	channeltypes "github.com/okx/brczero/libs/ibc-go/modules/core/04-channel/types"
+	ibcporttypes "github.com/okx/brczero/libs/ibc-go/modules/core/05-port/types"
+	ibcexported "github.com/okx/brczero/libs/ibc-go/modules/core/exported"
 )
 
 var (

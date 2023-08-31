@@ -14,14 +14,14 @@ import (
 	"testing"
 	"time"
 
-	"github.com/okx/okbchain/x/params/subspace"
+	"github.com/okx/brczero/x/params/subspace"
 
-	sdkerrors "github.com/okx/okbchain/libs/cosmos-sdk/types/errors"
+	sdkerrors "github.com/okx/brczero/libs/cosmos-sdk/types/errors"
 
-	apptypes "github.com/okx/okbchain/app/types"
-	"github.com/okx/okbchain/libs/cosmos-sdk/client/context"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	"github.com/okx/okbchain/libs/cosmos-sdk/types/rest"
+	apptypes "github.com/okx/brczero/app/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/client/context"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/types/rest"
 )
 
 const (

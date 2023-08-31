@@ -3,15 +3,15 @@ package utils
 import (
 	"context"
 
-	clictx "github.com/okx/okbchain/libs/cosmos-sdk/client/context"
-	sdkerrors "github.com/okx/okbchain/libs/cosmos-sdk/types/errors"
-	"github.com/okx/okbchain/libs/ibc-go/modules/core/02-client/types"
-	commitmenttypes "github.com/okx/okbchain/libs/ibc-go/modules/core/23-commitment/types"
-	host "github.com/okx/okbchain/libs/ibc-go/modules/core/24-host"
-	ibcclient "github.com/okx/okbchain/libs/ibc-go/modules/core/client"
-	"github.com/okx/okbchain/libs/ibc-go/modules/core/exported"
-	ibctmtypes "github.com/okx/okbchain/libs/ibc-go/modules/light-clients/07-tendermint/types"
-	tmtypes "github.com/okx/okbchain/libs/tendermint/types"
+	clictx "github.com/okx/brczero/libs/cosmos-sdk/client/context"
+	sdkerrors "github.com/okx/brczero/libs/cosmos-sdk/types/errors"
+	"github.com/okx/brczero/libs/ibc-go/modules/core/02-client/types"
+	commitmenttypes "github.com/okx/brczero/libs/ibc-go/modules/core/23-commitment/types"
+	host "github.com/okx/brczero/libs/ibc-go/modules/core/24-host"
+	ibcclient "github.com/okx/brczero/libs/ibc-go/modules/core/client"
+	"github.com/okx/brczero/libs/ibc-go/modules/core/exported"
+	ibctmtypes "github.com/okx/brczero/libs/ibc-go/modules/light-clients/07-tendermint/types"
+	tmtypes "github.com/okx/brczero/libs/tendermint/types"
 )
 
 // QueryClientState returns a client state. If prove is true, it performs an ABCI store query

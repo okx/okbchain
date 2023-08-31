@@ -2,14 +2,16 @@ package cli
 
 import (
 	"fmt"
-	"github.com/okx/okbchain/libs/cosmos-sdk/client/flags"
 	"strings"
 
-	"github.com/okx/okbchain/x/params/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/client/flags"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/client/context"
-	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
+	"github.com/okx/brczero/x/params/types"
+
 	"github.com/spf13/cobra"
+
+	"github.com/okx/brczero/libs/cosmos-sdk/client/context"
+	"github.com/okx/brczero/libs/cosmos-sdk/codec"
 )
 
 // GetQueryCmd returns the cli query commands for this module
@@ -36,7 +38,7 @@ func GetCmdQueryParams(queryRoute string, cdc *codec.Codec) *cobra.Command {
 		Short: "Query parameters of params",
 		Long: strings.TrimSpace(`Query parameters of params:
 
-$ okbchaincli query params params
+$ brczerocli query params params
 `),
 		Args: cobra.NoArgs,
 		RunE: func(_ *cobra.Command, _ []string) error {

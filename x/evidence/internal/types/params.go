@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/okx/okbchain/x/params"
+	"github.com/okx/brczero/x/params"
 
 	"gopkg.in/yaml.v2"
 )

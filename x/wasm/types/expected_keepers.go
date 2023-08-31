@@ -3,15 +3,15 @@ package types
 import (
 	"context"
 
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/auth"
-	capabilitytypes "github.com/okx/okbchain/libs/cosmos-sdk/x/capability/types"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/distribution/types"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/params"
-	stakingtypes "github.com/okx/okbchain/libs/cosmos-sdk/x/staking/types"
-	connectiontypes "github.com/okx/okbchain/libs/ibc-go/modules/core/03-connection/types"
-	channeltypes "github.com/okx/okbchain/libs/ibc-go/modules/core/04-channel/types"
-	ibcexported "github.com/okx/okbchain/libs/ibc-go/modules/core/exported"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/auth"
+	capabilitytypes "github.com/okx/brczero/libs/cosmos-sdk/x/capability/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/distribution/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/params"
+	stakingtypes "github.com/okx/brczero/libs/cosmos-sdk/x/staking/types"
+	connectiontypes "github.com/okx/brczero/libs/ibc-go/modules/core/03-connection/types"
+	channeltypes "github.com/okx/brczero/libs/ibc-go/modules/core/04-channel/types"
+	ibcexported "github.com/okx/brczero/libs/ibc-go/modules/core/exported"
 )
 
 // BankViewKeeper defines a subset of methods implemented by the cosmos-sdk bank keeper

@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"sort"
 
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
-	"github.com/okx/okbchain/x/common"
-	"github.com/okx/okbchain/x/staking/types"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	abci "github.com/okx/brczero/libs/tendermint/abci/types"
+	"github.com/okx/brczero/x/common"
+	"github.com/okx/brczero/x/staking/types"
 )
 
 // ApplyAndReturnValidatorSetUpdates applies and returns accumulated updates to the bonded validator set. Also,

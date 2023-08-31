@@ -1,8 +1,8 @@
 package keeper
 
 import (
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	"github.com/okx/okbchain/libs/ibc-go/modules/apps/29-fee/types"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	"github.com/okx/brczero/libs/ibc-go/modules/apps/29-fee/types"
 )
 
 // InitGenesis initializes the fee middleware application state from a provided genesis state

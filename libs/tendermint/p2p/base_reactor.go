@@ -1,8 +1,8 @@
 package p2p
 
 import (
-	"github.com/okx/okbchain/libs/tendermint/libs/service"
-	"github.com/okx/okbchain/libs/tendermint/p2p/conn"
+	"github.com/okx/brczero/libs/tendermint/libs/service"
+	"github.com/okx/brczero/libs/tendermint/p2p/conn"
 )
 
 // Reactor is responsible for handling incoming messages on one or more

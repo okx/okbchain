@@ -3,37 +3,40 @@ package watcher_test
 import (
 	"encoding/hex"
 	"fmt"
-	ethcommon "github.com/ethereum/go-ethereum/common"
-	chaincodec "github.com/okx/okbchain/app/codec"
-	"github.com/okx/okbchain/libs/cosmos-sdk/types/module"
 	"math/big"
 	"os"
 	"strings"
 	"testing"
 	"time"
 
+	ethcommon "github.com/ethereum/go-ethereum/common"
+
+	chaincodec "github.com/okx/brczero/app/codec"
+	"github.com/okx/brczero/libs/cosmos-sdk/types/module"
+
 	ethcrypto "github.com/ethereum/go-ethereum/crypto"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/auth"
-	"github.com/okx/okbchain/libs/tendermint/libs/log"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/auth"
+	"github.com/okx/brczero/libs/tendermint/libs/log"
 
 	"github.com/ethereum/go-ethereum/common"
 	ethcmn "github.com/ethereum/go-ethereum/common"
 	jsoniter "github.com/json-iterator/go"
-	"github.com/okx/okbchain/app"
-	"github.com/okx/okbchain/app/crypto/ethsecp256k1"
-	ethermint "github.com/okx/okbchain/app/types"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
-	"github.com/okx/okbchain/libs/tendermint/crypto/secp256k1"
-	"github.com/okx/okbchain/libs/tendermint/crypto/tmhash"
-	"github.com/okx/okbchain/x/evm"
-	"github.com/okx/okbchain/x/evm/types"
-	evmtypes "github.com/okx/okbchain/x/evm/types"
-	"github.com/okx/okbchain/x/evm/watcher"
 	"github.com/spf13/viper"
 	"github.com/status-im/keycard-go/hexutils"
 	"github.com/stretchr/testify/require"
+
+	"github.com/okx/brczero/app"
+	"github.com/okx/brczero/app/crypto/ethsecp256k1"
+	ethermint "github.com/okx/brczero/app/types"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	abci "github.com/okx/brczero/libs/tendermint/abci/types"
+	"github.com/okx/brczero/libs/tendermint/crypto/secp256k1"
+	"github.com/okx/brczero/libs/tendermint/crypto/tmhash"
+	"github.com/okx/brczero/x/evm"
+	"github.com/okx/brczero/x/evm/types"
+	evmtypes "github.com/okx/brczero/x/evm/types"
+	"github.com/okx/brczero/x/evm/watcher"
 )
 
 var json = jsoniter.ConfigCompatibleWithStandardLibrary
@@ -55,7 +58,7 @@ func calcHash(kvs []KV) []byte {
 
 type WatcherTestSt struct {
 	ctx     sdk.Context
-	app     *app.OKBChainApp
+	app     *app.BRCZeroApp
 	handler sdk.Handler
 }
 

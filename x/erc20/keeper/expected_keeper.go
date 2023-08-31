@@ -1,14 +1,14 @@
 package keeper
 
 import (
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	authexported "github.com/okx/okbchain/libs/cosmos-sdk/x/auth/exported"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/params"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/supply/exported"
-	"github.com/okx/okbchain/libs/ibc-go/modules/apps/transfer/types"
-	clienttypes "github.com/okx/okbchain/libs/ibc-go/modules/core/02-client/types"
-	tmbytes "github.com/okx/okbchain/libs/tendermint/libs/bytes"
-	govtypes "github.com/okx/okbchain/x/gov/types"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	authexported "github.com/okx/brczero/libs/cosmos-sdk/x/auth/exported"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/params"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/supply/exported"
+	"github.com/okx/brczero/libs/ibc-go/modules/apps/transfer/types"
+	clienttypes "github.com/okx/brczero/libs/ibc-go/modules/core/02-client/types"
+	tmbytes "github.com/okx/brczero/libs/tendermint/libs/bytes"
+	govtypes "github.com/okx/brczero/x/gov/types"
 )
 
 // GovKeeper defines the expected gov Keeper

@@ -3,13 +3,13 @@ package tx
 import (
 	"fmt"
 
-	ibcmsg "github.com/okx/okbchain/libs/cosmos-sdk/types/ibc-adapter"
+	ibcmsg "github.com/okx/brczero/libs/cosmos-sdk/types/ibc-adapter"
 
-	codectypes "github.com/okx/okbchain/libs/cosmos-sdk/codec/types"
-	cryptotypes "github.com/okx/okbchain/libs/cosmos-sdk/crypto/types"
-	ibckeys "github.com/okx/okbchain/libs/cosmos-sdk/crypto/types"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	sdkerrors "github.com/okx/okbchain/libs/cosmos-sdk/types/errors"
+	codectypes "github.com/okx/brczero/libs/cosmos-sdk/codec/types"
+	cryptotypes "github.com/okx/brczero/libs/cosmos-sdk/crypto/types"
+	ibckeys "github.com/okx/brczero/libs/cosmos-sdk/crypto/types"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	sdkerrors "github.com/okx/brczero/libs/cosmos-sdk/types/errors"
 )
 
 // MaxGasWanted defines the max gas allowed.

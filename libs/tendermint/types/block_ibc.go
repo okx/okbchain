@@ -1,7 +1,7 @@
 package types
 
 import (
-	tmbytes "github.com/okx/okbchain/libs/tendermint/libs/bytes"
+	tmbytes "github.com/okx/brczero/libs/tendermint/libs/bytes"
 )
 
 func (sh SignedHeader) ValidateBasicForIBC(chainID string) error {

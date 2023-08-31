@@ -1,11 +1,11 @@
 package slashing
 
 import (
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	sdkerrors "github.com/okx/okbchain/libs/cosmos-sdk/types/errors"
-	types2 "github.com/okx/okbchain/libs/tendermint/types"
-	"github.com/okx/okbchain/x/common"
-	"github.com/okx/okbchain/x/slashing/internal/types"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	sdkerrors "github.com/okx/brczero/libs/cosmos-sdk/types/errors"
+	types2 "github.com/okx/brczero/libs/tendermint/types"
+	"github.com/okx/brczero/x/common"
+	"github.com/okx/brczero/x/slashing/internal/types"
 )
 
 // NewHandler creates an sdk.Handler for all the slashing type messages

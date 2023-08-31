@@ -1,10 +1,10 @@
 package v018
 
 import (
-	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/genutil"
-	v018evm "github.com/okx/okbchain/x/evm/legacy/v0_18"
-	v018staking "github.com/okx/okbchain/x/staking/legacy/v0_18"
+	"github.com/okx/brczero/libs/cosmos-sdk/codec"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/genutil"
+	v018evm "github.com/okx/brczero/x/evm/legacy/v0_18"
+	v018staking "github.com/okx/brczero/x/staking/legacy/v0_18"
 	"github.com/stretchr/testify/require"
 	"testing"
 )

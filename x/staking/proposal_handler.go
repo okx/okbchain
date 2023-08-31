@@ -1,11 +1,11 @@
 package staking
 
 import (
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	"github.com/okx/okbchain/x/common"
-	"github.com/okx/okbchain/x/staking/types"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	"github.com/okx/brczero/x/common"
+	"github.com/okx/brczero/x/staking/types"
 
-	govTypes "github.com/okx/okbchain/x/gov/types"
+	govTypes "github.com/okx/brczero/x/gov/types"
 )
 
 // NewProposalHandler handles "gov" type message in "staking"

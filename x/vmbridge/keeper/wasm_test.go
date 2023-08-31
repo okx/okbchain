@@ -7,11 +7,11 @@ import (
 	"math/big"
 
 	"github.com/ethereum/go-ethereum/common"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	sdkerrors "github.com/okx/okbchain/libs/cosmos-sdk/types/errors"
-	"github.com/okx/okbchain/x/vmbridge/keeper"
-	"github.com/okx/okbchain/x/vmbridge/types"
-	wasmtypes "github.com/okx/okbchain/x/wasm/types"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	sdkerrors "github.com/okx/brczero/libs/cosmos-sdk/types/errors"
+	"github.com/okx/brczero/x/vmbridge/keeper"
+	"github.com/okx/brczero/x/vmbridge/types"
+	wasmtypes "github.com/okx/brczero/x/wasm/types"
 )
 
 func (suite *KeeperTestSuite) TestKeeper_SendToWasm() {

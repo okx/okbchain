@@ -6,10 +6,10 @@ import (
 	"math/big"
 
 	"github.com/ethereum/go-ethereum/common"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	erc20Keeper "github.com/okx/okbchain/x/erc20/keeper"
-	"github.com/okx/okbchain/x/erc20/types"
-	evmtypes "github.com/okx/okbchain/x/evm/types"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	erc20Keeper "github.com/okx/brczero/x/erc20/keeper"
+	"github.com/okx/brczero/x/erc20/types"
+	evmtypes "github.com/okx/brczero/x/evm/types"
 )
 
 const (

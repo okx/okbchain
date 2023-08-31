@@ -3,8 +3,8 @@ package types
 import (
 	"fmt"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
-	"github.com/okx/okbchain/libs/ibc-go/modules/core/exported"
+	"github.com/okx/brczero/libs/cosmos-sdk/codec"
+	"github.com/okx/brczero/libs/ibc-go/modules/core/exported"
 )
 
 // MustUnmarshalClientState attempts to decode and return an ClientState object from

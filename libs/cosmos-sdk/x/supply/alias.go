@@ -6,8 +6,8 @@
 package supply
 
 import (
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/supply/internal/keeper"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/supply/internal/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/supply/internal/keeper"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/supply/internal/types"
 )
 
 const (

@@ -2,9 +2,9 @@ package simulation_test
 
 import (
 	"encoding/json"
-	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
-	"github.com/okx/okbchain/libs/cosmos-sdk/types/module"
-	simtypes "github.com/okx/okbchain/libs/cosmos-sdk/x/simulation"
+	"github.com/okx/brczero/libs/cosmos-sdk/codec"
+	"github.com/okx/brczero/libs/cosmos-sdk/types/module"
+	simtypes "github.com/okx/brczero/libs/cosmos-sdk/x/simulation"
 	"math/rand"
 	"testing"
 
@@ -14,9 +14,9 @@ import (
 	// codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	// "github.com/cosmos/cosmos-sdk/types/module"
 	// simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
-	host "github.com/okx/okbchain/libs/ibc-go/modules/core/24-host"
-	"github.com/okx/okbchain/libs/ibc-go/modules/core/simulation"
-	"github.com/okx/okbchain/libs/ibc-go/modules/core/types"
+	host "github.com/okx/brczero/libs/ibc-go/modules/core/24-host"
+	"github.com/okx/brczero/libs/ibc-go/modules/core/simulation"
+	"github.com/okx/brczero/libs/ibc-go/modules/core/types"
 )
 
 // TestRandomizedGenState tests the normal scenario of applying RandomizedGenState.

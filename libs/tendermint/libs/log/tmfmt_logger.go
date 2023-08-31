@@ -3,7 +3,7 @@ package log
 import (
 	"bytes"
 	"fmt"
-	"github.com/okx/okbchain/libs/system"
+	"github.com/okx/brczero/libs/system"
 	"io"
 	"sync"
 	"time"

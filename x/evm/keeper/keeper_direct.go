@@ -4,9 +4,9 @@ import (
 	"fmt"
 	ethcmn "github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/rawdb"
-	"github.com/okx/okbchain/libs/cosmos-sdk/store/prefix"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	"github.com/okx/okbchain/x/evm/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/store/prefix"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	"github.com/okx/brczero/x/evm/types"
 )
 
 // SetCodeDirectly commit code into db with no cache

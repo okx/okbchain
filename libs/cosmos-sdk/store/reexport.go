@@ -1,7 +1,7 @@
 package store
 
 import (
-	"github.com/okx/okbchain/libs/cosmos-sdk/store/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/store/types"
 )
 
 // Import cosmos-sdk/types/store.go for convenience.

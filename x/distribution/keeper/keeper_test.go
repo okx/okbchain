@@ -3,8 +3,8 @@ package keeper
 import (
 	"testing"
 
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	"github.com/okx/okbchain/x/distribution/types"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	"github.com/okx/brczero/x/distribution/types"
 	"github.com/stretchr/testify/require"
 )
 

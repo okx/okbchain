@@ -1,6 +1,6 @@
 package token
 
-import "github.com/okx/okbchain/x/token/types"
+import "github.com/okx/brczero/x/token/types"
 
 const (
 	// ModuleName is the module name constant used in many places

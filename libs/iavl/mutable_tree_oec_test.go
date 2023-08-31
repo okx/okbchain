@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	db "github.com/okx/okbchain/libs/tm-db"
+	db "github.com/okx/brczero/libs/tm-db"
 	"github.com/stretchr/testify/require"
 )
 

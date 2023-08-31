@@ -3,15 +3,15 @@ package cli
 import (
 	"testing"
 
-	tcmd "github.com/okx/okbchain/libs/tendermint/cmd/tendermint/commands"
-	cfg "github.com/okx/okbchain/libs/tendermint/config"
-	"github.com/okx/okbchain/libs/tendermint/crypto"
-	"github.com/okx/okbchain/libs/tendermint/libs/log"
+	tcmd "github.com/okx/brczero/libs/tendermint/cmd/tendermint/commands"
+	cfg "github.com/okx/brczero/libs/tendermint/config"
+	"github.com/okx/brczero/libs/tendermint/crypto"
+	"github.com/okx/brczero/libs/tendermint/libs/log"
 	"github.com/spf13/viper"
 	"github.com/stretchr/testify/require"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/server"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/server"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
 )
 
 func TestPrepareFlagsForTxCreateValidator(t *testing.T) {

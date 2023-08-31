@@ -3,8 +3,8 @@ package abcicli
 import (
 	"sync"
 
-	"github.com/okx/okbchain/libs/tendermint/abci/types"
-	"github.com/okx/okbchain/libs/tendermint/libs/service"
+	"github.com/okx/brczero/libs/tendermint/abci/types"
+	"github.com/okx/brczero/libs/tendermint/libs/service"
 )
 
 const (

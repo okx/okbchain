@@ -1,9 +1,9 @@
 package wasmtesting
 
 import (
-	"github.com/okx/okbchain/libs/cosmos-sdk/store/types"
-	storetypes "github.com/okx/okbchain/libs/cosmos-sdk/store/types"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/store/types"
+	storetypes "github.com/okx/brczero/libs/cosmos-sdk/store/types"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
 )
 
 // MockCommitMultiStore mock with a CacheMultiStore to capture commits

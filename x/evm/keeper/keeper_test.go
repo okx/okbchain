@@ -1,23 +1,24 @@
 package keeper_test
 
 import (
-	dbm "github.com/okx/okbchain/libs/tm-db"
 	"math/big"
 	"testing"
 	"time"
+
+	dbm "github.com/okx/brczero/libs/tm-db"
 
 	ethcmn "github.com/ethereum/go-ethereum/common"
 	ethtypes "github.com/ethereum/go-ethereum/core/types"
 	ethcrypto "github.com/ethereum/go-ethereum/crypto"
 
-	"github.com/okx/okbchain/app"
-	ethermint "github.com/okx/okbchain/app/types"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/auth"
-	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
-	"github.com/okx/okbchain/x/evm/keeper"
-	"github.com/okx/okbchain/x/evm/types"
-	"github.com/okx/okbchain/x/evm/watcher"
+	"github.com/okx/brczero/app"
+	ethermint "github.com/okx/brczero/app/types"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/auth"
+	abci "github.com/okx/brczero/libs/tendermint/abci/types"
+	"github.com/okx/brczero/x/evm/keeper"
+	"github.com/okx/brczero/x/evm/types"
+	"github.com/okx/brczero/x/evm/watcher"
 
 	"github.com/spf13/viper"
 	"github.com/stretchr/testify/suite"
@@ -35,7 +36,7 @@ type KeeperTestSuite struct {
 
 	ctx     sdk.Context
 	querier sdk.Querier
-	app     *app.OKBChainApp
+	app     *app.BRCZeroApp
 	stateDB *types.CommitStateDB
 	address ethcmn.Address
 }

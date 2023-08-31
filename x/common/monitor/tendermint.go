@@ -2,9 +2,9 @@ package monitor
 
 import (
 	"fmt"
-	"github.com/okx/okbchain/libs/cosmos-sdk/server"
-	tmcli "github.com/okx/okbchain/libs/tendermint/rpc/client"
-	tmhttp "github.com/okx/okbchain/libs/tendermint/rpc/client/http"
+	"github.com/okx/brczero/libs/cosmos-sdk/server"
+	tmcli "github.com/okx/brczero/libs/tendermint/rpc/client"
+	tmhttp "github.com/okx/brczero/libs/tendermint/rpc/client/http"
 	"github.com/spf13/viper"
 	"strings"
 	"sync"

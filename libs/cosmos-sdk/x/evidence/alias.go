@@ -1,8 +1,8 @@
 package evidence
 
 import (
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/evidence/internal/keeper"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/evidence/internal/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/evidence/internal/keeper"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/evidence/internal/types"
 )
 
 // nolint

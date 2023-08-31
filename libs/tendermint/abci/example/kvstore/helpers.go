@@ -1,8 +1,8 @@
 package kvstore
 
 import (
-	"github.com/okx/okbchain/libs/tendermint/abci/types"
-	tmrand "github.com/okx/okbchain/libs/tendermint/libs/rand"
+	"github.com/okx/brczero/libs/tendermint/abci/types"
+	tmrand "github.com/okx/brczero/libs/tendermint/libs/rand"
 )
 
 // RandVal creates one random validator, with a key derived

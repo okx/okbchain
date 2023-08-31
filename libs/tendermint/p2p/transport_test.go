@@ -8,8 +8,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/okx/okbchain/libs/tendermint/crypto/ed25519"
-	"github.com/okx/okbchain/libs/tendermint/p2p/conn"
+	"github.com/okx/brczero/libs/tendermint/crypto/ed25519"
+	"github.com/okx/brczero/libs/tendermint/p2p/conn"
 )
 
 var defaultNodeName = "host_peer"

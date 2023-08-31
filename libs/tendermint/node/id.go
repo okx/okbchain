@@ -3,7 +3,7 @@ package node
 import (
 	"time"
 
-	"github.com/okx/okbchain/libs/tendermint/crypto"
+	"github.com/okx/brczero/libs/tendermint/crypto"
 )
 
 type ID struct {

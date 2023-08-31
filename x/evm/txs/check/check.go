@@ -1,7 +1,7 @@
 package check
 
 import (
-	"github.com/okx/okbchain/x/evm/txs/base"
+	"github.com/okx/brczero/x/evm/txs/base"
 )
 
 type Tx struct {

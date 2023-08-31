@@ -16,14 +16,14 @@ import (
 
 	"github.com/tendermint/go-amino"
 
-	"github.com/okx/okbchain/libs/system/trace"
-	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
-	cfg "github.com/okx/okbchain/libs/tendermint/config"
-	"github.com/okx/okbchain/libs/tendermint/libs/clist"
-	"github.com/okx/okbchain/libs/tendermint/libs/log"
-	tmmath "github.com/okx/okbchain/libs/tendermint/libs/math"
-	"github.com/okx/okbchain/libs/tendermint/proxy"
-	"github.com/okx/okbchain/libs/tendermint/types"
+	"github.com/okx/brczero/libs/system/trace"
+	abci "github.com/okx/brczero/libs/tendermint/abci/types"
+	cfg "github.com/okx/brczero/libs/tendermint/config"
+	"github.com/okx/brczero/libs/tendermint/libs/clist"
+	"github.com/okx/brczero/libs/tendermint/libs/log"
+	tmmath "github.com/okx/brczero/libs/tendermint/libs/math"
+	"github.com/okx/brczero/libs/tendermint/proxy"
+	"github.com/okx/brczero/libs/tendermint/types"
 )
 
 type TxInfoParser interface {

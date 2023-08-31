@@ -4,7 +4,7 @@
 ## Input parameters
 ##
 ID=${ID:-0}
-LOG=${LOG:-okbchaind.log}
+LOG=${LOG:-brczerod.log}
 
 ##
 ## Run binary with all parameters
@@ -12,8 +12,8 @@ LOG=${LOG:-okbchaind.log}
 export OKBCHAINDHOME="/okbchaind/node${ID}/okbchaind"
 
 if [ -d "$(dirname "${OKBCHAINDHOME}"/"${LOG}")" ]; then
-  okbchaind --chain-id okbchain-1 --home "${OKBCHAINDHOME}" "$@" | tee "${OKBCHAINDHOME}/${LOG}"
+  brczerod --chain-id okbchain-1 --home "${OKBCHAINDHOME}" "$@" | tee "${OKBCHAINDHOME}/${LOG}"
 else
-  okbchaind --chain-id okbchain-1 --home "${OKBCHAINDHOME}" "$@"
+  brczerod --chain-id okbchain-1 --home "${OKBCHAINDHOME}" "$@"
 fi
 

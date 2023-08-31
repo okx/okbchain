@@ -4,9 +4,9 @@ import (
 	"context"
 	"errors"
 
-	"github.com/okx/okbchain/libs/tendermint/libs/pubsub/query"
-	"github.com/okx/okbchain/libs/tendermint/state/txindex"
-	"github.com/okx/okbchain/libs/tendermint/types"
+	"github.com/okx/brczero/libs/tendermint/libs/pubsub/query"
+	"github.com/okx/brczero/libs/tendermint/state/txindex"
+	"github.com/okx/brczero/libs/tendermint/types"
 )
 
 var _ txindex.TxIndexer = (*TxIndex)(nil)

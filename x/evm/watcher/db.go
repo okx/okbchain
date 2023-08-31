@@ -7,11 +7,11 @@ import (
 	"path/filepath"
 	"sync"
 
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/client/flags"
-	dbm "github.com/okx/okbchain/libs/tm-db"
-	evmtypes "github.com/okx/okbchain/x/evm/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/client/flags"
+	dbm "github.com/okx/brczero/libs/tm-db"
+	evmtypes "github.com/okx/brczero/x/evm/types"
 	"github.com/spf13/viper"
 )
 

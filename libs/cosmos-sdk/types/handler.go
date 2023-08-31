@@ -2,9 +2,9 @@ package types
 
 import (
 	"github.com/ethereum/go-ethereum/common"
-	stypes "github.com/okx/okbchain/libs/cosmos-sdk/store/types"
+	stypes "github.com/okx/brczero/libs/cosmos-sdk/store/types"
 
-	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
+	abci "github.com/okx/brczero/libs/tendermint/abci/types"
 )
 
 // Handler defines the core of the state transition function of an application.

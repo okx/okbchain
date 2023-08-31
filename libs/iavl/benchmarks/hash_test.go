@@ -7,7 +7,7 @@ import (
 	"hash"
 	"testing"
 
-	"github.com/okx/okbchain/libs/iavl"
+	"github.com/okx/brczero/libs/iavl"
 
 	_ "crypto/sha256"
 

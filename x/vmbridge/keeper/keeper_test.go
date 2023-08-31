@@ -11,14 +11,15 @@ import (
 
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/okx/okbchain/app"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
-	"github.com/okx/okbchain/libs/tendermint/types"
-	evmtypes "github.com/okx/okbchain/x/evm/types"
-	"github.com/okx/okbchain/x/vmbridge/keeper"
-	wasmtypes "github.com/okx/okbchain/x/wasm/types"
 	"github.com/stretchr/testify/suite"
+
+	"github.com/okx/brczero/app"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	abci "github.com/okx/brczero/libs/tendermint/abci/types"
+	"github.com/okx/brczero/libs/tendermint/types"
+	evmtypes "github.com/okx/brczero/x/evm/types"
+	"github.com/okx/brczero/x/vmbridge/keeper"
+	wasmtypes "github.com/okx/brczero/x/wasm/types"
 )
 
 func TestKeeperTestSuite(t *testing.T) {
@@ -33,7 +34,7 @@ type KeeperTestSuite struct {
 	suite.Suite
 
 	ctx sdk.Context
-	app *app.OKBChainApp
+	app *app.BRCZeroApp
 
 	keeper *keeper.Keeper
 

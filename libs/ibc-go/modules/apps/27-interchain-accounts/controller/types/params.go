@@ -3,7 +3,7 @@ package types
 import (
 	"fmt"
 
-	paramtypes "github.com/okx/okbchain/x/params"
+	paramtypes "github.com/okx/brczero/x/params"
 )
 
 const (

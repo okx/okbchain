@@ -3,7 +3,7 @@ package simapp
 import (
 	"flag"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/simulation"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/simulation"
 )
 
 // List of available flags for the simulator

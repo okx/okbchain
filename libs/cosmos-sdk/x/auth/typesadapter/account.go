@@ -4,10 +4,10 @@ import (
 	"bytes"
 	"errors"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
-	codectypes "github.com/okx/okbchain/libs/cosmos-sdk/codec/types"
-	cryptotypes "github.com/okx/okbchain/libs/cosmos-sdk/crypto/types"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/codec"
+	codectypes "github.com/okx/brczero/libs/cosmos-sdk/codec/types"
+	cryptotypes "github.com/okx/brczero/libs/cosmos-sdk/crypto/types"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
 )
 
 // NewBaseAccountWithAddress - returns a new base account with a given address

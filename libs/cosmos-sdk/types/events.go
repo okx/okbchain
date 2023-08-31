@@ -7,8 +7,8 @@ import (
 	"sort"
 	"strings"
 
-	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
-	tmkv "github.com/okx/okbchain/libs/tendermint/libs/kv"
+	abci "github.com/okx/brczero/libs/tendermint/abci/types"
+	tmkv "github.com/okx/brczero/libs/tendermint/libs/kv"
 )
 
 // ----------------------------------------------------------------------------

@@ -5,10 +5,10 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/client/context"
-	"github.com/okx/okbchain/libs/cosmos-sdk/types/rest"
+	"github.com/okx/brczero/libs/cosmos-sdk/client/context"
+	"github.com/okx/brczero/libs/cosmos-sdk/types/rest"
 
-	"github.com/okx/okbchain/x/evidence/internal/types"
+	"github.com/okx/brczero/x/evidence/internal/types"
 
 	"github.com/gorilla/mux"
 )

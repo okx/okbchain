@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/okx/okbchain/libs/tendermint/crypto/tmhash"
-	tmtime "github.com/okx/okbchain/libs/tendermint/types/time"
+	"github.com/okx/brczero/libs/tendermint/crypto/tmhash"
+	tmtime "github.com/okx/brczero/libs/tendermint/types/time"
 )
 
 // ValidateTime does a basic time validation ensuring time does not drift too

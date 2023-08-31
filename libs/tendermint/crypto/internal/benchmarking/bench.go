@@ -4,7 +4,7 @@ import (
 	"io"
 	"testing"
 
-	"github.com/okx/okbchain/libs/tendermint/crypto"
+	"github.com/okx/brczero/libs/tendermint/crypto"
 )
 
 // The code in this file is adapted from agl/ed25519.

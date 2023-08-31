@@ -5,10 +5,10 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	tmrand "github.com/okx/okbchain/libs/tendermint/libs/rand"
-	. "github.com/okx/okbchain/libs/tendermint/libs/test"
+	tmrand "github.com/okx/brczero/libs/tendermint/libs/rand"
+	. "github.com/okx/brczero/libs/tendermint/libs/test"
 
-	"github.com/okx/okbchain/libs/tendermint/crypto/tmhash"
+	"github.com/okx/brczero/libs/tendermint/crypto/tmhash"
 )
 
 type testItem []byte

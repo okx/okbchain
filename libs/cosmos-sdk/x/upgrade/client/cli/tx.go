@@ -5,17 +5,17 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/gov/client/cli"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/gov/client/cli"
 
 	"github.com/spf13/cobra"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/client/context"
-	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/auth"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/auth/client/utils"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/gov"
-	upgrade "github.com/okx/okbchain/libs/cosmos-sdk/x/upgrade/internal/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/client/context"
+	"github.com/okx/brczero/libs/cosmos-sdk/codec"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/auth"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/auth/client/utils"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/gov"
+	upgrade "github.com/okx/brczero/libs/cosmos-sdk/x/upgrade/internal/types"
 )
 
 const (

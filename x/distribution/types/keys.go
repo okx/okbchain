@@ -1,6 +1,6 @@
 package types
 
-import sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
+import sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
 
 const (
 	// ModuleName is the module name constant used in many places
@@ -15,7 +15,7 @@ const (
 	// QuerierRoute is the querier route for distribution
 	QuerierRoute = ModuleName
 
-	// ShortUseByCli added for okbchaincli
+	// ShortUseByCli added for brczerocli
 	ShortUseByCli = "distr"
 )
 

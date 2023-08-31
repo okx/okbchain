@@ -7,9 +7,9 @@ import (
 
 	ics23 "github.com/confio/ics23/go"
 	"github.com/gogo/protobuf/proto"
-	sdkerrors "github.com/okx/okbchain/libs/cosmos-sdk/types/errors"
-	"github.com/okx/okbchain/libs/ibc-go/modules/core/exported"
-	"github.com/okx/okbchain/libs/tendermint/proto/crypto"
+	sdkerrors "github.com/okx/brczero/libs/cosmos-sdk/types/errors"
+	"github.com/okx/brczero/libs/ibc-go/modules/core/exported"
+	"github.com/okx/brczero/libs/tendermint/proto/crypto"
 )
 
 var _ exported.Root = (*MerkleRoot)(nil)

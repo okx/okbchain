@@ -4,11 +4,11 @@ import (
 	ethcmm "github.com/ethereum/go-ethereum/common"
 	"testing"
 
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	"github.com/okx/okbchain/libs/tendermint/libs/cli/flags"
-	"github.com/okx/okbchain/x/gov"
-	"github.com/okx/okbchain/x/gov/types"
-	"github.com/okx/okbchain/x/staking"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	"github.com/okx/brczero/libs/tendermint/libs/cli/flags"
+	"github.com/okx/brczero/x/gov"
+	"github.com/okx/brczero/x/gov/types"
+	"github.com/okx/brczero/x/staking"
 	"github.com/stretchr/testify/require"
 )
 

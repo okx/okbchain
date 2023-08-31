@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"time"
 
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	"github.com/okx/okbchain/x/common"
-	"github.com/okx/okbchain/x/params"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	"github.com/okx/brczero/x/common"
+	"github.com/okx/brczero/x/params"
 )
 
 const (

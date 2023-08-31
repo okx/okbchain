@@ -2,113 +2,114 @@ package app
 
 import (
 	"fmt"
-	"github.com/okx/okbchain/libs/cosmos-sdk/client/flags"
 	"io"
 	"os"
 	"runtime/debug"
 	"sync"
 
-	paramstypes "github.com/okx/okbchain/x/params/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/client/flags"
 
-	"github.com/okx/okbchain/x/vmbridge"
+	paramstypes "github.com/okx/brczero/x/params/types"
 
-	ica "github.com/okx/okbchain/libs/ibc-go/modules/apps/27-interchain-accounts"
-	icacontroller "github.com/okx/okbchain/libs/ibc-go/modules/apps/27-interchain-accounts/controller"
-	icahost "github.com/okx/okbchain/libs/ibc-go/modules/apps/27-interchain-accounts/host"
-	"github.com/okx/okbchain/x/icamauth"
+	"github.com/okx/brczero/x/vmbridge"
 
-	ibccommon "github.com/okx/okbchain/libs/ibc-go/modules/core/common"
+	ica "github.com/okx/brczero/libs/ibc-go/modules/apps/27-interchain-accounts"
+	icacontroller "github.com/okx/brczero/libs/ibc-go/modules/apps/27-interchain-accounts/controller"
+	icahost "github.com/okx/brczero/libs/ibc-go/modules/apps/27-interchain-accounts/host"
+	"github.com/okx/brczero/x/icamauth"
 
-	icacontrollertypes "github.com/okx/okbchain/libs/ibc-go/modules/apps/27-interchain-accounts/controller/types"
-	icahosttypes "github.com/okx/okbchain/libs/ibc-go/modules/apps/27-interchain-accounts/host/types"
-	icamauthtypes "github.com/okx/okbchain/x/icamauth/types"
+	ibccommon "github.com/okx/brczero/libs/ibc-go/modules/core/common"
 
-	icacontrollerkeeper "github.com/okx/okbchain/libs/ibc-go/modules/apps/27-interchain-accounts/controller/keeper"
-	icahostkeeper "github.com/okx/okbchain/libs/ibc-go/modules/apps/27-interchain-accounts/host/keeper"
-	icamauthkeeper "github.com/okx/okbchain/x/icamauth/keeper"
+	icacontrollertypes "github.com/okx/brczero/libs/ibc-go/modules/apps/27-interchain-accounts/controller/types"
+	icahosttypes "github.com/okx/brczero/libs/ibc-go/modules/apps/27-interchain-accounts/host/types"
+	icamauthtypes "github.com/okx/brczero/x/icamauth/types"
 
-	ibcfeekeeper "github.com/okx/okbchain/libs/ibc-go/modules/apps/29-fee/keeper"
+	icacontrollerkeeper "github.com/okx/brczero/libs/ibc-go/modules/apps/27-interchain-accounts/controller/keeper"
+	icahostkeeper "github.com/okx/brczero/libs/ibc-go/modules/apps/27-interchain-accounts/host/keeper"
+	icamauthkeeper "github.com/okx/brczero/x/icamauth/keeper"
 
-	icatypes "github.com/okx/okbchain/libs/ibc-go/modules/apps/27-interchain-accounts/types"
-	ibcfeetypes "github.com/okx/okbchain/libs/ibc-go/modules/apps/29-fee/types"
+	ibcfeekeeper "github.com/okx/brczero/libs/ibc-go/modules/apps/29-fee/keeper"
+
+	icatypes "github.com/okx/brczero/libs/ibc-go/modules/apps/27-interchain-accounts/types"
+	ibcfeetypes "github.com/okx/brczero/libs/ibc-go/modules/apps/29-fee/types"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"google.golang.org/grpc/encoding"
 	"google.golang.org/grpc/encoding/proto"
 
-	ibcfee "github.com/okx/okbchain/libs/ibc-go/modules/apps/29-fee"
+	ibcfee "github.com/okx/brczero/libs/ibc-go/modules/apps/29-fee"
 
-	"github.com/okx/okbchain/app/utils/appstatus"
+	"github.com/okx/brczero/app/utils/appstatus"
 
-	"github.com/okx/okbchain/app/ante"
-	chaincodec "github.com/okx/okbchain/app/codec"
-	appconfig "github.com/okx/okbchain/app/config"
-	"github.com/okx/okbchain/app/refund"
-	chain "github.com/okx/okbchain/app/types"
-	"github.com/okx/okbchain/app/utils/sanity"
-	bam "github.com/okx/okbchain/libs/cosmos-sdk/baseapp"
-	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
-	"github.com/okx/okbchain/libs/cosmos-sdk/server"
-	"github.com/okx/okbchain/libs/cosmos-sdk/simapp"
-	"github.com/okx/okbchain/libs/cosmos-sdk/store/mpt"
-	stypes "github.com/okx/okbchain/libs/cosmos-sdk/store/types"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	"github.com/okx/okbchain/libs/cosmos-sdk/types/module"
-	upgradetypes "github.com/okx/okbchain/libs/cosmos-sdk/types/upgrade"
-	"github.com/okx/okbchain/libs/cosmos-sdk/version"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/auth"
-	authtypes "github.com/okx/okbchain/libs/cosmos-sdk/x/auth/types"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/bank"
-	capabilityModule "github.com/okx/okbchain/libs/cosmos-sdk/x/capability"
-	capabilitykeeper "github.com/okx/okbchain/libs/cosmos-sdk/x/capability/keeper"
-	capabilitytypes "github.com/okx/okbchain/libs/cosmos-sdk/x/capability/types"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/crisis"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/mint"
-	govclient "github.com/okx/okbchain/libs/cosmos-sdk/x/mint/client"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/supply"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/upgrade"
-	"github.com/okx/okbchain/libs/iavl"
-	ibctransfer "github.com/okx/okbchain/libs/ibc-go/modules/apps/transfer"
-	ibctransferkeeper "github.com/okx/okbchain/libs/ibc-go/modules/apps/transfer/keeper"
-	ibctransfertypes "github.com/okx/okbchain/libs/ibc-go/modules/apps/transfer/types"
-	ibc "github.com/okx/okbchain/libs/ibc-go/modules/core"
-	ibcclient "github.com/okx/okbchain/libs/ibc-go/modules/core/02-client"
-	"github.com/okx/okbchain/libs/ibc-go/modules/core/02-client/client"
-	ibcclienttypes "github.com/okx/okbchain/libs/ibc-go/modules/core/02-client/types"
-	ibcporttypes "github.com/okx/okbchain/libs/ibc-go/modules/core/05-port/types"
-	ibchost "github.com/okx/okbchain/libs/ibc-go/modules/core/24-host"
-	"github.com/okx/okbchain/libs/system"
-	"github.com/okx/okbchain/libs/system/trace"
-	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
-	"github.com/okx/okbchain/libs/tendermint/libs/log"
-	tmos "github.com/okx/okbchain/libs/tendermint/libs/os"
-	sm "github.com/okx/okbchain/libs/tendermint/state"
-	tmtypes "github.com/okx/okbchain/libs/tendermint/types"
-	dbm "github.com/okx/okbchain/libs/tm-db"
-	commonversion "github.com/okx/okbchain/x/common/version"
-	distr "github.com/okx/okbchain/x/distribution"
-	"github.com/okx/okbchain/x/erc20"
-	erc20client "github.com/okx/okbchain/x/erc20/client"
-	"github.com/okx/okbchain/x/evidence"
-	"github.com/okx/okbchain/x/evm"
-	evmclient "github.com/okx/okbchain/x/evm/client"
-	evmtypes "github.com/okx/okbchain/x/evm/types"
-	"github.com/okx/okbchain/x/feesplit"
-	fsclient "github.com/okx/okbchain/x/feesplit/client"
-	"github.com/okx/okbchain/x/genutil"
-	"github.com/okx/okbchain/x/gov"
-	"github.com/okx/okbchain/x/gov/keeper"
-	"github.com/okx/okbchain/x/infura"
-	"github.com/okx/okbchain/x/params"
-	paramsclient "github.com/okx/okbchain/x/params/client"
-	"github.com/okx/okbchain/x/slashing"
-	"github.com/okx/okbchain/x/staking"
-	stakingclient "github.com/okx/okbchain/x/staking/client"
-	"github.com/okx/okbchain/x/token"
-	"github.com/okx/okbchain/x/wasm"
-	wasmclient "github.com/okx/okbchain/x/wasm/client"
-	wasmkeeper "github.com/okx/okbchain/x/wasm/keeper"
+	"github.com/okx/brczero/app/ante"
+	chaincodec "github.com/okx/brczero/app/codec"
+	appconfig "github.com/okx/brczero/app/config"
+	"github.com/okx/brczero/app/refund"
+	chain "github.com/okx/brczero/app/types"
+	"github.com/okx/brczero/app/utils/sanity"
+	bam "github.com/okx/brczero/libs/cosmos-sdk/baseapp"
+	"github.com/okx/brczero/libs/cosmos-sdk/codec"
+	"github.com/okx/brczero/libs/cosmos-sdk/server"
+	"github.com/okx/brczero/libs/cosmos-sdk/simapp"
+	"github.com/okx/brczero/libs/cosmos-sdk/store/mpt"
+	stypes "github.com/okx/brczero/libs/cosmos-sdk/store/types"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/types/module"
+	upgradetypes "github.com/okx/brczero/libs/cosmos-sdk/types/upgrade"
+	"github.com/okx/brczero/libs/cosmos-sdk/version"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/auth"
+	authtypes "github.com/okx/brczero/libs/cosmos-sdk/x/auth/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/bank"
+	capabilityModule "github.com/okx/brczero/libs/cosmos-sdk/x/capability"
+	capabilitykeeper "github.com/okx/brczero/libs/cosmos-sdk/x/capability/keeper"
+	capabilitytypes "github.com/okx/brczero/libs/cosmos-sdk/x/capability/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/crisis"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/mint"
+	govclient "github.com/okx/brczero/libs/cosmos-sdk/x/mint/client"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/supply"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/upgrade"
+	"github.com/okx/brczero/libs/iavl"
+	ibctransfer "github.com/okx/brczero/libs/ibc-go/modules/apps/transfer"
+	ibctransferkeeper "github.com/okx/brczero/libs/ibc-go/modules/apps/transfer/keeper"
+	ibctransfertypes "github.com/okx/brczero/libs/ibc-go/modules/apps/transfer/types"
+	ibc "github.com/okx/brczero/libs/ibc-go/modules/core"
+	ibcclient "github.com/okx/brczero/libs/ibc-go/modules/core/02-client"
+	"github.com/okx/brczero/libs/ibc-go/modules/core/02-client/client"
+	ibcclienttypes "github.com/okx/brczero/libs/ibc-go/modules/core/02-client/types"
+	ibcporttypes "github.com/okx/brczero/libs/ibc-go/modules/core/05-port/types"
+	ibchost "github.com/okx/brczero/libs/ibc-go/modules/core/24-host"
+	"github.com/okx/brczero/libs/system"
+	"github.com/okx/brczero/libs/system/trace"
+	abci "github.com/okx/brczero/libs/tendermint/abci/types"
+	"github.com/okx/brczero/libs/tendermint/libs/log"
+	tmos "github.com/okx/brczero/libs/tendermint/libs/os"
+	sm "github.com/okx/brczero/libs/tendermint/state"
+	tmtypes "github.com/okx/brczero/libs/tendermint/types"
+	dbm "github.com/okx/brczero/libs/tm-db"
+	commonversion "github.com/okx/brczero/x/common/version"
+	distr "github.com/okx/brczero/x/distribution"
+	"github.com/okx/brczero/x/erc20"
+	erc20client "github.com/okx/brczero/x/erc20/client"
+	"github.com/okx/brczero/x/evidence"
+	"github.com/okx/brczero/x/evm"
+	evmclient "github.com/okx/brczero/x/evm/client"
+	evmtypes "github.com/okx/brczero/x/evm/types"
+	"github.com/okx/brczero/x/feesplit"
+	fsclient "github.com/okx/brczero/x/feesplit/client"
+	"github.com/okx/brczero/x/genutil"
+	"github.com/okx/brczero/x/gov"
+	"github.com/okx/brczero/x/gov/keeper"
+	"github.com/okx/brczero/x/infura"
+	"github.com/okx/brczero/x/params"
+	paramsclient "github.com/okx/brczero/x/params/client"
+	"github.com/okx/brczero/x/slashing"
+	"github.com/okx/brczero/x/staking"
+	stakingclient "github.com/okx/brczero/x/staking/client"
+	"github.com/okx/brczero/x/token"
+	"github.com/okx/brczero/x/wasm"
+	wasmclient "github.com/okx/brczero/x/wasm/client"
+	wasmkeeper "github.com/okx/brczero/x/wasm/keeper"
 )
 
 func init() {
@@ -209,12 +210,12 @@ var (
 	FlagGolangMaxThreads string = "golang-max-threads"
 )
 
-var _ simapp.App = (*OKBChainApp)(nil)
+var _ simapp.App = (*BRCZeroApp)(nil)
 
-// OKBChainApp implements an extended ABCI application. It is an application
+// BRCZeroApp implements an extended ABCI application. It is an application
 // that may process transactions through Ethereum's EVM running atop of
 // Tendermint consensus.
-type OKBChainApp struct {
+type BRCZeroApp struct {
 	*bam.BaseApp
 
 	invCheckPeriod uint
@@ -272,8 +273,8 @@ type OKBChainApp struct {
 	WasmHandler wasmkeeper.HandlerOption
 }
 
-// NewOKBChainApp returns a reference to a new initialized OKBChain application.
-func NewOKBChainApp(
+// NewBRCZeroApp returns a reference to a new initialized BRCZero application.
+func NewBRCZeroApp(
 	logger log.Logger,
 	db dbm.DB,
 	traceStore io.Writer,
@@ -281,7 +282,7 @@ func NewOKBChainApp(
 	skipUpgradeHeights map[int64]bool,
 	invCheckPeriod uint,
 	baseAppOptions ...func(*bam.BaseApp),
-) *OKBChainApp {
+) *BRCZeroApp {
 	logger.Info("Starting " + system.ChainName)
 	onceLog.Do(func() {
 		iavl.SetLogger(logger.With("module", "iavl"))
@@ -290,7 +291,7 @@ func NewOKBChainApp(
 
 	codecProxy, interfaceReg := chaincodec.MakeCodecSuit(ModuleBasics)
 	vmbridge.RegisterInterface(interfaceReg)
-	// NOTE we use custom OKBChain transaction decoder that supports the sdk.Tx interface instead of sdk.StdTx
+	// NOTE we use custom BRCZero transaction decoder that supports the sdk.Tx interface instead of sdk.StdTx
 	bApp := bam.NewBaseApp(appName, logger, db, evm.TxDecoder(codecProxy), baseAppOptions...)
 
 	bApp.SetCommitMultiStoreTracer(traceStore)
@@ -318,7 +319,7 @@ func NewOKBChainApp(
 	tkeys := sdk.NewTransientStoreKeys(params.TStoreKey)
 	memKeys := sdk.NewMemoryStoreKeys(capabilitytypes.MemStoreKey)
 
-	app := &OKBChainApp{
+	app := &BRCZeroApp{
 		BaseApp:        bApp,
 		invCheckPeriod: invCheckPeriod,
 		keys:           keys,
@@ -351,7 +352,7 @@ func NewOKBChainApp(
 
 	//proxy := codec.NewMarshalProxy(cc, cdc)
 	app.marshal = codecProxy
-	// use custom OKBChain account for contracts
+	// use custom BRCZero account for contracts
 	app.AccountKeeper = auth.NewAccountKeeper(
 		codecProxy.GetCdc(), keys[mpt.StoreKey], app.subspaces[auth.ModuleName], chain.ProtoAccount,
 	)
@@ -738,7 +739,7 @@ func NewOKBChainApp(
 	return app
 }
 
-func (app *OKBChainApp) InitUpgrade(ctx sdk.Context) {
+func (app *BRCZeroApp) InitUpgrade(ctx sdk.Context) {
 	// Claim before ApplyEffectiveUpgrade
 	app.ParamsKeeper.ClaimReadyForUpgrade(tmtypes.MILESTONE_EARTH, func(info paramstypes.UpgradeInfo) {
 		tmtypes.InitMilestoneEarthHeight(int64(info.EffectiveHeight))
@@ -755,7 +756,7 @@ func (app *OKBChainApp) InitUpgrade(ctx sdk.Context) {
 	}
 }
 
-func (app *OKBChainApp) SetOption(req abci.RequestSetOption) (res abci.ResponseSetOption) {
+func (app *BRCZeroApp) SetOption(req abci.RequestSetOption) (res abci.ResponseSetOption) {
 	if req.Key == "CheckChainID" {
 		if err := chain.IsValidateChainIdWithGenesisHeight(req.Value); err != nil {
 			app.Logger().Error(err.Error())
@@ -770,25 +771,25 @@ func (app *OKBChainApp) SetOption(req abci.RequestSetOption) (res abci.ResponseS
 	return app.BaseApp.SetOption(req)
 }
 
-func (app *OKBChainApp) LoadStartVersion(height int64) error {
+func (app *BRCZeroApp) LoadStartVersion(height int64) error {
 	return app.LoadVersion(height, app.keys[bam.MainStoreKey])
 }
 
 // Name returns the name of the App
-func (app *OKBChainApp) Name() string { return app.BaseApp.Name() }
+func (app *BRCZeroApp) Name() string { return app.BaseApp.Name() }
 
 // BeginBlocker updates every begin block
-func (app *OKBChainApp) BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock) abci.ResponseBeginBlock {
+func (app *BRCZeroApp) BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock) abci.ResponseBeginBlock {
 	return app.mm.BeginBlock(ctx, req)
 }
 
 // EndBlocker updates every end block
-func (app *OKBChainApp) EndBlocker(ctx sdk.Context, req abci.RequestEndBlock) abci.ResponseEndBlock {
+func (app *BRCZeroApp) EndBlocker(ctx sdk.Context, req abci.RequestEndBlock) abci.ResponseEndBlock {
 	return app.mm.EndBlock(ctx, req)
 }
 
 // InitChainer updates at chain initialization
-func (app *OKBChainApp) InitChainer(ctx sdk.Context, req abci.RequestInitChain) abci.ResponseInitChain {
+func (app *BRCZeroApp) InitChainer(ctx sdk.Context, req abci.RequestInitChain) abci.ResponseInitChain {
 
 	var genesisState simapp.GenesisState
 	app.marshal.GetCdc().MustUnmarshalJSON(req.AppStateBytes, &genesisState)
@@ -796,12 +797,12 @@ func (app *OKBChainApp) InitChainer(ctx sdk.Context, req abci.RequestInitChain) 
 }
 
 // LoadHeight loads state at a particular height
-func (app *OKBChainApp) LoadHeight(height int64) error {
+func (app *BRCZeroApp) LoadHeight(height int64) error {
 	return app.LoadVersion(height, app.keys[bam.MainStoreKey])
 }
 
 // ModuleAccountAddrs returns all the app's module account addresses.
-func (app *OKBChainApp) ModuleAccountAddrs() map[string]bool {
+func (app *BRCZeroApp) ModuleAccountAddrs() map[string]bool {
 	modAccAddrs := make(map[string]bool)
 	for acc := range maccPerms {
 		modAccAddrs[supply.NewModuleAddress(acc).String()] = true
@@ -811,14 +812,14 @@ func (app *OKBChainApp) ModuleAccountAddrs() map[string]bool {
 }
 
 // SimulationManager implements the SimulationApp interface
-func (app *OKBChainApp) SimulationManager() *module.SimulationManager {
+func (app *BRCZeroApp) SimulationManager() *module.SimulationManager {
 	return app.sm
 }
 
 // GetKey returns the KVStoreKey for the provided store key.
 //
 // NOTE: This is solely to be used for testing purposes.
-func (app *OKBChainApp) GetKey(storeKey string) *sdk.KVStoreKey {
+func (app *BRCZeroApp) GetKey(storeKey string) *sdk.KVStoreKey {
 	return app.keys[storeKey]
 }
 
@@ -826,18 +827,18 @@ func (app *OKBChainApp) GetKey(storeKey string) *sdk.KVStoreKey {
 //
 // NOTE: This is solely to be used for testing purposes as it may be desirable
 // for modules to register their own custom testing types.
-func (app *OKBChainApp) Codec() *codec.Codec {
+func (app *BRCZeroApp) Codec() *codec.Codec {
 	return app.marshal.GetCdc()
 }
 
-func (app *OKBChainApp) Marshal() *codec.CodecProxy {
+func (app *BRCZeroApp) Marshal() *codec.CodecProxy {
 	return app.marshal
 }
 
 // GetSubspace returns a param subspace for a given module name.
 //
 // NOTE: This is solely to be used for testing purposes.
-func (app *OKBChainApp) GetSubspace(moduleName string) params.Subspace {
+func (app *BRCZeroApp) GetSubspace(moduleName string) params.Subspace {
 	return app.subspaces[moduleName]
 }
 

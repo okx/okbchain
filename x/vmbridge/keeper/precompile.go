@@ -5,9 +5,9 @@ import (
 	"errors"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/vm"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	evmtypes "github.com/okx/okbchain/x/evm/types"
-	"github.com/okx/okbchain/x/vmbridge/types"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	evmtypes "github.com/okx/brczero/x/evm/types"
+	"github.com/okx/brczero/x/vmbridge/types"
 	"math/big"
 )
 

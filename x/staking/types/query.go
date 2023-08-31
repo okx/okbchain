@@ -1,8 +1,8 @@
 package types
 
 import (
-	"github.com/okx/okbchain/libs/cosmos-sdk/types/query"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/staking/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/types/query"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/staking/types"
 )
 
 // note: it should act like protobuf ,but for now ,we only need the `pure struct`

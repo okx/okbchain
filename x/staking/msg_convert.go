@@ -3,12 +3,12 @@ package staking
 import (
 	"encoding/json"
 	"errors"
-	"github.com/okx/okbchain/libs/system"
+	"github.com/okx/brczero/libs/system"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/baseapp"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	"github.com/okx/okbchain/x/common"
-	"github.com/okx/okbchain/x/staking/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/baseapp"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	"github.com/okx/brczero/x/common"
+	"github.com/okx/brczero/x/staking/types"
 )
 
 var (

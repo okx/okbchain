@@ -4,18 +4,18 @@ import (
 	"testing"
 	"time"
 
-	blockindexer "github.com/okx/okbchain/libs/tendermint/state/indexer/block/kv"
+	blockindexer "github.com/okx/brczero/libs/tendermint/state/indexer/block/kv"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	db "github.com/okx/okbchain/libs/tm-db"
+	db "github.com/okx/brczero/libs/tm-db"
 
-	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
-	"github.com/okx/okbchain/libs/tendermint/libs/log"
-	"github.com/okx/okbchain/libs/tendermint/state/txindex"
-	"github.com/okx/okbchain/libs/tendermint/state/txindex/kv"
-	"github.com/okx/okbchain/libs/tendermint/types"
+	abci "github.com/okx/brczero/libs/tendermint/abci/types"
+	"github.com/okx/brczero/libs/tendermint/libs/log"
+	"github.com/okx/brczero/libs/tendermint/state/txindex"
+	"github.com/okx/brczero/libs/tendermint/state/txindex/kv"
+	"github.com/okx/brczero/libs/tendermint/types"
 )
 
 func TestIndexerServiceIndexesBlocks(t *testing.T) {

@@ -1,7 +1,7 @@
 package behaviour
 
 import (
-	"github.com/okx/okbchain/libs/tendermint/p2p"
+	"github.com/okx/brczero/libs/tendermint/p2p"
 )
 
 // PeerBehaviour is a struct describing a behaviour a peer performed.

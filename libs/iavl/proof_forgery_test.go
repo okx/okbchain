@@ -6,8 +6,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/okx/okbchain/libs/tendermint/crypto/tmhash"
-	db "github.com/okx/okbchain/libs/tm-db"
+	"github.com/okx/brczero/libs/tendermint/crypto/tmhash"
+	db "github.com/okx/brczero/libs/tm-db"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

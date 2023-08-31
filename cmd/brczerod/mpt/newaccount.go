@@ -6,17 +6,19 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
+	"strconv"
+
 	ethcmn "github.com/ethereum/go-ethereum/common"
 	ethcrypto "github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/trie"
-	apptypes "github.com/okx/okbchain/app/types"
-	"github.com/okx/okbchain/cmd/okbchaind/base"
-	"github.com/okx/okbchain/libs/cosmos-sdk/server"
-	"github.com/okx/okbchain/libs/cosmos-sdk/store/mpt"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
 	"github.com/spf13/cobra"
-	"io/ioutil"
-	"strconv"
+
+	apptypes "github.com/okx/brczero/app/types"
+	"github.com/okx/brczero/cmd/brczerod/base"
+	"github.com/okx/brczero/libs/cosmos-sdk/server"
+	"github.com/okx/brczero/libs/cosmos-sdk/store/mpt"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
 )
 
 type TempNewAccountPretty struct {

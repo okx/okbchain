@@ -3,16 +3,16 @@ package simulation
 import (
 	"math/rand"
 
-	"github.com/okx/okbchain/libs/tendermint/crypto"
+	"github.com/okx/brczero/libs/tendermint/crypto"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/baseapp"
-	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
-	"github.com/okx/okbchain/libs/cosmos-sdk/simapp/helpers"
-	simappparams "github.com/okx/okbchain/libs/cosmos-sdk/simapp/params"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/bank/internal/keeper"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/bank/internal/types"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/simulation"
+	"github.com/okx/brczero/libs/cosmos-sdk/baseapp"
+	"github.com/okx/brczero/libs/cosmos-sdk/codec"
+	"github.com/okx/brczero/libs/cosmos-sdk/simapp/helpers"
+	simappparams "github.com/okx/brczero/libs/cosmos-sdk/simapp/params"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/bank/internal/keeper"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/bank/internal/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/simulation"
 )
 
 // Simulation operation weights constants

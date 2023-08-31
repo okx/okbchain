@@ -4,12 +4,12 @@ import (
 	"time"
 
 	ethcmn "github.com/ethereum/go-ethereum/common"
-	ethermint "github.com/okx/okbchain/app/types"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	"github.com/okx/okbchain/libs/tendermint/crypto/ed25519"
-	"github.com/okx/okbchain/x/evm/types"
-	govtypes "github.com/okx/okbchain/x/gov/types"
-	staking_types "github.com/okx/okbchain/x/staking/types"
+	ethermint "github.com/okx/brczero/app/types"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	"github.com/okx/brczero/libs/tendermint/crypto/ed25519"
+	"github.com/okx/brczero/x/evm/types"
+	govtypes "github.com/okx/brczero/x/gov/types"
+	staking_types "github.com/okx/brczero/x/staking/types"
 	"github.com/stretchr/testify/require"
 )
 

@@ -8,8 +8,8 @@ import (
 	"strconv"
 	"strings"
 
-	auto "github.com/okx/okbchain/libs/tendermint/libs/autofile"
-	tmos "github.com/okx/okbchain/libs/tendermint/libs/os"
+	auto "github.com/okx/brczero/libs/tendermint/libs/autofile"
+	tmos "github.com/okx/brczero/libs/tendermint/libs/os"
 )
 
 const Version = "0.0.1"

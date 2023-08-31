@@ -3,10 +3,10 @@ package v0_36
 import (
 	"testing"
 
-	"github.com/okx/okbchain/libs/tendermint/crypto/secp256k1"
+	"github.com/okx/brczero/libs/tendermint/crypto/secp256k1"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/types"
-	v034distr "github.com/okx/okbchain/libs/cosmos-sdk/x/distribution/legacy/v0_34"
+	"github.com/okx/brczero/libs/cosmos-sdk/types"
+	v034distr "github.com/okx/brczero/libs/cosmos-sdk/x/distribution/legacy/v0_34"
 
 	"github.com/stretchr/testify/require"
 )

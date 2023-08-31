@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/okx/okbchain/libs/tendermint/libs/log"
+	"github.com/okx/brczero/libs/tendermint/libs/log"
 )
 
 func TestVariousLevels(t *testing.T) {

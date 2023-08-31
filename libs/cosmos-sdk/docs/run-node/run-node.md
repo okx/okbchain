@@ -21,7 +21,7 @@ Before actually running the node, we need to initialize the chain, and most impo
 
 ```bash
 # The argument <moniker> is the custom username of your node, it should be human-readable.
-okbchaind init <moniker> --chain-id my-test-chain
+brczerod init <moniker> --chain-id my-test-chain
 ```
 
 The command above creates all the configuration files needed for your node to run, as well as a default genesis file, which defines the initial state of the network. All these configuration files are in `~/.okbchaind` by default, but you can overwrite the location of this folder by passing the `--home` flag.
@@ -29,7 +29,7 @@ The command above creates all the configuration files needed for your node to ru
 The `~/.okbchaind` folder has the following structure:
 
 ```bash
-.                                   # ~/.okbchaind
+.                                   # ~/.brczerod
   |- data                           # Contains the databases used by the node.
   |- config/
       |- app.toml                   # Application-related configuration file.
@@ -44,7 +44,7 @@ Before starting the chain, you need to populate the state with at least one acco
 Now that you have created a local account, go ahead and grant it some `okb` tokens in your chain's genesis file. Doing so will also make sure your chain is aware of this account's existence:
 
 ```bash
-okbchaind add-genesis-account $MY_VALIDATOR_ADDRESS 100000000okb
+brczerod add-genesis-account $MY_VALIDATOR_ADDRESS 100000000okb
 ```
 
 Recall that `$MY_VALIDATOR_ADDRESS` is a variable that holds the address of the `my_validator` key in the [keyring](./keyring.md#adding-keys-to-the-keyring). Also note that the tokens in the SDK have the `{amount}{denom}` format: `amount` is is a 18-digit-precision decimal number, and `denom` is the unique token identifier with its denomination key (e.g. `okb`). Here, we are granting `okb` tokens, as `okb` is the token identifier used for staking in [`okbchaind`](https://github.com/okx/okbchain). For your own chain with its own staking denom, that token identifier should be used instead.
@@ -53,10 +53,10 @@ Now that your account has some tokens, you need to add a validator to your chain
 
 ```bash
 # Create a gentx.
-okbchaind gentx my_validator 100000stake --chain-id my-test-chain --keyring-backend test
+brczerod gentx my_validator 100000stake --chain-id my-test-chain --keyring-backend test
 
 # Add the gentx to the genesis file.
-okbchaind collect-gentxs
+brczerod collect-gentxs
 ```
 
 A `gentx` does three things:
@@ -68,7 +68,7 @@ A `gentx` does three things:
 For more information on `gentx`, use the following command:
 
 ```bash
-okbchaind gentx --help
+brczerod gentx --help
 ```
 
 ## Run a Localnet
@@ -76,7 +76,7 @@ okbchaind gentx --help
 Now that everything is set up, you can finally start your node:
 
 ```bash
-okbchaind start
+brczerod start
 ```
 
 You should see blocks come in.

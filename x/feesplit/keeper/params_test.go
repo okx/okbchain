@@ -1,6 +1,6 @@
 package keeper_test
 
-import "github.com/okx/okbchain/x/feesplit/types"
+import "github.com/okx/brczero/x/feesplit/types"
 
 func (suite *KeeperTestSuite) TestParams() {
 	params := suite.app.FeeSplitKeeper.GetParams(suite.ctx)

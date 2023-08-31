@@ -6,20 +6,20 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/upgrade"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/upgrade"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
-	"github.com/okx/okbchain/libs/cosmos-sdk/store/prefix"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	sdkerrors "github.com/okx/okbchain/libs/cosmos-sdk/types/errors"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/params"
-	"github.com/okx/okbchain/libs/ibc-go/modules/core/02-client/types"
-	commitmenttypes "github.com/okx/okbchain/libs/ibc-go/modules/core/23-commitment/types"
-	host "github.com/okx/okbchain/libs/ibc-go/modules/core/24-host"
-	"github.com/okx/okbchain/libs/ibc-go/modules/core/exported"
-	ibctmtypes "github.com/okx/okbchain/libs/ibc-go/modules/light-clients/07-tendermint/types"
-	"github.com/okx/okbchain/libs/tendermint/libs/log"
-	lite "github.com/okx/okbchain/libs/tendermint/lite2"
+	"github.com/okx/brczero/libs/cosmos-sdk/codec"
+	"github.com/okx/brczero/libs/cosmos-sdk/store/prefix"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	sdkerrors "github.com/okx/brczero/libs/cosmos-sdk/types/errors"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/params"
+	"github.com/okx/brczero/libs/ibc-go/modules/core/02-client/types"
+	commitmenttypes "github.com/okx/brczero/libs/ibc-go/modules/core/23-commitment/types"
+	host "github.com/okx/brczero/libs/ibc-go/modules/core/24-host"
+	"github.com/okx/brczero/libs/ibc-go/modules/core/exported"
+	ibctmtypes "github.com/okx/brczero/libs/ibc-go/modules/light-clients/07-tendermint/types"
+	"github.com/okx/brczero/libs/tendermint/libs/log"
+	lite "github.com/okx/brczero/libs/tendermint/lite2"
 )
 
 type Keeper struct {

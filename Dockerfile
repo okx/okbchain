@@ -1,7 +1,7 @@
 # Simple usage with a mounted data directory:
 # > docker build -t okbchain .
-# > docker run -it -p 36657:36657 -p 36656:36656 -v ~/.okbchaind:/root/.okbchaind -v ~/.okbchaincli:/root/.okbchaincli okbchain okbchaind init mynode
-# > docker run -it -p 36657:36657 -p 36656:36656 -v ~/.okbchaind:/root/.okbchaind -v ~/.okbchaincli:/root/.okbchaincli okbchain okbchaind start
+# > docker run -it -p 36657:36657 -p 36656:36656 -v ~/.brczerod:/root/.brczerod -v ~/.brczerocli:/root/.brczerocli okbchain brczerod init mynode
+# > docker run -it -p 36657:36657 -p 36656:36656 -v ~/.brczerod:/root/.brczerod -v ~/.brczerocli:/root/.brczerocli okbchain brczerod start
 FROM golang:1.20.2-alpine AS build-env
 
 # Install minimum necessary dependencies, remove packages
@@ -27,5 +27,5 @@ WORKDIR /root
 COPY --from=build-env /go/bin/okbchaind /usr/bin/okbchaind
 COPY --from=build-env /go/bin/okbchaincli /usr/bin/okbchaincli
 
-# Run okbchaind by default, omit entrypoint to ease using container with okbchaincli
+# Run brczerod by default, omit entrypoint to ease using container with brczerocli
 CMD ["okbchaind"]

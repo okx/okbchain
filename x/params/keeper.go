@@ -3,12 +3,12 @@ package params
 import (
 	"fmt"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
-	stypes "github.com/okx/okbchain/libs/cosmos-sdk/store/types"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	sdkparams "github.com/okx/okbchain/libs/cosmos-sdk/x/params"
-	"github.com/okx/okbchain/libs/tendermint/libs/log"
-	"github.com/okx/okbchain/x/params/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/codec"
+	stypes "github.com/okx/brczero/libs/cosmos-sdk/store/types"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	sdkparams "github.com/okx/brczero/libs/cosmos-sdk/x/params"
+	"github.com/okx/brczero/libs/tendermint/libs/log"
+	"github.com/okx/brczero/x/params/types"
 )
 
 // Keeper is the struct of params keeper

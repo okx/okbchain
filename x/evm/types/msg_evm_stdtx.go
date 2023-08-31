@@ -3,7 +3,7 @@ package types
 import (
 	"math/big"
 
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
 )
 
 //___________________std tx______________________

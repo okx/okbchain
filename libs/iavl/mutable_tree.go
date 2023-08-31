@@ -10,7 +10,7 @@ import (
 
 	"github.com/tendermint/go-amino"
 
-	dbm "github.com/okx/okbchain/libs/tm-db"
+	dbm "github.com/okx/brczero/libs/tm-db"
 	"github.com/pkg/errors"
 )
 

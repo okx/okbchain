@@ -9,18 +9,18 @@ import (
 	"strings"
 	"time"
 
-	cryptoamino "github.com/okx/okbchain/libs/tendermint/crypto/encoding/amino"
+	cryptoamino "github.com/okx/brczero/libs/tendermint/crypto/encoding/amino"
 
 	"github.com/tendermint/go-amino"
 
-	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
-	"github.com/okx/okbchain/libs/tendermint/crypto"
-	tmtypes "github.com/okx/okbchain/libs/tendermint/types"
+	abci "github.com/okx/brczero/libs/tendermint/abci/types"
+	"github.com/okx/brczero/libs/tendermint/crypto"
+	tmtypes "github.com/okx/brczero/libs/tendermint/types"
 	"gopkg.in/yaml.v2"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	"github.com/okx/okbchain/x/staking/exported"
+	"github.com/okx/brczero/libs/cosmos-sdk/codec"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	"github.com/okx/brczero/x/staking/exported"
 )
 
 // nolint

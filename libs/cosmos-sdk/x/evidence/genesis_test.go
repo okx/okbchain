@@ -3,14 +3,14 @@ package evidence_test
 import (
 	"testing"
 
-	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
-	"github.com/okx/okbchain/libs/tendermint/crypto/ed25519"
+	abci "github.com/okx/brczero/libs/tendermint/abci/types"
+	"github.com/okx/brczero/libs/tendermint/crypto/ed25519"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/simapp"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/evidence"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/evidence/exported"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/evidence/internal/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/simapp"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/evidence"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/evidence/exported"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/evidence/internal/types"
 
 	"github.com/stretchr/testify/suite"
 )

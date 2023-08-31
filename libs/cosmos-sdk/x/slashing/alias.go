@@ -3,8 +3,8 @@ package slashing
 // nolint
 
 import (
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/slashing/internal/keeper"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/slashing/internal/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/slashing/internal/keeper"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/slashing/internal/types"
 )
 
 const (

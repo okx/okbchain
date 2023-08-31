@@ -1,7 +1,7 @@
 package keeper_test
 
 import (
-	"github.com/okx/okbchain/x/evidence/internal/types"
+	"github.com/okx/brczero/x/evidence/internal/types"
 )
 
 func (suite *KeeperTestSuite) TestParams() {

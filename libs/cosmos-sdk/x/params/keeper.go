@@ -3,12 +3,12 @@ package params
 import (
 	"fmt"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/params/subspace"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/params/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/codec"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/params/subspace"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/params/types"
 
-	"github.com/okx/okbchain/libs/tendermint/libs/log"
+	"github.com/okx/brczero/libs/tendermint/libs/log"
 )
 
 // Keeper of the global paramstore

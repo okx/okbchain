@@ -8,9 +8,9 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	abcicli "github.com/okx/okbchain/libs/tendermint/abci/client"
-	"github.com/okx/okbchain/libs/tendermint/abci/example/code"
-	"github.com/okx/okbchain/libs/tendermint/abci/types"
+	abcicli "github.com/okx/brczero/libs/tendermint/abci/client"
+	"github.com/okx/brczero/libs/tendermint/abci/example/code"
+	"github.com/okx/brczero/libs/tendermint/abci/types"
 )
 
 const (

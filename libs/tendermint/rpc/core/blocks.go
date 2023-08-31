@@ -5,17 +5,17 @@ import (
 	"fmt"
 	"sort"
 
-	sdkerrors "github.com/okx/okbchain/libs/cosmos-sdk/types/errors"
+	sdkerrors "github.com/okx/brczero/libs/cosmos-sdk/types/errors"
 
-	nullblockindexer "github.com/okx/okbchain/libs/tendermint/state/indexer/block/null"
+	nullblockindexer "github.com/okx/brczero/libs/tendermint/state/indexer/block/null"
 
-	tmquery "github.com/okx/okbchain/libs/tendermint/libs/pubsub/query"
+	tmquery "github.com/okx/brczero/libs/tendermint/libs/pubsub/query"
 
-	tmmath "github.com/okx/okbchain/libs/tendermint/libs/math"
-	ctypes "github.com/okx/okbchain/libs/tendermint/rpc/core/types"
-	rpctypes "github.com/okx/okbchain/libs/tendermint/rpc/jsonrpc/types"
-	sm "github.com/okx/okbchain/libs/tendermint/state"
-	"github.com/okx/okbchain/libs/tendermint/types"
+	tmmath "github.com/okx/brczero/libs/tendermint/libs/math"
+	ctypes "github.com/okx/brczero/libs/tendermint/rpc/core/types"
+	rpctypes "github.com/okx/brczero/libs/tendermint/rpc/jsonrpc/types"
+	sm "github.com/okx/brczero/libs/tendermint/state"
+	"github.com/okx/brczero/libs/tendermint/types"
 )
 
 // BlockchainInfo gets block headers for minHeight <= height <= maxHeight.

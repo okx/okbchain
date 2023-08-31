@@ -6,18 +6,18 @@ import (
 	"github.com/stretchr/testify/suite"
 
 	// sdk "github.com/cosmos/cosmos-sdk/types"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
 
-	clienttypes "github.com/okx/okbchain/libs/ibc-go/modules/core/02-client/types"
-	channeltypes "github.com/okx/okbchain/libs/ibc-go/modules/core/04-channel/types"
-	commitmenttypes "github.com/okx/okbchain/libs/ibc-go/modules/core/23-commitment/types"
-	host "github.com/okx/okbchain/libs/ibc-go/modules/core/24-host"
-	"github.com/okx/okbchain/libs/ibc-go/modules/core/exported"
-	"github.com/okx/okbchain/libs/ibc-go/modules/core/keeper"
-	ibctmtypes "github.com/okx/okbchain/libs/ibc-go/modules/light-clients/07-tendermint/types"
-	ibctesting "github.com/okx/okbchain/libs/ibc-go/testing"
-	ibcmock "github.com/okx/okbchain/libs/ibc-go/testing/mock"
-	types2 "github.com/okx/okbchain/libs/ibc-go/testing/simapp/types"
+	clienttypes "github.com/okx/brczero/libs/ibc-go/modules/core/02-client/types"
+	channeltypes "github.com/okx/brczero/libs/ibc-go/modules/core/04-channel/types"
+	commitmenttypes "github.com/okx/brczero/libs/ibc-go/modules/core/23-commitment/types"
+	host "github.com/okx/brczero/libs/ibc-go/modules/core/24-host"
+	"github.com/okx/brczero/libs/ibc-go/modules/core/exported"
+	"github.com/okx/brczero/libs/ibc-go/modules/core/keeper"
+	ibctmtypes "github.com/okx/brczero/libs/ibc-go/modules/light-clients/07-tendermint/types"
+	ibctesting "github.com/okx/brczero/libs/ibc-go/testing"
+	ibcmock "github.com/okx/brczero/libs/ibc-go/testing/mock"
+	types2 "github.com/okx/brczero/libs/ibc-go/testing/simapp/types"
 )
 
 const height = 10

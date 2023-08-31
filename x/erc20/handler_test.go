@@ -4,12 +4,13 @@ import (
 	"testing"
 	"time"
 
-	"github.com/okx/okbchain/app"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
-	"github.com/okx/okbchain/x/erc20"
-	"github.com/okx/okbchain/x/erc20/types"
 	"github.com/stretchr/testify/suite"
+
+	"github.com/okx/brczero/app"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	abci "github.com/okx/brczero/libs/tendermint/abci/types"
+	"github.com/okx/brczero/x/erc20"
+	"github.com/okx/brczero/x/erc20/types"
 )
 
 type Erc20TestSuite struct {
@@ -17,7 +18,7 @@ type Erc20TestSuite struct {
 
 	ctx     sdk.Context
 	handler sdk.Handler
-	app     *app.OKBChainApp
+	app     *app.BRCZeroApp
 }
 
 func TestErc20TestSuite(t *testing.T) {

@@ -3,8 +3,8 @@ package keeper
 import (
 	"github.com/ethereum/go-ethereum/common"
 	ethtypes "github.com/ethereum/go-ethereum/core/types"
-	"github.com/okx/okbchain/libs/cosmos-sdk/store/mpt"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/store/mpt"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
 )
 
 func (k Keeper) getStorageStore(ctx sdk.Context, acc sdk.WasmAddress) sdk.KVStore {

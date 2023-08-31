@@ -5,21 +5,21 @@ import (
 	"io"
 	"os"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/codec/types"
-	tmtypes "github.com/okx/okbchain/libs/tendermint/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/codec/types"
+	tmtypes "github.com/okx/brczero/libs/tendermint/types"
 
-	"github.com/okx/okbchain/libs/tendermint/libs/cli"
-	tmlite "github.com/okx/okbchain/libs/tendermint/lite"
-	rpcclient "github.com/okx/okbchain/libs/tendermint/rpc/client"
-	rpchttp "github.com/okx/okbchain/libs/tendermint/rpc/client/http"
+	"github.com/okx/brczero/libs/tendermint/libs/cli"
+	tmlite "github.com/okx/brczero/libs/tendermint/lite"
+	rpcclient "github.com/okx/brczero/libs/tendermint/rpc/client"
+	rpchttp "github.com/okx/brczero/libs/tendermint/rpc/client/http"
 	"github.com/pkg/errors"
 	"github.com/spf13/viper"
 	yaml "gopkg.in/yaml.v2"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/client/flags"
-	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
-	"github.com/okx/okbchain/libs/cosmos-sdk/crypto/keys"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/client/flags"
+	"github.com/okx/brczero/libs/cosmos-sdk/codec"
+	"github.com/okx/brczero/libs/cosmos-sdk/crypto/keys"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
 )
 
 // CLIContext implements a typical CLI context created in SDK modules for

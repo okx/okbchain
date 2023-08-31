@@ -12,10 +12,11 @@ import (
 	ethtypes "github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/rlp"
-	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	"github.com/okx/okbchain/libs/tendermint/global"
 	"github.com/stretchr/testify/require"
+
+	"github.com/okx/brczero/libs/cosmos-sdk/codec"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	"github.com/okx/brczero/libs/tendermint/global"
 )
 
 func TestEvmDataEncoding(t *testing.T) {
@@ -355,7 +356,7 @@ func BenchmarkEthAddressStringer(b *testing.B) {
 			_ = addr.String()
 		}
 	})
-	b.Run("okbc stringer", func(b *testing.B) {
+	b.Run("brczero stringer", func(b *testing.B) {
 		b.ReportAllocs()
 		for i := 0; i < b.N; i++ {
 			_ = EthAddressStringer(addr).String()
@@ -373,7 +374,7 @@ func BenchmarkEthHashStringer(b *testing.B) {
 			_ = h.String()
 		}
 	})
-	b.Run("okbc stringer", func(b *testing.B) {
+	b.Run("brczero stringer", func(b *testing.B) {
 		b.ReportAllocs()
 		for i := 0; i < b.N; i++ {
 			_ = EthHashStringer(h).String()

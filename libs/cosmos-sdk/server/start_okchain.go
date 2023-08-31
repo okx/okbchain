@@ -12,19 +12,19 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/baseapp"
-	"github.com/okx/okbchain/libs/cosmos-sdk/client/flags"
-	"github.com/okx/okbchain/libs/cosmos-sdk/store/flatkv"
-	"github.com/okx/okbchain/libs/cosmos-sdk/store/iavl"
-	"github.com/okx/okbchain/libs/cosmos-sdk/store/mpt"
-	sdkstoretypes "github.com/okx/okbchain/libs/cosmos-sdk/store/types"
-	storetypes "github.com/okx/okbchain/libs/cosmos-sdk/store/types"
-	tmiavl "github.com/okx/okbchain/libs/iavl"
-	"github.com/okx/okbchain/libs/system"
-	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
-	cmn "github.com/okx/okbchain/libs/tendermint/libs/os"
-	"github.com/okx/okbchain/libs/tendermint/state"
-	tmtypes "github.com/okx/okbchain/libs/tendermint/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/baseapp"
+	"github.com/okx/brczero/libs/cosmos-sdk/client/flags"
+	"github.com/okx/brczero/libs/cosmos-sdk/store/flatkv"
+	"github.com/okx/brczero/libs/cosmos-sdk/store/iavl"
+	"github.com/okx/brczero/libs/cosmos-sdk/store/mpt"
+	sdkstoretypes "github.com/okx/brczero/libs/cosmos-sdk/store/types"
+	storetypes "github.com/okx/brczero/libs/cosmos-sdk/store/types"
+	tmiavl "github.com/okx/brczero/libs/iavl"
+	"github.com/okx/brczero/libs/system"
+	abci "github.com/okx/brczero/libs/tendermint/abci/types"
+	cmn "github.com/okx/brczero/libs/tendermint/libs/os"
+	"github.com/okx/brczero/libs/tendermint/state"
+	tmtypes "github.com/okx/brczero/libs/tendermint/types"
 )
 
 // okbchain full-node start flags
@@ -115,7 +115,7 @@ func StopCmd(ctx *Context) *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			f, err := os.Open(filepath.Join(ctx.Config.RootDir, "config", "pid"))
 			if err != nil {
-				errStr := fmt.Sprintf("%s Please finish the process of okbchaind through kill -2 pid to stop gracefully", err.Error())
+				errStr := fmt.Sprintf("%s Please finish the process of brczerod through kill -2 pid to stop gracefully", err.Error())
 				cmn.Exit(errStr)
 			}
 			defer f.Close()
@@ -123,7 +123,7 @@ func StopCmd(ctx *Context) *cobra.Command {
 			in.Scan()
 			pid, err := strconv.Atoi(in.Text())
 			if err != nil {
-				errStr := fmt.Sprintf("%s Please finish the process of okbchaind through kill -2 pid to stop gracefully", err.Error())
+				errStr := fmt.Sprintf("%s Please finish the process of brczerod through kill -2 pid to stop gracefully", err.Error())
 				cmn.Exit(errStr)
 			}
 			process, err := os.FindProcess(pid)
@@ -274,8 +274,8 @@ func RegisterServerFlags(cmd *cobra.Command) *cobra.Command {
 func nodeModeCmd(ctx *Context) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "node-mode",
-		Short: "okbchaind start --node-mode help info",
-		Long: `There are three node modes that can be set when the okbchaind start
+		Short: "brczerod start --node-mode help info",
+		Long: `There are three node modes that can be set when the brczerod start
 set --node-mode=rpc to manage the following flags:
 	--disable-checktx-mutex=true
 	--disable-query-mutex=true

@@ -1,30 +1,32 @@
 package evm_test
 
 import (
-	"github.com/okx/okbchain/libs/system"
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/okx/brczero/libs/system"
 
 	"github.com/ethereum/go-ethereum/common"
 	ethcmn "github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	ethtypes "github.com/ethereum/go-ethereum/core/types"
 	ethcrypto "github.com/ethereum/go-ethereum/crypto"
-	"github.com/okx/okbchain/app"
-	"github.com/okx/okbchain/app/crypto/ethsecp256k1"
-	ethermint "github.com/okx/okbchain/app/types"
-	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
-	"github.com/okx/okbchain/libs/cosmos-sdk/simapp"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/auth"
-	authtypes "github.com/okx/okbchain/libs/cosmos-sdk/x/auth/types"
-	abci "github.com/okx/okbchain/libs/tendermint/abci/types"
-	"github.com/okx/okbchain/libs/tendermint/libs/log"
-	dbm "github.com/okx/okbchain/libs/tm-db"
-	"github.com/okx/okbchain/x/evm"
-	"github.com/okx/okbchain/x/evm/types"
 	"github.com/spf13/viper"
+
+	"github.com/okx/brczero/app"
+	"github.com/okx/brczero/app/crypto/ethsecp256k1"
+	ethermint "github.com/okx/brczero/app/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/codec"
+	"github.com/okx/brczero/libs/cosmos-sdk/simapp"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/auth"
+	authtypes "github.com/okx/brczero/libs/cosmos-sdk/x/auth/types"
+	abci "github.com/okx/brczero/libs/tendermint/abci/types"
+	"github.com/okx/brczero/libs/tendermint/libs/log"
+	dbm "github.com/okx/brczero/libs/tm-db"
+	"github.com/okx/brczero/x/evm"
+	"github.com/okx/brczero/x/evm/types"
 )
 
 func (suite *EvmTestSuite) TestExportImport() {
@@ -290,7 +292,7 @@ func (suite *EvmTestSuite) TestInit() {
 			suite.SetupTest() // reset values
 
 			db := dbm.NewMemDB()
-			chain := app.NewOKBChainApp(log.NewNopLogger(), db, nil, true, map[int64]bool{}, 0)
+			chain := app.NewBRCZeroApp(log.NewNopLogger(), db, nil, true, map[int64]bool{}, 0)
 			genesisState := app.NewDefaultGenesisState()
 
 			tc.malleate(&genesisState)

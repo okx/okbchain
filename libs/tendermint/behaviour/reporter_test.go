@@ -4,8 +4,8 @@ import (
 	"sync"
 	"testing"
 
-	bh "github.com/okx/okbchain/libs/tendermint/behaviour"
-	"github.com/okx/okbchain/libs/tendermint/p2p"
+	bh "github.com/okx/brczero/libs/tendermint/behaviour"
+	"github.com/okx/brczero/libs/tendermint/p2p"
 )
 
 // TestMockReporter tests the MockReporter's ability to store reported

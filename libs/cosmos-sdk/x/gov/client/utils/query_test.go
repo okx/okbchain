@@ -3,19 +3,19 @@ package utils
 import (
 	"testing"
 
-	codectypes "github.com/okx/okbchain/libs/cosmos-sdk/codec/types"
+	codectypes "github.com/okx/brczero/libs/cosmos-sdk/codec/types"
 
-	"github.com/okx/okbchain/libs/tendermint/rpc/client/mock"
-	ctypes "github.com/okx/okbchain/libs/tendermint/rpc/core/types"
-	tmtypes "github.com/okx/okbchain/libs/tendermint/types"
+	"github.com/okx/brczero/libs/tendermint/rpc/client/mock"
+	ctypes "github.com/okx/brczero/libs/tendermint/rpc/core/types"
+	tmtypes "github.com/okx/brczero/libs/tendermint/types"
 	"github.com/stretchr/testify/require"
 
-	"github.com/okx/okbchain/libs/cosmos-sdk/client"
-	"github.com/okx/okbchain/libs/cosmos-sdk/client/context"
-	"github.com/okx/okbchain/libs/cosmos-sdk/codec"
-	sdk "github.com/okx/okbchain/libs/cosmos-sdk/types"
-	authtypes "github.com/okx/okbchain/libs/cosmos-sdk/x/auth/types"
-	"github.com/okx/okbchain/libs/cosmos-sdk/x/gov/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/client"
+	"github.com/okx/brczero/libs/cosmos-sdk/client/context"
+	"github.com/okx/brczero/libs/cosmos-sdk/codec"
+	sdk "github.com/okx/brczero/libs/cosmos-sdk/types"
+	authtypes "github.com/okx/brczero/libs/cosmos-sdk/x/auth/types"
+	"github.com/okx/brczero/libs/cosmos-sdk/x/gov/types"
 )
 
 type TxSearchMock struct {
