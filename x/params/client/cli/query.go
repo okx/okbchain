@@ -3,6 +3,7 @@ package cli
 import (
 	"fmt"
 	"github.com/okx/okbchain/libs/cosmos-sdk/client/flags"
+	"strconv"
 	"strings"
 
 	"github.com/okx/okbchain/x/params/types"
@@ -88,9 +89,17 @@ func GetCmdQueryBlockConfig(queryRoute string, cdc *codec.Codec) *cobra.Command 
 		Long: strings.TrimSpace(`Query parameters of blockconfig:
 $ exchaincli query params blockconfig
 `),
-		Args: cobra.NoArgs,
-		RunE: func(_ *cobra.Command, _ []string) error {
-			cliCtx := context.NewCLIContext().WithCodec(cdc)
+		Args: cobra.MinimumNArgs(0),
+		RunE: func(_ *cobra.Command, args []string) error {
+			height := int64(0)
+			if len(args) > 0 {
+				var err error
+				height, err = strconv.ParseInt(args[0], 10, 64)
+				if err != nil {
+					return err
+				}
+			}
+			cliCtx := context.NewCLIContext().WithCodec(cdc).WithHeight(height)
 
 			route := fmt.Sprintf("custom/%s/%s", queryRoute, types.QueryBlockConfig)
 			bz, _, err := cliCtx.QueryWithData(route, nil)

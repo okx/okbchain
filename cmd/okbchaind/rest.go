@@ -25,6 +25,7 @@ import (
 	fsrest "github.com/okx/okbchain/x/feesplit/client/rest"
 	govrest "github.com/okx/okbchain/x/gov/client/rest"
 	paramsclient "github.com/okx/okbchain/x/params/client"
+	paramsrest "github.com/okx/okbchain/x/params/client/rest"
 	stakingclient "github.com/okx/okbchain/x/staking/client"
 	stakingrest "github.com/okx/okbchain/x/staking/client/rest"
 	"github.com/okx/okbchain/x/token"
@@ -80,7 +81,7 @@ func registerRoutesV1(rs *lcd.RestServer) {
 		},
 	)
 	mintrest.RegisterRoutes(rs.CliCtx, v1Router)
-
+	paramsrest.RegisterRoutes(rs.CliCtx, v1Router)
 }
 
 func registerRoutesV2(rs *lcd.RestServer) {
