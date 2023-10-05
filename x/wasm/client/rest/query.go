@@ -114,7 +114,7 @@ func listCodesHandlerFn(cliCtx clientCtx.CLIContext) http.HandlerFunc {
 		queryClient := types.NewQueryClient(cliCtx)
 		pageReq, err := rest.ParseGRPCWasmPageRequest(r)
 		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 		var reverse bool
@@ -124,7 +124,7 @@ func listCodesHandlerFn(cliCtx clientCtx.CLIContext) http.HandlerFunc {
 		} else {
 			reverse, err = strconv.ParseBool(reverseStr)
 			if err != nil {
-				rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+				rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 				return
 			}
 		}
@@ -171,12 +171,17 @@ func queryCodeHandlerFn(cliCtx clientCtx.CLIContext) http.HandlerFunc {
 			},
 		)
 
+		if isErrNotFound(err) {
+			rest.WriteErrorResponse(w, http.StatusNotFound, "code not found")
+			return
+		}
+
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return
 		}
 		if res == nil {
-			rest.WriteErrorResponse(w, http.StatusNotFound, "contract not found")
+			rest.WriteErrorResponse(w, http.StatusNotFound, "code not found")
 			return
 		}
 
@@ -193,7 +198,7 @@ func listContractsByCodeHandlerFn(cliCtx clientCtx.CLIContext) http.HandlerFunc 
 	return func(w http.ResponseWriter, r *http.Request) {
 		codeID, err := strconv.ParseUint(mux.Vars(r)["codeID"], 10, 64)
 		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 		cliCtx, ok := rest.ParseQueryHeightOrReturnBadRequest(w, cliCtx, r)
@@ -204,7 +209,7 @@ func listContractsByCodeHandlerFn(cliCtx clientCtx.CLIContext) http.HandlerFunc 
 		queryClient := types.NewQueryClient(cliCtx)
 		pageReq, err := rest.ParseGRPCWasmPageRequest(r)
 		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 		var reverse bool
@@ -256,6 +261,12 @@ func queryContractHandlerFn(cliCtx clientCtx.CLIContext) http.HandlerFunc {
 				Address: mux.Vars(r)["contractAddr"],
 			},
 		)
+
+		if isErrNotFound(err) {
+			rest.WriteErrorResponse(w, http.StatusNotFound, "contract not found")
+			return
+		}
+
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return
@@ -283,6 +294,12 @@ func queryCodeContractHandlerFn(cliCtx clientCtx.CLIContext) http.HandlerFunc {
 				Address: mux.Vars(r)["contractAddr"],
 			},
 		)
+
+		if isErrNotFound(err) {
+			rest.WriteErrorResponse(w, http.StatusNotFound, "contract not found")
+			return
+		}
+
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return
@@ -296,6 +313,11 @@ func queryCodeContractHandlerFn(cliCtx clientCtx.CLIContext) http.HandlerFunc {
 				CodeId: codeId,
 			},
 		)
+
+		if isErrNotFound(err) {
+			rest.WriteErrorResponse(w, http.StatusNotFound, "code not found")
+			return
+		}
 
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
@@ -319,7 +341,7 @@ func queryContractBlockedMethodsHandlerFn(cliCtx clientCtx.CLIContext) http.Hand
 	return func(w http.ResponseWriter, r *http.Request) {
 		addr, err := sdk.WasmAddressFromBech32(mux.Vars(r)["contractAddr"])
 		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 		cliCtx, ok := rest.ParseQueryHeightOrReturnBadRequest(w, cliCtx, r)
@@ -329,6 +351,12 @@ func queryContractBlockedMethodsHandlerFn(cliCtx clientCtx.CLIContext) http.Hand
 
 		route := fmt.Sprintf("custom/%s/%s/%s", types.QuerierRoute, keeper.QueryListContractBlockedMethod, addr.String())
 		res, height, err := cliCtx.Query(route)
+
+		if isErrNotFound(err) {
+			rest.WriteErrorResponse(w, http.StatusNotFound, "methods not found")
+			return
+		}
+
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return
@@ -351,7 +379,7 @@ func queryContractStateAllHandlerFn(cliCtx clientCtx.CLIContext) http.HandlerFun
 		queryClient := types.NewQueryClient(cliCtx)
 		pageReq, err := rest.ParseGRPCWasmPageRequest(r)
 		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 		var reverse bool
@@ -361,7 +389,7 @@ func queryContractStateAllHandlerFn(cliCtx clientCtx.CLIContext) http.HandlerFun
 		} else {
 			reverse, err = strconv.ParseBool(reverseStr)
 			if err != nil {
-				rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+				rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 				return
 			}
 		}
@@ -380,6 +408,11 @@ func queryContractStateAllHandlerFn(cliCtx clientCtx.CLIContext) http.HandlerFun
 			}
 		}
 
+		if isErrNotFound(err) {
+			rest.WriteErrorResponse(w, http.StatusNotFound, "state not found")
+			return
+		}
+
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return
@@ -395,7 +428,7 @@ func queryContractStateRawHandlerFn(cliCtx clientCtx.CLIContext) http.HandlerFun
 		decoder.encoding = mux.Vars(r)["encoding"]
 		queryData, err := decoder.DecodeString(mux.Vars(r)["key"])
 		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 		cliCtx, ok := rest.ParseQueryHeightOrReturnBadRequest(w, cliCtx, r)
@@ -410,6 +443,11 @@ func queryContractStateRawHandlerFn(cliCtx clientCtx.CLIContext) http.HandlerFun
 				QueryData: queryData,
 			},
 		)
+
+		if isErrNotFound(err) {
+			rest.WriteErrorResponse(w, http.StatusNotFound, "state not found")
+			return
+		}
 
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
@@ -435,7 +473,7 @@ func queryContractStateSmartHandlerFn(cliCtx clientCtx.CLIContext) http.HandlerF
 		decoder.encoding = mux.Vars(r)["encoding"]
 		queryData, err := decoder.DecodeString(mux.Vars(r)["query"])
 		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
@@ -447,6 +485,11 @@ func queryContractStateSmartHandlerFn(cliCtx clientCtx.CLIContext) http.HandlerF
 				QueryData: queryData,
 			},
 		)
+
+		if isErrNotFound(err) {
+			rest.WriteErrorResponse(w, http.StatusNotFound, "state not found")
+			return
+		}
 
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
@@ -474,7 +517,7 @@ func queryContractHistoryFn(cliCtx clientCtx.CLIContext) http.HandlerFunc {
 		queryClient := types.NewQueryClient(cliCtx)
 		pageReq, err := rest.ParseGRPCWasmPageRequest(r)
 		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 		var reverse bool
@@ -484,7 +527,7 @@ func queryContractHistoryFn(cliCtx clientCtx.CLIContext) http.HandlerFunc {
 		} else {
 			reverse, err = strconv.ParseBool(reverseStr)
 			if err != nil {
-				rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+				rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 				return
 			}
 		}
@@ -531,4 +574,11 @@ func (a *argumentDecoder) DecodeString(s string) ([]byte, error) {
 	default:
 		return a.dec(s)
 	}
+}
+
+func isErrNotFound(err error) bool {
+	if err == nil {
+		return false
+	}
+	return strings.Contains(err.Error(), "not found")
 }
