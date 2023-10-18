@@ -364,5 +364,6 @@ func SetExternalPackageValue(cmd *cobra.Command) {
 	mptstore.TrieAsyncDBInitCap = viper.GetInt(mptstore.FlagTrieAsyncDBInitCap)
 	mptstore.TrieAsyncDBAutoPruningOff = viper.GetBool(mptstore.FlagTrieAsyncDBAutoPruningOff)
 	mptstore.TrieAsyncDBSyncPruning = viper.GetBool(mptstore.FlagTrieAsyncDBSyncPruning)
+	mptstore.TrieAsyncPushDB = viper.GetBool(mptstore.FlagTrieAsyncPushDB)
 	mptstore.SetSnapshotJournal(viper.GetBool(mptstore.FlagTrieEnableSnapshotJournal))
 }
