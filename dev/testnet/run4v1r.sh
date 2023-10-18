@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -e
+
 ./testnet.sh -s -i -n 5 -r 1
 
 okbchaincli keys add --recover val0 -m "puzzle glide follow cruel say burst deliver wild tragic galaxy lumber offer" --coin-type 996 -y
