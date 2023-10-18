@@ -33,6 +33,24 @@ func (suite *KeeperTestSuite) TestChanOpenInit() {
 	)
 
 	testCases := []testCase{
+		{"connection does not support ORDERED channels", func() {
+			suite.coordinator.SetupConnections(path)
+
+			// modify connA versions to only support UNORDERED channels
+			conn := path.EndpointA.GetConnection()
+
+			version := connectiontypes.NewVersion("1", []string{"ORDER_UNORDERED"})
+			conn.Versions = []*connectiontypes.Version{version}
+
+			suite.chainA.App().GetIBCKeeper().ConnectionKeeper.SetConnection(
+				suite.chainA.GetContext(),
+				path.EndpointA.ConnectionID, conn,
+			)
+			// NOTE: Opening UNORDERED channels is still expected to pass but ORDERED channels should fail
+			features = []string{"ORDER_UNORDERED"}
+			suite.chainA.CreatePortCapability(suite.chainA.GetSimApp().ScopedIBCMockKeeper, ibctesting.MockPort)
+			portCap = suite.chainA.GetPortCapability(ibctesting.MockPort)
+		}, true},
 		{"success", func() {
 			suite.coordinator.SetupConnections(path)
 			features = []string{"ORDER_ORDERED", "ORDER_UNORDERED"}
@@ -41,6 +59,8 @@ func (suite *KeeperTestSuite) TestChanOpenInit() {
 		}, true},
 		{"channel already exists", func() {
 			suite.coordinator.Setup(path)
+			// we refactor the `FwdCapabilityKey`,so we have to change the index
+			portCap.Index = 100
 		}, false},
 		{"connection doesn't exist", func() {
 			// any non-empty values
@@ -69,24 +89,6 @@ func (suite *KeeperTestSuite) TestChanOpenInit() {
 			suite.chainA.CreatePortCapability(suite.chainA.GetSimApp().ScopedIBCMockKeeper, ibctesting.MockPort)
 			portCap = suite.chainA.GetPortCapability(ibctesting.MockPort)
 		}, false},
-		{"connection does not support ORDERED channels", func() {
-			suite.coordinator.SetupConnections(path)
-
-			// modify connA versions to only support UNORDERED channels
-			conn := path.EndpointA.GetConnection()
-
-			version := connectiontypes.NewVersion("1", []string{"ORDER_UNORDERED"})
-			conn.Versions = []*connectiontypes.Version{version}
-
-			suite.chainA.App().GetIBCKeeper().ConnectionKeeper.SetConnection(
-				suite.chainA.GetContext(),
-				path.EndpointA.ConnectionID, conn,
-			)
-			// NOTE: Opening UNORDERED channels is still expected to pass but ORDERED channels should fail
-			features = []string{"ORDER_UNORDERED"}
-			suite.chainA.CreatePortCapability(suite.chainA.GetSimApp().ScopedIBCMockKeeper, ibctesting.MockPort)
-			portCap = suite.chainA.GetPortCapability(ibctesting.MockPort)
-		}, true},
 	}
 
 	for _, tc := range testCases {
@@ -151,6 +153,22 @@ func (suite *KeeperTestSuite) TestChanOpenTry() {
 	)
 
 	testCases := []testCase{
+		{"connection does not support ORDERED channels", func() {
+			suite.coordinator.SetupConnections(path)
+			path.SetChannelOrdered()
+			path.EndpointA.ChanOpenInit()
+
+			// modify connA versions to only support UNORDERED channels
+			conn := path.EndpointA.GetConnection()
+
+			version := connectiontypes.NewVersion("1", []string{"ORDER_UNORDERED"})
+			conn.Versions = []*connectiontypes.Version{version}
+
+			suite.chainA.GetSimApp().GetIBCKeeper().ConnectionKeeper.SetConnection(
+				suite.chainA.GetContext(),
+				path.EndpointA.ConnectionID, conn,
+			)
+		}, false},
 		{"success", func() {
 			suite.coordinator.SetupConnections(path)
 			path.SetChannelOrdered()
@@ -215,24 +233,6 @@ func (suite *KeeperTestSuite) TestChanOpenTry() {
 			)
 			suite.chainB.CreatePortCapability(suite.chainB.GetSimApp().ScopedIBCMockKeeper, ibctesting.MockPort)
 			portCap = suite.chainB.GetPortCapability(ibctesting.MockPort)
-		}, false},
-		{"connection does not support ORDERED channels", func() {
-			suite.coordinator.SetupConnections(path)
-			path.SetChannelOrdered()
-			path.EndpointA.ChanOpenInit()
-
-			// modify connA versions to only support UNORDERED channels
-			conn := path.EndpointA.GetConnection()
-
-			version := connectiontypes.NewVersion("1", []string{"ORDER_UNORDERED"})
-			conn.Versions = []*connectiontypes.Version{version}
-
-			suite.chainA.GetSimApp().GetIBCKeeper().ConnectionKeeper.SetConnection(
-				suite.chainA.GetContext(),
-				path.EndpointA.ConnectionID, conn,
-			)
-			suite.chainA.CreatePortCapability(suite.chainA.GetSimApp().ScopedIBCMockKeeper, ibctesting.MockPort)
-			portCap = suite.chainA.GetPortCapability(ibctesting.MockPort)
 		}, false},
 	}
 

@@ -37,8 +37,12 @@ func RevCapabilityKey(module, name string) []byte {
 
 // FwdCapabilityKey returns a forward lookup key for a given module and capability
 // reference.
+// NOTE, FwdCapabilityKey use the pointer address to build key
+// which means, when simulate and deliver tx concurrently execute ,the capMap maybe override by simulate which will fail
+// to create the channel
+// create new capability with the current global index
 func FwdCapabilityKey(module string, cap *Capability) []byte {
-	return []byte(fmt.Sprintf("%s/fwd/%p", module, cap))
+	return []byte(fmt.Sprintf("%s/fwd/%d", module, cap.Index))
 }
 
 // IndexToKey returns bytes to be used as a key for a given capability index.
