@@ -151,6 +151,7 @@ require (
 	github.com/rivo/uniseg v0.2.0 // indirect
 	github.com/rjeczalik/notify v0.9.1 // indirect
 	github.com/shirou/gopsutil v3.21.4-0.20210419000835-c7a38de76ee5+incompatible // indirect
+	github.com/shopspring/decimal v1.3.1 // indirect
 	github.com/spf13/afero v1.8.2 // indirect
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
 	github.com/subosito/gotenv v1.4.0 // indirect
@@ -176,7 +177,7 @@ replace (
 	github.com/buger/jsonparser => github.com/buger/jsonparser v1.0.0 // imported by nacos-go-sdk, upgraded to v1.0.0 in case of a known vulnerable bug
 	github.com/confio/ics23/go => github.com/cosmos/cosmos-sdk/ics23/go v0.8.0
 	github.com/cosmos/gorocksdb => github.com/okx/grocksdb v1.6.45-okc2
-	github.com/ethereum/go-ethereum => github.com/okx/go-ethereum v1.10.26-0.20230605041300-9db59c1d91e6
+	github.com/ethereum/go-ethereum => github.com/okx/go-ethereum v1.10.26-0.20231118140337-0567aa912335
 	github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.3-alpha.regen.1
 	github.com/keybase/go-keychain => github.com/99designs/go-keychain v0.0.0-20191008050251-8e49817e8af4
 	github.com/tendermint/go-amino => github.com/okx/go-amino v0.15.1-okc4

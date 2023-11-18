@@ -611,8 +611,8 @@ github.com/nxadm/tail v1.4.8/go.mod h1:+ncqLTQzXmGhMZNUePPaPqPvBxHAIsmXswZKocGu+
 github.com/oklog/ulid v1.3.1/go.mod h1:CirwcVhetQ6Lv90oh/F+FBtV6XMibvdAFo93nm5qn4U=
 github.com/okx/go-amino v0.15.1-okc4 h1:K0xPoVjkz33ySNC4VLStyit4dblMeVlWJQQ6sq+aUBY=
 github.com/okx/go-amino v0.15.1-okc4/go.mod h1:TQU0M1i/ImAo+tYpZi73AU3V/dKeCoMC9Sphe2ZwGME=
-github.com/okx/go-ethereum v1.10.26-0.20230605041300-9db59c1d91e6 h1:pXsdHnWHejHIc1cJZ625U44eBN3x12Sr5H8Qm9EQCtY=
-github.com/okx/go-ethereum v1.10.26-0.20230605041300-9db59c1d91e6/go.mod h1:f9/CleoGkiU7NWF9tdpWGfEYmFbN7zUi17jGick31KM=
+github.com/okx/go-ethereum v1.10.26-0.20231118140337-0567aa912335 h1:ZLZIoc32Cd0hz/HY9RjJUsS7COPQAH4bcU3Xg893gww=
+github.com/okx/go-ethereum v1.10.26-0.20231118140337-0567aa912335/go.mod h1:MSrWTQg5dlIYZm30uHk7R39ZqNtuh/YXKegsbeVRFHk=
 github.com/okx/grocksdb v1.6.45-okc2 h1:Dbmax+uY71YuGTkJftpF55dbGW7hfIVOfNz2mnFqXl0=
 github.com/okx/grocksdb v1.6.45-okc2/go.mod h1:+/BHUY+mT0tbaVXwO2wTtD9eytazyw1W5n2O7AGyXZA=
 github.com/okx/wasmvm v1.3.5 h1:2eCD8Niy4Bdwssj3ztE5dZy+mz27dZJB5XdG+oaT4lU=
@@ -737,6 +737,8 @@ github.com/shirou/gopsutil v2.20.9+incompatible/go.mod h1:5b4v6he4MtMOwMlS0TUMTu
 github.com/shirou/gopsutil v3.21.4-0.20210419000835-c7a38de76ee5+incompatible h1:Bn1aCHHRnjv4Bl16T8rcaFjYSrGrIZvpiGO6P3Q4GpU=
 github.com/shirou/gopsutil v3.21.4-0.20210419000835-c7a38de76ee5+incompatible/go.mod h1:5b4v6he4MtMOwMlS0TUMTu2PcXUg8+E1lC7eC3UO/RA=
 github.com/shirou/gopsutil/v3 v3.21.9/go.mod h1:YWp/H8Qs5fVmf17v7JNZzA0mPJ+mS2e9JdiUF9LlKzQ=
+github.com/shopspring/decimal v1.3.1 h1:2Usl1nmF/WZucqkFZhnfFYxxxu8LG21F6nPQBE5gKV8=
+github.com/shopspring/decimal v1.3.1/go.mod h1:DKyhrW/HYNuLGql+MJL6WCR6knT2jwCFRcu2hWCYk4o=
 github.com/shurcooL/sanitized_anchor_name v1.0.0/go.mod h1:1NzhyTcUVG4SuEtjjoZeVRXNmyL/1OwPU0+IJeTBvfc=
 github.com/sirupsen/logrus v1.2.0/go.mod h1:LxeOpSwHxABJmUn/MG1IvRgCAasNZTLOkJPxbbu5VWo=
 github.com/sirupsen/logrus v1.4.2/go.mod h1:tLMulIdttU9McNUspp0xgXVQah82FyeX6MwdIuYE2rE=
